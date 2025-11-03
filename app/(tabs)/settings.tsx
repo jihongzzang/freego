@@ -6,22 +6,23 @@ import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/hooks/useDialog';
 
 export default function SettingsScreen() {
-  const { colors, isDark } = useTheme();
+  const { colors, isDark, themePreference, setTheme } = useTheme();
   const { alert, confirm, DialogComponent } = useDialog();
   const [notificationDays, setNotificationDays] = useState(3);
-  const [isDarkMode, setIsDarkMode] = useState(isDark);
-
-  useEffect(() => {
-    setIsDarkMode(isDark);
-  }, [isDark]);
 
   function updateNotificationDays(days: number) {
     setNotificationDays(days);
     alert('성공', `알림 주기가 ${days}일로 변경되었습니다.`, 'success');
   }
 
-  function toggleTheme() {
-    alert('안내', '테마 변경 기능은 추후 업데이트될 예정입니다.', 'info');
+  async function toggleTheme() {
+    const newMode = isDark ? 'light' : 'dark';
+    await setTheme(newMode);
+  }
+
+  async function resetThemeToSystem() {
+    await setTheme('system');
+    alert('성공', '시스템 설정을 따릅니다.', 'success');
   }
 
   async function clearAllData() {
@@ -93,7 +94,7 @@ export default function SettingsScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            {isDarkMode ? <Moon size={20} color={colors.primary} /> : <Sun size={20} color={colors.primary} />}
+            {isDark ? <Moon size={20} color={colors.primary} /> : <Sun size={20} color={colors.primary} />}
             <Text style={[styles.sectionTitle, { color: colors.text }]}>테마</Text>
           </View>
 
@@ -101,15 +102,26 @@ export default function SettingsScreen() {
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
                 <Text style={[styles.settingTitle, { color: colors.text }]}>다크 모드</Text>
-                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>어두운 테마 사용</Text>
+                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+                  {themePreference === 'system' ? '시스템 설정 따름' : '어두운 테마 사용'}
+                </Text>
               </View>
               <Switch
-                value={isDarkMode}
+                value={isDark}
                 onValueChange={toggleTheme}
                 trackColor={{ false: '#d1d5db', true: '#86efac' }}
                 thumbColor={isDarkMode ? '#10b981' : '#f3f4f6'}
               />
             </View>
+            {themePreference !== 'system' && (
+              <TouchableOpacity
+                style={[styles.settingRow, styles.systemResetButton]}
+                onPress={resetThemeToSystem}>
+                <Text style={[styles.systemResetText, { color: colors.primary }]}>
+                  시스템 설정으로 되돌리기
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
@@ -314,5 +326,15 @@ const styles = StyleSheet.create({
   footerSubtext: {
     fontSize: 12,
     color: '#9ca3af',
+  },
+  systemResetButton: {
+    paddingVertical: 12,
+    justifyContent: 'center',
+    borderTopWidth: 1,
+  },
+  systemResetText: {
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

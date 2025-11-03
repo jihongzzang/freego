@@ -1,4 +1,8 @@
 import { useColorScheme } from 'react-native';
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const THEME_KEY = '@theme_preference';
 
 export const Colors = {
   light: {
@@ -40,9 +44,38 @@ export const Colors = {
 };
 
 export function useTheme() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const systemColorScheme = useColorScheme();
+  const [themePreference, setThemePreference] = useState<'system' | 'light' | 'dark'>('system');
+
+  useEffect(() => {
+    loadThemePreference();
+  }, []);
+
+  async function loadThemePreference() {
+    try {
+      const saved = await AsyncStorage.getItem(THEME_KEY);
+      if (saved) {
+        setThemePreference(saved as 'system' | 'light' | 'dark');
+      }
+    } catch (error) {
+      console.error('Error loading theme preference:', error);
+    }
+  }
+
+  const isDark = themePreference === 'system'
+    ? systemColorScheme === 'dark'
+    : themePreference === 'dark';
+
   const colors = isDark ? Colors.dark : Colors.light;
 
-  return { colors, isDark };
+  async function setTheme(mode: 'system' | 'light' | 'dark') {
+    try {
+      await AsyncStorage.setItem(THEME_KEY, mode);
+      setThemePreference(mode);
+    } catch (error) {
+      console.error('Error saving theme preference:', error);
+    }
+  }
+
+  return { colors, isDark, themePreference, setTheme };
 }
