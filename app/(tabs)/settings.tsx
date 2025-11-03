@@ -110,7 +110,7 @@ export default function SettingsScreen() {
                 value={isDark}
                 onValueChange={toggleTheme}
                 trackColor={{ false: '#d1d5db', true: '#86efac' }}
-                thumbColor={isDarkMode ? '#10b981' : '#f3f4f6'}
+                thumbColor={isDark ? '#10b981' : '#f3f4f6'}
               />
             </View>
             {themePreference !== 'system' && (
