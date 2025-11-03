@@ -4,7 +4,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { ChefHat, Plus, Clock, Minus, Bell, Package, Carrot, Apple, Beef, Milk } from 'lucide-react-native';
 import { storage, Ingredient as StoredIngredient } from '@/lib/storage';
 import { useCallback } from 'react';
-import { useTheme } from '@/lib/theme';
+import { useTheme, getStatusColor } from '@/lib/theme';
 
 interface Ingredient extends StoredIngredient {
   status: string;
@@ -67,18 +67,6 @@ export default function DashboardScreen() {
     return `${diffDays}일`;
   }
 
-  function getStatusColor(status: string) {
-    switch (status) {
-      case '신선':
-        return colors.primary;
-      case '주의':
-        return colors.secondary;
-      case '소모됨':
-        return colors.danger;
-      default:
-        return colors.textTertiary;
-    }
-  }
 
   const expiringItems = ingredients.filter(item => item.status === '주의' || item.status === '소모됨');
   const freshItems = ingredients.filter(item => item.status === '신선');

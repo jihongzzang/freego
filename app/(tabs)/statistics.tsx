@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { TrendingUp, Package, ShoppingCart, AlertTriangle } from 'lucide-react-native';
 import { storage } from '@/lib/storage';
-import { useTheme } from '@/lib/theme';
+import { useTheme, getCategoryColor, getStorageColor } from '@/lib/theme';
 
 interface Stats {
   totalIngredients: number;
@@ -69,16 +69,6 @@ export default function StatisticsScreen() {
     }
   }
 
-  function getCategoryColor(category: string) {
-    const colors: { [key: string]: string } = {
-      채소: '#10b981',
-      과일: '#f59e0b',
-      육류: '#ef4444',
-      유제품: '#3b82f6',
-      기타: '#6b7280',
-    };
-    return colors[category] || '#6b7280';
-  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -212,14 +202,6 @@ export default function StatisticsScreen() {
   );
 }
 
-function getStorageColor(location: string) {
-  const colors: { [key: string]: string } = {
-    냉장실: '#3b82f6',
-    냉동실: '#06b6d4',
-    실온: '#8b5cf6',
-  };
-  return colors[location] || '#6b7280';
-}
 
 const styles = StyleSheet.create({
   container: {

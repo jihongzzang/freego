@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { ShoppingCart, Trash2, Check, Plus } from 'lucide-react-native';
 import { storage, ShoppingItem } from '@/lib/storage';
-import { useTheme } from '@/lib/theme';
+import { useTheme, getCategoryColor } from '@/lib/theme';
 import { useDialog } from '@/hooks/useDialog';
 
 export default function ShoppingListScreen() {
@@ -85,16 +85,6 @@ export default function ShoppingListScreen() {
     );
   }
 
-  function getCategoryColor(category: string) {
-    const colors: { [key: string]: string } = {
-      채소: '#10b981',
-      과일: '#f59e0b',
-      육류: '#ef4444',
-      유제품: '#3b82f6',
-      기타: '#6b7280',
-    };
-    return colors[category] || '#6b7280';
-  }
 
   const unpurchasedItems = shoppingList.filter(item => !item.is_purchased);
   const purchasedItems = shoppingList.filter(item => item.is_purchased);

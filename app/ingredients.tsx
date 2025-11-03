@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { ArrowLeft, Carrot, Apple, Beef, Milk, Package, Minus } from 'lucide-react-native';
 import { storage, Ingredient as StoredIngredient } from '@/lib/storage';
-import { useTheme } from '@/lib/theme';
+import { useTheme, getStatusColor } from '@/lib/theme';
 
 interface Ingredient extends StoredIngredient {
   status: string;
@@ -59,18 +59,6 @@ export default function IngredientsScreen() {
     return `${diffDays}일 남음`;
   }
 
-  function getStatusColor(status: string): string {
-    switch (status) {
-      case '신선':
-        return colors.success;
-      case '주의':
-        return colors.warning;
-      case '소모됨':
-        return colors.danger;
-      default:
-        return colors.textTertiary;
-    }
-  }
 
   function getCategoryIcon(category: string) {
     switch (category) {
