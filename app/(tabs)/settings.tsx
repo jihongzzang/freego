@@ -176,25 +176,20 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
   },
   header: {
-    backgroundColor: '#ffffff',
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#111827',
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#6b7280',
   },
   content: {
     flex: 1,
@@ -212,10 +207,8 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
   },
   card: {
-    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     shadowColor: '#000',
@@ -227,12 +220,10 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
     marginBottom: 8,
   },
   cardDescription: {
     fontSize: 14,
-    color: '#6b7280',
     marginBottom: 16,
   },
   notificationOptions: {
@@ -243,22 +234,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: '#f3f4f6',
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  notificationOptionActive: {
-    backgroundColor: '#d1fae5',
-    borderColor: '#10b981',
-  },
   notificationOptionText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6b7280',
-  },
-  notificationOptionTextActive: {
-    color: '#10b981',
   },
   settingRow: {
     flexDirection: 'row',
@@ -271,12 +253,10 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
     marginBottom: 4,
   },
   settingDescription: {
     fontSize: 14,
-    color: '#6b7280',
   },
   dangerButton: {
     flexDirection: 'row',
@@ -285,14 +265,11 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: '#fef2f2',
     borderWidth: 1,
-    borderColor: '#fecaca',
   },
   dangerButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#ef4444',
   },
   infoRow: {
     flexDirection: 'row',
@@ -302,16 +279,13 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 14,
-    color: '#6b7280',
   },
   infoValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111827',
   },
   divider: {
     height: 1,
-    backgroundColor: '#e5e7eb',
   },
   footer: {
     alignItems: 'center',
@@ -320,12 +294,10 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
     marginBottom: 4,
   },
   footerSubtext: {
     fontSize: 12,
-    color: '#9ca3af',
   },
   systemResetButton: {
     paddingVertical: 12,

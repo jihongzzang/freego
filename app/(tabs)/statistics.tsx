@@ -224,25 +224,20 @@ function getStorageColor(location: string) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
   },
   header: {
-    backgroundColor: '#ffffff',
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#111827',
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#6b7280',
   },
   content: {
     flex: 1,
@@ -265,12 +260,10 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#6b7280',
     textAlign: 'center',
   },
   section: {
@@ -280,11 +273,9 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
     marginBottom: 12,
   },
   chartCard: {
-    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     shadowColor: '#000',
@@ -295,7 +286,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
-    color: '#9ca3af',
     textAlign: 'center',
     paddingVertical: 20,
   },
@@ -313,15 +303,12 @@ const styles = StyleSheet.create({
   barLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
   },
   barValue: {
     fontSize: 12,
-    color: '#6b7280',
   },
   barBackground: {
     height: 8,
-    backgroundColor: '#f3f4f6',
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -345,12 +332,10 @@ const styles = StyleSheet.create({
   pieLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
     flex: 1,
   },
   pieValue: {
     fontSize: 14,
-    color: '#6b7280',
   },
   consumptionList: {
     gap: 12,
@@ -364,7 +349,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#d1fae5',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -374,16 +358,13 @@ const styles = StyleSheet.create({
   consumptionName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111827',
     marginBottom: 2,
   },
   consumptionDate: {
     fontSize: 12,
-    color: '#6b7280',
   },
   consumptionQuantity: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#10b981',
   },
 });

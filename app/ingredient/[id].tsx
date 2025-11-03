@@ -169,13 +169,13 @@ export default function IngredientDetailScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: colors.surface }]}>
           {isEditing ? (
             <View style={styles.editSection}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>이름</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>이름</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.surfaceSecondary, color: colors.text }]}
                   value={editForm.name}
                   onChangeText={(text) => setEditForm({ ...editForm, name: text })}
                   placeholder="식재료 이름"
@@ -183,20 +183,22 @@ export default function IngredientDetailScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>카테고리</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>카테고리</Text>
                 <View style={styles.categoryButtons}>
                   {['채소', '과일', '육류', '유제품', '기타'].map((cat) => (
                     <TouchableOpacity
                       key={cat}
                       style={[
                         styles.categoryBtn,
-                        editForm.category === cat && styles.categoryBtnActive,
+                        { backgroundColor: colors.surfaceSecondary },
+                        editForm.category === cat && { backgroundColor: colors.primary },
                       ]}
                       onPress={() => setEditForm({ ...editForm, category: cat })}>
                       <Text
                         style={[
                           styles.categoryBtnText,
-                          editForm.category === cat && styles.categoryBtnTextActive,
+                          { color: colors.textSecondary },
+                          editForm.category === cat && { color: '#ffffff' },
                         ]}>
                         {cat}
                       </Text>
@@ -207,9 +209,9 @@ export default function IngredientDetailScreen() {
 
               <View style={styles.row}>
                 <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>수량</Text>
+                  <Text style={[styles.label, { color: colors.textSecondary }]}>수량</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surfaceSecondary, color: colors.text }]}
                     value={editForm.quantity}
                     onChangeText={(text) => setEditForm({ ...editForm, quantity: text })}
                     keyboardType="numeric"
@@ -217,9 +219,9 @@ export default function IngredientDetailScreen() {
                   />
                 </View>
                 <View style={[styles.inputGroup, { flex: 1, marginLeft: 12 }]}>
-                  <Text style={styles.label}>단위</Text>
+                  <Text style={[styles.label, { color: colors.textSecondary }]}>단위</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surfaceSecondary, color: colors.text }]}
                     value={editForm.unit}
                     onChangeText={(text) => setEditForm({ ...editForm, unit: text })}
                     placeholder="개, g, ml"
@@ -228,9 +230,9 @@ export default function IngredientDetailScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>유통기한</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>유통기한</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.surfaceSecondary, color: colors.text }]}
                   value={editForm.expiry_date}
                   onChangeText={(text) => setEditForm({ ...editForm, expiry_date: text })}
                   placeholder="YYYY-MM-DD"
@@ -238,20 +240,22 @@ export default function IngredientDetailScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>보관 위치</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>보관 위치</Text>
                 <View style={styles.categoryButtons}>
                   {['냉장실', '냉동실', '실온'].map((loc) => (
                     <TouchableOpacity
                       key={loc}
                       style={[
                         styles.categoryBtn,
-                        editForm.storage_location === loc && styles.categoryBtnActive,
+                        { backgroundColor: colors.surfaceSecondary },
+                        editForm.storage_location === loc && { backgroundColor: colors.primary },
                       ]}
                       onPress={() => setEditForm({ ...editForm, storage_location: loc })}>
                       <Text
                         style={[
                           styles.categoryBtnText,
-                          editForm.storage_location === loc && styles.categoryBtnTextActive,
+                          { color: colors.textSecondary },
+                          editForm.storage_location === loc && { color: '#ffffff' },
                         ]}>
                         {loc}
                       </Text>
@@ -261,9 +265,9 @@ export default function IngredientDetailScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>메모</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>메모</Text>
                 <TextInput
-                  style={[styles.input, styles.textArea]}
+                  style={[styles.input, styles.textArea, { backgroundColor: colors.surfaceSecondary, color: colors.text }]}
                   value={editForm.memo}
                   onChangeText={(text) => setEditForm({ ...editForm, memo: text })}
                   placeholder="메모를 입력하세요"
@@ -274,42 +278,42 @@ export default function IngredientDetailScreen() {
             </View>
           ) : (
             <View style={styles.detailSection}>
-              <View style={styles.mainInfo}>
-                <Text style={styles.ingredientName}>{ingredient.name}</Text>
+              <View style={[styles.mainInfo, { borderBottomColor: colors.border }]}>
+                <Text style={[styles.ingredientName, { color: colors.text }]}>{ingredient.name}</Text>
                 <View style={[styles.statusBadge, { backgroundColor: getStatusColor(ingredient.status) }]}>
-                  <Text style={styles.statusText}>{ingredient.status}</Text>
+                  <Text style={[styles.statusText, { color: '#ffffff' }]}>{ingredient.status}</Text>
                 </View>
               </View>
 
               <View style={styles.infoGrid}>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>카테고리</Text>
-                  <Text style={styles.infoValue}>{ingredient.category}</Text>
+                  <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>카테고리</Text>
+                  <Text style={[styles.infoValue, { color: colors.text }]}>{ingredient.category}</Text>
                 </View>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>수량</Text>
-                  <Text style={styles.infoValue}>
+                  <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>수량</Text>
+                  <Text style={[styles.infoValue, { color: colors.text }]}>
                     {ingredient.quantity} {ingredient.unit}
                   </Text>
                 </View>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>보관 위치</Text>
-                  <Text style={styles.infoValue}>{ingredient.storage_location}</Text>
+                  <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>보관 위치</Text>
+                  <Text style={[styles.infoValue, { color: colors.text }]}>{ingredient.storage_location}</Text>
                 </View>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>구매일</Text>
-                  <Text style={styles.infoValue}>{ingredient.purchase_date || '-'}</Text>
+                  <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>구매일</Text>
+                  <Text style={[styles.infoValue, { color: colors.text }]}>{ingredient.purchase_date || '-'}</Text>
                 </View>
                 <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>유통기한</Text>
-                  <Text style={styles.infoValue}>{ingredient.expiry_date || '-'}</Text>
+                  <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>유통기한</Text>
+                  <Text style={[styles.infoValue, { color: colors.text }]}>{ingredient.expiry_date || '-'}</Text>
                 </View>
               </View>
 
               {ingredient.memo && (
-                <View style={styles.memoSection}>
-                  <Text style={styles.memoLabel}>메모</Text>
-                  <Text style={styles.memoText}>{ingredient.memo}</Text>
+                <View style={[styles.memoSection, { borderTopColor: colors.border }]}>
+                  <Text style={[styles.memoLabel, { color: colors.textSecondary }]}>메모</Text>
+                  <Text style={[styles.memoText, { color: colors.text }]}>{ingredient.memo}</Text>
                 </View>
               )}
             </View>
@@ -318,13 +322,13 @@ export default function IngredientDetailScreen() {
 
         {!isEditing && (
           <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.consumeButton} onPress={handleConsume}>
+            <TouchableOpacity style={[styles.consumeButton, { backgroundColor: colors.success }]} onPress={handleConsume}>
               <Minus size={20} color="#ffffff" />
-              <Text style={styles.buttonText}>소모</Text>
+              <Text style={[styles.buttonText, { color: '#ffffff' }]}>소모</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+            <TouchableOpacity style={[styles.deleteButton, { backgroundColor: colors.danger }]} onPress={handleDelete}>
               <Trash2 size={20} color="#ffffff" />
-              <Text style={styles.buttonText}>삭제</Text>
+              <Text style={[styles.buttonText, { color: '#ffffff' }]}>삭제</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -337,7 +341,6 @@ export default function IngredientDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
   },
   header: {
     flexDirection: 'row',
@@ -361,7 +364,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
-    backgroundColor: '#ffffff',
     margin: 20,
     borderRadius: 16,
     padding: 20,
@@ -385,7 +387,6 @@ const styles = StyleSheet.create({
   ingredientName: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
     flex: 1,
   },
   statusBadge: {
@@ -396,7 +397,6 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#ffffff',
   },
   infoGrid: {
     gap: 16,
@@ -408,12 +408,10 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 14,
-    color: '#6b7280',
   },
   infoValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
   },
   memoSection: {
     gap: 8,
@@ -424,11 +422,9 @@ const styles = StyleSheet.create({
   memoLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6b7280',
   },
   memoText: {
     fontSize: 14,
-    color: '#111827',
     lineHeight: 20,
   },
   editSection: {
@@ -440,15 +436,12 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
   },
   input: {
-    backgroundColor: '#f3f4f6',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#111827',
   },
   textArea: {
     height: 100,
@@ -466,18 +459,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#f3f4f6',
-  },
-  categoryBtnActive: {
-    backgroundColor: '#10b981',
   },
   categoryBtnText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6b7280',
-  },
-  categoryBtnTextActive: {
-    color: '#ffffff',
   },
   actionButtons: {
     flexDirection: 'row',
@@ -490,7 +475,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#10b981',
     paddingVertical: 16,
     borderRadius: 12,
     gap: 8,
@@ -500,7 +484,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ef4444',
     paddingVertical: 16,
     borderRadius: 12,
     gap: 8,
@@ -508,6 +491,5 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#ffffff',
   },
 });
