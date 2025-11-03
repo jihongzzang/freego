@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Plus, BarChart3, Settings } from 'lucide-react-native';
+import { Home, Plus, ShoppingCart, BarChart3, Settings } from 'lucide-react-native';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/lib/theme';
@@ -38,6 +38,15 @@ export default function TabLayout() {
           title: '추가',
           tabBarIcon: ({ size, color }) => (
             <Plus size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="shopping"
+        options={{
+          title: '장보기',
+          tabBarIcon: ({ size, color }) => (
+            <ShoppingCart size={size} color={color} />
           ),
         }}
       />

@@ -92,14 +92,20 @@ export default function IngredientDetailScreen() {
 
     Alert.alert(
       '소모 확인',
-      `${ingredient.name}을(를) 소모 처리하시겠습니까?`,
+      `${ingredient.name}을(를) 소모 처리하시겠습니까?\n장보기 목록에 자동으로 추가됩니다.`,
       [
         { text: '취소', style: 'cancel' },
         {
           text: '소모',
           onPress: async () => {
             try {
+              await storage.addToShoppingList({
+                name: ingredient.name,
+                category: ingredient.category,
+                unit: ingredient.unit,
+              });
               await storage.deleteIngredient(id as string);
+              Alert.alert('완료', `${ingredient.name}이(가) 장보기 목록에 추가되었습니다.`);
               router.back();
             } catch (error) {
               console.error('Error consuming ingredient:', error);
