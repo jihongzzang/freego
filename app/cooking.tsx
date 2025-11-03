@@ -1,14 +1,16 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, ChefHat, Clock, Check } from 'lucide-react-native';
 import { storage } from '@/lib/storage';
 import { recipes, Recipe } from '@/lib/recipes';
 import { useTheme } from '@/lib/theme';
+import { useDialog } from '@/hooks/useDialog';
 
 export default function CookingScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const { alert, confirm, DialogComponent } = useDialog();
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [ingredients, setIngredients] = useState<any[]>([]);
   const [availableRecipes, setAvailableRecipes] = useState<Recipe[]>([]);
@@ -42,50 +44,43 @@ export default function CookingScreen() {
 
   async function handleCook(recipe: Recipe) {
     if (!canMakeRecipe(recipe)) {
-      Alert.alert('알림', '재료가 부족해요. 추가해볼까요?');
+      alert('알림', '재료가 부족해요. 추가해볼까요?', 'warning');
       return;
     }
 
-    Alert.alert(
+    confirm(
       '요리하기',
       `${recipe.name}을(를) 만들까요? 재료가 자동으로 차감돼요.`,
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '요리하기',
-          onPress: async () => {
-            try {
-              for (const recipeIng of recipe.ingredients) {
-                const userIng = ingredients.find(
-                  ui => ui.name.toLowerCase().includes(recipeIng.name.toLowerCase()) ||
-                        recipeIng.name.toLowerCase().includes(ui.name.toLowerCase())
-                );
+      async () => {
+        try {
+          for (const recipeIng of recipe.ingredients) {
+            const userIng = ingredients.find(
+              ui => ui.name.toLowerCase().includes(recipeIng.name.toLowerCase()) ||
+                    recipeIng.name.toLowerCase().includes(ui.name.toLowerCase())
+            );
 
-                if (userIng) {
-                  const newQuantity = userIng.quantity - recipeIng.quantity;
-                  if (newQuantity <= 0) {
-                    await storage.deleteIngredient(userIng.id);
-                  } else {
-                    await storage.updateIngredient(userIng.id, {
-                      quantity: newQuantity,
-                    });
-                  }
-                }
+            if (userIng) {
+              const newQuantity = userIng.quantity - recipeIng.quantity;
+              if (newQuantity <= 0) {
+                await storage.deleteIngredient(userIng.id);
+              } else {
+                await storage.updateIngredient(userIng.id, {
+                  quantity: newQuantity,
+                });
               }
-
-              Alert.alert('완료', `${recipe.name} 완성했어요!`, [
-                {
-                  text: '확인',
-                  onPress: () => router.back(),
-                },
-              ]);
-            } catch (error) {
-              console.error('Error cooking:', error);
-              Alert.alert('알림', '문제가 발생했어요. 다시 시도해주세요.');
             }
-          },
-        },
-      ]
+          }
+
+          alert('완료', `${recipe.name} 완성했어요!`, 'success');
+          router.back();
+        } catch (error) {
+          console.error('Error cooking:', error);
+          alert('알림', '문제가 발생했어요. 다시 시도해주세요.', 'error');
+        }
+      },
+      undefined,
+      '요리하기',
+      '취소'
     );
   }
 
@@ -176,10 +171,12 @@ export default function CookingScreen() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: colors.surface }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color={colors.text} />
+    <>
+      <DialogComponent />
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.surface }]}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>요리해볼까요?</Text>
         <View style={{ width: 24 }} />
@@ -241,6 +238,7 @@ export default function CookingScreen() {
         </View>
       </ScrollView>
     </View>
+    </>
   );
 }
 

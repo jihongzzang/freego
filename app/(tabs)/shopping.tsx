@@ -1,12 +1,14 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { ShoppingCart, Trash2, Check, Plus } from 'lucide-react-native';
 import { storage, ShoppingItem } from '@/lib/storage';
 import { useTheme } from '@/lib/theme';
+import { useDialog } from '@/hooks/useDialog';
 
 export default function ShoppingListScreen() {
   const { colors } = useTheme();
+  const { alert, confirm, DialogComponent } = useDialog();
   const [shoppingList, setShoppingList] = useState<ShoppingItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,50 +40,48 @@ export default function ShoppingListScreen() {
   }
 
   async function deleteItem(id: string, name: string) {
-    Alert.alert('삭제 확인', `"${name}"을(를) 장보기 목록에서 삭제하시겠습니까?`, [
-      { text: '취소', style: 'cancel' },
-      {
-        text: '삭제',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await storage.deleteShoppingItem(id);
-            fetchShoppingList();
-          } catch (error) {
-            console.error('Error deleting shopping item:', error);
-          }
-        },
+    confirm(
+      '삭제 확인',
+      `"${name}"을(를) 장보기 목록에서 삭제하시겠습니까?`,
+      async () => {
+        try {
+          await storage.deleteShoppingItem(id);
+          fetchShoppingList();
+        } catch (error) {
+          console.error('Error deleting shopping item:', error);
+        }
       },
-    ]);
+      undefined,
+      '삭제',
+      '취소',
+      true
+    );
   }
 
   async function clearPurchased() {
     const purchasedItems = shoppingList.filter(item => item.is_purchased);
     if (purchasedItems.length === 0) {
-      Alert.alert('알림', '구매한 항목이 없습니다.');
+      alert('알림', '구매한 항목이 없습니다.', 'info');
       return;
     }
 
-    Alert.alert(
+    confirm(
       '구매 완료 항목 삭제',
       `${purchasedItems.length}개의 구매 완료 항목을 삭제하시겠습니까?`,
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '삭제',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              for (const item of purchasedItems) {
-                await storage.deleteShoppingItem(item.id);
-              }
-              fetchShoppingList();
-            } catch (error) {
-              console.error('Error clearing purchased items:', error);
-            }
-          },
-        },
-      ]
+      async () => {
+        try {
+          for (const item of purchasedItems) {
+            await storage.deleteShoppingItem(item.id);
+          }
+          fetchShoppingList();
+        } catch (error) {
+          console.error('Error clearing purchased items:', error);
+        }
+      },
+      undefined,
+      '삭제',
+      '취소',
+      true
     );
   }
 
@@ -100,10 +100,12 @@ export default function ShoppingListScreen() {
   const purchasedItems = shoppingList.filter(item => item.is_purchased);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <View style={styles.headerTop}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>장보기 목록</Text>
+    <>
+      <DialogComponent />
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <View style={styles.headerTop}>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>장보기 목록</Text>
           {purchasedItems.length > 0 && (
             <TouchableOpacity
               style={[styles.clearButton, { backgroundColor: colors.dangerLight }]}
@@ -244,6 +246,7 @@ export default function ShoppingListScreen() {
         )}
       </ScrollView>
     </View>
+    </>
   );
 }
 

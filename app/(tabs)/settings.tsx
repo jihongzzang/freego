@@ -1,11 +1,13 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Bell, Moon, Sun, Trash2, Info } from 'lucide-react-native';
 import { storage } from '@/lib/storage';
 import { useTheme } from '@/lib/theme';
+import { useDialog } from '@/hooks/useDialog';
 
 export default function SettingsScreen() {
   const { colors, isDark } = useTheme();
+  const { alert, confirm, DialogComponent } = useDialog();
   const [notificationDays, setNotificationDays] = useState(3);
   const [isDarkMode, setIsDarkMode] = useState(isDark);
 
@@ -15,37 +17,40 @@ export default function SettingsScreen() {
 
   function updateNotificationDays(days: number) {
     setNotificationDays(days);
-    Alert.alert('성공', `알림 주기가 ${days}일로 변경되었습니다.`);
+    alert('성공', `알림 주기가 ${days}일로 변경되었습니다.`, 'success');
   }
 
   function toggleTheme() {
-    Alert.alert('안내', '테마 변경 기능은 추후 업데이트될 예정입니다.');
+    alert('안내', '테마 변경 기능은 추후 업데이트될 예정입니다.', 'info');
   }
 
   async function clearAllData() {
-    Alert.alert('데이터 삭제', '모든 식재료 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.', [
-      { text: '취소', style: 'cancel' },
-      {
-        text: '삭제',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            const ingredients = await storage.getIngredients();
-            for (const ingredient of ingredients) {
-              await storage.deleteIngredient(ingredient.id);
-            }
-            Alert.alert('완료', '모든 데이터가 삭제되었습니다.');
-          } catch (error) {
-            console.error('Error clearing data:', error);
-            Alert.alert('오류', '데이터 삭제에 실패했습니다.');
+    confirm(
+      '데이터 삭제',
+      '모든 식재료 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+      async () => {
+        try {
+          const ingredients = await storage.getIngredients();
+          for (const ingredient of ingredients) {
+            await storage.deleteIngredient(ingredient.id);
           }
-        },
+          alert('완료', '모든 데이터가 삭제되었습니다.', 'success');
+        } catch (error) {
+          console.error('Error clearing data:', error);
+          alert('오류', '데이터 삭제에 실패했습니다.', 'error');
+        }
       },
-    ]);
+      undefined,
+      '삭제',
+      '취소',
+      true
+    );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <>
+      <DialogComponent />
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.headerTitle, { color: colors.text }]}>설정</Text>
         <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>앱 설정 및 관리</Text>
@@ -152,6 +157,7 @@ export default function SettingsScreen() {
         </View>
       </ScrollView>
     </View>
+    </>
   );
 }
 

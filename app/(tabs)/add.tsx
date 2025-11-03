@@ -1,13 +1,15 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Camera, Edit, Carrot, Apple, Beef, Milk, Package } from 'lucide-react-native';
 import { storage } from '@/lib/storage';
 import { useTheme } from '@/lib/theme';
+import { useDialog } from '@/hooks/useDialog';
 
 export default function AddIngredientScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const { alert, DialogComponent } = useDialog();
   const [mode, setMode] = useState<'select' | 'manual'>('select');
 
   function getCategoryIcon(category: string) {
@@ -37,12 +39,12 @@ export default function AddIngredientScreen() {
 
   async function handleSubmit() {
     if (!form.name.trim()) {
-      Alert.alert('알림', '재료 이름을 입력해주세요.');
+      alert('알림', '재료 이름을 입력해주세요.', 'warning');
       return;
     }
 
     if (!form.quantity.trim() || parseInt(form.quantity) <= 0) {
-      Alert.alert('알림', '수량을 입력해주세요.');
+      alert('알림', '수량을 입력해주세요.', 'warning');
       return;
     }
 
@@ -58,27 +60,21 @@ export default function AddIngredientScreen() {
         memo: form.memo,
       });
 
-      Alert.alert('성공', '식재료가 등록되었습니다.', [
-        {
-          text: '확인',
-          onPress: () => {
-            setForm({
-              name: '',
-              category: '채소',
-              quantity: '1',
-              unit: '개',
-              expiry_date: '',
-              storage_location: '냉장실',
-              memo: '',
-            });
-            setMode('select');
-            router.push('/(tabs)');
-          },
-        },
-      ]);
+      alert('성공', '식재료가 등록되었습니다.', 'success');
+      setForm({
+        name: '',
+        category: '채소',
+        quantity: '1',
+        unit: '개',
+        expiry_date: '',
+        storage_location: '냉장실',
+        memo: '',
+      });
+      setMode('select');
+      router.push('/(tabs)');
     } catch (error) {
       console.error('Error adding ingredient:', error);
-      Alert.alert('오류', '식재료 등록에 실패했습니다.');
+      alert('오류', '식재료 등록에 실패했습니다.', 'error');
     }
   }
 
@@ -87,12 +83,14 @@ export default function AddIngredientScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={0}>
-      <View style={[styles.header, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>재료 추가</Text>
+    <>
+      <DialogComponent />
+      <KeyboardAvoidingView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={0}>
+        <View style={[styles.header, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>재료 추가</Text>
         <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>관리하고 싶은 재료만 추가해보세요</Text>
       </View>
 
@@ -223,6 +221,7 @@ export default function AddIngredientScreen() {
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </>
   );
 }
 

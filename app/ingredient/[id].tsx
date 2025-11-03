@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Trash2, Edit3, Minus, Calendar } from 'lucide-react-native';
 import { storage, Ingredient as StoredIngredient } from '@/lib/storage';
 import { useTheme } from '@/lib/theme';
+import { useDialog } from '@/hooks/useDialog';
 
 interface Ingredient extends StoredIngredient {
   status: string;
@@ -13,6 +14,7 @@ export default function IngredientDetailScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const { id } = useLocalSearchParams();
+  const { alert, confirm, DialogComponent } = useDialog();
   const [ingredient, setIngredient] = useState<Ingredient | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -66,53 +68,47 @@ export default function IngredientDetailScreen() {
   }
 
   async function handleDelete() {
-    Alert.alert(
+    confirm(
       '삭제 확인',
       '이 식재료를 삭제하시겠습니까?',
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '삭제',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await storage.deleteIngredient(id as string);
-              router.back();
-            } catch (error) {
-              console.error('Error deleting ingredient:', error);
-            }
-          },
-        },
-      ]
+      async () => {
+        try {
+          await storage.deleteIngredient(id as string);
+          router.back();
+        } catch (error) {
+          console.error('Error deleting ingredient:', error);
+        }
+      },
+      undefined,
+      '삭제',
+      '취소',
+      true
     );
   }
 
   async function handleConsume() {
     if (!ingredient) return;
 
-    Alert.alert(
+    confirm(
       '소모 확인',
       `${ingredient.name}을(를) 소모 처리하시겠습니까?\n장보기 목록에 자동으로 추가됩니다.`,
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '소모',
-          onPress: async () => {
-            try {
-              await storage.addToShoppingList({
-                name: ingredient.name,
-                category: ingredient.category,
-                unit: ingredient.unit,
-              });
-              await storage.deleteIngredient(id as string);
-              Alert.alert('완료', `${ingredient.name}이(가) 장보기 목록에 추가되었습니다.`);
-              router.back();
-            } catch (error) {
-              console.error('Error consuming ingredient:', error);
-            }
-          },
-        },
-      ]
+      async () => {
+        try {
+          await storage.addToShoppingList({
+            name: ingredient.name,
+            category: ingredient.category,
+            unit: ingredient.unit,
+          });
+          await storage.deleteIngredient(id as string);
+          alert('완료', `${ingredient.name}이(가) 장보기 목록에 추가되었습니다.`, 'success');
+          router.back();
+        } catch (error) {
+          console.error('Error consuming ingredient:', error);
+        }
+      },
+      undefined,
+      '소모',
+      '취소'
     );
   }
 
@@ -157,10 +153,12 @@ export default function IngredientDetailScreen() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: colors.surface }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color={colors.text} />
+    <>
+      <DialogComponent />
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.surface }]}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>식재료 상세</Text>
         <TouchableOpacity
@@ -332,6 +330,7 @@ export default function IngredientDetailScreen() {
         )}
       </ScrollView>
     </View>
+    </>
   );
 }
 
