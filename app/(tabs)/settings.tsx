@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Bell, Moon, Sun, Trash2, Info } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
+import { storage } from '@/lib/storage';
 import { useTheme } from '@/lib/theme';
 
 interface Settings {
@@ -81,11 +81,10 @@ export default function SettingsScreen() {
         style: 'destructive',
         onPress: async () => {
           try {
-            await supabase.from('ingredients').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-            await supabase
-              .from('consumption_history')
-              .delete()
-              .neq('id', '00000000-0000-0000-0000-000000000000');
+            const ingredients = await storage.getIngredients();
+            for (const ingredient of ingredients) {
+              await storage.deleteIngredient(ingredient.id);
+            }
             Alert.alert('완료', '모든 데이터가 삭제되었습니다.');
           } catch (error) {
             console.error('Error clearing data:', error);
@@ -120,13 +119,15 @@ export default function SettingsScreen() {
                   key={days}
                   style={[
                     styles.notificationOption,
-                    notificationDays === days && styles.notificationOptionActive,
+                    { backgroundColor: colors.surfaceSecondary, borderColor: colors.border },
+                    notificationDays === days && { backgroundColor: colors.primaryLight, borderColor: colors.primary },
                   ]}
                   onPress={() => updateNotificationDays(days)}>
                   <Text
                     style={[
                       styles.notificationOptionText,
-                      notificationDays === days && styles.notificationOptionTextActive,
+                      { color: colors.textSecondary },
+                      notificationDays === days && { color: colors.primary },
                     ]}>
                     {days}일
                   </Text>
@@ -138,15 +139,15 @@ export default function SettingsScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            {isDarkMode ? <Moon size={20} color="#10b981" /> : <Sun size={20} color="#10b981" />}
-            <Text style={styles.sectionTitle}>테마</Text>
+            {isDarkMode ? <Moon size={20} color={colors.primary} /> : <Sun size={20} color={colors.primary} />}
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>테마</Text>
           </View>
 
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>다크 모드</Text>
-                <Text style={styles.settingDescription}>어두운 테마 사용</Text>
+                <Text style={[styles.settingTitle, { color: colors.text }]}>다크 모드</Text>
+                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>어두운 테마 사용</Text>
               </View>
               <Switch
                 value={isDarkMode}
@@ -160,45 +161,45 @@ export default function SettingsScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Trash2 size={20} color="#ef4444" />
-            <Text style={styles.sectionTitle}>데이터 관리</Text>
+            <Trash2 size={20} color={colors.danger} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>데이터 관리</Text>
           </View>
 
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
             <TouchableOpacity style={styles.dangerButton} onPress={clearAllData}>
-              <Trash2 size={20} color="#ef4444" />
-              <Text style={styles.dangerButtonText}>모든 데이터 삭제</Text>
+              <Trash2 size={20} color={colors.danger} />
+              <Text style={[styles.dangerButtonText, { color: colors.danger }]}>모든 데이터 삭제</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Info size={20} color="#3b82f6" />
-            <Text style={styles.sectionTitle}>앱 정보</Text>
+            <Info size={20} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>앱 정보</Text>
           </View>
 
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>버전</Text>
-              <Text style={styles.infoValue}>1.0.0</Text>
+              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>버전</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>1.0.0</Text>
             </View>
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>개발자</Text>
-              <Text style={styles.infoValue}>냉장고 관리 팀</Text>
+              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>개발자</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>냉장고 관리 팀</Text>
             </View>
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>문의</Text>
-              <Text style={styles.infoValue}>support@fridge.app</Text>
+              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>문의</Text>
+              <Text style={[styles.infoValue, { color: colors.text }]}>support@fridge.app</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>냉장고 재고관리 앱</Text>
-          <Text style={styles.footerSubtext}>음식물 쓰레기를 줄이고 현명한 소비를</Text>
+          <Text style={[styles.footerText, { color: colors.textSecondary }]}>냉장고 재고관리 앱</Text>
+          <Text style={[styles.footerSubtext, { color: colors.textTertiary }]}>음식물 쓰레기를 줄이고 현명한 소비를</Text>
         </View>
       </ScrollView>
     </View>

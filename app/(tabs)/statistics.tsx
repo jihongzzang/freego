@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { TrendingUp, Package, ShoppingCart, AlertTriangle } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
+import { storage } from '@/lib/storage';
 import { useTheme } from '@/lib/theme';
 
 interface Stats {
@@ -24,45 +25,33 @@ export default function StatisticsScreen() {
     recentConsumptions: [],
   });
 
-  useEffect(() => {
-    fetchStatistics();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchStatistics();
+    }, [])
+  );
 
   async function fetchStatistics() {
     try {
-      const { data: ingredients, error: ingredientsError } = await supabase
-        .from('ingredients')
-        .select('*');
+      const ingredients = await storage.getIngredients();
 
-      const { data: consumptions, error: consumptionsError } = await supabase
-        .from('consumption_history')
-        .select('*')
-        .order('consumed_date', { ascending: false })
-        .limit(5);
+      const totalIngredients = ingredients.length;
 
-      if (ingredientsError) throw ingredientsError;
-      if (consumptionsError) throw consumptionsError;
-
-      const totalIngredients = ingredients?.length || 0;
-
-      const expiringItems =
-        ingredients?.filter((item) => {
-          if (!item.expiry_date) return false;
-          const today = new Date();
-          const expiry = new Date(item.expiry_date);
-          const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-          return diffDays >= 0 && diffDays <= 3;
-        }).length || 0;
-
-      const totalConsumed = consumptions?.length || 0;
+      const expiringItems = ingredients.filter((item) => {
+        if (!item.expiry_date) return false;
+        const today = new Date();
+        const expiry = new Date(item.expiry_date);
+        const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        return diffDays >= 0 && diffDays <= 3;
+      }).length;
 
       const categoryDistribution: { [key: string]: number } = {};
-      ingredients?.forEach((item) => {
+      ingredients.forEach((item) => {
         categoryDistribution[item.category] = (categoryDistribution[item.category] || 0) + 1;
       });
 
       const storageDistribution: { [key: string]: number } = {};
-      ingredients?.forEach((item) => {
+      ingredients.forEach((item) => {
         storageDistribution[item.storage_location] =
           (storageDistribution[item.storage_location] || 0) + 1;
       });
@@ -70,10 +59,10 @@ export default function StatisticsScreen() {
       setStats({
         totalIngredients,
         expiringItems,
-        totalConsumed,
+        totalConsumed: 0,
         categoryDistribution,
         storageDistribution,
-        recentConsumptions: consumptions || [],
+        recentConsumptions: [],
       });
     } catch (error) {
       console.error('Error fetching statistics:', error);
@@ -139,10 +128,10 @@ export default function StatisticsScreen() {
                   return (
                     <View key={category} style={styles.barItem}>
                       <View style={styles.barLabelContainer}>
-                        <Text style={styles.barLabel}>{category}</Text>
-                        <Text style={styles.barValue}>{count}개</Text>
+                        <Text style={[styles.barLabel, { color: colors.text }]}>{category}</Text>
+                        <Text style={[styles.barValue, { color: colors.textSecondary }]}>{count}개</Text>
                       </View>
-                      <View style={styles.barBackground}>
+                      <View style={[styles.barBackground, { backgroundColor: colors.surfaceSecondary }]}>
                         <View
                           style={[
                             styles.barFill,
@@ -162,10 +151,10 @@ export default function StatisticsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>보관 위치별 분포</Text>
-          <View style={styles.chartCard}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>보관 위치별 분포</Text>
+          <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
             {Object.keys(stats.storageDistribution).length === 0 ? (
-              <Text style={styles.emptyText}>데이터가 없습니다</Text>
+              <Text style={[styles.emptyText, { color: colors.textTertiary }]}>데이터가 없습니다</Text>
             ) : (
               <View style={styles.pieChartContainer}>
                 {Object.entries(stats.storageDistribution).map(([location, count]) => {
@@ -183,8 +172,8 @@ export default function StatisticsScreen() {
                           { backgroundColor: getStorageColor(location) },
                         ]}
                       />
-                      <Text style={styles.pieLabel}>{location}</Text>
-                      <Text style={styles.pieValue}>
+                      <Text style={[styles.pieLabel, { color: colors.text }]}>{location}</Text>
+                      <Text style={[styles.pieValue, { color: colors.textSecondary }]}>
                         {count}개 ({percentage}%)
                       </Text>
                     </View>
