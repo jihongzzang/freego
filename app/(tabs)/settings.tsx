@@ -4,73 +4,22 @@ import { Bell, Moon, Sun, Trash2, Info } from 'lucide-react-native';
 import { storage } from '@/lib/storage';
 import { useTheme } from '@/lib/theme';
 
-interface Settings {
-  id: string;
-  notification_days: number;
-  theme: string;
-}
-
 export default function SettingsScreen() {
   const { colors, isDark } = useTheme();
-  const [settings, setSettings] = useState<Settings | null>(null);
   const [notificationDays, setNotificationDays] = useState(3);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(isDark);
 
   useEffect(() => {
-    fetchSettings();
-  }, []);
+    setIsDarkMode(isDark);
+  }, [isDark]);
 
-  async function fetchSettings() {
-    try {
-      const { data, error } = await supabase.from('settings').select('*').limit(1).maybeSingle();
-
-      if (error) throw error;
-
-      if (data) {
-        setSettings(data);
-        setNotificationDays(data.notification_days);
-        setIsDarkMode(data.theme === 'dark');
-      }
-    } catch (error) {
-      console.error('Error fetching settings:', error);
-    }
+  function updateNotificationDays(days: number) {
+    setNotificationDays(days);
+    Alert.alert('성공', `알림 주기가 ${days}일로 변경되었습니다.`);
   }
 
-  async function updateNotificationDays(days: number) {
-    try {
-      if (settings) {
-        const { error } = await supabase
-          .from('settings')
-          .update({ notification_days: days, updated_at: new Date().toISOString() })
-          .eq('id', settings.id);
-
-        if (error) throw error;
-        setNotificationDays(days);
-        Alert.alert('성공', `알림 주기가 ${days}일로 변경되었습니다.`);
-      }
-    } catch (error) {
-      console.error('Error updating notification days:', error);
-      Alert.alert('오류', '설정 변경에 실패했습니다.');
-    }
-  }
-
-  async function toggleTheme() {
-    const newTheme = isDarkMode ? 'light' : 'dark';
-    try {
-      if (settings) {
-        const { error } = await supabase
-          .from('settings')
-          .update({ theme: newTheme, updated_at: new Date().toISOString() })
-          .eq('id', settings.id);
-
-        if (error) throw error;
-        setIsDarkMode(!isDarkMode);
-        Alert.alert('안내', '테마 변경은 앱 재시작 후 적용됩니다.');
-      }
-    } catch (error) {
-      console.error('Error updating theme:', error);
-      Alert.alert('오류', '테마 변경에 실패했습니다.');
-    }
+  function toggleTheme() {
+    Alert.alert('안내', '테마 변경 기능은 추후 업데이트될 예정입니다.');
   }
 
   async function clearAllData() {
