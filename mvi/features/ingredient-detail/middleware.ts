@@ -202,6 +202,12 @@ export const ingredientDetailMiddleware: Middleware<
       }
     }
 
+    case 'NAVIGATE_BACK': {
+      return {
+        effects: [{ type: 'NAVIGATE_BACK' }],
+      };
+    }
+
     default:
       return {};
   }

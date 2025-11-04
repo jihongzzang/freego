@@ -2,7 +2,7 @@
  * Statistics Screen MVI Types
  */
 
-import { Intent, State, Effect } from '@/mvi/base';
+import { State } from '@/mvi/base';
 
 /**
  * Statistics Data

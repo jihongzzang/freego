@@ -42,15 +42,34 @@ export interface IngredientDetailState extends State {
 export type IngredientDetailIntent =
   | { type: 'LOAD_INGREDIENT'; payload: string }
   | { type: 'SET_EDITING'; payload: boolean }
-  | { type: 'UPDATE_FORM_FIELD'; payload: { field: keyof EditFormData; value: string } }
+  | {
+      type: 'UPDATE_FORM_FIELD';
+      payload: { field: keyof EditFormData; value: string };
+    }
   | { type: 'DELETE_INGREDIENT' }
   | { type: 'CONSUME_INGREDIENT' }
-  | { type: 'UPDATE_INGREDIENT' };
+  | { type: 'UPDATE_INGREDIENT' }
+  | { type: 'NAVIGATE_BACK' };
 
 /**
  * Ingredient Detail Effect (부수 효과)
  */
 export type IngredientDetailEffect =
-  | { type: 'SHOW_ALERT'; payload: { title: string; message: string; variant: 'success' | 'warning' | 'error' } }
-  | { type: 'SHOW_CONFIRM'; payload: { title: string; message: string; onConfirm: () => void; isDanger?: boolean } }
+  | {
+      type: 'SHOW_ALERT';
+      payload: {
+        title: string;
+        message: string;
+        variant: 'success' | 'warning' | 'error';
+      };
+    }
+  | {
+      type: 'SHOW_CONFIRM';
+      payload: {
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        isDanger?: boolean;
+      };
+    }
   | { type: 'NAVIGATE_BACK' };

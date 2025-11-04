@@ -1,4 +1,12 @@
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Dimensions,
+} from 'react-native';
+import { useMemo } from 'react';
 import { BlurView } from 'expo-blur';
 import { AlertCircle, CheckCircle, Info, XCircle } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
@@ -20,14 +28,27 @@ interface DialogProps {
   onClose?: () => void;
 }
 
-export function Dialog({ visible, title, message, type = 'default', buttons, onClose }: DialogProps) {
-  const { colors, isDark } = useTheme();
+export function Dialog({
+  visible,
+  title,
+  message,
+  type = 'default',
+  buttons,
+  onClose,
+}: DialogProps) {
+  const { colors, typography, spacing, borderRadius, shadows, isDark } =
+    useTheme();
+
+  const styles = useMemo(
+    () => createStyles({ spacing, borderRadius, shadows }),
+    [spacing, borderRadius, shadows]
+  );
 
   function getIcon() {
-    const iconSize = 48;
+    const iconSize = 24;
     switch (type) {
       case 'success':
-        return <CheckCircle size={iconSize} color="#10b981" />;
+        return <CheckCircle size={iconSize} color={colors.primary} />;
       case 'warning':
         return <AlertCircle size={iconSize} color="#f59e0b" />;
       case 'error':
@@ -74,22 +95,30 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
       transparent
       animationType="fade"
       onRequestClose={onClose}
-      statusBarTranslucent>
-      <BlurView intensity={isDark ? 40 : 20} style={styles.overlay}>
+      statusBarTranslucent
+    >
+      <BlurView intensity={isDark ? 40 : 60} style={styles.overlay}>
         <TouchableOpacity
-          style={styles.backdrop}
+          style={[
+            styles.backdrop,
+            { backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)' },
+          ]}
           activeOpacity={1}
           onPress={onClose}
         />
         <View style={[styles.dialog, { backgroundColor: colors.surface }]}>
-          {type !== 'default' && (
-            <View style={styles.iconContainer}>
-              {getIcon()}
-            </View>
-          )}
+          <View style={styles.titleContainer}>
+            <Text style={[typography.styles.h4, { color: colors.text }]}>
+              {title}
+            </Text>
+            {type !== 'default' && getIcon()}
+          </View>
 
-          <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-          <Text style={[styles.message, { color: colors.textSecondary }]}>{message}</Text>
+          <Text
+            style={[typography.styles.body, { color: colors.textSecondary }]}
+          >
+            {message}
+          </Text>
 
           <View style={styles.buttonsContainer}>
             {buttons.map((button, index) => {
@@ -103,8 +132,14 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
                     buttons.length === 1 && styles.buttonFull,
                   ]}
                   onPress={() => handleButtonPress(button)}
-                  activeOpacity={0.7}>
-                  <Text style={[styles.buttonText, { color: buttonStyles.textColor }]}>
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      typography.styles.bodySemibold,
+                      { color: buttonStyles.textColor },
+                    ]}
+                  >
                     {button.text}
                   </Text>
                 </TouchableOpacity>
@@ -117,63 +152,58 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  dialog: {
-    width: width - 64,
-    maxWidth: 400,
-    borderRadius: 24,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  iconContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  message: {
-    fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 24,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonFull: {
-    flex: 1,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+const createStyles = ({
+  spacing,
+  borderRadius,
+  shadows,
+}: {
+  spacing: typeof import('@/lib/theme').spacing;
+  borderRadius: typeof import('@/lib/theme').borderRadius;
+  shadows: typeof import('@/lib/theme').shadows;
+}) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    backdrop: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    },
+    dialog: {
+      width: width - 64,
+      maxWidth: 400,
+      borderRadius: borderRadius.xxl,
+      padding: spacing.xxl,
+      ...shadows.lg,
+      shadowOpacity: 0.25,
+      shadowRadius: 20,
+      elevation: 10,
+    },
+    titleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.md,
+    },
+    buttonsContainer: {
+      flexDirection: 'row',
+      gap: spacing.md,
+      marginTop: spacing.xxl,
+    },
+    button: {
+      flex: 1,
+      paddingVertical: 14,
+      paddingHorizontal: spacing.xl,
+      borderRadius: borderRadius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonFull: {
+      flex: 1,
+    },
+  });

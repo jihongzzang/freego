@@ -1,10 +1,29 @@
-import { useColorScheme } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useColorScheme, TextStyle } from 'react-native';
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  ReactNode,
+} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const THEME_KEY = '@theme_preference';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
+
+type ThemeContextType = {
+  colors: ColorPalette;
+  isDark: boolean;
+  themePreference: ThemeMode;
+  setTheme: (mode: ThemeMode) => Promise<void>;
+  spacing: typeof spacing;
+  borderRadius: typeof borderRadius;
+  typography: typeof typography;
+  shadows: typeof shadows;
+};
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export type ColorPalette = {
   background: string;
@@ -88,6 +107,7 @@ export const borderRadius = {
   md: 12,
   lg: 16,
   xl: 20,
+  xxl: 24,
   full: 9999,
 };
 
@@ -100,6 +120,7 @@ export const typography = {
     xl: 20,
     xxl: 24,
     xxxl: 28,
+    huge: 32,
   },
   fontWeight: {
     normal: '400' as const,
@@ -112,6 +133,112 @@ export const typography = {
     normal: 1.5,
     relaxed: 1.75,
   },
+  // 재사용 가능한 텍스트 스타일 프리셋
+  styles: {
+    // 헤딩 스타일
+    h1: {
+      fontSize: 32,
+      fontWeight: '700' as const,
+      lineHeight: 38,
+    },
+    h2: {
+      fontSize: 28,
+      fontWeight: '700' as const,
+      lineHeight: 34,
+    },
+    h3: {
+      fontSize: 24,
+      fontWeight: '600' as const,
+      lineHeight: 29,
+    },
+    h4: {
+      fontSize: 20,
+      fontWeight: '600' as const,
+      lineHeight: 24,
+    },
+    h5: {
+      fontSize: 18,
+      fontWeight: '600' as const,
+      lineHeight: 22,
+    },
+    h6: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      lineHeight: 19,
+    },
+    // 본문 스타일
+    body: {
+      fontSize: 16,
+      fontWeight: '400' as const,
+      lineHeight: 24,
+    },
+    bodyMedium: {
+      fontSize: 16,
+      fontWeight: '500' as const,
+      lineHeight: 24,
+    },
+    bodySemibold: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      lineHeight: 24,
+    },
+    bodySmall: {
+      fontSize: 14,
+      fontWeight: '400' as const,
+      lineHeight: 21,
+    },
+    bodySmallMedium: {
+      fontSize: 14,
+      fontWeight: '500' as const,
+      lineHeight: 21,
+    },
+    // 캡션 스타일
+    caption: {
+      fontSize: 12,
+      fontWeight: '400' as const,
+      lineHeight: 18,
+    },
+    captionMedium: {
+      fontSize: 12,
+      fontWeight: '500' as const,
+      lineHeight: 18,
+    },
+    captionBold: {
+      fontSize: 12,
+      fontWeight: '700' as const,
+      lineHeight: 18,
+    },
+    // 버튼 스타일
+    button: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      lineHeight: 19,
+    },
+    buttonSmall: {
+      fontSize: 14,
+      fontWeight: '600' as const,
+      lineHeight: 17,
+    },
+    // 라벨 스타일
+    label: {
+      fontSize: 14,
+      fontWeight: '500' as const,
+      lineHeight: 17,
+    },
+    labelSmall: {
+      fontSize: 12,
+      fontWeight: '500' as const,
+      lineHeight: 14,
+    },
+    // 오버라인 (작은 강조 텍스트)
+    overline: {
+      fontSize: 10,
+      fontWeight: '600' as const,
+      lineHeight: 12,
+      textTransform: 'uppercase' as const,
+      letterSpacing: 1,
+    },
+  } satisfies Record<string, TextStyle>,
 };
 
 export const shadows = {
@@ -138,7 +265,7 @@ export const shadows = {
   },
 };
 
-export function useTheme() {
+export function ThemeProvider({ children }: { children: ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [themePreference, setThemePreference] = useState<ThemeMode>('system');
 
@@ -173,7 +300,7 @@ export function useTheme() {
     }
   }
 
-  return {
+  const value: ThemeContextType = {
     colors,
     isDark,
     themePreference,
@@ -183,6 +310,18 @@ export function useTheme() {
     typography,
     shadows,
   };
+
+  return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
+}
+
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
 }
 
 export function getStatusColor(status: string): string {
@@ -197,11 +336,14 @@ export function getStatusColor(status: string): string {
 
 export function getCategoryColor(category: string): string {
   const categoryColors: Record<string, string> = {
-    채소: '#10B981',
-    과일: '#F59E0B',
-    육류: '#EF4444',
-    유제품: '#3B82F6',
-    기타: '#6B7280',
+    채소: '#10B981',      // 초록
+    과일: '#EF4444',      // 빨강
+    육류: '#F97316',      // 주황
+    생선류: '#06B6D4',    // 시안/청록
+    유제품: '#3B82F6',    // 파랑
+    가공식품: '#F59E0B',  // 노랑/금색
+    조미료: '#8B5CF6',    // 보라
+    기타: '#6B7280',      // 회색
   };
   return categoryColors[category] || '#6B7280';
 }

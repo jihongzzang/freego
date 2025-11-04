@@ -11,7 +11,9 @@ import { storage } from '@/lib/storage';
 /**
  * 유통기한 상태 계산
  */
-function calculateStatus(expiryDate: string | null): '신선' | '주의' | '소모됨' {
+function calculateStatus(
+  expiryDate: string | null,
+): '신선' | '주의' | '소모됨' {
   if (!expiryDate) return '신선';
 
   const today = new Date();
@@ -41,10 +43,11 @@ function calculateDaysRemaining(expiryDate: string | null): number | null {
 /**
  * Home Middleware
  */
-export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = async (
-  state,
-  intent
-): Promise<MiddlewareResult<HomeState, HomeEffect>> => {
+export const homeMiddleware: Middleware<
+  HomeState,
+  HomeIntent,
+  HomeEffect
+> = async (state, intent): Promise<MiddlewareResult<HomeState, HomeEffect>> => {
   switch (intent.type) {
     case 'LOAD_INGREDIENTS': {
       try {
@@ -118,17 +121,19 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
 
     case 'NAVIGATE_TO_ADD':
       return {
-        effects: [{ type: 'NAVIGATE', payload: '/(tabs)/add' }],
-      };
-
-    case 'NAVIGATE_TO_COOKING':
-      return {
-        effects: [{ type: 'NAVIGATE', payload: '/cooking' }],
+        effects: [{ type: 'NAVIGATE', payload: '/add' }],
       };
 
     case 'NAVIGATE_TO_INGREDIENTS':
       return {
-        effects: [{ type: 'NAVIGATE', payload: '/ingredients' }],
+        effects: [
+          {
+            type: 'NAVIGATE',
+            payload: intent.payload
+              ? `/(tabs)/ingredients?category=${encodeURIComponent(intent.payload)}`
+              : '/(tabs)/ingredients',
+          },
+        ],
       };
 
     case 'NAVIGATE_TO_EXPIRING':
@@ -138,7 +143,9 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
 
     case 'NAVIGATE_TO_DETAIL':
       return {
-        effects: [{ type: 'NAVIGATE', payload: `/ingredient/${intent.payload}` }],
+        effects: [
+          { type: 'NAVIGATE', payload: `/ingredient/${intent.payload}` },
+        ],
       };
 
     default:

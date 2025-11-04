@@ -41,17 +41,29 @@ export interface AddState extends State {
  */
 export type AddIntent =
   | { type: 'SET_MODE'; payload: 'select' | 'manual' }
-  | { type: 'UPDATE_FIELD'; payload: { field: keyof AddFormData; value: string } }
+  | {
+      type: 'UPDATE_FIELD';
+      payload: { field: keyof AddFormData; value: string };
+    }
   | { type: 'UPDATE_FORM'; payload: Partial<AddFormData> }
   | { type: 'SUBMIT_FORM' }
   | { type: 'SUBMIT_SUCCESS' }
   | { type: 'SUBMIT_ERROR'; payload: string }
   | { type: 'RESET_FORM' }
-  | { type: 'VALIDATE_FORM' };
+  | { type: 'VALIDATE_FORM' }
+  | { type: 'NAVIGATE_BACK' };
 
 /**
  * Add Effect (부수 효과)
  */
 export type AddEffect =
-  | { type: 'SHOW_ALERT'; payload: { title: string; message: string; variant: 'success' | 'warning' | 'error' } }
-  | { type: 'NAVIGATE_HOME' };
+  | {
+      type: 'SHOW_ALERT';
+      payload: {
+        title: string;
+        message: string;
+        variant: 'success' | 'warning' | 'error';
+      };
+    }
+  | { type: 'NAVIGATE_HOME' }
+  | { type: 'NAVIGATE_BACK' };

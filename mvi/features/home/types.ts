@@ -31,8 +31,7 @@ export type HomeIntent =
   | { type: 'LOAD_INGREDIENTS_ERROR'; payload: string }
   | { type: 'DELETE_INGREDIENT'; payload: string }
   | { type: 'NAVIGATE_TO_ADD' }
-  | { type: 'NAVIGATE_TO_COOKING' }
-  | { type: 'NAVIGATE_TO_INGREDIENTS' }
+  | { type: 'NAVIGATE_TO_INGREDIENTS'; payload?: string }
   | { type: 'NAVIGATE_TO_EXPIRING' }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: string };
 

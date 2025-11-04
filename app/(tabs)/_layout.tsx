@@ -1,11 +1,5 @@
 import { Tabs } from 'expo-router';
-import {
-  Home,
-  Plus,
-  ShoppingCart,
-  BarChart3,
-  Settings,
-} from 'lucide-react-native';
+import { Home, Package, Settings } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/lib/theme';
 import { Platform } from 'react-native';
@@ -22,14 +16,21 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.textTertiary,
         tabBarStyle: {
           backgroundColor: colors.surface,
-          borderTopWidth: 1,
-          borderTopColor: colors.border,
+          borderTopWidth: 0,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
           paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           paddingTop: 8,
-          height: insets.bottom > 0 ? 65 + insets.bottom : 65,
+          height: insets.bottom > 0 ? 56 + insets.bottom : 56,
+          position: 'absolute',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -1 },
+          shadowOpacity: 0.1,
+          shadowRadius: 1,
+          elevation: 1,
         },
         // 애니메이션 비활성화 (커스텀 애니메이션 사용)
-        animation: 'none',
+        animation: 'shift',
         lazy: false,
 
         // iOS에서 부드러운 전환
@@ -42,38 +43,23 @@ export default function TabLayout() {
         name="index"
         options={{
           title: '홈',
+          sceneStyle: { backgroundColor: colors.background },
           tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="add"
+        name="ingredients"
         options={{
-          title: '추가',
-          tabBarIcon: ({ size, color }) => <Plus size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="shopping"
-        options={{
-          title: '장보기',
-          tabBarIcon: ({ size, color }) => (
-            <ShoppingCart size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="statistics"
-        options={{
-          title: '통계',
-          tabBarIcon: ({ size, color }) => (
-            <BarChart3 size={size} color={color} />
-          ),
+          title: '재료',
+          sceneStyle: { backgroundColor: colors.background },
+          tabBarIcon: ({ size, color }) => <Package size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: '설정',
+          sceneStyle: { backgroundColor: colors.background },
           tabBarIcon: ({ size, color }) => (
             <Settings size={size} color={color} />
           ),

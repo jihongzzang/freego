@@ -4,8 +4,8 @@ export interface Ingredient {
   id: string;
   name: string;
   category: string;
-  quantity: number;
-  unit: string;
+  quantity: number | null;
+  unit: string | null;
   purchase_date: string;
   expiry_date: string | null;
   storage_location: string;
@@ -48,6 +48,23 @@ export const storage = {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
     } catch (error) {
       console.error('Error adding ingredient:', error);
+      throw error;
+    }
+  },
+
+  async addMultipleIngredients(ingredientList: Omit<Ingredient, 'id' | 'created_at'>[]): Promise<void> {
+    try {
+      const ingredients = await this.getIngredients();
+      const now = Date.now();
+      const newIngredients: Ingredient[] = ingredientList.map((ingredient, index) => ({
+        ...ingredient,
+        id: (now + index).toString(),
+        created_at: new Date().toISOString(),
+      }));
+      ingredients.push(...newIngredients);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+    } catch (error) {
+      console.error('Error adding multiple ingredients:', error);
       throw error;
     }
   },

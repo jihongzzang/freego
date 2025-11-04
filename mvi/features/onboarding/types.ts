@@ -27,6 +27,7 @@ export interface OnboardingState extends State {
  */
 export type OnboardingIntent =
   | { type: 'NEXT_STEP' }
+  | { type: 'PREVIOUS_STEP' }
   | { type: 'SKIP_ONBOARDING' }
   | { type: 'COMPLETE_ONBOARDING' };
 

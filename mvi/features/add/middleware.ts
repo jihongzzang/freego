@@ -14,19 +14,21 @@ import { storage } from '@/lib/storage';
 function validateForm(form: AddState['form']): { isValid: boolean; errors: AddState['errors'] } {
   const errors: AddState['errors'] = {};
 
-  // 이름 검증
+  // 이름 검증 (필수)
   if (!form.name.trim()) {
     errors.name = '재료 이름을 입력해주세요.';
   }
 
-  // 수량 검증
-  const quantity = parseInt(form.quantity);
-  if (!form.quantity.trim() || isNaN(quantity) || quantity <= 0) {
-    errors.quantity = '올바른 수량을 입력해주세요.';
+  // 수량 검증 (선택적)
+  if (form.quantity.trim()) {
+    const quantity = parseInt(form.quantity);
+    if (isNaN(quantity) || quantity <= 0) {
+      errors.quantity = '올바른 수량을 입력해주세요.';
+    }
   }
 
   // 유통기한 검증 (선택적)
-  if (form.expiry_date) {
+  if (form.expiry_date.trim()) {
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!dateRegex.test(form.expiry_date)) {
       errors.expiry_date = '날짜 형식이 올바르지 않습니다. (YYYY-MM-DD)';
@@ -92,10 +94,10 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
         await storage.addIngredient({
           name: state.form.name,
           category: state.form.category,
-          quantity: parseInt(state.form.quantity),
-          unit: state.form.unit,
+          quantity: state.form.quantity.trim() ? parseInt(state.form.quantity) : null,
+          unit: state.form.unit.trim() || null,
           purchase_date: new Date().toISOString().split('T')[0],
-          expiry_date: state.form.expiry_date || null,
+          expiry_date: state.form.expiry_date.trim() || null,
           storage_location: state.form.storage_location,
           memo: state.form.memo,
         });
@@ -107,8 +109,8 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
             form: {
               name: '',
               category: '채소',
-              quantity: '1',
-              unit: '개',
+              quantity: '',
+              unit: '',
               expiry_date: '',
               storage_location: '냉장실',
               memo: '',

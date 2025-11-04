@@ -22,7 +22,7 @@ const initialFormData = {
 
 export const addReducer: Reducer<AddState, AddIntent> = (
   state,
-  intent
+  intent,
 ): AddState => {
   switch (intent.type) {
     case 'SET_MODE':
@@ -55,11 +55,8 @@ export const addReducer: Reducer<AddState, AddIntent> = (
       };
 
     case 'SUBMIT_FORM':
-      return {
-        ...state,
-        isSubmitting: true,
-        errors: {},
-      };
+      // SUBMIT_FORM은 미들웨어에서 처리하므로 리듀서에서는 상태 변경 없음
+      return state;
 
     case 'SUBMIT_SUCCESS':
       return {
