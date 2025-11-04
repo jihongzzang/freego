@@ -19,12 +19,6 @@ function validateForm(form: AddState['form']): { isValid: boolean; errors: AddSt
     errors.name = '재료 이름을 입력해주세요.';
   }
 
-  // 수량 검증
-  const quantity = parseInt(form.quantity);
-  if (!form.quantity.trim() || isNaN(quantity) || quantity <= 0) {
-    errors.quantity = '올바른 수량을 입력해주세요.';
-  }
-
   // 유통기한 검증 (선택적)
   if (form.expiry_date) {
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;

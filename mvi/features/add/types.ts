@@ -22,7 +22,6 @@ export interface AddFormData {
  */
 export interface ValidationErrors {
   name?: string;
-  quantity?: string;
   expiry_date?: string;
 }
 

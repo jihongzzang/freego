@@ -172,51 +172,6 @@ function AddIngredientContent() {
               </View>
             </View>
 
-            <View style={styles.row}>
-              <View style={[styles.inputGroup, { flex: 1 }]}>
-                <Text style={[styles.label, { color: colors.text }]}>
-                  수량 <Text style={styles.required}>*</Text>
-                </Text>
-                <TextInput
-                  style={[
-                    styles.input,
-                    {
-                      backgroundColor: colors.surface,
-                      color: colors.text,
-                      borderColor: colors.border,
-                    },
-                    state.errors.quantity && { borderColor: '#F04452' },
-                  ]}
-                  value={state.form.quantity}
-                  onChangeText={(text) => handleFieldChange('quantity', text)}
-                  keyboardType="numeric"
-                  placeholder="0"
-                  placeholderTextColor={colors.textTertiary}
-                />
-                {state.errors.quantity && (
-                  <Text style={[styles.errorText, { color: '#F04452' }]}>
-                    {state.errors.quantity}
-                  </Text>
-                )}
-              </View>
-              <View style={[styles.inputGroup, { flex: 1, marginLeft: 12 }]}>
-                <Text style={[styles.label, { color: colors.text }]}>단위</Text>
-                <TextInput
-                  style={[
-                    styles.input,
-                    {
-                      backgroundColor: colors.surface,
-                      color: colors.text,
-                      borderColor: colors.border,
-                    },
-                  ]}
-                  value={state.form.unit}
-                  onChangeText={(text) => handleFieldChange('unit', text)}
-                  placeholder="개, g, ml"
-                  placeholderTextColor={colors.textTertiary}
-                />
-              </View>
-            </View>
 
             <View style={styles.inputGroup}>
               <Text style={[styles.label, { color: colors.text }]}>
