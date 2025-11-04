@@ -1,79 +1,64 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { useState, useRef } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { ChefHat, Plus, Clock, Minus, Bell, Package, Carrot, Apple, Beef, Milk } from 'lucide-react-native';
-import { storage, Ingredient as StoredIngredient } from '@/lib/storage';
-import { useCallback } from 'react';
 import { useTheme, getStatusColor } from '@/lib/theme';
-
-interface Ingredient extends StoredIngredient {
-  status: string;
-}
+import { useMVIStore } from '@/mvi/base';
+import { createHomeStore, Ingredient } from '@/mvi/features/home';
+import { AnimatedTabWrapper } from '@/components/AnimatedTabWrapper';
 
 export default function DashboardScreen() {
+  return (
+    <AnimatedTabWrapper tabName="index">
+      <DashboardContent />
+    </AnimatedTabWrapper>
+  );
+}
+
+function DashboardContent() {
   const router = useRouter();
   const { colors } = useTheme();
   const scrollViewRef = useRef<ScrollView>(null);
   const expiringRef = useRef<View>(null);
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [loading, setLoading] = useState(true);
 
+  // MVI Store 사용
+  const [state, dispatch, effect] = useMVIStore(createHomeStore);
+  const { ingredients, loading } = state;
+
+  // Effect 처리
+  useEffect(() => {
+    if (effect) {
+      switch (effect.type) {
+        case 'NAVIGATE':
+          router.push(effect.payload as any);
+          break;
+        case 'SHOW_TOAST':
+          console.log(effect.payload);
+          break;
+      }
+    }
+  }, [effect, router]);
+
+  // 화면 포커스 시 데이터 로드
   useFocusEffect(
     useCallback(() => {
-      fetchIngredients();
-    }, [])
+      dispatch({ type: 'LOAD_INGREDIENTS' });
+    }, [dispatch])
   );
 
-  async function fetchIngredients() {
-    try {
-      const data = await storage.getIngredients();
-      const updatedData = data.map(item => ({
-        ...item,
-        status: calculateStatus(item.expiry_date)
-      }));
+  function getDaysRemaining(daysRemaining: number | null): string {
+    if (daysRemaining === null) return '';
 
-      setIngredients(updatedData);
-    } catch (error) {
-      console.error('Error fetching ingredients:', error);
-    } finally {
-      setLoading(false);
-    }
+    if (daysRemaining < 0) return '만료';
+    if (daysRemaining === 0) return '오늘';
+    if (daysRemaining === 1) return '내일';
+    return `${daysRemaining}일`;
   }
-
-  function calculateStatus(expiryDate: string | null): string {
-    if (!expiryDate) return '신선';
-
-    const today = new Date();
-    const expiry = new Date(expiryDate);
-    const diffTime = expiry.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) return '소모됨';
-    if (diffDays <= 3) return '주의';
-    return '신선';
-  }
-
-  function getDaysRemaining(expiryDate: string | null): string {
-    if (!expiryDate) return '';
-
-    const today = new Date();
-    const expiry = new Date(expiryDate);
-    const diffTime = expiry.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) return '만료';
-    if (diffDays === 0) return '오늘';
-    if (diffDays === 1) return '내일';
-    return `${diffDays}일`;
-  }
-
 
   const expiringItems = ingredients.filter(item => item.status === '주의' || item.status === '소모됨');
-  const freshItems = ingredients.filter(item => item.status === '신선');
 
   async function quickDeduct(id: string) {
-    await storage.deleteIngredient(id);
-    fetchIngredients();
+    dispatch({ type: 'DELETE_INGREDIENT', payload: id });
   }
 
   function getCategoryIcon(category: string) {
@@ -94,7 +79,7 @@ export default function DashboardScreen() {
   const renderIngredientItem = ({ item }: { item: Ingredient }) => (
     <TouchableOpacity
       style={styles.ingredientItem}
-      onPress={() => router.push(`/ingredient/${item.id}`)}
+      onPress={() => dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: item.id })}
       activeOpacity={0.7}>
       <View style={styles.ingredientLeft}>
         <View style={[styles.categoryIconWrapper, { backgroundColor: colors.primaryLight }]}>
@@ -107,7 +92,7 @@ export default function DashboardScreen() {
           </View>
           <Text style={[styles.ingredientMeta, { color: colors.textSecondary }]}>
             {item.quantity}{item.unit} · {item.storage_location}
-            {item.expiry_date && ` · ${getDaysRemaining(item.expiry_date)}`}
+            {item.daysRemaining !== null && ` · ${getDaysRemaining(item.daysRemaining)}`}
           </Text>
         </View>
       </View>
@@ -133,7 +118,7 @@ export default function DashboardScreen() {
           style={[styles.notificationButton, { backgroundColor: expiringItems.length > 0 ? colors.dangerLight : colors.surfaceSecondary }]}
           onPress={() => {
             if (expiringItems.length > 0) {
-              router.push('/expiring');
+              dispatch({ type: 'NAVIGATE_TO_EXPIRING' });
             }
           }}>
           <Bell size={20} color={expiringItems.length > 0 ? colors.danger : colors.textSecondary} />
@@ -149,7 +134,7 @@ export default function DashboardScreen() {
         <View style={styles.quickActions}>
           <TouchableOpacity
             style={[styles.actionCard, { backgroundColor: colors.surface }]}
-            onPress={() => router.push('/(tabs)/add')}
+            onPress={() => dispatch({ type: 'NAVIGATE_TO_ADD' })}
             activeOpacity={0.7}>
             <View style={[styles.actionIcon, { backgroundColor: colors.primaryLight }]}>
               <Plus size={24} color={colors.primary} />
@@ -159,7 +144,7 @@ export default function DashboardScreen() {
 
           <TouchableOpacity
             style={[styles.actionCard, { backgroundColor: colors.surface }]}
-            onPress={() => router.push('/cooking')}
+            onPress={() => dispatch({ type: 'NAVIGATE_TO_COOKING' })}
             activeOpacity={0.7}>
             <View style={[styles.actionIcon, { backgroundColor: colors.secondaryLight }]}>
               <ChefHat size={24} color={colors.secondary} />
@@ -171,7 +156,7 @@ export default function DashboardScreen() {
         <View style={styles.summaryCard}>
           <TouchableOpacity
             style={[styles.summaryItem, { backgroundColor: colors.surface }]}
-            onPress={() => router.push('/ingredients')}
+            onPress={() => dispatch({ type: 'NAVIGATE_TO_INGREDIENTS' })}
             activeOpacity={0.7}>
             <Package size={20} color={colors.primary} />
             <View style={styles.summaryContent}>
@@ -181,7 +166,7 @@ export default function DashboardScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.summaryItem, { backgroundColor: colors.surface }]}
-            onPress={() => router.push('/expiring')}
+            onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
             activeOpacity={0.7}>
             <Clock size={20} color={colors.danger} />
             <View style={styles.summaryContent}>
@@ -195,7 +180,7 @@ export default function DashboardScreen() {
           <View ref={expiringRef} style={styles.section}>
             <TouchableOpacity
               style={styles.sectionHeader}
-              onPress={() => router.push('/expiring')}
+              onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
               activeOpacity={0.7}>
               <Bell size={20} color={colors.danger} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>유통기한 임박</Text>
@@ -206,7 +191,7 @@ export default function DashboardScreen() {
             {expiringItems.length > 3 && (
               <TouchableOpacity
                 style={styles.viewMoreButton}
-                onPress={() => router.push('/expiring')}>
+                onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}>
                 <Text style={[styles.viewMoreText, { color: colors.primary }]}>더 보기</Text>
               </TouchableOpacity>
             )}
@@ -216,7 +201,7 @@ export default function DashboardScreen() {
         <View style={styles.section}>
           <TouchableOpacity
             style={styles.sectionHeader}
-            onPress={() => router.push('/ingredients')}
+            onPress={() => dispatch({ type: 'NAVIGATE_TO_INGREDIENTS' })}
             activeOpacity={0.7}>
             <Package size={20} color={colors.primary} />
             <Text style={[styles.sectionTitle, { color: colors.text }]}>보관 중인 재료</Text>
@@ -238,7 +223,7 @@ export default function DashboardScreen() {
               {ingredients.length > 5 && (
                 <TouchableOpacity
                   style={styles.viewMoreButton}
-                  onPress={() => router.push('/ingredients')}>
+                  onPress={() => dispatch({ type: 'NAVIGATE_TO_INGREDIENTS' })}>
                   <Text style={[styles.viewMoreText, { color: colors.primary }]}>더 보기</Text>
                 </TouchableOpacity>
               )}

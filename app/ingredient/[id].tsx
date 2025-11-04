@@ -1,138 +1,87 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Trash2, Edit3, Minus, Calendar } from 'lucide-react-native';
-import { storage, Ingredient as StoredIngredient } from '@/lib/storage';
+import { ArrowLeft, Trash2, Edit3, Minus } from 'lucide-react-native';
 import { useTheme, getStatusColor } from '@/lib/theme';
 import { useDialog } from '@/hooks/useDialog';
-
-interface Ingredient extends StoredIngredient {
-  status: string;
-}
+import { useMVIStore } from '@/mvi/base';
+import { createIngredientDetailStore, EditFormData } from '@/mvi/features/ingredient-detail';
 
 export default function IngredientDetailScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const { id } = useLocalSearchParams();
   const { alert, confirm, DialogComponent } = useDialog();
-  const [ingredient, setIngredient] = useState<Ingredient | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({
-    name: '',
-    category: '',
-    quantity: '',
-    unit: '',
-    expiry_date: '',
-    storage_location: '',
-    memo: '',
-  });
+  const [state, dispatch, effect] = useMVIStore(createIngredientDetailStore);
 
+  // 식재료 데이터 로드
   useEffect(() => {
-    fetchIngredient();
+    if (id) {
+      dispatch({ type: 'LOAD_INGREDIENT', payload: id as string });
+    }
   }, [id]);
 
-  async function fetchIngredient() {
-    try {
-      const ingredients = await storage.getIngredients();
-      const data = ingredients.find(item => item.id === id);
+  // Effect 처리
+  useEffect(() => {
+    if (!effect) return;
 
-      if (data) {
-        const status = calculateStatus(data.expiry_date);
-        setIngredient({ ...data, status });
-        setEditForm({
-          name: data.name,
-          category: data.category,
-          quantity: data.quantity.toString(),
-          unit: data.unit,
-          expiry_date: data.expiry_date || '',
-          storage_location: data.storage_location,
-          memo: data.memo || '',
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching ingredient:', error);
+    switch (effect.type) {
+      case 'SHOW_ALERT':
+        alert(effect.payload.title, effect.payload.message, effect.payload.variant);
+        break;
+
+      case 'SHOW_CONFIRM':
+        confirm(
+          effect.payload.title,
+          effect.payload.message,
+          async () => {
+            await effect.payload.onConfirm();
+            // 삭제/소모 후 화면 이동
+            if (effect.payload.title.includes('삭제') || effect.payload.title.includes('소모')) {
+              if (effect.payload.title.includes('소모')) {
+                alert('완료', `${state.ingredient?.name}이(가) 장보기 목록에 추가되었습니다.`, 'success');
+              }
+              router.back();
+            }
+          },
+          undefined,
+          effect.payload.isDanger ? '삭제' : '소모',
+          '취소',
+          effect.payload.isDanger
+        );
+        break;
+
+      case 'NAVIGATE_BACK':
+        router.back();
+        break;
+    }
+  }, [effect]);
+
+  function handleFieldChange(field: keyof EditFormData, value: string) {
+    dispatch({ type: 'UPDATE_FORM_FIELD', payload: { field, value } });
+  }
+
+  function handleDelete() {
+    dispatch({ type: 'DELETE_INGREDIENT' });
+  }
+
+  function handleConsume() {
+    dispatch({ type: 'CONSUME_INGREDIENT' });
+  }
+
+  function handleUpdate() {
+    dispatch({ type: 'UPDATE_INGREDIENT' });
+  }
+
+  function toggleEditing() {
+    if (state.isEditing) {
+      handleUpdate();
+    } else {
+      dispatch({ type: 'SET_EDITING', payload: true });
     }
   }
 
-  function calculateStatus(expiryDate: string | null): string {
-    if (!expiryDate) return '신선';
-
-    const today = new Date();
-    const expiry = new Date(expiryDate);
-    const diffTime = expiry.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) return '소모됨';
-    if (diffDays <= 3) return '주의';
-    return '신선';
-  }
-
-  async function handleDelete() {
-    confirm(
-      '삭제 확인',
-      '이 식재료를 삭제하시겠습니까?',
-      async () => {
-        try {
-          await storage.deleteIngredient(id as string);
-          router.back();
-        } catch (error) {
-          console.error('Error deleting ingredient:', error);
-        }
-      },
-      undefined,
-      '삭제',
-      '취소',
-      true
-    );
-  }
-
-  async function handleConsume() {
-    if (!ingredient) return;
-
-    confirm(
-      '소모 확인',
-      `${ingredient.name}을(를) 소모 처리하시겠습니까?\n장보기 목록에 자동으로 추가됩니다.`,
-      async () => {
-        try {
-          await storage.addToShoppingList({
-            name: ingredient.name,
-            category: ingredient.category,
-            unit: ingredient.unit,
-          });
-          await storage.deleteIngredient(id as string);
-          alert('완료', `${ingredient.name}이(가) 장보기 목록에 추가되었습니다.`, 'success');
-          router.back();
-        } catch (error) {
-          console.error('Error consuming ingredient:', error);
-        }
-      },
-      undefined,
-      '소모',
-      '취소'
-    );
-  }
-
-  async function handleUpdate() {
-    try {
-      await storage.updateIngredient(id as string, {
-        name: editForm.name,
-        category: editForm.category,
-        quantity: parseInt(editForm.quantity) || 0,
-        unit: editForm.unit,
-        expiry_date: editForm.expiry_date || null,
-        storage_location: editForm.storage_location,
-        memo: editForm.memo,
-      });
-
-      setIsEditing(false);
-      fetchIngredient();
-    } catch (error) {
-      console.error('Error updating ingredient:', error);
-    }
-  }
-
-
-  if (!ingredient) {
+  if (!state.ingredient) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Text style={{ color: colors.text }}>로딩 중...</Text>
@@ -150,7 +99,7 @@ export default function IngredientDetailScreen() {
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>식재료 상세</Text>
         <TouchableOpacity
-          onPress={() => (isEditing ? handleUpdate() : setIsEditing(true))}
+          onPress={toggleEditing}
           style={styles.editButton}>
           <Edit3 size={24} color={colors.primary} />
         </TouchableOpacity>
@@ -158,14 +107,14 @@ export default function IngredientDetailScreen() {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
-          {isEditing ? (
+          {state.isEditing ? (
             <View style={styles.editSection}>
               <View style={styles.inputGroup}>
                 <Text style={[styles.label, { color: colors.textSecondary }]}>이름</Text>
                 <TextInput
                   style={[styles.input, { backgroundColor: colors.surfaceSecondary, color: colors.text }]}
-                  value={editForm.name}
-                  onChangeText={(text) => setEditForm({ ...editForm, name: text })}
+                  value={state.editForm.name}
+                  onChangeText={(text) => handleFieldChange('name', text)}
                   placeholder="식재료 이름"
                 />
               </View>
@@ -179,14 +128,14 @@ export default function IngredientDetailScreen() {
                       style={[
                         styles.categoryBtn,
                         { backgroundColor: colors.surfaceSecondary },
-                        editForm.category === cat && { backgroundColor: colors.primary },
+                        state.editForm.category === cat && { backgroundColor: colors.primary },
                       ]}
-                      onPress={() => setEditForm({ ...editForm, category: cat })}>
+                      onPress={() => handleFieldChange('category', cat)}>
                       <Text
                         style={[
                           styles.categoryBtnText,
                           { color: colors.textSecondary },
-                          editForm.category === cat && { color: '#ffffff' },
+                          state.editForm.category === cat && { color: '#ffffff' },
                         ]}>
                         {cat}
                       </Text>
@@ -200,8 +149,8 @@ export default function IngredientDetailScreen() {
                   <Text style={[styles.label, { color: colors.textSecondary }]}>수량</Text>
                   <TextInput
                     style={[styles.input, { backgroundColor: colors.surfaceSecondary, color: colors.text }]}
-                    value={editForm.quantity}
-                    onChangeText={(text) => setEditForm({ ...editForm, quantity: text })}
+                    value={state.editForm.quantity}
+                    onChangeText={(text) => handleFieldChange('quantity', text)}
                     keyboardType="numeric"
                     placeholder="0"
                   />
@@ -210,8 +159,8 @@ export default function IngredientDetailScreen() {
                   <Text style={[styles.label, { color: colors.textSecondary }]}>단위</Text>
                   <TextInput
                     style={[styles.input, { backgroundColor: colors.surfaceSecondary, color: colors.text }]}
-                    value={editForm.unit}
-                    onChangeText={(text) => setEditForm({ ...editForm, unit: text })}
+                    value={state.editForm.unit}
+                    onChangeText={(text) => handleFieldChange('unit', text)}
                     placeholder="개, g, ml"
                   />
                 </View>
@@ -221,8 +170,8 @@ export default function IngredientDetailScreen() {
                 <Text style={[styles.label, { color: colors.textSecondary }]}>유통기한</Text>
                 <TextInput
                   style={[styles.input, { backgroundColor: colors.surfaceSecondary, color: colors.text }]}
-                  value={editForm.expiry_date}
-                  onChangeText={(text) => setEditForm({ ...editForm, expiry_date: text })}
+                  value={state.editForm.expiry_date}
+                  onChangeText={(text) => handleFieldChange('expiry_date', text)}
                   placeholder="YYYY-MM-DD"
                 />
               </View>
@@ -236,14 +185,14 @@ export default function IngredientDetailScreen() {
                       style={[
                         styles.categoryBtn,
                         { backgroundColor: colors.surfaceSecondary },
-                        editForm.storage_location === loc && { backgroundColor: colors.primary },
+                        state.editForm.storage_location === loc && { backgroundColor: colors.primary },
                       ]}
-                      onPress={() => setEditForm({ ...editForm, storage_location: loc })}>
+                      onPress={() => handleFieldChange('storage_location', loc)}>
                       <Text
                         style={[
                           styles.categoryBtnText,
                           { color: colors.textSecondary },
-                          editForm.storage_location === loc && { color: '#ffffff' },
+                          state.editForm.storage_location === loc && { color: '#ffffff' },
                         ]}>
                         {loc}
                       </Text>
@@ -256,8 +205,8 @@ export default function IngredientDetailScreen() {
                 <Text style={[styles.label, { color: colors.textSecondary }]}>메모</Text>
                 <TextInput
                   style={[styles.input, styles.textArea, { backgroundColor: colors.surfaceSecondary, color: colors.text }]}
-                  value={editForm.memo}
-                  onChangeText={(text) => setEditForm({ ...editForm, memo: text })}
+                  value={state.editForm.memo}
+                  onChangeText={(text) => handleFieldChange('memo', text)}
                   placeholder="메모를 입력하세요"
                   multiline
                   numberOfLines={4}
@@ -267,48 +216,48 @@ export default function IngredientDetailScreen() {
           ) : (
             <View style={styles.detailSection}>
               <View style={[styles.mainInfo, { borderBottomColor: colors.border }]}>
-                <Text style={[styles.ingredientName, { color: colors.text }]}>{ingredient.name}</Text>
-                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(ingredient.status) }]}>
-                  <Text style={[styles.statusText, { color: '#ffffff' }]}>{ingredient.status}</Text>
+                <Text style={[styles.ingredientName, { color: colors.text }]}>{state.ingredient.name}</Text>
+                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(state.ingredient.status) }]}>
+                  <Text style={[styles.statusText, { color: '#ffffff' }]}>{state.ingredient.status}</Text>
                 </View>
               </View>
 
               <View style={styles.infoGrid}>
                 <View style={styles.infoItem}>
                   <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>카테고리</Text>
-                  <Text style={[styles.infoValue, { color: colors.text }]}>{ingredient.category}</Text>
+                  <Text style={[styles.infoValue, { color: colors.text }]}>{state.ingredient.category}</Text>
                 </View>
                 <View style={styles.infoItem}>
                   <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>수량</Text>
                   <Text style={[styles.infoValue, { color: colors.text }]}>
-                    {ingredient.quantity} {ingredient.unit}
+                    {state.ingredient.quantity} {state.ingredient.unit}
                   </Text>
                 </View>
                 <View style={styles.infoItem}>
                   <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>보관 위치</Text>
-                  <Text style={[styles.infoValue, { color: colors.text }]}>{ingredient.storage_location}</Text>
+                  <Text style={[styles.infoValue, { color: colors.text }]}>{state.ingredient.storage_location}</Text>
                 </View>
                 <View style={styles.infoItem}>
                   <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>구매일</Text>
-                  <Text style={[styles.infoValue, { color: colors.text }]}>{ingredient.purchase_date || '-'}</Text>
+                  <Text style={[styles.infoValue, { color: colors.text }]}>{state.ingredient.purchase_date || '-'}</Text>
                 </View>
                 <View style={styles.infoItem}>
                   <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>유통기한</Text>
-                  <Text style={[styles.infoValue, { color: colors.text }]}>{ingredient.expiry_date || '-'}</Text>
+                  <Text style={[styles.infoValue, { color: colors.text }]}>{state.ingredient.expiry_date || '-'}</Text>
                 </View>
               </View>
 
-              {ingredient.memo && (
+              {state.ingredient.memo && (
                 <View style={[styles.memoSection, { borderTopColor: colors.border }]}>
                   <Text style={[styles.memoLabel, { color: colors.textSecondary }]}>메모</Text>
-                  <Text style={[styles.memoText, { color: colors.text }]}>{ingredient.memo}</Text>
+                  <Text style={[styles.memoText, { color: colors.text }]}>{state.ingredient.memo}</Text>
                 </View>
               )}
             </View>
           )}
         </View>
 
-        {!isEditing && (
+        {!state.isEditing && (
           <View style={styles.actionButtons}>
             <TouchableOpacity style={[styles.consumeButton, { backgroundColor: colors.success }]} onPress={handleConsume}>
               <Minus size={20} color="#ffffff" />

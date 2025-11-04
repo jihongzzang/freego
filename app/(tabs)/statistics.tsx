@@ -1,73 +1,30 @@
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
-import { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { TrendingUp, Package, ShoppingCart, AlertTriangle } from 'lucide-react-native';
-import { storage } from '@/lib/storage';
 import { useTheme, getCategoryColor, getStorageColor } from '@/lib/theme';
-
-interface Stats {
-  totalIngredients: number;
-  expiringItems: number;
-  totalConsumed: number;
-  categoryDistribution: { [key: string]: number };
-  storageDistribution: { [key: string]: number };
-  recentConsumptions: Array<{ ingredient_name: string; quantity: number; consumed_date: string }>;
-}
+import { useMVIStore } from '@/mvi/base';
+import { createStatisticsStore } from '@/mvi/features/statistics';
+import { AnimatedTabWrapper } from '@/components/AnimatedTabWrapper';
 
 export default function StatisticsScreen() {
-  const { colors } = useTheme();
-  const [stats, setStats] = useState<Stats>({
-    totalIngredients: 0,
-    expiringItems: 0,
-    totalConsumed: 0,
-    categoryDistribution: {},
-    storageDistribution: {},
-    recentConsumptions: [],
-  });
+  return (
+    <AnimatedTabWrapper tabName="statistics">
+      <StatisticsContent />
+    </AnimatedTabWrapper>
+  );
+}
 
+function StatisticsContent() {
+  const { colors } = useTheme();
+  const [state, dispatch] = useMVIStore(createStatisticsStore);
+
+  // 화면 포커스 시 데이터 로드
   useFocusEffect(
     useCallback(() => {
-      fetchStatistics();
+      dispatch({ type: 'LOAD_STATISTICS' });
     }, [])
   );
-
-  async function fetchStatistics() {
-    try {
-      const ingredients = await storage.getIngredients();
-
-      const totalIngredients = ingredients.length;
-
-      const expiringItems = ingredients.filter((item) => {
-        if (!item.expiry_date) return false;
-        const today = new Date();
-        const expiry = new Date(item.expiry_date);
-        const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        return diffDays >= 0 && diffDays <= 3;
-      }).length;
-
-      const categoryDistribution: { [key: string]: number } = {};
-      ingredients.forEach((item) => {
-        categoryDistribution[item.category] = (categoryDistribution[item.category] || 0) + 1;
-      });
-
-      const storageDistribution: { [key: string]: number } = {};
-      ingredients.forEach((item) => {
-        storageDistribution[item.storage_location] =
-          (storageDistribution[item.storage_location] || 0) + 1;
-      });
-
-      setStats({
-        totalIngredients,
-        expiringItems,
-        totalConsumed: 0,
-        categoryDistribution,
-        storageDistribution,
-        recentConsumptions: [],
-      });
-    } catch (error) {
-      console.error('Error fetching statistics:', error);
-    }
-  }
 
 
   return (
@@ -83,7 +40,7 @@ export default function StatisticsScreen() {
             <View style={styles.statIcon}>
               <Package size={24} color={colors.primary} />
             </View>
-            <Text style={[styles.statValue, { color: colors.text }]}>{stats.totalIngredients}</Text>
+            <Text style={[styles.statValue, { color: colors.text }]}>{state.stats.totalIngredients}</Text>
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>전체 식재료</Text>
           </View>
 
@@ -91,7 +48,7 @@ export default function StatisticsScreen() {
             <View style={styles.statIcon}>
               <AlertTriangle size={24} color={colors.secondary} />
             </View>
-            <Text style={[styles.statValue, { color: colors.text }]}>{stats.expiringItems}</Text>
+            <Text style={[styles.statValue, { color: colors.text }]}>{state.stats.expiringItems}</Text>
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>유통기한 임박</Text>
           </View>
 
@@ -99,7 +56,7 @@ export default function StatisticsScreen() {
             <View style={styles.statIcon}>
               <TrendingUp size={24} color={colors.success} />
             </View>
-            <Text style={[styles.statValue, { color: colors.text }]}>{stats.totalConsumed}</Text>
+            <Text style={[styles.statValue, { color: colors.text }]}>{state.stats.totalConsumed}</Text>
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>소비 기록</Text>
           </View>
         </View>
@@ -107,12 +64,12 @@ export default function StatisticsScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>카테고리별 분포</Text>
           <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
-            {Object.keys(stats.categoryDistribution).length === 0 ? (
+            {Object.keys(state.stats.categoryDistribution).length === 0 ? (
               <Text style={[styles.emptyText, { color: colors.textTertiary }]}>데이터가 없습니다</Text>
             ) : (
               <View style={styles.barChart}>
-                {Object.entries(stats.categoryDistribution).map(([category, count]) => {
-                  const maxCount = Math.max(...Object.values(stats.categoryDistribution));
+                {Object.entries(state.stats.categoryDistribution).map(([category, count]) => {
+                  const maxCount = Math.max(...Object.values(state.stats.categoryDistribution));
                   const percentage = (count / maxCount) * 100;
 
                   return (
@@ -143,12 +100,12 @@ export default function StatisticsScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>보관 위치별 분포</Text>
           <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
-            {Object.keys(stats.storageDistribution).length === 0 ? (
+            {Object.keys(state.stats.storageDistribution).length === 0 ? (
               <Text style={[styles.emptyText, { color: colors.textTertiary }]}>데이터가 없습니다</Text>
             ) : (
               <View style={styles.pieChartContainer}>
-                {Object.entries(stats.storageDistribution).map(([location, count]) => {
-                  const total = Object.values(stats.storageDistribution).reduce(
+                {Object.entries(state.stats.storageDistribution).map(([location, count]) => {
+                  const total = Object.values(state.stats.storageDistribution).reduce(
                     (a, b) => a + b,
                     0
                   );
@@ -175,22 +132,22 @@ export default function StatisticsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>최근 소비 기록</Text>
-          <View style={styles.chartCard}>
-            {stats.recentConsumptions.length === 0 ? (
-              <Text style={styles.emptyText}>소비 기록이 없습니다</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>최근 소비 기록</Text>
+          <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
+            {state.stats.recentConsumptions.length === 0 ? (
+              <Text style={[styles.emptyText, { color: colors.textTertiary }]}>소비 기록이 없습니다</Text>
             ) : (
               <View style={styles.consumptionList}>
-                {stats.recentConsumptions.map((item, index) => (
+                {state.stats.recentConsumptions.map((item, index) => (
                   <View key={index} style={styles.consumptionItem}>
-                    <View style={styles.consumptionIcon}>
-                      <ShoppingCart size={16} color="#10b981" />
+                    <View style={[styles.consumptionIcon, { backgroundColor: colors.successLight }]}>
+                      <ShoppingCart size={16} color={colors.success} />
                     </View>
                     <View style={styles.consumptionInfo}>
-                      <Text style={styles.consumptionName}>{item.ingredient_name}</Text>
-                      <Text style={styles.consumptionDate}>{item.consumed_date}</Text>
+                      <Text style={[styles.consumptionName, { color: colors.text }]}>{item.ingredient_name}</Text>
+                      <Text style={[styles.consumptionDate, { color: colors.textSecondary }]}>{item.consumed_date}</Text>
                     </View>
-                    <Text style={styles.consumptionQuantity}>{item.quantity}개</Text>
+                    <Text style={[styles.consumptionQuantity, { color: colors.text }]}>{item.quantity}개</Text>
                   </View>
                 ))}
               </View>

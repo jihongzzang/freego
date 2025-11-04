@@ -1,16 +1,27 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
-import { Camera, Edit, Carrot, Apple, Beef, Milk, Package } from 'lucide-react-native';
-import { storage } from '@/lib/storage';
+import { Carrot, Apple, Beef, Milk, Package } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/hooks/useDialog';
+import { useMVIStore } from '@/mvi/base';
+import { createAddStore } from '@/mvi/features/add';
+import type { AddFormData } from '@/mvi/features/add';
+import { AnimatedTabWrapper } from '@/components/AnimatedTabWrapper';
 
 export default function AddIngredientScreen() {
+  return (
+    <AnimatedTabWrapper tabName="add">
+      <AddIngredientContent />
+    </AnimatedTabWrapper>
+  );
+}
+
+function AddIngredientContent() {
   const router = useRouter();
   const { colors } = useTheme();
   const { alert, DialogComponent } = useDialog();
-  const [mode, setMode] = useState<'select' | 'manual'>('select');
+  const [state, dispatch, effect] = useMVIStore(createAddStore);
 
   function getCategoryIcon(category: string) {
     const size = 18;
@@ -27,59 +38,35 @@ export default function AddIngredientScreen() {
         return <Package size={size} color="#8b5cf6" />;
     }
   }
-  const [form, setForm] = useState({
-    name: '',
-    category: '채소',
-    quantity: '1',
-    unit: '개',
-    expiry_date: '',
-    storage_location: '냉장실',
-    memo: '',
-  });
 
-  async function handleSubmit() {
-    if (!form.name.trim()) {
-      alert('알림', '재료 이름을 입력해주세요.', 'warning');
-      return;
+  // Effect 처리
+  useEffect(() => {
+    if (!effect) return;
+
+    switch (effect.type) {
+      case 'SHOW_ALERT':
+        alert(effect.payload.title, effect.payload.message, effect.payload.variant);
+        break;
+
+      case 'NAVIGATE_HOME':
+        router.push('/(tabs)');
+        break;
     }
+  }, [effect]);
 
-    if (!form.quantity.trim() || parseInt(form.quantity) <= 0) {
-      alert('알림', '수량을 입력해주세요.', 'warning');
-      return;
+  // 초기 모드 설정
+  useEffect(() => {
+    if (state.mode === 'select') {
+      dispatch({ type: 'SET_MODE', payload: 'manual' });
     }
+  }, [state.mode]);
 
-    try {
-      await storage.addIngredient({
-        name: form.name,
-        category: form.category,
-        quantity: parseInt(form.quantity),
-        unit: form.unit,
-        purchase_date: new Date().toISOString().split('T')[0],
-        expiry_date: form.expiry_date || null,
-        storage_location: form.storage_location,
-        memo: form.memo,
-      });
-
-      alert('성공', '식재료가 등록되었습니다.', 'success');
-      setForm({
-        name: '',
-        category: '채소',
-        quantity: '1',
-        unit: '개',
-        expiry_date: '',
-        storage_location: '냉장실',
-        memo: '',
-      });
-      setMode('select');
-      router.push('/(tabs)');
-    } catch (error) {
-      console.error('Error adding ingredient:', error);
-      alert('오류', '식재료 등록에 실패했습니다.', 'error');
-    }
+  function handleFieldChange(field: keyof AddFormData, value: string) {
+    dispatch({ type: 'UPDATE_FIELD', payload: { field, value } });
   }
 
-  if (mode === 'select') {
-    setMode('manual');
+  function handleSubmit() {
+    dispatch({ type: 'SUBMIT_FORM' });
   }
 
   return (
@@ -91,136 +78,166 @@ export default function AddIngredientScreen() {
         keyboardVerticalOffset={0}>
         <View style={[styles.header, { backgroundColor: colors.surface }]}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>재료 추가</Text>
-        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>관리하고 싶은 재료만 추가해보세요</Text>
-      </View>
+          <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>관리하고 싶은 재료만 추가해보세요</Text>
+        </View>
 
-      <ScrollView
-        style={styles.formContainer}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled">
-        <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: colors.text }]}>
-              이름 <Text style={styles.required}>*</Text>
-            </Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
-              value={form.name}
-              onChangeText={(text) => setForm({ ...form, name: text })}
-              placeholder="기억하고 싶은 재료 이름"
-              placeholderTextColor={colors.textTertiary}
-            />
-          </View>
+        <ScrollView
+          style={styles.formContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled">
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: colors.text }]}>
+                이름 <Text style={styles.required}>*</Text>
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
+                  state.errors.name && { borderColor: '#F04452' },
+                ]}
+                value={state.form.name}
+                onChangeText={(text) => handleFieldChange('name', text)}
+                placeholder="기억하고 싶은 재료 이름"
+                placeholderTextColor={colors.textTertiary}
+              />
+              {state.errors.name && (
+                <Text style={[styles.errorText, { color: '#F04452' }]}>{state.errors.name}</Text>
+              )}
+            </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: colors.text }]}>카테고리</Text>
-            <View style={styles.categoryButtons}>
-              {['채소', '과일', '육류', '유제품', '기타'].map((cat) => (
-                <TouchableOpacity
-                  key={cat}
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: colors.text }]}>카테고리</Text>
+              <View style={styles.categoryButtons}>
+                {['채소', '과일', '육류', '유제품', '기타'].map((cat) => (
+                  <TouchableOpacity
+                    key={cat}
+                    style={[
+                      styles.categoryBtn,
+                      { backgroundColor: colors.surfaceSecondary, borderColor: colors.surfaceSecondary },
+                      state.form.category === cat && { backgroundColor: colors.primaryLight, borderColor: colors.primary },
+                    ]}
+                    onPress={() => handleFieldChange('category', cat)}>
+                    <View style={styles.categoryBtnContent}>
+                      {getCategoryIcon(cat)}
+                      <Text
+                        style={[
+                          styles.categoryBtnText,
+                          { color: colors.textSecondary },
+                          state.form.category === cat && { color: colors.primary },
+                        ]}>
+                        {cat}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.row}>
+              <View style={[styles.inputGroup, { flex: 1 }]}>
+                <Text style={[styles.label, { color: colors.text }]}>
+                  수량 <Text style={styles.required}>*</Text>
+                </Text>
+                <TextInput
                   style={[
-                    styles.categoryBtn,
-                    { backgroundColor: colors.surfaceSecondary, borderColor: colors.surfaceSecondary },
-                    form.category === cat && { backgroundColor: colors.primaryLight, borderColor: colors.primary },
+                    styles.input,
+                    { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
+                    state.errors.quantity && { borderColor: '#F04452' },
                   ]}
-                  onPress={() => setForm({ ...form, category: cat })}>
-                  <View style={styles.categoryBtnContent}>
-                    {getCategoryIcon(cat)}
+                  value={state.form.quantity}
+                  onChangeText={(text) => handleFieldChange('quantity', text)}
+                  keyboardType="numeric"
+                  placeholder="0"
+                  placeholderTextColor={colors.textTertiary}
+                />
+                {state.errors.quantity && (
+                  <Text style={[styles.errorText, { color: '#F04452' }]}>{state.errors.quantity}</Text>
+                )}
+              </View>
+              <View style={[styles.inputGroup, { flex: 1, marginLeft: 12 }]}>
+                <Text style={[styles.label, { color: colors.text }]}>단위</Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+                  value={state.form.unit}
+                  onChangeText={(text) => handleFieldChange('unit', text)}
+                  placeholder="개, g, ml"
+                  placeholderTextColor={colors.textTertiary}
+                />
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: colors.text }]}>유통기한</Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
+                  state.errors.expiry_date && { borderColor: '#F04452' },
+                ]}
+                value={state.form.expiry_date}
+                onChangeText={(text) => handleFieldChange('expiry_date', text)}
+                placeholder="YYYY-MM-DD (예: 2025-12-31)"
+                placeholderTextColor={colors.textTertiary}
+              />
+              {state.errors.expiry_date && (
+                <Text style={[styles.errorText, { color: '#F04452' }]}>{state.errors.expiry_date}</Text>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: colors.text }]}>보관 위치</Text>
+              <View style={styles.categoryButtons}>
+                {['냉장실', '냉동실', '실온'].map((loc) => (
+                  <TouchableOpacity
+                    key={loc}
+                    style={[
+                      styles.categoryBtn,
+                      { backgroundColor: colors.surfaceSecondary, borderColor: colors.surfaceSecondary },
+                      state.form.storage_location === loc && { backgroundColor: colors.primaryLight, borderColor: colors.primary },
+                    ]}
+                    onPress={() => handleFieldChange('storage_location', loc)}>
                     <Text
                       style={[
                         styles.categoryBtnText,
                         { color: colors.textSecondary },
-                        form.category === cat && { color: colors.primary },
+                        state.form.storage_location === loc && { color: colors.primary },
                       ]}>
-                      {cat}
+                      {loc}
                     </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-          </View>
 
-          <View style={styles.row}>
-            <View style={[styles.inputGroup, { flex: 1 }]}>
-              <Text style={[styles.label, { color: colors.text }]}>
-                수량 <Text style={styles.required}>*</Text>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: colors.text }]}>메모</Text>
+              <TextInput
+                style={[styles.input, styles.textArea, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+                value={state.form.memo}
+                onChangeText={(text) => handleFieldChange('memo', text)}
+                placeholder="특별히 기억하고 싶은 내용이 있나요?"
+                placeholderTextColor={colors.textTertiary}
+                multiline
+                numberOfLines={4}
+              />
+            </View>
+
+            <TouchableOpacity
+              style={[
+                styles.submitButton,
+                { backgroundColor: colors.primary },
+                state.isSubmitting && { opacity: 0.6 }
+              ]}
+              onPress={handleSubmit}
+              disabled={state.isSubmitting}>
+              <Text style={styles.submitButtonText}>
+                {state.isSubmitting ? '추가 중...' : '추가할게요'}
               </Text>
-              <TextInput
-                style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
-                value={form.quantity}
-                onChangeText={(text) => setForm({ ...form, quantity: text })}
-                keyboardType="numeric"
-                placeholder="0"
-                placeholderTextColor={colors.textTertiary}
-              />
-            </View>
-            <View style={[styles.inputGroup, { flex: 1, marginLeft: 12 }]}>
-              <Text style={[styles.label, { color: colors.text }]}>단위</Text>
-              <TextInput
-                style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
-                value={form.unit}
-                onChangeText={(text) => setForm({ ...form, unit: text })}
-                placeholder="개, g, ml"
-                placeholderTextColor={colors.textTertiary}
-              />
-            </View>
+            </TouchableOpacity>
           </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: colors.text }]}>유통기한</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
-              value={form.expiry_date}
-              onChangeText={(text) => setForm({ ...form, expiry_date: text })}
-              placeholder="YYYY-MM-DD (예: 2025-12-31)"
-              placeholderTextColor={colors.textTertiary}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: colors.text }]}>보관 위치</Text>
-            <View style={styles.categoryButtons}>
-              {['냉장실', '냉동실', '실온'].map((loc) => (
-                <TouchableOpacity
-                  key={loc}
-                  style={[
-                    styles.categoryBtn,
-                    { backgroundColor: colors.surfaceSecondary, borderColor: colors.surfaceSecondary },
-                    form.storage_location === loc && { backgroundColor: colors.primaryLight, borderColor: colors.primary },
-                  ]}
-                  onPress={() => setForm({ ...form, storage_location: loc })}>
-                  <Text
-                    style={[
-                      styles.categoryBtnText,
-                      { color: colors.textSecondary },
-                      form.storage_location === loc && { color: colors.primary },
-                    ]}>
-                    {loc}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: colors.text }]}>메모</Text>
-            <TextInput
-              style={[styles.input, styles.textArea, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
-              value={form.memo}
-              onChangeText={(text) => setForm({ ...form, memo: text })}
-              placeholder="특별히 기억하고 싶은 내용이 있나요?"
-              placeholderTextColor={colors.textTertiary}
-              multiline
-              numberOfLines={4}
-            />
-          </View>
-
-          <TouchableOpacity style={[styles.submitButton, { backgroundColor: colors.primary }]} onPress={handleSubmit}>
-            <Text style={styles.submitButtonText}>추가할게요</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </>
   );
 }
@@ -270,6 +287,10 @@ const styles = StyleSheet.create({
   textArea: {
     height: 100,
     textAlignVertical: 'top',
+  },
+  errorText: {
+    fontSize: 12,
+    marginTop: -4,
   },
   row: {
     flexDirection: 'row',

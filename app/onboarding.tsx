@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronRight, Refrigerator, ShoppingCart, TrendingDown, Sparkles } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
+import { useMVIStore } from '@/mvi/base';
+import { createOnboardingStore } from '@/mvi/features/onboarding';
 
 const { width, height } = Dimensions.get('window');
 
@@ -16,7 +18,7 @@ interface OnboardingStep {
 
 export default function OnboardingScreen() {
   const { colors } = useTheme();
-  const [currentStep, setCurrentStep] = useState(0);
+  const [state, dispatch, effect] = useMVIStore(createOnboardingStore);
 
   const steps: OnboardingStep[] = [
     {
@@ -45,18 +47,23 @@ export default function OnboardingScreen() {
     },
   ];
 
-  const currentStepData = steps[currentStep];
+  const currentStepData = steps[state.currentStep];
 
-  function handleNext() {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
+  // Handle effects
+  useEffect(() => {
+    if (!effect) return;
+
+    if (effect.type === 'NAVIGATE_TO_HOME') {
       router.replace('/(tabs)');
     }
+  }, [effect]);
+
+  function handleNext() {
+    dispatch({ type: 'NEXT_STEP' });
   }
 
   function handleSkip() {
-    router.replace('/(tabs)');
+    dispatch({ type: 'SKIP_ONBOARDING' });
   }
 
   return (
@@ -64,7 +71,7 @@ export default function OnboardingScreen() {
       <LinearGradient
         colors={[currentStepData.color, currentStepData.color + 'dd']}
         style={styles.gradient}>
-        {currentStep < steps.length - 1 && (
+        {state.currentStep < steps.length - 1 && (
           <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
             <Text style={styles.skipText}>건너뛰기</Text>
           </TouchableOpacity>
@@ -85,7 +92,7 @@ export default function OnboardingScreen() {
                   key={index}
                   style={[
                     styles.paginationDot,
-                    index === currentStep && styles.paginationDotActive,
+                    index === state.currentStep && styles.paginationDotActive,
                   ]}
                 />
               ))}
@@ -93,7 +100,7 @@ export default function OnboardingScreen() {
 
             <TouchableOpacity style={styles.nextButton} onPress={handleNext} activeOpacity={0.8}>
               <Text style={styles.nextButtonText}>
-                {currentStep < steps.length - 1 ? '다음' : '시작하기'}
+                {state.currentStep < steps.length - 1 ? '다음' : '시작하기'}
               </Text>
               <ChevronRight size={24} color={currentStepData.color} />
             </TouchableOpacity>

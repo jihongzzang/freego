@@ -157,9 +157,10 @@ export function useTheme() {
     }
   }
 
-  const isDark = themePreference === 'system'
-    ? systemColorScheme === 'dark'
-    : themePreference === 'dark';
+  const isDark =
+    themePreference === 'system'
+      ? systemColorScheme === 'dark'
+      : themePreference === 'dark';
 
   const colors = isDark ? Colors.dark : Colors.light;
 
@@ -186,30 +187,30 @@ export function useTheme() {
 
 export function getStatusColor(status: string): string {
   const statusColors: Record<string, string> = {
-    '신선': '#10B981',
-    '주의': '#F59E0B',
-    '임박': '#F04452',
-    '만료': '#9CA3AF',
+    신선: '#10B981',
+    주의: '#F59E0B',
+    임박: '#F04452',
+    만료: '#9CA3AF',
   };
   return statusColors[status] || '#6B7280';
 }
 
 export function getCategoryColor(category: string): string {
   const categoryColors: Record<string, string> = {
-    '채소': '#10B981',
-    '과일': '#F59E0B',
-    '육류': '#EF4444',
-    '유제품': '#3B82F6',
-    '기타': '#6B7280',
+    채소: '#10B981',
+    과일: '#F59E0B',
+    육류: '#EF4444',
+    유제품: '#3B82F6',
+    기타: '#6B7280',
   };
   return categoryColors[category] || '#6B7280';
 }
 
 export function getStorageColor(location: string): string {
   const storageColors: Record<string, string> = {
-    '냉장실': '#3B82F6',
-    '냉동실': '#8B5CF6',
-    '실온': '#10B981',
+    냉장실: '#3B82F6',
+    냉동실: '#8B5CF6',
+    실온: '#10B981',
   };
   return storageColors[location] || '#6B7280';
 }

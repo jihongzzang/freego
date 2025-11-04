@@ -37,7 +37,7 @@ export default function ExpiringScreen() {
     }
   }
 
-  function calculateStatus(expiryDate?: string): string {
+  function calculateStatus(expiryDate?: string | null): string {
     if (!expiryDate) return '신선';
     const today = new Date();
     const expiry = new Date(expiryDate);

@@ -7,6 +7,12 @@ dist/
 web-build/
 expo-env.d.ts
 
+# claude
+.claude
+
+# claude
+.bolt
+
 # native
 *.orig.*
 *.jks

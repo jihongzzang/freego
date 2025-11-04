@@ -1,96 +1,73 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, ChefHat, Clock, Check } from 'lucide-react-native';
-import { storage } from '@/lib/storage';
 import { recipes, Recipe } from '@/lib/recipes';
 import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/hooks/useDialog';
+import { useMVIStore } from '@/mvi/base';
+import { createCookingStore } from '@/mvi/features/cooking';
 
 export default function CookingScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const { alert, confirm, DialogComponent } = useDialog();
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-  const [ingredients, setIngredients] = useState<any[]>([]);
-  const [availableRecipes, setAvailableRecipes] = useState<Recipe[]>([]);
+  const [state, dispatch, effect] = useMVIStore(createCookingStore);
 
+  // 데이터 로드
   useEffect(() => {
-    fetchIngredients();
+    dispatch({ type: 'LOAD_INGREDIENTS' });
   }, []);
 
-  async function fetchIngredients() {
-    const data = await storage.getIngredients();
-    setIngredients(data);
-    checkAvailableRecipes(data);
-  }
+  // Effect 처리
+  useEffect(() => {
+    if (!effect) return;
 
-  function checkAvailableRecipes(userIngredients: any[]) {
-    const available = recipes.filter(recipe => {
-      return recipe.ingredients.every(recipeIng => {
-        const userIng = userIngredients.find(
-          ui => ui.name.toLowerCase().includes(recipeIng.name.toLowerCase()) ||
-                recipeIng.name.toLowerCase().includes(ui.name.toLowerCase())
+    switch (effect.type) {
+      case 'SHOW_ALERT':
+        alert(effect.payload.title, effect.payload.message, effect.payload.variant);
+        break;
+
+      case 'SHOW_CONFIRM':
+        confirm(
+          effect.payload.title,
+          effect.payload.message,
+          async () => {
+            await effect.payload.onConfirm();
+            alert('완료', `${state.selectedRecipe?.name} 완성했어요!`, 'success');
+            router.back();
+          },
+          undefined,
+          '요리하기',
+          '취소'
         );
-        return userIng && userIng.quantity >= recipeIng.quantity;
-      });
-    });
-    setAvailableRecipes(available);
-  }
+        break;
+
+      case 'NAVIGATE_BACK':
+        router.back();
+        break;
+    }
+  }, [effect]);
 
   function canMakeRecipe(recipe: Recipe): boolean {
-    return availableRecipes.some(r => r.id === recipe.id);
+    return state.availableRecipes.some((r) => r.id === recipe.id);
   }
 
-  async function handleCook(recipe: Recipe) {
-    if (!canMakeRecipe(recipe)) {
-      alert('알림', '재료가 부족해요. 추가해볼까요?', 'warning');
-      return;
-    }
-
-    confirm(
-      '요리하기',
-      `${recipe.name}을(를) 만들까요? 재료가 자동으로 차감돼요.`,
-      async () => {
-        try {
-          for (const recipeIng of recipe.ingredients) {
-            const userIng = ingredients.find(
-              ui => ui.name.toLowerCase().includes(recipeIng.name.toLowerCase()) ||
-                    recipeIng.name.toLowerCase().includes(ui.name.toLowerCase())
-            );
-
-            if (userIng) {
-              const newQuantity = userIng.quantity - recipeIng.quantity;
-              if (newQuantity <= 0) {
-                await storage.deleteIngredient(userIng.id);
-              } else {
-                await storage.updateIngredient(userIng.id, {
-                  quantity: newQuantity,
-                });
-              }
-            }
-          }
-
-          alert('완료', `${recipe.name} 완성했어요!`, 'success');
-          router.back();
-        } catch (error) {
-          console.error('Error cooking:', error);
-          alert('알림', '문제가 발생했어요. 다시 시도해주세요.', 'error');
-        }
-      },
-      undefined,
-      '요리하기',
-      '취소'
-    );
+  function handleSelectRecipe(recipe: Recipe | null) {
+    dispatch({ type: 'SELECT_RECIPE', payload: recipe });
   }
 
-  if (selectedRecipe) {
-    const canMake = canMakeRecipe(selectedRecipe);
+  function handleCook(recipe: Recipe) {
+    dispatch({ type: 'COOK_RECIPE', payload: recipe });
+  }
+
+  if (state.selectedRecipe) {
+    const canMake = canMakeRecipe(state.selectedRecipe);
 
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { backgroundColor: colors.surface }]}>
-          <TouchableOpacity onPress={() => setSelectedRecipe(null)} style={styles.backButton}>
+          <TouchableOpacity onPress={() => handleSelectRecipe(null)} style={styles.backButton}>
             <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>레시피 보기</Text>
@@ -99,19 +76,19 @@ export default function CookingScreen() {
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={[styles.recipeDetailCard, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.recipeDetailName, { color: colors.text }]}>{selectedRecipe.name}</Text>
+            <Text style={[styles.recipeDetailName, { color: colors.text }]}>{state.selectedRecipe.name}</Text>
             <View style={styles.recipeDetailMeta}>
               <View style={[styles.metaItem, { backgroundColor: colors.background }]}>
                 <Text style={[styles.metaLabel, { color: colors.textSecondary }]}>카테고리</Text>
-                <Text style={[styles.metaValue, { color: colors.text }]}>{selectedRecipe.category}</Text>
+                <Text style={[styles.metaValue, { color: colors.text }]}>{state.selectedRecipe.category}</Text>
               </View>
               <View style={[styles.metaItem, { backgroundColor: colors.background }]}>
                 <Text style={[styles.metaLabel, { color: colors.textSecondary }]}>난이도</Text>
-                <Text style={[styles.metaValue, { color: colors.text }]}>{selectedRecipe.difficulty}</Text>
+                <Text style={[styles.metaValue, { color: colors.text }]}>{state.selectedRecipe.difficulty}</Text>
               </View>
               <View style={[styles.metaItem, { backgroundColor: colors.background }]}>
                 <Text style={[styles.metaLabel, { color: colors.textSecondary }]}>조리시간</Text>
-                <Text style={[styles.metaValue, { color: colors.text }]}>{selectedRecipe.cookingTime}분</Text>
+                <Text style={[styles.metaValue, { color: colors.text }]}>{state.selectedRecipe.cookingTime}분</Text>
               </View>
             </View>
 
@@ -119,9 +96,9 @@ export default function CookingScreen() {
 
             <Text style={[styles.ingredientsTitle, { color: colors.text }]}>필요한 재료는 이거에요</Text>
             <View style={styles.ingredientsList}>
-              {selectedRecipe.ingredients.map((ing, index) => {
-                const userIng = ingredients.find(
-                  ui => ui.name.toLowerCase().includes(ing.name.toLowerCase()) ||
+              {state.selectedRecipe.ingredients.map((ing: any, index: number) => {
+                const userIng = state.ingredients.find(
+                  (ui: any) => ui.name.toLowerCase().includes(ing.name.toLowerCase()) ||
                         ing.name.toLowerCase().includes(ui.name.toLowerCase())
                 );
                 const hasEnough = userIng && userIng.quantity >= ing.quantity;
@@ -158,7 +135,7 @@ export default function CookingScreen() {
 
           <TouchableOpacity
             style={[styles.cookButton, { backgroundColor: colors.primary }, !canMake && { backgroundColor: colors.textTertiary }]}
-            onPress={() => handleCook(selectedRecipe)}
+            onPress={() => state.selectedRecipe && handleCook(state.selectedRecipe)}
             disabled={!canMake}>
             <ChefHat size={20} color="#FFFFFF" />
             <Text style={styles.cookButtonText}>
@@ -183,14 +160,14 @@ export default function CookingScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {availableRecipes.length > 0 && (
+        {state.availableRecipes.length > 0 && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>지금 바로 만들 수 있어요</Text>
-            {availableRecipes.map(recipe => (
+            {state.availableRecipes.map((recipe: Recipe) => (
               <TouchableOpacity
                 key={recipe.id}
                 style={[styles.recipeCard, { backgroundColor: colors.surface }]}
-                onPress={() => setSelectedRecipe(recipe)}
+                onPress={() => handleSelectRecipe(recipe)}
                 activeOpacity={0.7}>
                 <View style={[styles.recipeIcon, { backgroundColor: colors.primaryLight }]}>
                   <ChefHat size={24} color={colors.primary} />
@@ -214,11 +191,11 @@ export default function CookingScreen() {
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>다른 레시피도 보세요</Text>
-          {recipes.filter(r => !availableRecipes.some(ar => ar.id === r.id)).map(recipe => (
+          {recipes.filter(r => !state.availableRecipes.some((ar: Recipe) => ar.id === r.id)).map(recipe => (
             <TouchableOpacity
               key={recipe.id}
               style={[styles.recipeCard, { backgroundColor: colors.surface }, styles.unavailableCard]}
-              onPress={() => setSelectedRecipe(recipe)}
+              onPress={() => handleSelectRecipe(recipe)}
               activeOpacity={0.7}>
               <View style={[styles.recipeIcon, { backgroundColor: colors.surfaceSecondary }]}>
                 <ChefHat size={24} color={colors.textTertiary} />

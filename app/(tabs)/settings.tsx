@@ -1,18 +1,41 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Bell, Moon, Sun, Trash2, Info } from 'lucide-react-native';
-import { storage } from '@/lib/storage';
 import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/hooks/useDialog';
+import { useMVIStore } from '@/mvi/base';
+import { createSettingsStore } from '@/mvi/features/settings';
+import { AnimatedTabWrapper } from '@/components/AnimatedTabWrapper';
 
 export default function SettingsScreen() {
+  return (
+    <AnimatedTabWrapper tabName="settings">
+      <SettingsContent />
+    </AnimatedTabWrapper>
+  );
+}
+
+function SettingsContent() {
   const { colors, isDark, themePreference, setTheme } = useTheme();
   const { alert, confirm, DialogComponent } = useDialog();
-  const [notificationDays, setNotificationDays] = useState(3);
+
+  // MVI Store 사용
+  const [state, dispatch, effect] = useMVIStore(createSettingsStore);
+  const { notificationDays } = state;
+
+  // Effect 처리
+  useEffect(() => {
+    if (effect) {
+      switch (effect.type) {
+        case 'SHOW_ALERT':
+          alert(effect.payload.title, effect.payload.message, effect.payload.type);
+          break;
+      }
+    }
+  }, [effect, alert]);
 
   function updateNotificationDays(days: number) {
-    setNotificationDays(days);
-    alert('성공', `알림 주기가 ${days}일로 변경되었습니다.`, 'success');
+    dispatch({ type: 'SET_NOTIFICATION_DAYS', payload: days });
   }
 
   async function toggleTheme() {
@@ -29,17 +52,8 @@ export default function SettingsScreen() {
     confirm(
       '데이터 삭제',
       '모든 식재료 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
-      async () => {
-        try {
-          const ingredients = await storage.getIngredients();
-          for (const ingredient of ingredients) {
-            await storage.deleteIngredient(ingredient.id);
-          }
-          alert('완료', '모든 데이터가 삭제되었습니다.', 'success');
-        } catch (error) {
-          console.error('Error clearing data:', error);
-          alert('오류', '데이터 삭제에 실패했습니다.', 'error');
-        }
+      () => {
+        dispatch({ type: 'CLEAR_ALL_DATA' });
       },
       undefined,
       '삭제',
