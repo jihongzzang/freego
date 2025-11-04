@@ -1,17 +1,33 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import { useRef, useEffect, useCallback } from 'react';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { ChefHat, Plus, Clock, Minus, Bell, Package, Carrot, Apple, Beef, Milk } from 'lucide-react-native';
+import {
+  ChefHat,
+  Plus,
+  Clock,
+  Minus,
+  Bell,
+  Package,
+  Carrot,
+  Apple,
+  Beef,
+  Milk,
+} from 'lucide-react-native';
 import { useTheme, getStatusColor } from '@/lib/theme';
 import { useMVIStore } from '@/mvi/base';
 import { createHomeStore, Ingredient } from '@/mvi/features/home';
-import { AnimatedTabWrapper } from '@/components/AnimatedTabWrapper';
 
 export default function DashboardScreen() {
   return (
-    <AnimatedTabWrapper tabName="index">
+    <View style={{ flex: 1 }}>
       <DashboardContent />
-    </AnimatedTabWrapper>
+    </View>
   );
 }
 
@@ -55,7 +71,9 @@ function DashboardContent() {
     return `${daysRemaining}일`;
   }
 
-  const expiringItems = ingredients.filter(item => item.status === '주의' || item.status === '소모됨');
+  const expiringItems = ingredients.filter(
+    (item) => item.status === '주의' || item.status === '소모됨'
+  );
 
   async function quickDeduct(id: string) {
     dispatch({ type: 'DELETE_INGREDIENT', payload: id });
@@ -80,28 +98,49 @@ function DashboardContent() {
     <TouchableOpacity
       style={styles.ingredientItem}
       onPress={() => dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: item.id })}
-      activeOpacity={0.7}>
+      activeOpacity={0.7}
+    >
       <View style={styles.ingredientLeft}>
-        <View style={[styles.categoryIconWrapper, { backgroundColor: colors.primaryLight }]}>
+        <View
+          style={[
+            styles.categoryIconWrapper,
+            { backgroundColor: colors.primaryLight },
+          ]}
+        >
           {getCategoryIcon(item.category)}
         </View>
         <View style={styles.ingredientInfo}>
           <View style={styles.ingredientNameRow}>
-            <Text style={[styles.ingredientName, { color: colors.text }]}>{item.name}</Text>
-            <View style={[styles.statusDot, { backgroundColor: getStatusColor(item.status) }]} />
+            <Text style={[styles.ingredientName, { color: colors.text }]}>
+              {item.name}
+            </Text>
+            <View
+              style={[
+                styles.statusDot,
+                { backgroundColor: getStatusColor(item.status) },
+              ]}
+            />
           </View>
-          <Text style={[styles.ingredientMeta, { color: colors.textSecondary }]}>
-            {item.quantity}{item.unit} · {item.storage_location}
-            {item.daysRemaining !== null && ` · ${getDaysRemaining(item.daysRemaining)}`}
+          <Text
+            style={[styles.ingredientMeta, { color: colors.textSecondary }]}
+          >
+            {item.quantity}
+            {item.unit} · {item.storage_location}
+            {item.daysRemaining !== null &&
+              ` · ${getDaysRemaining(item.daysRemaining)}`}
           </Text>
         </View>
       </View>
       <TouchableOpacity
-        style={[styles.quickButton, { backgroundColor: colors.surfaceSecondary }]}
+        style={[
+          styles.quickButton,
+          { backgroundColor: colors.surfaceSecondary },
+        ]}
         onPress={(e) => {
           e.stopPropagation();
           quickDeduct(item.id);
-        }}>
+        }}
+      >
         <Minus size={16} color={colors.text} />
       </TouchableOpacity>
     </TouchableOpacity>
@@ -111,17 +150,35 @@ function DashboardContent() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <View>
-          <Text style={[styles.greeting, { color: colors.textSecondary }]}>안녕하세요 👋</Text>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>기억하고 싶은 재료만!</Text>
+          <Text style={[styles.greeting, { color: colors.textSecondary }]}>
+            안녕하세요 👋
+          </Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            기억하고 싶은 재료만!
+          </Text>
         </View>
         <TouchableOpacity
-          style={[styles.notificationButton, { backgroundColor: expiringItems.length > 0 ? colors.dangerLight : colors.surfaceSecondary }]}
+          style={[
+            styles.notificationButton,
+            {
+              backgroundColor:
+                expiringItems.length > 0
+                  ? colors.dangerLight
+                  : colors.surfaceSecondary,
+            },
+          ]}
           onPress={() => {
             if (expiringItems.length > 0) {
               dispatch({ type: 'NAVIGATE_TO_EXPIRING' });
             }
-          }}>
-          <Bell size={20} color={expiringItems.length > 0 ? colors.danger : colors.textSecondary} />
+          }}
+        >
+          <Bell
+            size={20}
+            color={
+              expiringItems.length > 0 ? colors.danger : colors.textSecondary
+            }
+          />
           {expiringItems.length > 0 && (
             <View style={[styles.badge, { backgroundColor: colors.danger }]}>
               <Text style={styles.badgeText}>{expiringItems.length}</Text>
@@ -130,26 +187,46 @@ function DashboardContent() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView ref={scrollViewRef} style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.quickActions}>
           <TouchableOpacity
             style={[styles.actionCard, { backgroundColor: colors.surface }]}
             onPress={() => dispatch({ type: 'NAVIGATE_TO_ADD' })}
-            activeOpacity={0.7}>
-            <View style={[styles.actionIcon, { backgroundColor: colors.primaryLight }]}>
+            activeOpacity={0.7}
+          >
+            <View
+              style={[
+                styles.actionIcon,
+                { backgroundColor: colors.primaryLight },
+              ]}
+            >
               <Plus size={24} color={colors.primary} />
             </View>
-            <Text style={[styles.actionTitle, { color: colors.text }]}>재료 추가해요</Text>
+            <Text style={[styles.actionTitle, { color: colors.text }]}>
+              재료 추가해요
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.actionCard, { backgroundColor: colors.surface }]}
             onPress={() => dispatch({ type: 'NAVIGATE_TO_COOKING' })}
-            activeOpacity={0.7}>
-            <View style={[styles.actionIcon, { backgroundColor: colors.secondaryLight }]}>
+            activeOpacity={0.7}
+          >
+            <View
+              style={[
+                styles.actionIcon,
+                { backgroundColor: colors.secondaryLight },
+              ]}
+            >
               <ChefHat size={24} color={colors.secondary} />
             </View>
-            <Text style={[styles.actionTitle, { color: colors.text }]}>요리해보세요</Text>
+            <Text style={[styles.actionTitle, { color: colors.text }]}>
+              요리해보세요
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -157,21 +234,35 @@ function DashboardContent() {
           <TouchableOpacity
             style={[styles.summaryItem, { backgroundColor: colors.surface }]}
             onPress={() => dispatch({ type: 'NAVIGATE_TO_INGREDIENTS' })}
-            activeOpacity={0.7}>
+            activeOpacity={0.7}
+          >
             <Package size={20} color={colors.primary} />
             <View style={styles.summaryContent}>
-              <Text style={[styles.summaryValue, { color: colors.text }]}>{ingredients.length}개</Text>
-              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>보관 중인 재료</Text>
+              <Text style={[styles.summaryValue, { color: colors.text }]}>
+                {ingredients.length}개
+              </Text>
+              <Text
+                style={[styles.summaryLabel, { color: colors.textSecondary }]}
+              >
+                보관 중인 재료
+              </Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.summaryItem, { backgroundColor: colors.surface }]}
             onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
-            activeOpacity={0.7}>
+            activeOpacity={0.7}
+          >
             <Clock size={20} color={colors.danger} />
             <View style={styles.summaryContent}>
-              <Text style={[styles.summaryValue, { color: colors.text }]}>{expiringItems.length}개</Text>
-              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>유통기한 임박</Text>
+              <Text style={[styles.summaryValue, { color: colors.text }]}>
+                {expiringItems.length}개
+              </Text>
+              <Text
+                style={[styles.summaryLabel, { color: colors.textSecondary }]}
+              >
+                유통기한 임박
+              </Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -181,18 +272,31 @@ function DashboardContent() {
             <TouchableOpacity
               style={styles.sectionHeader}
               onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
-              activeOpacity={0.7}>
+              activeOpacity={0.7}
+            >
               <Bell size={20} color={colors.danger} />
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>유통기한 임박</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                유통기한 임박
+              </Text>
             </TouchableOpacity>
-            <View style={[styles.alertCard, { backgroundColor: colors.dangerLight }]}>
-              {expiringItems.slice(0, 3).map((item) => renderIngredientItem({ item }))}
+            <View
+              style={[
+                styles.alertCard,
+                { backgroundColor: colors.dangerLight },
+              ]}
+            >
+              {expiringItems
+                .slice(0, 3)
+                .map((item) => renderIngredientItem({ item }))}
             </View>
             {expiringItems.length > 3 && (
               <TouchableOpacity
                 style={styles.viewMoreButton}
-                onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}>
-                <Text style={[styles.viewMoreText, { color: colors.primary }]}>더 보기</Text>
+                onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
+              >
+                <Text style={[styles.viewMoreText, { color: colors.primary }]}>
+                  더 보기
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -202,29 +306,59 @@ function DashboardContent() {
           <TouchableOpacity
             style={styles.sectionHeader}
             onPress={() => dispatch({ type: 'NAVIGATE_TO_INGREDIENTS' })}
-            activeOpacity={0.7}>
+            activeOpacity={0.7}
+          >
             <Package size={20} color={colors.primary} />
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>보관 중인 재료</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              보관 중인 재료
+            </Text>
           </TouchableOpacity>
           {loading ? (
-            <View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.emptyText, { color: colors.textTertiary }]}>로딩 중이에요...</Text>
+            <View
+              style={[
+                styles.emptyContainer,
+                { backgroundColor: colors.surface },
+              ]}
+            >
+              <Text style={[styles.emptyText, { color: colors.textTertiary }]}>
+                로딩 중이에요...
+              </Text>
             </View>
           ) : ingredients.length === 0 ? (
-            <View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.emptyText, { color: colors.textTertiary }]}>관리할 재료가 없어요</Text>
-              <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>기억하고 싶은 재료만 추가해보세요</Text>
+            <View
+              style={[
+                styles.emptyContainer,
+                { backgroundColor: colors.surface },
+              ]}
+            >
+              <Text style={[styles.emptyText, { color: colors.textTertiary }]}>
+                관리할 재료가 없어요
+              </Text>
+              <Text
+                style={[styles.emptySubtext, { color: colors.textTertiary }]}
+              >
+                기억하고 싶은 재료만 추가해보세요
+              </Text>
             </View>
           ) : (
             <>
-              <View style={[styles.listCard, { backgroundColor: colors.surface }]}>
-                {ingredients.slice(0, 5).map((item) => renderIngredientItem({ item }))}
+              <View
+                style={[styles.listCard, { backgroundColor: colors.surface }]}
+              >
+                {ingredients
+                  .slice(0, 5)
+                  .map((item) => renderIngredientItem({ item }))}
               </View>
               {ingredients.length > 5 && (
                 <TouchableOpacity
                   style={styles.viewMoreButton}
-                  onPress={() => dispatch({ type: 'NAVIGATE_TO_INGREDIENTS' })}>
-                  <Text style={[styles.viewMoreText, { color: colors.primary }]}>더 보기</Text>
+                  onPress={() => dispatch({ type: 'NAVIGATE_TO_INGREDIENTS' })}
+                >
+                  <Text
+                    style={[styles.viewMoreText, { color: colors.primary }]}
+                  >
+                    더 보기
+                  </Text>
                 </TouchableOpacity>
               )}
             </>

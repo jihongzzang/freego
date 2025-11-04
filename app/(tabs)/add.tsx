@@ -1,4 +1,13 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { Carrot, Apple, Beef, Milk, Package } from 'lucide-react-native';
@@ -7,13 +16,12 @@ import { useDialog } from '@/hooks/useDialog';
 import { useMVIStore } from '@/mvi/base';
 import { createAddStore } from '@/mvi/features/add';
 import type { AddFormData } from '@/mvi/features/add';
-import { AnimatedTabWrapper } from '@/components/AnimatedTabWrapper';
 
 export default function AddIngredientScreen() {
   return (
-    <AnimatedTabWrapper tabName="add">
+    <View style={{ flex: 1 }}>
       <AddIngredientContent />
-    </AnimatedTabWrapper>
+    </View>
   );
 }
 
@@ -45,7 +53,11 @@ function AddIngredientContent() {
 
     switch (effect.type) {
       case 'SHOW_ALERT':
-        alert(effect.payload.title, effect.payload.message, effect.payload.variant);
+        alert(
+          effect.payload.title,
+          effect.payload.message,
+          effect.payload.variant
+        );
         break;
 
       case 'NAVIGATE_HOME':
@@ -75,16 +87,24 @@ function AddIngredientContent() {
       <KeyboardAvoidingView
         style={[styles.container, { backgroundColor: colors.background }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={0}>
+        keyboardVerticalOffset={0}
+      >
         <View style={[styles.header, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>재료 추가</Text>
-          <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>관리하고 싶은 재료만 추가해보세요</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            재료 추가
+          </Text>
+          <Text
+            style={[styles.headerSubtitle, { color: colors.textSecondary }]}
+          >
+            관리하고 싶은 재료만 추가해보세요
+          </Text>
         </View>
 
         <ScrollView
           style={styles.formContainer}
           showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled">
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.form}>
             <View style={styles.inputGroup}>
               <Text style={[styles.label, { color: colors.text }]}>
@@ -93,7 +113,11 @@ function AddIngredientContent() {
               <TextInput
                 style={[
                   styles.input,
-                  { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
+                  {
+                    backgroundColor: colors.surface,
+                    color: colors.text,
+                    borderColor: colors.border,
+                  },
                   state.errors.name && { borderColor: '#F04452' },
                 ]}
                 value={state.form.name}
@@ -102,30 +126,44 @@ function AddIngredientContent() {
                 placeholderTextColor={colors.textTertiary}
               />
               {state.errors.name && (
-                <Text style={[styles.errorText, { color: '#F04452' }]}>{state.errors.name}</Text>
+                <Text style={[styles.errorText, { color: '#F04452' }]}>
+                  {state.errors.name}
+                </Text>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, { color: colors.text }]}>카테고리</Text>
+              <Text style={[styles.label, { color: colors.text }]}>
+                카테고리
+              </Text>
               <View style={styles.categoryButtons}>
                 {['채소', '과일', '육류', '유제품', '기타'].map((cat) => (
                   <TouchableOpacity
                     key={cat}
                     style={[
                       styles.categoryBtn,
-                      { backgroundColor: colors.surfaceSecondary, borderColor: colors.surfaceSecondary },
-                      state.form.category === cat && { backgroundColor: colors.primaryLight, borderColor: colors.primary },
+                      {
+                        backgroundColor: colors.surfaceSecondary,
+                        borderColor: colors.surfaceSecondary,
+                      },
+                      state.form.category === cat && {
+                        backgroundColor: colors.primaryLight,
+                        borderColor: colors.primary,
+                      },
                     ]}
-                    onPress={() => handleFieldChange('category', cat)}>
+                    onPress={() => handleFieldChange('category', cat)}
+                  >
                     <View style={styles.categoryBtnContent}>
                       {getCategoryIcon(cat)}
                       <Text
                         style={[
                           styles.categoryBtnText,
                           { color: colors.textSecondary },
-                          state.form.category === cat && { color: colors.primary },
-                        ]}>
+                          state.form.category === cat && {
+                            color: colors.primary,
+                          },
+                        ]}
+                      >
                         {cat}
                       </Text>
                     </View>
@@ -142,7 +180,11 @@ function AddIngredientContent() {
                 <TextInput
                   style={[
                     styles.input,
-                    { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
+                    {
+                      backgroundColor: colors.surface,
+                      color: colors.text,
+                      borderColor: colors.border,
+                    },
                     state.errors.quantity && { borderColor: '#F04452' },
                   ]}
                   value={state.form.quantity}
@@ -152,13 +194,22 @@ function AddIngredientContent() {
                   placeholderTextColor={colors.textTertiary}
                 />
                 {state.errors.quantity && (
-                  <Text style={[styles.errorText, { color: '#F04452' }]}>{state.errors.quantity}</Text>
+                  <Text style={[styles.errorText, { color: '#F04452' }]}>
+                    {state.errors.quantity}
+                  </Text>
                 )}
               </View>
               <View style={[styles.inputGroup, { flex: 1, marginLeft: 12 }]}>
                 <Text style={[styles.label, { color: colors.text }]}>단위</Text>
                 <TextInput
-                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: colors.surface,
+                      color: colors.text,
+                      borderColor: colors.border,
+                    },
+                  ]}
                   value={state.form.unit}
                   onChangeText={(text) => handleFieldChange('unit', text)}
                   placeholder="개, g, ml"
@@ -168,11 +219,17 @@ function AddIngredientContent() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, { color: colors.text }]}>유통기한</Text>
+              <Text style={[styles.label, { color: colors.text }]}>
+                유통기한
+              </Text>
               <TextInput
                 style={[
                   styles.input,
-                  { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
+                  {
+                    backgroundColor: colors.surface,
+                    color: colors.text,
+                    borderColor: colors.border,
+                  },
                   state.errors.expiry_date && { borderColor: '#F04452' },
                 ]}
                 value={state.form.expiry_date}
@@ -181,28 +238,42 @@ function AddIngredientContent() {
                 placeholderTextColor={colors.textTertiary}
               />
               {state.errors.expiry_date && (
-                <Text style={[styles.errorText, { color: '#F04452' }]}>{state.errors.expiry_date}</Text>
+                <Text style={[styles.errorText, { color: '#F04452' }]}>
+                  {state.errors.expiry_date}
+                </Text>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[styles.label, { color: colors.text }]}>보관 위치</Text>
+              <Text style={[styles.label, { color: colors.text }]}>
+                보관 위치
+              </Text>
               <View style={styles.categoryButtons}>
                 {['냉장실', '냉동실', '실온'].map((loc) => (
                   <TouchableOpacity
                     key={loc}
                     style={[
                       styles.categoryBtn,
-                      { backgroundColor: colors.surfaceSecondary, borderColor: colors.surfaceSecondary },
-                      state.form.storage_location === loc && { backgroundColor: colors.primaryLight, borderColor: colors.primary },
+                      {
+                        backgroundColor: colors.surfaceSecondary,
+                        borderColor: colors.surfaceSecondary,
+                      },
+                      state.form.storage_location === loc && {
+                        backgroundColor: colors.primaryLight,
+                        borderColor: colors.primary,
+                      },
                     ]}
-                    onPress={() => handleFieldChange('storage_location', loc)}>
+                    onPress={() => handleFieldChange('storage_location', loc)}
+                  >
                     <Text
                       style={[
                         styles.categoryBtnText,
                         { color: colors.textSecondary },
-                        state.form.storage_location === loc && { color: colors.primary },
-                      ]}>
+                        state.form.storage_location === loc && {
+                          color: colors.primary,
+                        },
+                      ]}
+                    >
                       {loc}
                     </Text>
                   </TouchableOpacity>
@@ -213,7 +284,15 @@ function AddIngredientContent() {
             <View style={styles.inputGroup}>
               <Text style={[styles.label, { color: colors.text }]}>메모</Text>
               <TextInput
-                style={[styles.input, styles.textArea, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+                style={[
+                  styles.input,
+                  styles.textArea,
+                  {
+                    backgroundColor: colors.surface,
+                    color: colors.text,
+                    borderColor: colors.border,
+                  },
+                ]}
                 value={state.form.memo}
                 onChangeText={(text) => handleFieldChange('memo', text)}
                 placeholder="특별히 기억하고 싶은 내용이 있나요?"
@@ -227,10 +306,11 @@ function AddIngredientContent() {
               style={[
                 styles.submitButton,
                 { backgroundColor: colors.primary },
-                state.isSubmitting && { opacity: 0.6 }
+                state.isSubmitting && { opacity: 0.6 },
               ]}
               onPress={handleSubmit}
-              disabled={state.isSubmitting}>
+              disabled={state.isSubmitting}
+            >
               <Text style={styles.submitButtonText}>
                 {state.isSubmitting ? '추가 중...' : '추가할게요'}
               </Text>

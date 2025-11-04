@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { useEffect, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { ShoppingCart, Trash2, Check } from 'lucide-react-native';
@@ -6,13 +12,12 @@ import { useTheme, getCategoryColor } from '@/lib/theme';
 import { useDialog } from '@/hooks/useDialog';
 import { useMVIStore } from '@/mvi/base';
 import { createShoppingStore } from '@/mvi/features/shopping';
-import { AnimatedTabWrapper } from '@/components/AnimatedTabWrapper';
 
 export default function ShoppingListScreen() {
   return (
-    <AnimatedTabWrapper tabName="shopping">
+    <View style={{ flex: 1 }}>
       <ShoppingListContent />
-    </AnimatedTabWrapper>
+    </View>
   );
 }
 
@@ -34,7 +39,11 @@ function ShoppingListContent() {
 
     switch (effect.type) {
       case 'SHOW_ALERT':
-        alert(effect.payload.title, effect.payload.message, effect.payload.variant);
+        alert(
+          effect.payload.title,
+          effect.payload.message,
+          effect.payload.variant
+        );
         break;
 
       case 'SHOW_CONFIRM':
@@ -67,26 +76,48 @@ function ShoppingListContent() {
     dispatch({ type: 'CLEAR_PURCHASED' });
   }
 
-  const unpurchasedItems = state.shoppingList.filter((item) => !item.is_purchased);
+  const unpurchasedItems = state.shoppingList.filter(
+    (item) => !item.is_purchased
+  );
   const purchasedItems = state.shoppingList.filter((item) => item.is_purchased);
 
   return (
     <>
       <DialogComponent />
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <View
+          style={[
+            styles.header,
+            {
+              backgroundColor: colors.surface,
+              borderBottomColor: colors.border,
+            },
+          ]}
+        >
           <View style={styles.headerTop}>
-            <Text style={[styles.headerTitle, { color: colors.text }]}>장보기 목록</Text>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>
+              장보기 목록
+            </Text>
             {purchasedItems.length > 0 && (
               <TouchableOpacity
-                style={[styles.clearButton, { backgroundColor: colors.dangerLight }]}
-                onPress={handleClearPurchased}>
+                style={[
+                  styles.clearButton,
+                  { backgroundColor: colors.dangerLight },
+                ]}
+                onPress={handleClearPurchased}
+              >
                 <Trash2 size={16} color={colors.danger} />
-                <Text style={[styles.clearButtonText, { color: colors.danger }]}>구매완료 삭제</Text>
+                <Text
+                  style={[styles.clearButtonText, { color: colors.danger }]}
+                >
+                  구매완료 삭제
+                </Text>
               </TouchableOpacity>
             )}
           </View>
-          <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
+          <Text
+            style={[styles.headerSubtitle, { color: colors.textSecondary }]}
+          >
             {unpurchasedItems.length}개 항목
           </Text>
         </View>
@@ -94,13 +125,19 @@ function ShoppingListContent() {
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {state.loading ? (
             <View style={styles.emptyContainer}>
-              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>로딩 중...</Text>
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                로딩 중...
+              </Text>
             </View>
           ) : state.shoppingList.length === 0 ? (
             <View style={styles.emptyContainer}>
               <ShoppingCart size={64} color={colors.textTertiary} />
-              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>장보기 목록이 비어있습니다</Text>
-              <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                장보기 목록이 비어있습니다
+              </Text>
+              <Text
+                style={[styles.emptySubtext, { color: colors.textTertiary }]}
+              >
                 식재료를 소모하면 자동으로 추가됩니다
               </Text>
             </View>
@@ -108,38 +145,74 @@ function ShoppingListContent() {
             <>
               {unpurchasedItems.length > 0 && (
                 <View style={styles.section}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>구매 예정</Text>
-                  <View style={[styles.listCard, { backgroundColor: colors.surface }]}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                    구매 예정
+                  </Text>
+                  <View
+                    style={[
+                      styles.listCard,
+                      { backgroundColor: colors.surface },
+                    ]}
+                  >
                     {unpurchasedItems.map((item) => (
-                      <View key={item.id} style={[styles.itemRow, { borderBottomColor: colors.border }]}>
+                      <View
+                        key={item.id}
+                        style={[
+                          styles.itemRow,
+                          { borderBottomColor: colors.border },
+                        ]}
+                      >
                         <TouchableOpacity
                           style={styles.itemContent}
-                          onPress={() => handleTogglePurchased(item.id, item.is_purchased)}
-                          activeOpacity={0.7}>
+                          onPress={() =>
+                            handleTogglePurchased(item.id, item.is_purchased)
+                          }
+                          activeOpacity={0.7}
+                        >
                           <View
                             style={[
                               styles.checkbox,
-                              { borderColor: colors.border, backgroundColor: colors.background },
-                            ]}>
-                            {item.is_purchased && <Check size={16} color={colors.primary} />}
+                              {
+                                borderColor: colors.border,
+                                backgroundColor: colors.background,
+                              },
+                            ]}
+                          >
+                            {item.is_purchased && (
+                              <Check size={16} color={colors.primary} />
+                            )}
                           </View>
                           <View style={styles.itemInfo}>
-                            <Text style={[styles.itemName, { color: colors.text }]}>{item.name}</Text>
+                            <Text
+                              style={[styles.itemName, { color: colors.text }]}
+                            >
+                              {item.name}
+                            </Text>
                             <View style={styles.itemMeta}>
                               <View
                                 style={[
                                   styles.categoryBadge,
-                                  { backgroundColor: getCategoryColor(item.category) + '20' },
-                                ]}>
+                                  {
+                                    backgroundColor:
+                                      getCategoryColor(item.category) + '20',
+                                  },
+                                ]}
+                              >
                                 <Text
                                   style={[
                                     styles.categoryText,
                                     { color: getCategoryColor(item.category) },
-                                  ]}>
+                                  ]}
+                                >
                                   {item.category}
                                 </Text>
                               </View>
-                              <Text style={[styles.itemUnit, { color: colors.textSecondary }]}>
+                              <Text
+                                style={[
+                                  styles.itemUnit,
+                                  { color: colors.textSecondary },
+                                ]}
+                              >
                                 {item.unit}
                               </Text>
                             </View>
@@ -147,7 +220,8 @@ function ShoppingListContent() {
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={styles.deleteButton}
-                          onPress={() => handleDeleteItem(item.id, item.name)}>
+                          onPress={() => handleDeleteItem(item.id, item.name)}
+                        >
                           <Trash2 size={20} color={colors.textTertiary} />
                         </TouchableOpacity>
                       </View>
@@ -158,20 +232,40 @@ function ShoppingListContent() {
 
               {purchasedItems.length > 0 && (
                 <View style={styles.section}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>구매 완료</Text>
-                  <View style={[styles.listCard, { backgroundColor: colors.surface }]}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                    구매 완료
+                  </Text>
+                  <View
+                    style={[
+                      styles.listCard,
+                      { backgroundColor: colors.surface },
+                    ]}
+                  >
                     {purchasedItems.map((item) => (
-                      <View key={item.id} style={[styles.itemRow, { borderBottomColor: colors.border }]}>
+                      <View
+                        key={item.id}
+                        style={[
+                          styles.itemRow,
+                          { borderBottomColor: colors.border },
+                        ]}
+                      >
                         <TouchableOpacity
                           style={styles.itemContent}
-                          onPress={() => handleTogglePurchased(item.id, item.is_purchased)}
-                          activeOpacity={0.7}>
+                          onPress={() =>
+                            handleTogglePurchased(item.id, item.is_purchased)
+                          }
+                          activeOpacity={0.7}
+                        >
                           <View
                             style={[
                               styles.checkbox,
                               styles.checkboxChecked,
-                              { backgroundColor: colors.primary, borderColor: colors.primary },
-                            ]}>
+                              {
+                                backgroundColor: colors.primary,
+                                borderColor: colors.primary,
+                              },
+                            ]}
+                          >
                             <Check size={16} color="#ffffff" />
                           </View>
                           <View style={styles.itemInfo}>
@@ -180,24 +274,35 @@ function ShoppingListContent() {
                                 styles.itemName,
                                 styles.itemNamePurchased,
                                 { color: colors.textTertiary },
-                              ]}>
+                              ]}
+                            >
                               {item.name}
                             </Text>
                             <View style={styles.itemMeta}>
                               <View
                                 style={[
                                   styles.categoryBadge,
-                                  { backgroundColor: getCategoryColor(item.category) + '20' },
-                                ]}>
+                                  {
+                                    backgroundColor:
+                                      getCategoryColor(item.category) + '20',
+                                  },
+                                ]}
+                              >
                                 <Text
                                   style={[
                                     styles.categoryText,
                                     { color: getCategoryColor(item.category) },
-                                  ]}>
+                                  ]}
+                                >
                                   {item.category}
                                 </Text>
                               </View>
-                              <Text style={[styles.itemUnit, { color: colors.textTertiary }]}>
+                              <Text
+                                style={[
+                                  styles.itemUnit,
+                                  { color: colors.textTertiary },
+                                ]}
+                              >
                                 {item.unit}
                               </Text>
                             </View>
@@ -205,7 +310,8 @@ function ShoppingListContent() {
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={styles.deleteButton}
-                          onPress={() => handleDeleteItem(item.id, item.name)}>
+                          onPress={() => handleDeleteItem(item.id, item.name)}
+                        >
                           <Trash2 size={20} color={colors.textTertiary} />
                         </TouchableOpacity>
                       </View>
