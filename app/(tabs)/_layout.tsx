@@ -21,7 +21,7 @@ export default function TabLayout() {
           borderTopRightRadius: 20,
           paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           paddingTop: 8,
-          height: insets.bottom > 0 ? 56 + insets.bottom : 56,
+          height: insets.bottom > 0 ? 48 + insets.bottom : 48,
           position: 'absolute',
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -1 },
@@ -42,7 +42,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '홈',
+          title: '내 냉장고',
           sceneStyle: { backgroundColor: colors.background },
           tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
         }}
@@ -50,9 +50,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="ingredients"
         options={{
-          title: '재료',
+          title: '재료 관리',
           sceneStyle: { backgroundColor: colors.background },
-          tabBarIcon: ({ size, color }) => <Package size={size} color={color} />,
+          tabBarIcon: ({ size, color }) => (
+            <Package size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="shopping"
+        options={{
+          title: '장보기',
+          sceneStyle: { backgroundColor: colors.background },
+          tabBarIcon: ({ size, color }) => (
+            <Package size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen

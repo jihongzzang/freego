@@ -12,11 +12,20 @@ export const shoppingReducer: Reducer<ShoppingState, ShoppingIntent> = (
   intent
 ): ShoppingState => {
   switch (intent.type) {
-    case 'LOAD_SHOPPING_LIST':
+    case 'TOGGLE_ADD_MODAL':
       return {
         ...state,
-        loading: true,
-        error: null,
+        isAddingItem: intent.payload,
+        addForm: intent.payload ? state.addForm : { name: '', category: '채소' },
+      };
+
+    case 'UPDATE_ADD_FORM':
+      return {
+        ...state,
+        addForm: {
+          ...state.addForm,
+          [intent.payload.field]: intent.payload.value,
+        },
       };
 
     default:

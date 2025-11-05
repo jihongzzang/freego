@@ -14,7 +14,7 @@ import { onboardingMiddleware } from './middleware';
  */
 const initialState: OnboardingState = {
   currentStep: 0,
-  totalSteps: 3, // 온보딩 단계 수
+  totalSteps: 4, // 온보딩 단계 수
 };
 
 /**

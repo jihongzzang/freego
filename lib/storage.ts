@@ -17,7 +17,6 @@ export interface ShoppingItem {
   id: string;
   name: string;
   category: string;
-  unit: string;
   is_purchased: boolean;
   created_at: string;
 }
@@ -36,7 +35,9 @@ export const storage = {
     }
   },
 
-  async addIngredient(ingredient: Omit<Ingredient, 'id' | 'created_at'>): Promise<void> {
+  async addIngredient(
+    ingredient: Omit<Ingredient, 'id' | 'created_at'>,
+  ): Promise<void> {
     try {
       const ingredients = await this.getIngredients();
       const newIngredient: Ingredient = {
@@ -52,15 +53,19 @@ export const storage = {
     }
   },
 
-  async addMultipleIngredients(ingredientList: Omit<Ingredient, 'id' | 'created_at'>[]): Promise<void> {
+  async addMultipleIngredients(
+    ingredientList: Omit<Ingredient, 'id' | 'created_at'>[],
+  ): Promise<void> {
     try {
       const ingredients = await this.getIngredients();
       const now = Date.now();
-      const newIngredients: Ingredient[] = ingredientList.map((ingredient, index) => ({
-        ...ingredient,
-        id: (now + index).toString(),
-        created_at: new Date().toISOString(),
-      }));
+      const newIngredients: Ingredient[] = ingredientList.map(
+        (ingredient, index) => ({
+          ...ingredient,
+          id: (now + index).toString(),
+          created_at: new Date().toISOString(),
+        }),
+      );
       ingredients.push(...newIngredients);
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
     } catch (error) {
@@ -69,7 +74,10 @@ export const storage = {
     }
   },
 
-  async updateIngredient(id: string, updates: Partial<Ingredient>): Promise<void> {
+  async updateIngredient(
+    id: string,
+    updates: Partial<Ingredient>,
+  ): Promise<void> {
     try {
       const ingredients = await this.getIngredients();
       const index = ingredients.findIndex((item) => item.id === id);
@@ -113,10 +121,14 @@ export const storage = {
     }
   },
 
-  async addToShoppingList(item: Omit<ShoppingItem, 'id' | 'created_at' | 'is_purchased'>): Promise<void> {
+  async addToShoppingList(
+    item: Omit<ShoppingItem, 'id' | 'created_at' | 'is_purchased'>,
+  ): Promise<void> {
     try {
       const shoppingList = await this.getShoppingList();
-      const existing = shoppingList.find(i => i.name === item.name && i.category === item.category);
+      const existing = shoppingList.find(
+        (i) => i.name === item.name && i.category === item.category,
+      );
 
       if (!existing) {
         const newItem: ShoppingItem = {
@@ -134,7 +146,10 @@ export const storage = {
     }
   },
 
-  async updateShoppingItem(id: string, updates: Partial<ShoppingItem>): Promise<void> {
+  async updateShoppingItem(
+    id: string,
+    updates: Partial<ShoppingItem>,
+  ): Promise<void> {
     try {
       const shoppingList = await this.getShoppingList();
       const index = shoppingList.findIndex((item) => item.id === id);

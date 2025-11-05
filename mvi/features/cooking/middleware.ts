@@ -12,9 +12,13 @@ import { recipes } from '@/lib/recipes';
 /**
  * Cooking Middleware
  */
-export const cookingMiddleware: Middleware<CookingState, CookingIntent, CookingEffect> = async (
+export const cookingMiddleware: Middleware<
+  CookingState,
+  CookingIntent,
+  CookingEffect
+> = async (
   state,
-  intent
+  intent,
 ): Promise<MiddlewareResult<CookingState, CookingEffect>> => {
   switch (intent.type) {
     case 'LOAD_INGREDIENTS': {
@@ -27,9 +31,9 @@ export const cookingMiddleware: Middleware<CookingState, CookingIntent, CookingE
             const userIng = data.find(
               (ui) =>
                 ui.name.toLowerCase().includes(recipeIng.name.toLowerCase()) ||
-                recipeIng.name.toLowerCase().includes(ui.name.toLowerCase())
+                recipeIng.name.toLowerCase().includes(ui.name.toLowerCase()),
             );
-            return userIng && userIng.quantity >= recipeIng.quantity;
+            return userIng?.quantity && userIng.quantity >= recipeIng.quantity;
           });
         });
 
@@ -87,8 +91,12 @@ export const cookingMiddleware: Middleware<CookingState, CookingIntent, CookingE
                   for (const recipeIng of recipe.ingredients) {
                     const userIng = state.ingredients.find(
                       (ui) =>
-                        ui.name.toLowerCase().includes(recipeIng.name.toLowerCase()) ||
-                        recipeIng.name.toLowerCase().includes(ui.name.toLowerCase())
+                        ui.name
+                          .toLowerCase()
+                          .includes(recipeIng.name.toLowerCase()) ||
+                        recipeIng.name
+                          .toLowerCase()
+                          .includes(ui.name.toLowerCase()),
                     );
 
                     if (userIng) {

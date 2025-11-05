@@ -11,9 +11,13 @@ import { storage } from '@/lib/storage';
 /**
  * Shopping Middleware
  */
-export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, ShoppingEffect> = async (
+export const shoppingMiddleware: Middleware<
+  ShoppingState,
+  ShoppingIntent,
+  ShoppingEffect
+> = async (
   state,
-  intent
+  intent,
 ): Promise<MiddlewareResult<ShoppingState, ShoppingEffect>> => {
   switch (intent.type) {
     case 'LOAD_SHOPPING_LIST': {
@@ -61,7 +65,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
               type: 'SHOW_ALERT',
               payload: {
                 title: '오류',
-                message: '상태 변경에 실패했습니다.',
+                message: '상태 변경에 실패했어요.',
                 variant: 'error',
               },
             },
@@ -77,7 +81,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             type: 'SHOW_CONFIRM',
             payload: {
               title: '삭제 확인',
-              message: `"${intent.payload.name}"을(를) 장보기 목록에서 삭제하시겠습니까?`,
+              message: `"${intent.payload.name}"을(를) 장보기 목록에서 삭제할까요?`,
               onConfirm: async () => {
                 try {
                   await storage.deleteShoppingItem(intent.payload.id);
@@ -94,8 +98,68 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
       };
     }
 
+    case 'SUBMIT_ADD_ITEM': {
+      if (!state.addForm.name.trim()) {
+        return {
+          effects: [
+            {
+              type: 'SHOW_ALERT',
+              payload: {
+                title: '입력 오류',
+                message: '재료 이름을 입력해주세요.',
+                variant: 'warning',
+              },
+            },
+          ],
+        };
+      }
+
+      try {
+        await storage.addToShoppingList({
+          name: state.addForm.name.trim(),
+          category: state.addForm.category,
+        });
+
+        const items = await storage.getShoppingList();
+        return {
+          state: {
+            ...state,
+            shoppingList: items,
+            isAddingItem: false,
+            addForm: { name: '', category: '채소' },
+          },
+          effects: [
+            {
+              type: 'SHOW_ALERT',
+              payload: {
+                title: '완료',
+                message: '장보기 목록에 추가됐어요.',
+                variant: 'success',
+              },
+            },
+          ],
+        };
+      } catch (error) {
+        console.error('Error adding shopping item:', error);
+        return {
+          effects: [
+            {
+              type: 'SHOW_ALERT',
+              payload: {
+                title: '오류',
+                message: '항목 추가에 실패했어요.',
+                variant: 'error',
+              },
+            },
+          ],
+        };
+      }
+    }
+
     case 'CLEAR_PURCHASED': {
-      const purchasedItems = state.shoppingList.filter((item) => item.is_purchased);
+      const purchasedItems = state.shoppingList.filter(
+        (item) => item.is_purchased,
+      );
 
       if (purchasedItems.length === 0) {
         return {
@@ -104,7 +168,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
               type: 'SHOW_ALERT',
               payload: {
                 title: '알림',
-                message: '구매한 항목이 없습니다.',
+                message: '구매한 항목이 없어요.',
                 variant: 'info',
               },
             },
@@ -118,7 +182,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             type: 'SHOW_CONFIRM',
             payload: {
               title: '구매 완료 항목 삭제',
-              message: `${purchasedItems.length}개의 구매 완료 항목을 삭제하시겠습니까?`,
+              message: `${purchasedItems.length}개의 구매 완료 항목을 삭제할까요?`,
               onConfirm: async () => {
                 try {
                   for (const item of purchasedItems) {

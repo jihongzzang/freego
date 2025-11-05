@@ -124,7 +124,7 @@ export default function ExpiringScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Header
-        title="유통기한 임박"
+        title="빨리 먹어야 해요"
         onBackPress={() => dispatch({ type: 'NAVIGATE_BACK' })}
       />
 

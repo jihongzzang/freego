@@ -21,7 +21,6 @@ import { getCategoryIcon } from '@/utils/categoryIcons';
 import Header from '@/components/Header';
 import BottomSheet from '@/components/BottomSheet';
 import {
-  ingredientTemplates,
   getTemplatesByCategory,
   type IngredientTemplate,
 } from '@/utils/ingredientTemplates';
@@ -167,9 +166,6 @@ function AddIngredientContent() {
         `${selectedTemplates.length}개의 재료가 추가되었습니다.`,
         'success',
       );
-
-      // 홈으로 이동
-      router.push('/(tabs)');
     } catch (error) {
       console.error('Error adding templates:', error);
       alert('오류', '재료 추가 중 오류가 발생했습니다.', 'error');

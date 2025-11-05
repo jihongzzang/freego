@@ -5,10 +5,13 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  BackHandler,
 } from 'react-native';
 import { useEffect, useMemo } from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import { Trash2, Edit3, Minus } from 'lucide-react-native';
+import { Trash2, Edit3, Minus, Check } from 'lucide-react-native';
 import { useTheme, getStatusColor } from '@/lib/theme';
 import { useDialog } from '@/hooks/useDialog';
 import { useRouter } from '@/hooks/useRouter';
@@ -19,6 +22,7 @@ import {
 } from '@/mvi/features/ingredient-detail';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 import Header from '@/components/Header';
+import FloatingButton from '@/components/FloatingButton';
 
 export default function IngredientDetailScreen() {
   const router = useRouter();
@@ -86,6 +90,24 @@ export default function IngredientDetailScreen() {
     }
   }, [effect]);
 
+  // Android 시스템 백버튼 핸들링
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        if (state.isEditing) {
+          // 수정 모드일 때는 수정 모드 취소
+          dispatch({ type: 'SET_EDITING', payload: false });
+          return true; // 기본 동작 방지
+        }
+        // 일반 모드일 때는 기본 동작 허용 (뒤로가기)
+        return false;
+      },
+    );
+
+    return () => backHandler.remove();
+  }, [state.isEditing, dispatch]);
+
   function handleFieldChange(field: keyof EditFormData, value: string) {
     dispatch({ type: 'UPDATE_FORM_FIELD', payload: { field, value } });
   }
@@ -102,19 +124,11 @@ export default function IngredientDetailScreen() {
     dispatch({ type: 'UPDATE_INGREDIENT' });
   }
 
-  function toggleEditing() {
-    if (state.isEditing) {
-      handleUpdate();
-    } else {
-      dispatch({ type: 'SET_EDITING', payload: true });
-    }
-  }
-
   if (!state.ingredient) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Text style={[typography.styles.body, { color: colors.text }]}>
-          로딩 중...
+          로딩 중이에요...
         </Text>
       </View>
     );
@@ -125,110 +139,36 @@ export default function IngredientDetailScreen() {
       <DialogComponent />
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header
-          title="식재료 상세"
-          onBackPress={() => dispatch({ type: 'NAVIGATE_BACK' })}
-          rightComponent={
-            <TouchableOpacity onPress={toggleEditing}>
-              <Edit3 size={24} color={colors.primary} />
-            </TouchableOpacity>
-          }
+          title="재료 정보"
+          onBackPress={() => {
+            if (state.isEditing) {
+              dispatch({ type: 'SET_EDITING', payload: false });
+            } else {
+              dispatch({ type: 'NAVIGATE_BACK' });
+            }
+          }}
         />
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={[styles.card, { backgroundColor: colors.surface }]}>
-            {state.isEditing ? (
-              <View style={styles.editSection}>
-                <View style={styles.inputGroup}>
-                  <Text
-                    style={[
-                      typography.styles.bodySemibold,
-                      { color: colors.text },
-                    ]}
-                  >
-                    이름
-                  </Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      {
-                        backgroundColor: colors.surface,
-                        color: colors.text,
-                        borderColor: colors.border,
-                      },
-                    ]}
-                    value={state.editForm.name}
-                    onChangeText={(text) => handleFieldChange('name', text)}
-                    placeholder="식재료 이름"
-                    placeholderTextColor={colors.textTertiary}
-                  />
-                </View>
-
-                <View style={styles.inputGroup}>
-                  <Text
-                    style={[
-                      typography.styles.bodySemibold,
-                      { color: colors.text },
-                    ]}
-                  >
-                    카테고리
-                  </Text>
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.categoryScrollContent}
-                  >
-                    {[
-                      '채소',
-                      '과일',
-                      '육류',
-                      '생선류',
-                      '유제품',
-                      '가공식품',
-                      '조미료',
-                    ].map((cat) => (
-                      <TouchableOpacity
-                        key={cat}
-                        style={[
-                          styles.categoryBtn,
-                          {
-                            backgroundColor: colors.surfaceSecondary,
-                            borderColor: colors.surfaceSecondary,
-                          },
-                          state.editForm.category === cat && {
-                            backgroundColor: colors.primaryLight,
-                            borderColor: colors.primary,
-                          },
-                        ]}
-                        onPress={() => handleFieldChange('category', cat)}
-                      >
-                        <View style={styles.categoryBtnContent}>
-                          {getCategoryIcon(cat, 18)}
-                          <Text
-                            style={[
-                              typography.styles.bodySemibold,
-                              { color: colors.textSecondary },
-                              state.editForm.category === cat && {
-                                color: colors.primary,
-                              },
-                            ]}
-                          >
-                            {cat}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-
-                <View style={styles.row}>
-                  <View style={[styles.inputGroup, { flex: 1 }]}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
+          <ScrollView
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={[styles.card, { backgroundColor: colors.surface }]}>
+              {state.isEditing ? (
+                <View style={styles.editSection}>
+                  <View style={styles.inputGroup}>
                     <Text
                       style={[
                         typography.styles.bodySemibold,
                         { color: colors.text },
                       ]}
                     >
-                      수량
+                      이름
                     </Text>
                     <TextInput
                       style={[
@@ -239,325 +179,437 @@ export default function IngredientDetailScreen() {
                           borderColor: colors.border,
                         },
                       ]}
-                      value={state.editForm.quantity}
-                      onChangeText={(text) =>
-                        handleFieldChange('quantity', text)
-                      }
-                      keyboardType="numeric"
-                      placeholder="0"
+                      value={state.editForm.name}
+                      onChangeText={(text) => handleFieldChange('name', text)}
+                      placeholder="식재료 이름"
                       placeholderTextColor={colors.textTertiary}
                     />
                   </View>
-                  <View
-                    style={[styles.inputGroup, { flex: 1, marginLeft: spacing.md }]}
-                  >
+
+                  <View style={styles.inputGroup}>
                     <Text
                       style={[
                         typography.styles.bodySemibold,
                         { color: colors.text },
-                      ]}
-                    >
-                      단위
-                    </Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        {
-                          backgroundColor: colors.surface,
-                          color: colors.text,
-                          borderColor: colors.border,
-                        },
-                      ]}
-                      value={state.editForm.unit}
-                      onChangeText={(text) => handleFieldChange('unit', text)}
-                      placeholder="개, g, ml"
-                      placeholderTextColor={colors.textTertiary}
-                    />
-                  </View>
-                </View>
-
-                <View style={styles.inputGroup}>
-                  <Text
-                    style={[
-                      typography.styles.bodySemibold,
-                      { color: colors.text },
-                    ]}
-                  >
-                    유통기한
-                  </Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      {
-                        backgroundColor: colors.surface,
-                        color: colors.text,
-                        borderColor: colors.border,
-                      },
-                    ]}
-                    value={state.editForm.expiry_date}
-                    onChangeText={(text) =>
-                      handleFieldChange('expiry_date', text)
-                    }
-                    placeholder="YYYY-MM-DD"
-                    placeholderTextColor={colors.textTertiary}
-                  />
-                </View>
-
-                <View style={styles.inputGroup}>
-                  <Text
-                    style={[
-                      typography.styles.bodySemibold,
-                      { color: colors.text },
-                    ]}
-                  >
-                    보관 위치
-                  </Text>
-                  <View style={styles.categoryButtons}>
-                    {['냉장실', '냉동실', '실온'].map((loc) => (
-                      <TouchableOpacity
-                        key={loc}
-                        style={[
-                          styles.categoryBtn,
-                          {
-                            backgroundColor: colors.surfaceSecondary,
-                            borderColor: colors.surfaceSecondary,
-                          },
-                          state.editForm.storage_location === loc && {
-                            backgroundColor: colors.primaryLight,
-                            borderColor: colors.primary,
-                          },
-                        ]}
-                        onPress={() =>
-                          handleFieldChange('storage_location', loc)
-                        }
-                      >
-                        <Text
-                          style={[
-                            typography.styles.bodySemibold,
-                            { color: colors.textSecondary },
-                            state.editForm.storage_location === loc && {
-                              color: colors.primary,
-                            },
-                          ]}
-                        >
-                          {loc}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                <View style={styles.inputGroup}>
-                  <Text
-                    style={[
-                      typography.styles.bodySemibold,
-                      { color: colors.text },
-                    ]}
-                  >
-                    메모
-                  </Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      styles.textArea,
-                      {
-                        backgroundColor: colors.surface,
-                        color: colors.text,
-                        borderColor: colors.border,
-                      },
-                    ]}
-                    value={state.editForm.memo}
-                    onChangeText={(text) => handleFieldChange('memo', text)}
-                    placeholder="메모를 입력하세요"
-                    placeholderTextColor={colors.textTertiary}
-                    multiline
-                    numberOfLines={4}
-                  />
-                </View>
-              </View>
-            ) : (
-              <View style={styles.detailSection}>
-                <View
-                  style={[
-                    styles.mainInfo,
-                    { borderBottomColor: colors.border },
-                  ]}
-                >
-                  <Text style={[typography.styles.h3, { color: colors.text }]}>
-                    {state.ingredient.name}
-                  </Text>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      {
-                        backgroundColor: getStatusColor(
-                          state.ingredient.status,
-                        ),
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        typography.styles.captionBold,
-                        { color: '#ffffff' },
-                      ]}
-                    >
-                      {state.ingredient.status}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.infoGrid}>
-                  <View style={styles.infoItem}>
-                    <Text
-                      style={[
-                        typography.styles.bodySmall,
-                        { color: colors.textSecondary },
                       ]}
                     >
                       카테고리
                     </Text>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.categoryScrollContent}
+                    >
+                      {[
+                        '채소',
+                        '과일',
+                        '육류',
+                        '생선류',
+                        '유제품',
+                        '가공식품',
+                        '조미료',
+                        '기타',
+                      ].map((cat) => (
+                        <TouchableOpacity
+                          key={cat}
+                          style={[
+                            styles.categoryBtn,
+                            {
+                              backgroundColor: colors.surfaceSecondary,
+                              borderColor: colors.surfaceSecondary,
+                            },
+                            state.editForm.category === cat && {
+                              backgroundColor: colors.primaryLight,
+                              borderColor: colors.primary,
+                            },
+                          ]}
+                          onPress={() => handleFieldChange('category', cat)}
+                        >
+                          <View style={styles.categoryBtnContent}>
+                            {getCategoryIcon(cat, 18)}
+                            <Text
+                              style={[
+                                typography.styles.bodySemibold,
+                                { color: colors.textSecondary },
+                                state.editForm.category === cat && {
+                                  color: colors.primary,
+                                },
+                              ]}
+                            >
+                              {cat}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+
+                  <View style={styles.row}>
+                    <View style={[styles.inputGroup, { flex: 1 }]}>
+                      <Text
+                        style={[
+                          typography.styles.bodySemibold,
+                          { color: colors.text },
+                        ]}
+                      >
+                        수량
+                      </Text>
+                      <TextInput
+                        style={[
+                          styles.input,
+                          {
+                            backgroundColor: colors.surface,
+                            color: colors.text,
+                            borderColor: colors.border,
+                          },
+                        ]}
+                        value={state.editForm.quantity}
+                        onChangeText={(text) =>
+                          handleFieldChange('quantity', text)
+                        }
+                        keyboardType="numeric"
+                        placeholder="0"
+                        placeholderTextColor={colors.textTertiary}
+                      />
+                    </View>
+                    <View
+                      style={[
+                        styles.inputGroup,
+                        { flex: 1, marginLeft: spacing.md },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          typography.styles.bodySemibold,
+                          { color: colors.text },
+                        ]}
+                      >
+                        단위
+                      </Text>
+                      <TextInput
+                        style={[
+                          styles.input,
+                          {
+                            backgroundColor: colors.surface,
+                            color: colors.text,
+                            borderColor: colors.border,
+                          },
+                        ]}
+                        value={state.editForm.unit}
+                        onChangeText={(text) => handleFieldChange('unit', text)}
+                        placeholder="개, g, ml"
+                        placeholderTextColor={colors.textTertiary}
+                      />
+                    </View>
+                  </View>
+
+                  <View style={styles.inputGroup}>
                     <Text
                       style={[
                         typography.styles.bodySemibold,
                         { color: colors.text },
-                      ]}
-                    >
-                      {state.ingredient.category}
-                    </Text>
-                  </View>
-                  <View style={styles.infoItem}>
-                    <Text
-                      style={[
-                        typography.styles.bodySmall,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      수량
-                    </Text>
-                    <Text
-                      style={[
-                        typography.styles.bodySemibold,
-                        { color: colors.text },
-                      ]}
-                    >
-                      {state.ingredient.quantity} {state.ingredient.unit}
-                    </Text>
-                  </View>
-                  <View style={styles.infoItem}>
-                    <Text
-                      style={[
-                        typography.styles.bodySmall,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      보관 위치
-                    </Text>
-                    <Text
-                      style={[
-                        typography.styles.bodySemibold,
-                        { color: colors.text },
-                      ]}
-                    >
-                      {state.ingredient.storage_location}
-                    </Text>
-                  </View>
-                  <View style={styles.infoItem}>
-                    <Text
-                      style={[
-                        typography.styles.bodySmall,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      구매일
-                    </Text>
-                    <Text
-                      style={[
-                        typography.styles.bodySemibold,
-                        { color: colors.text },
-                      ]}
-                    >
-                      {state.ingredient.purchase_date || '-'}
-                    </Text>
-                  </View>
-                  <View style={styles.infoItem}>
-                    <Text
-                      style={[
-                        typography.styles.bodySmall,
-                        { color: colors.textSecondary },
                       ]}
                     >
                       유통기한
                     </Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        {
+                          backgroundColor: colors.surface,
+                          color: colors.text,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                      value={state.editForm.expiry_date}
+                      onChangeText={(text) =>
+                        handleFieldChange('expiry_date', text)
+                      }
+                      placeholder="YYYY-MM-DD"
+                      placeholderTextColor={colors.textTertiary}
+                    />
+                  </View>
+
+                  <View style={styles.inputGroup}>
                     <Text
                       style={[
                         typography.styles.bodySemibold,
                         { color: colors.text },
                       ]}
                     >
-                      {state.ingredient.expiry_date || '-'}
+                      보관 위치
                     </Text>
+                    <View style={styles.categoryButtons}>
+                      {['냉장실', '냉동실', '실온'].map((loc) => (
+                        <TouchableOpacity
+                          key={loc}
+                          style={[
+                            styles.categoryBtn,
+                            {
+                              backgroundColor: colors.surfaceSecondary,
+                              borderColor: colors.surfaceSecondary,
+                            },
+                            state.editForm.storage_location === loc && {
+                              backgroundColor: colors.primaryLight,
+                              borderColor: colors.primary,
+                            },
+                          ]}
+                          onPress={() =>
+                            handleFieldChange('storage_location', loc)
+                          }
+                        >
+                          <Text
+                            style={[
+                              typography.styles.bodySemibold,
+                              { color: colors.textSecondary },
+                              state.editForm.storage_location === loc && {
+                                color: colors.primary,
+                              },
+                            ]}
+                          >
+                            {loc}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
                   </View>
-                </View>
 
-                {state.ingredient.memo && (
-                  <View
-                    style={[
-                      styles.memoSection,
-                      { borderTopColor: colors.border },
-                    ]}
-                  >
+                  <View style={styles.inputGroup}>
                     <Text
                       style={[
-                        typography.styles.label,
-                        { color: colors.textSecondary },
+                        typography.styles.bodySemibold,
+                        { color: colors.text },
                       ]}
                     >
                       메모
                     </Text>
-                    <Text
+                    <TextInput
                       style={[
-                        typography.styles.bodySmall,
-                        { color: colors.text },
+                        styles.input,
+                        styles.textArea,
+                        {
+                          backgroundColor: colors.surface,
+                          color: colors.text,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                      value={state.editForm.memo}
+                      onChangeText={(text) => handleFieldChange('memo', text)}
+                      placeholder="메모를 입력하세요"
+                      placeholderTextColor={colors.textTertiary}
+                      multiline
+                      numberOfLines={4}
+                    />
+                  </View>
+                </View>
+              ) : (
+                <View style={styles.detailSection}>
+                  <View
+                    style={[
+                      styles.mainInfo,
+                      { borderBottomColor: colors.border },
+                    ]}
+                  >
+                    <Text
+                      style={[typography.styles.h3, { color: colors.text }]}
+                    >
+                      {state.ingredient.name}
+                    </Text>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        {
+                          backgroundColor: getStatusColor(
+                            state.ingredient.status,
+                          ),
+                        },
                       ]}
                     >
-                      {state.ingredient.memo}
-                    </Text>
+                      <Text
+                        style={[
+                          typography.styles.captionBold,
+                          { color: '#ffffff' },
+                        ]}
+                      >
+                        {state.ingredient.status}
+                      </Text>
+                    </View>
                   </View>
-                )}
+
+                  <View style={styles.infoGrid}>
+                    <View style={styles.infoItem}>
+                      <Text
+                        style={[
+                          typography.styles.bodySmall,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        카테고리
+                      </Text>
+                      <Text
+                        style={[
+                          typography.styles.bodySemibold,
+                          { color: colors.text },
+                        ]}
+                      >
+                        {state.ingredient.category}
+                      </Text>
+                    </View>
+                    <View style={styles.infoItem}>
+                      <Text
+                        style={[
+                          typography.styles.bodySmall,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        수량
+                      </Text>
+                      <Text
+                        style={[
+                          typography.styles.bodySemibold,
+                          { color: colors.text },
+                        ]}
+                      >
+                        {state.ingredient.quantity} {state.ingredient.unit}
+                      </Text>
+                    </View>
+                    <View style={styles.infoItem}>
+                      <Text
+                        style={[
+                          typography.styles.bodySmall,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        보관 위치
+                      </Text>
+                      <Text
+                        style={[
+                          typography.styles.bodySemibold,
+                          { color: colors.text },
+                        ]}
+                      >
+                        {state.ingredient.storage_location}
+                      </Text>
+                    </View>
+                    <View style={styles.infoItem}>
+                      <Text
+                        style={[
+                          typography.styles.bodySmall,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        구매일
+                      </Text>
+                      <Text
+                        style={[
+                          typography.styles.bodySemibold,
+                          { color: colors.text },
+                        ]}
+                      >
+                        {state.ingredient.purchase_date || '-'}
+                      </Text>
+                    </View>
+                    <View style={styles.infoItem}>
+                      <Text
+                        style={[
+                          typography.styles.bodySmall,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        유통기한
+                      </Text>
+                      <Text
+                        style={[
+                          typography.styles.bodySemibold,
+                          { color: colors.text },
+                        ]}
+                      >
+                        {state.ingredient.expiry_date || '-'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {state.ingredient.memo && (
+                    <View
+                      style={[
+                        styles.memoSection,
+                        { borderTopColor: colors.border },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          typography.styles.label,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        메모
+                      </Text>
+                      <Text
+                        style={[
+                          typography.styles.bodySmall,
+                          { color: colors.text },
+                        ]}
+                      >
+                        {state.ingredient.memo}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              )}
+            </View>
+
+            {!state.isEditing && (
+              <View style={styles.actionButtons}>
+                <TouchableOpacity
+                  style={[
+                    styles.consumeButton,
+                    { backgroundColor: colors.primary },
+                  ]}
+                  onPress={handleConsume}
+                >
+                  <Minus size={20} color="#ffffff" />
+                  <Text
+                    style={[typography.styles.button, { color: '#ffffff' }]}
+                  >
+                    소모
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.deleteButton,
+                    { backgroundColor: colors.danger },
+                  ]}
+                  onPress={handleDelete}
+                >
+                  <Trash2 size={20} color="#ffffff" />
+                  <Text
+                    style={[typography.styles.button, { color: '#ffffff' }]}
+                  >
+                    삭제
+                  </Text>
+                </TouchableOpacity>
               </View>
             )}
-          </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
 
-          {!state.isEditing && (
-            <View style={styles.actionButtons}>
-              <TouchableOpacity
-                style={[
-                  styles.consumeButton,
-                  { backgroundColor: colors.success },
-                ]}
-                onPress={handleConsume}
-              >
-                <Minus size={20} color="#ffffff" />
-                <Text style={[typography.styles.button, { color: '#ffffff' }]}>
-                  소모
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.deleteButton,
-                  { backgroundColor: colors.danger },
-                ]}
-                onPress={handleDelete}
-              >
-                <Trash2 size={20} color="#ffffff" />
-                <Text style={[typography.styles.button, { color: '#ffffff' }]}>
-                  삭제
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </ScrollView>
+        {/* 플로팅 버튼 */}
+        {state.isEditing ? (
+          <FloatingButton
+            onPress={handleUpdate}
+            icon={<Check size={24} color="#FFFFFF" />}
+            label="저장하기"
+            backgroundColor={colors.success}
+            hasTabBar={false}
+          />
+        ) : (
+          <FloatingButton
+            onPress={() => dispatch({ type: 'SET_EDITING', payload: true })}
+            icon={<Edit3 size={24} color="#FFFFFF" />}
+            label="수정하기"
+            hasTabBar={false}
+          />
+        )}
       </View>
     </>
   );

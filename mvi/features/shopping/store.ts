@@ -14,8 +14,13 @@ import { shoppingMiddleware } from './middleware';
  */
 const initialState: ShoppingState = {
   shoppingList: [],
-  loading: true,
+  loading: false,
   error: null,
+  isAddingItem: false,
+  addForm: {
+    name: '',
+    category: '채소',
+  },
 };
 
 /**

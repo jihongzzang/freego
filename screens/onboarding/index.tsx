@@ -21,7 +21,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 import {
   // ChevronRight,
   Refrigerator,
-  // ShoppingCart,
+  ShoppingCart,
   TrendingDown,
   Sparkles,
 } from 'lucide-react-native';
@@ -31,7 +31,7 @@ import { useMVIStore } from '@/mvi/base';
 import { createOnboardingStore } from '@/mvi/features/onboarding';
 import { useRouter } from '@/hooks/useRouter';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 interface OnboardingStep {
   icon: React.ReactNode;
@@ -49,7 +49,7 @@ export default function OnboardingScreen() {
 
   const styles = useMemo(
     () => createStyles({ spacing, borderRadius, shadows }),
-    [spacing, borderRadius, shadows]
+    [spacing, borderRadius, shadows],
   );
 
   const steps: OnboardingStep[] = [
@@ -62,20 +62,20 @@ export default function OnboardingScreen() {
     {
       icon: <TrendingDown size={80} color="#ffffff" />,
       title: '음식물 쓰레기 줄이기',
-      description: '소비 패턴을 분석하고\n낭비를 최소화하세요',
+      description: '소비 패턴을 분석하고\n낭비를 최소화 해요',
       color: '#3b82f6',
     },
-    // {
-    //   icon: <ShoppingCart size={80} color="#ffffff" />,
-    //   title: '장보기도 간편하게',
-    //   description: '다 떨어진 재료는 자동으로\n장보기 목록에 추가됩니다',
-    //   color: '#f59e0b',
-    // },
+    {
+      icon: <ShoppingCart size={80} color="#ffffff" />,
+      title: '장보기도 간편하게',
+      description: '다 떨어진 재료는 손쉽게\n장보기 목록에 추가해요',
+      color: '#f59e0b',
+    },
     {
       icon: <Sparkles size={80} color="#ffffff" />,
       title: '시작해볼까요?',
       description:
-        '현명한 소비 습관을 만들고\n지구를 지키는 작은 실천을 시작하세요',
+        '현명한 소비 습관을 만들고\n지구를 지키는 작은 실천을 시작해요',
       color: '#8b5cf6',
     },
   ];
@@ -97,7 +97,12 @@ export default function OnboardingScreen() {
   }, [state.currentStep]);
 
   function handleNext() {
-    console.log('handleNext called, currentStep:', state.currentStep, 'totalSteps:', state.totalSteps);
+    console.log(
+      'handleNext called, currentStep:',
+      state.currentStep,
+      'totalSteps:',
+      state.totalSteps,
+    );
     dispatch({ type: 'NEXT_STEP' });
   }
 
@@ -150,30 +155,32 @@ export default function OnboardingScreen() {
     transform: [{ translateX: translateX.value }],
   }));
 
+  const currentStep = steps[state.currentStep];
+
   return (
     <GestureHandlerRootView style={styles.container}>
-      <GestureDetector gesture={panGesture}>
-        <Animated.View style={[styles.carouselContainer, animatedStyle]}>
-          {steps.map((step, index) => (
-            <View key={index} style={{ width, height }}>
-              <LinearGradient
-                colors={[step.color, step.color + 'dd']}
-                style={styles.gradient}
-              >
-                {state.currentStep < steps.length - 1 && (
-                  <TouchableOpacity
-                    style={[styles.skipButton, { top: insets.top + 10 }]}
-                    onPress={handleSkip}
-                  >
-                    <Text
-                      style={[typography.styles.bodySemibold, styles.skipText]}
-                    >
-                      건너뛰기
-                    </Text>
-                  </TouchableOpacity>
-                )}
+      <LinearGradient
+        colors={[currentStep.color, currentStep.color + 'dd']}
+        style={styles.gradient}
+      >
+        {/* 상단 고정: 건너뛰기 버튼 */}
+        {state.currentStep < steps.length - 1 && (
+          <TouchableOpacity
+            style={[styles.skipButton, { top: insets.top + 10 }]}
+            onPress={handleSkip}
+          >
+            <Text style={[typography.styles.bodySemibold, styles.skipText]}>
+              건너뛰기
+            </Text>
+          </TouchableOpacity>
+        )}
 
-                <View style={styles.content}>
+        {/* 가운데 컨텐츠: 캐러셀 */}
+        <GestureDetector gesture={panGesture}>
+          <View style={styles.contentWrapper}>
+            <Animated.View style={[styles.carouselContainer, animatedStyle]}>
+              {steps.map((step, index) => (
+                <View key={index} style={[styles.slideContent, { width }]}>
                   <View style={styles.iconContainer}>{step.icon}</View>
 
                   <View style={styles.textContainer}>
@@ -184,41 +191,37 @@ export default function OnboardingScreen() {
                       {step.description}
                     </Text>
                   </View>
-
-                  <View style={styles.footer}>
-                    <View style={styles.pagination}>
-                      {steps.map((_, dotIndex) => (
-                        <View
-                          key={dotIndex}
-                          style={[
-                            styles.paginationDot,
-                            dotIndex === state.currentStep &&
-                              styles.paginationDotActive,
-                          ]}
-                        />
-                      ))}
-                    </View>
-
-                    <TouchableOpacity
-                      style={styles.nextButton}
-                      onPress={handleNext}
-                      activeOpacity={0.8}
-                    >
-                      <Text
-                        style={[typography.styles.h5, styles.nextButtonText]}
-                      >
-                        {state.currentStep < steps.length - 1
-                          ? '다음'
-                          : '시작하기'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
                 </View>
-              </LinearGradient>
-            </View>
-          ))}
-        </Animated.View>
-      </GestureDetector>
+              ))}
+            </Animated.View>
+          </View>
+        </GestureDetector>
+
+        {/* 하단 고정: pagination과 버튼 */}
+        <View style={styles.footer}>
+          <View style={styles.pagination}>
+            {steps.map((_, dotIndex) => (
+              <View
+                key={dotIndex}
+                style={[
+                  styles.paginationDot,
+                  dotIndex === state.currentStep && styles.paginationDotActive,
+                ]}
+              />
+            ))}
+          </View>
+
+          <TouchableOpacity
+            style={styles.nextButton}
+            onPress={handleNext}
+            activeOpacity={0.8}
+          >
+            <Text style={[typography.styles.h5, styles.nextButtonText]}>
+              {state.currentStep < steps.length - 1 ? '다음' : '시작하기'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
     </GestureHandlerRootView>
   );
 }
@@ -236,9 +239,6 @@ const createStyles = ({
     container: {
       flex: 1,
     },
-    carouselContainer: {
-      flexDirection: 'row',
-    },
     gradient: {
       flex: 1,
     },
@@ -253,11 +253,20 @@ const createStyles = ({
       color: '#ffffff',
       opacity: 0.9,
     },
-    content: {
+    contentWrapper: {
       flex: 1,
+      overflow: 'hidden',
+      width: width,
+    },
+    carouselContainer: {
+      flexDirection: 'row',
+      height: '100%',
+    },
+    slideContent: {
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: 40,
+      height: '100%',
     },
     iconContainer: {
       marginBottom: 60,
@@ -266,7 +275,6 @@ const createStyles = ({
     },
     textContainer: {
       alignItems: 'center',
-      marginBottom: 80,
     },
     title: {
       color: '#ffffff',
@@ -281,7 +289,8 @@ const createStyles = ({
     footer: {
       position: 'absolute',
       bottom: 60,
-      width: width - 80,
+      left: 40,
+      right: 40,
       alignItems: 'center',
       gap: spacing.xxxl,
     },
@@ -301,6 +310,7 @@ const createStyles = ({
       opacity: 1,
     },
     nextButton: {
+      width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',

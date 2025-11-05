@@ -5,7 +5,12 @@
  */
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
-import { IngredientDetailState, IngredientDetailIntent, IngredientDetailEffect, Ingredient } from './types';
+import {
+  IngredientDetailState,
+  IngredientDetailIntent,
+  IngredientDetailEffect,
+  Ingredient,
+} from './types';
 import { storage } from '@/lib/storage';
 
 /**
@@ -31,7 +36,10 @@ export const ingredientDetailMiddleware: Middleware<
   IngredientDetailState,
   IngredientDetailIntent,
   IngredientDetailEffect
-> = async (state, intent): Promise<MiddlewareResult<IngredientDetailState, IngredientDetailEffect>> => {
+> = async (
+  state,
+  intent,
+): Promise<MiddlewareResult<IngredientDetailState, IngredientDetailEffect>> => {
   switch (intent.type) {
     case 'LOAD_INGREDIENT': {
       try {
@@ -49,8 +57,8 @@ export const ingredientDetailMiddleware: Middleware<
               editForm: {
                 name: data.name,
                 category: data.category,
-                quantity: data.quantity.toString(),
-                unit: data.unit,
+                quantity: data.quantity?.toString() || '',
+                unit: data.unit || '',
                 expiry_date: data.expiry_date || '',
                 storage_location: data.storage_location,
                 memo: data.memo || '',
@@ -89,7 +97,7 @@ export const ingredientDetailMiddleware: Middleware<
             type: 'SHOW_CONFIRM',
             payload: {
               title: '삭제 확인',
-              message: '이 식재료를 삭제하시겠습니까?',
+              message: '이 식재료를 삭제할까요?',
               onConfirm: async () => {
                 try {
                   await storage.deleteIngredient(state.ingredient!.id);
@@ -115,13 +123,12 @@ export const ingredientDetailMiddleware: Middleware<
             type: 'SHOW_CONFIRM',
             payload: {
               title: '소모 확인',
-              message: `${ingredient.name}을(를) 소모 처리하시겠습니까?\n장보기 목록에 자동으로 추가됩니다.`,
+              message: `${ingredient.name}을(를) 소모 처리할까요?\n장보기 목록에 자동으로 추가돼요.`,
               onConfirm: async () => {
                 try {
                   await storage.addToShoppingList({
                     name: ingredient.name,
                     category: ingredient.category,
-                    unit: ingredient.unit,
                   });
                   await storage.deleteIngredient(ingredient.id);
                 } catch (error) {
@@ -150,7 +157,9 @@ export const ingredientDetailMiddleware: Middleware<
 
         // 업데이트 후 다시 로드
         const ingredients = await storage.getIngredients();
-        const data = ingredients.find((item) => item.id === state.ingredient!.id);
+        const data = ingredients.find(
+          (item) => item.id === state.ingredient!.id,
+        );
 
         if (data) {
           const status = calculateStatus(data.expiry_date);
@@ -163,8 +172,8 @@ export const ingredientDetailMiddleware: Middleware<
               editForm: {
                 name: data.name,
                 category: data.category,
-                quantity: data.quantity.toString(),
-                unit: data.unit,
+                quantity: data.quantity?.toString() || '',
+                unit: data.unit || '',
                 expiry_date: data.expiry_date || '',
                 storage_location: data.storage_location,
                 memo: data.memo || '',
@@ -176,7 +185,7 @@ export const ingredientDetailMiddleware: Middleware<
                 type: 'SHOW_ALERT',
                 payload: {
                   title: '완료',
-                  message: '식재료 정보가 업데이트되었습니다.',
+                  message: '식재료 정보가 업데이트됐어요.',
                   variant: 'success',
                 },
               },
@@ -193,7 +202,7 @@ export const ingredientDetailMiddleware: Middleware<
               type: 'SHOW_ALERT',
               payload: {
                 title: '오류',
-                message: '식재료 업데이트에 실패했습니다.',
+                message: '식재료 업데이트에 실패했어요.',
                 variant: 'error',
               },
             },

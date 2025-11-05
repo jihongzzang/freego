@@ -12,6 +12,11 @@ export interface ShoppingState extends State {
   shoppingList: ShoppingItem[];
   loading: boolean;
   error: string | null;
+  isAddingItem: boolean;
+  addForm: {
+    name: string;
+    category: string;
+  };
 }
 
 /**
@@ -21,7 +26,10 @@ export type ShoppingIntent =
   | { type: 'LOAD_SHOPPING_LIST' }
   | { type: 'TOGGLE_PURCHASED'; payload: { id: string; currentStatus: boolean } }
   | { type: 'DELETE_ITEM'; payload: { id: string; name: string } }
-  | { type: 'CLEAR_PURCHASED' };
+  | { type: 'CLEAR_PURCHASED' }
+  | { type: 'TOGGLE_ADD_MODAL'; payload: boolean }
+  | { type: 'UPDATE_ADD_FORM'; payload: { field: 'name' | 'category'; value: string } }
+  | { type: 'SUBMIT_ADD_ITEM' };
 
 /**
  * Shopping Effect (부수 효과)

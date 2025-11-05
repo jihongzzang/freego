@@ -19,6 +19,8 @@ export function getCategoryIcon(category: string, size: number = 16) {
       return <Cookie size={size} color={color} />;
     case '조미료':
       return <Soup size={size} color={color} />;
+    case '기타':
+      return <Package size={size} color={color} />;
     default:
       return <Package size={size} color={color} />;
   }

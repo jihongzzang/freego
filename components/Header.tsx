@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/lib/theme';
@@ -39,10 +34,7 @@ export default function Header({
       <View style={styles.headerContent}>
         {onBackPress && (
           <TouchableOpacity
-            style={[
-              styles.backButton,
-              { borderRadius: borderRadius.full },
-            ]}
+            style={[styles.backButton, { borderRadius: borderRadius.full }]}
             onPress={onBackPress}
           >
             <ArrowLeft size={24} color={colors.text} />
@@ -74,7 +66,7 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 4,
   },
   backButton: {
     width: 40,

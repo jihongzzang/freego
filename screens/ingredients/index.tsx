@@ -5,10 +5,10 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { useEffect, useCallback, useMemo, useRef } from 'react';
+import { useEffect, useCallback, useMemo, useRef, useState } from 'react';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
-import { Minus } from 'lucide-react-native';
+import { Minus, ChevronDown, ChevronUp, Package } from 'lucide-react-native';
 import { useTheme, getStatusColor } from '@/lib/theme';
 import { useMVIStore } from '@/mvi/base';
 import { createIngredientsStore, Ingredient } from '@/mvi/features/ingredients';
@@ -23,13 +23,18 @@ export default function IngredientsScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const hasScrolledRef = useRef(false);
 
+  // 아코디언 상태 관리 (카테고리별 접힘/펼침)
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(
+    new Set(),
+  );
+
   // MVI Store 사용
   const [state, dispatch, effect] = useMVIStore(createIngredientsStore);
   const { ingredients, loading } = state;
 
   const styles = useMemo(
     () => createStyles({ borderRadius, spacing }),
-    [spacing, borderRadius]
+    [spacing, borderRadius],
   );
 
   // Effect 처리
@@ -56,7 +61,7 @@ export default function IngredientsScreen() {
       dispatch({ type: 'LOAD_INGREDIENTS' });
       // 화면 재진입 시 스크롤 플래그 리셋
       hasScrolledRef.current = false;
-    }, [dispatch])
+    }, [dispatch]),
   );
 
   // 카테고리별로 재료 그룹화
@@ -74,7 +79,16 @@ export default function IngredientsScreen() {
   }, [ingredients]);
 
   // 카테고리 순서
-  const categoryOrder = ['채소', '과일', '육류', '생선류', '유제품', '가공식품', '조미료'];
+  const categoryOrder = [
+    '채소',
+    '과일',
+    '육류',
+    '생선류',
+    '유제품',
+    '가공식품',
+    '조미료',
+    '기타',
+  ];
 
   const sortedCategories = useMemo(() => {
     return Object.keys(groupedIngredients).sort((a, b) => {
@@ -87,6 +101,19 @@ export default function IngredientsScreen() {
       return indexA - indexB;
     });
   }, [groupedIngredients]);
+
+  // 카테고리 접기/펼치기 토글
+  const toggleCategory = (category: string) => {
+    setCollapsedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
 
   function getDaysRemaining(daysRemaining: number | null): string {
     if (daysRemaining === null) return '';
@@ -147,8 +174,8 @@ export default function IngredientsScreen() {
                     item.status === '소모됨'
                       ? colors.danger
                       : item.status === '주의'
-                      ? colors.warning
-                      : colors.success,
+                        ? colors.warning
+                        : colors.success,
                   marginTop: spacing.xs,
                 },
               ]}
@@ -190,11 +217,7 @@ export default function IngredientsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header
-        title="보관 중인 재료"
-        onBackPress={() => dispatch({ type: 'NAVIGATE_BACK' })}
-      />
-
+      <Header title="재료 관리" />
       <ScrollView
         ref={scrollViewRef}
         style={styles.content}
@@ -215,23 +238,12 @@ export default function IngredientsScreen() {
             </Text>
           </View>
         ) : ingredients.length === 0 ? (
-          <View
-            style={[styles.emptyContainer, { backgroundColor: colors.surface }]}
-          >
-            <Text
-              style={[
-                typography.styles.bodySemibold,
-                { color: colors.textTertiary },
-              ]}
-            >
+          <View style={styles.emptyContainer}>
+            <Package size={64} color={colors.textTertiary} />
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               관리할 재료가 없어요
             </Text>
-            <Text
-              style={[
-                typography.styles.bodySmall,
-                { color: colors.textTertiary },
-              ]}
-            >
+            <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
               기억하고 싶은 재료만 추가해보세요
             </Text>
           </View>
@@ -259,7 +271,11 @@ export default function IngredientsScreen() {
                   }
                 }}
               >
-                <View style={styles.categoryHeader}>
+                <TouchableOpacity
+                  style={styles.categoryHeader}
+                  onPress={() => toggleCategory(cat)}
+                  activeOpacity={0.7}
+                >
                   <View style={styles.categoryHeaderLeft}>
                     {getCategoryIcon(cat, 20)}
                     <Text
@@ -268,29 +284,41 @@ export default function IngredientsScreen() {
                       {cat}
                     </Text>
                   </View>
-                  <View
-                    style={[
-                      styles.categoryBadge,
-                      { backgroundColor: colors.primaryLight },
-                    ]}
-                  >
-                    <Text
+                  <View style={styles.categoryHeaderRight}>
+                    <View
                       style={[
-                        typography.styles.captionBold,
-                        { color: colors.primary },
+                        styles.categoryBadge,
+                        { backgroundColor: colors.primaryLight },
                       ]}
                     >
-                      {groupedIngredients[cat].length}
-                    </Text>
+                      <Text
+                        style={[
+                          typography.styles.captionBold,
+                          { color: colors.primary },
+                        ]}
+                      >
+                        {groupedIngredients[cat].length}
+                      </Text>
+                    </View>
+                    {collapsedCategories.has(cat) ? (
+                      <ChevronDown size={20} color={colors.textSecondary} />
+                    ) : (
+                      <ChevronUp size={20} color={colors.textSecondary} />
+                    )}
                   </View>
-                </View>
-                <View
-                  style={[styles.listCard, { backgroundColor: colors.surface }]}
-                >
-                  {groupedIngredients[cat].map((item) =>
-                    renderIngredientItem({ item })
-                  )}
-                </View>
+                </TouchableOpacity>
+                {!collapsedCategories.has(cat) && (
+                  <View
+                    style={[
+                      styles.listCard,
+                      { backgroundColor: colors.surface },
+                    ]}
+                  >
+                    {groupedIngredients[cat].map((item) =>
+                      renderIngredientItem({ item }),
+                    )}
+                  </View>
+                )}
               </View>
             ))}
           </View>
@@ -331,6 +359,11 @@ const createStyles = ({
       justifyContent: 'space-between',
     },
     categoryHeaderLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    categoryHeaderRight: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: spacing.sm,
@@ -386,8 +419,18 @@ const createStyles = ({
       alignItems: 'center',
     },
     emptyContainer: {
-      borderRadius: borderRadius.lg,
-      padding: 40,
+      flex: 1,
       alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 100,
+      gap: 12,
+    },
+    emptyText: {
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    emptySubtext: {
+      fontSize: 14,
+      textAlign: 'center',
     },
   });

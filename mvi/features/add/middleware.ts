@@ -127,9 +127,6 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
                 variant: 'success',
               },
             },
-            {
-              type: 'NAVIGATE_HOME',
-            },
           ],
         };
       } catch (error) {
@@ -151,6 +148,16 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
           ],
         };
       }
+    }
+
+    case 'NAVIGATE_BACK': {
+      return {
+        effects: [
+          {
+            type: 'NAVIGATE_BACK',
+          },
+        ],
+      };
     }
 
     default:

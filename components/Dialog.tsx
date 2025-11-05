@@ -41,7 +41,7 @@ export function Dialog({
 
   const styles = useMemo(
     () => createStyles({ spacing, borderRadius, shadows }),
-    [spacing, borderRadius, shadows]
+    [spacing, borderRadius, shadows],
   );
 
   function getIcon() {
@@ -114,11 +114,13 @@ export function Dialog({
             {type !== 'default' && getIcon()}
           </View>
 
-          <Text
-            style={[typography.styles.body, { color: colors.textSecondary }]}
-          >
-            {message}
-          </Text>
+          <View style={styles.messageContainer}>
+            <Text
+              style={[typography.styles.body, { color: colors.textSecondary }]}
+            >
+              {message}
+            </Text>
+          </View>
 
           <View style={styles.buttonsContainer}>
             {buttons.map((button, index) => {
@@ -189,6 +191,10 @@ const createStyles = ({
       alignItems: 'center',
       justifyContent: 'space-between',
       marginBottom: spacing.md,
+    },
+    messageContainer: {
+      textAlign: 'left',
+      justifyContent: 'flex-start',
     },
     buttonsContainer: {
       flexDirection: 'row',

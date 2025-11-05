@@ -86,8 +86,7 @@ function DashboardContent() {
 
   // 모든 카테고리 정렬 (많은 순)
   const sortedCategories = useMemo(() => {
-    return Object.entries(categoryStats)
-      .sort(([, a], [, b]) => b - a);
+    return Object.entries(categoryStats).sort(([, a], [, b]) => b - a);
   }, [categoryStats]);
 
   async function quickDeduct(id: string) {
@@ -152,7 +151,7 @@ function DashboardContent() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Header
-        title="홈"
+        title="내 냉장고"
         rightComponent={
           <TouchableOpacity
             style={[
@@ -198,7 +197,10 @@ function DashboardContent() {
         {/* Summary Grid 2x2 */}
         <View style={styles.summaryGrid}>
           <TouchableOpacity
-            style={[styles.summaryGridItem, { backgroundColor: colors.surface }]}
+            style={[
+              styles.summaryGridItem,
+              { backgroundColor: colors.surface },
+            ]}
             onPress={() => dispatch({ type: 'NAVIGATE_TO_INGREDIENTS' })}
             activeOpacity={0.7}
           >
@@ -213,7 +215,7 @@ function DashboardContent() {
                   { color: colors.textSecondary },
                 ]}
               >
-                보관 중인 재료
+                나의 식재료
               </Text>
             </View>
           </TouchableOpacity>
@@ -222,7 +224,10 @@ function DashboardContent() {
             style={[
               styles.summaryGridItem,
               {
-                backgroundColor: expiringItems.length > 0 ? colors.dangerLight : colors.surface,
+                backgroundColor:
+                  expiringItems.length > 0
+                    ? colors.dangerLight
+                    : colors.surface,
               },
             ]}
             onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
@@ -239,7 +244,12 @@ function DashboardContent() {
               {expiringItems.length}
             </Text>
             <View style={styles.summaryBottomRow}>
-              <Clock size={16} color={expiringItems.length > 0 ? colors.danger : colors.textTertiary} />
+              <Clock
+                size={16}
+                color={
+                  expiringItems.length > 0 ? colors.danger : colors.textTertiary
+                }
+              />
               <Text
                 style={[
                   typography.styles.caption,
@@ -275,16 +285,14 @@ function DashboardContent() {
                     { backgroundColor: colors.surface },
                   ]}
                   onPress={() =>
-                    dispatch({ type: 'NAVIGATE_TO_INGREDIENTS', payload: category })
+                    dispatch({
+                      type: 'NAVIGATE_TO_INGREDIENTS',
+                      payload: category,
+                    })
                   }
                   activeOpacity={0.7}
                 >
-                  <Text
-                    style={[
-                      typography.styles.h2,
-                      { color: colors.text },
-                    ]}
-                  >
+                  <Text style={[typography.styles.h2, { color: colors.text }]}>
                     {count}
                   </Text>
                   <View style={styles.categoryBottomRow}>
@@ -347,7 +355,7 @@ function DashboardContent() {
             <View style={styles.sectionHeaderLeft}>
               <Package size={20} color={colors.primary} />
               <Text style={[typography.styles.h5, { color: colors.text }]}>
-                보관 중인 재료
+                나의 식재료
               </Text>
             </View>
             {ingredients.length > 5 && (
