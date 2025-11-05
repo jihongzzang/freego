@@ -59,12 +59,12 @@ export default function OnboardingScreen() {
       description: '식재료를 체계적으로 관리하고\n유통기한을 놓치지 마세요',
       color: '#10b981',
     },
-    {
-      icon: <TrendingDown size={80} color="#ffffff" />,
-      title: '음식물 쓰레기 줄이기',
-      description: '소비 패턴을 분석하고\n낭비를 최소화 해요',
-      color: '#3b82f6',
-    },
+    // {
+    //   icon: <TrendingDown size={80} color="#ffffff" />,
+    //   title: '음식물 쓰레기 줄이기',
+    //   description: '소비 패턴을 분석하고\n낭비를 최소화 해요',
+    //   color: '#3b82f6',
+    // },
     {
       icon: <ShoppingCart size={80} color="#ffffff" />,
       title: '장보기도 간편하게',

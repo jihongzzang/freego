@@ -49,6 +49,8 @@ export type IngredientDetailIntent =
   | { type: 'DELETE_INGREDIENT' }
   | { type: 'CONSUME_INGREDIENT' }
   | { type: 'UPDATE_INGREDIENT' }
+  | { type: 'DELETE_SUCCESS' }
+  | { type: 'CONSUME_SUCCESS'; payload: { name: string } }
   | { type: 'NAVIGATE_BACK' };
 
 /**
@@ -66,7 +68,7 @@ export type IngredientDetailEffect =
   | {
       type: 'SHOW_CONFIRM';
       payload: {
-        title: string;
+        title?: string;
         message: string;
         onConfirm: () => void;
         isDanger?: boolean;

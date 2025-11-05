@@ -240,10 +240,20 @@ export default function IngredientsScreen() {
         ) : ingredients.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Package size={64} color={colors.textTertiary} />
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+            <Text
+              style={[
+                typography.styles.bodyMedium,
+                { color: colors.textSecondary },
+              ]}
+            >
               관리할 재료가 없어요
             </Text>
-            <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
+            <Text
+              style={[
+                typography.styles.bodySmall,
+                { color: colors.textTertiary },
+              ]}
+            >
               기억하고 싶은 재료만 추가해보세요
             </Text>
           </View>
@@ -342,7 +352,8 @@ const createStyles = ({
     },
     content: {
       flex: 1,
-      padding: spacing.xl,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
     },
     scrollContent: {
       paddingBottom: 180,
@@ -424,13 +435,5 @@ const createStyles = ({
       justifyContent: 'center',
       paddingVertical: 100,
       gap: 12,
-    },
-    emptyText: {
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    emptySubtext: {
-      fontSize: 14,
-      textAlign: 'center',
     },
   });

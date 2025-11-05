@@ -8,7 +8,7 @@ interface DialogButton {
 }
 
 interface DialogOptions {
-  title: string;
+  title?: string;
   message: string;
   type?: 'default' | 'success' | 'warning' | 'error' | 'info';
   buttons: DialogButton[];
@@ -32,7 +32,15 @@ export function useDialog() {
     setVisible(false);
   }
 
-  function alert(title: string, message: string, type?: 'success' | 'warning' | 'error' | 'info') {
+  function alert({
+    title,
+    message,
+    type,
+  }: {
+    title: string;
+    message: string;
+    type?: 'success' | 'warning' | 'error' | 'info';
+  }) {
     showDialog({
       title,
       message,
@@ -46,15 +54,23 @@ export function useDialog() {
     });
   }
 
-  function confirm(
-    title: string,
-    message: string,
-    onConfirm: () => void,
-    onCancel?: () => void,
-    confirmText: string = '확인',
-    cancelText: string = '취소',
-    isDestructive: boolean = false
-  ) {
+  function confirm({
+    title,
+    message,
+    onConfirm,
+    onCancel,
+    confirmText = '확인',
+    cancelText = '취소',
+    isDestructive = false,
+  }: {
+    title?: string;
+    message: string;
+    onConfirm: () => void;
+    onCancel?: () => void;
+    confirmText: string;
+    cancelText: string;
+    isDestructive?: boolean;
+  }) {
     showDialog({
       title,
       message,

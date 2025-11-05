@@ -80,7 +80,7 @@ export const shoppingMiddleware: Middleware<
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '삭제 확인',
+              // title: '삭제 확인',
               message: `"${intent.payload.name}"을(를) 장보기 목록에서 삭제할까요?`,
               onConfirm: async () => {
                 try {

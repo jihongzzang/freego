@@ -24,16 +24,37 @@ export interface ShoppingState extends State {
  */
 export type ShoppingIntent =
   | { type: 'LOAD_SHOPPING_LIST' }
-  | { type: 'TOGGLE_PURCHASED'; payload: { id: string; currentStatus: boolean } }
+  | {
+      type: 'TOGGLE_PURCHASED';
+      payload: { id: string; currentStatus: boolean };
+    }
   | { type: 'DELETE_ITEM'; payload: { id: string; name: string } }
   | { type: 'CLEAR_PURCHASED' }
   | { type: 'TOGGLE_ADD_MODAL'; payload: boolean }
-  | { type: 'UPDATE_ADD_FORM'; payload: { field: 'name' | 'category'; value: string } }
+  | {
+      type: 'UPDATE_ADD_FORM';
+      payload: { field: 'name' | 'category'; value: string };
+    }
   | { type: 'SUBMIT_ADD_ITEM' };
 
 /**
  * Shopping Effect (부수 효과)
  */
 export type ShoppingEffect =
-  | { type: 'SHOW_ALERT'; payload: { title: string; message: string; variant: 'success' | 'info' | 'warning' | 'error' } }
-  | { type: 'SHOW_CONFIRM'; payload: { title: string; message: string; onConfirm: () => void; isDanger?: boolean } };
+  | {
+      type: 'SHOW_ALERT';
+      payload: {
+        title: string;
+        message: string;
+        variant: 'success' | 'info' | 'warning' | 'error';
+      };
+    }
+  | {
+      type: 'SHOW_CONFIRM';
+      payload: {
+        title?: string;
+        message: string;
+        onConfirm: () => void;
+        isDanger?: boolean;
+      };
+    };

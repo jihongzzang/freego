@@ -112,6 +112,14 @@ export const ingredientDetailMiddleware: Middleware<
       };
     }
 
+    case 'DELETE_SUCCESS': {
+      return {
+        effects: [
+          { type: 'NAVIGATE_BACK' },
+        ],
+      };
+    }
+
     case 'CONSUME_INGREDIENT': {
       if (!state.ingredient) return {};
 
@@ -137,6 +145,22 @@ export const ingredientDetailMiddleware: Middleware<
               },
             },
           },
+        ],
+      };
+    }
+
+    case 'CONSUME_SUCCESS': {
+      return {
+        effects: [
+          {
+            type: 'SHOW_ALERT',
+            payload: {
+              title: '완료',
+              message: `${intent.payload.name}이(가) 장보기 목록에 추가되었습니다.`,
+              variant: 'success',
+            },
+          },
+          { type: 'NAVIGATE_BACK' },
         ],
       };
     }

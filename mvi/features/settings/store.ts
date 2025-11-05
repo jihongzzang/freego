@@ -18,7 +18,11 @@ const initialState: SettingsState = {
 /**
  * Settings Store 생성 함수
  */
-export function createSettingsStore(): Store<SettingsState, SettingsIntent, SettingsEffect> {
+export function createSettingsStore(): Store<
+  SettingsState,
+  SettingsIntent,
+  SettingsEffect
+> {
   return new Store({
     initialState,
     reducer: settingsReducer,

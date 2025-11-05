@@ -49,39 +49,34 @@ export default function IngredientDetailScreen() {
 
     switch (effect.type) {
       case 'SHOW_ALERT':
-        alert(
-          effect.payload.title,
-          effect.payload.message,
-          effect.payload.variant,
-        );
+        alert({
+          title: effect.payload.title,
+          message: effect.payload.message,
+          type: effect.payload.variant,
+        });
         break;
 
       case 'SHOW_CONFIRM':
-        confirm(
-          effect.payload.title,
-          effect.payload.message,
-          async () => {
+        confirm({
+          title: effect.payload.title,
+          message: effect.payload.message,
+          onConfirm: async () => {
             await effect.payload.onConfirm();
-            // 삭제/소모 후 화면 이동
-            if (
-              effect.payload.title.includes('삭제') ||
-              effect.payload.title.includes('소모')
-            ) {
-              if (effect.payload.title.includes('소모')) {
-                alert(
-                  '완료',
-                  `${state.ingredient?.name}이(가) 장보기 목록에 추가되었습니다.`,
-                  'success',
-                );
-              }
-              router.back();
+            // 삭제/소모 성공 후 처리
+            if (effect.payload.title?.includes('삭제')) {
+              dispatch({ type: 'DELETE_SUCCESS' });
+            } else if (effect.payload.title?.includes('소모')) {
+              dispatch({
+                type: 'CONSUME_SUCCESS',
+                payload: { name: state.ingredient?.name || '' },
+              });
             }
           },
-          undefined,
-          effect.payload.isDanger ? '삭제' : '소모',
-          '취소',
-          effect.payload.isDanger,
-        );
+          onCancel: undefined,
+          confirmText: effect.payload.isDanger ? '삭제' : '소모',
+          cancelText: '취소',
+          isDestructive: effect.payload.isDanger,
+        });
         break;
 
       case 'NAVIGATE_BACK':
@@ -148,7 +143,6 @@ export default function IngredientDetailScreen() {
             }
           }}
         />
-
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -158,7 +152,12 @@ export default function IngredientDetailScreen() {
             style={styles.content}
             showsVerticalScrollIndicator={false}
           >
-            <View style={[styles.card, { backgroundColor: colors.surface }]}>
+            <View
+              style={[
+                state.isEditing ? styles.editCard : styles.card,
+                { backgroundColor: colors.surface },
+              ]}
+            >
               {state.isEditing ? (
                 <View style={styles.editSection}>
                   <View style={styles.inputGroup}>
@@ -628,27 +627,20 @@ const createStyles = ({
     container: {
       flex: 1,
     },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingTop: 60,
-      paddingHorizontal: spacing.xl,
-      paddingBottom: spacing.lg,
-    },
-    backButton: {
-      padding: spacing.xs,
-    },
-    editButton: {
-      padding: spacing.xs,
-    },
     content: {
       flex: 1,
+      padding: spacing.xl,
     },
     card: {
-      margin: spacing.xl,
+      marginBottom: spacing.xl,
       borderRadius: borderRadius.lg,
       padding: spacing.xl,
+      ...shadows.md,
+    },
+    editCard: {
+      borderRadius: borderRadius.lg,
+      padding: spacing.xl,
+      marginBottom: 84,
       ...shadows.md,
     },
     detailSection: {
@@ -721,8 +713,6 @@ const createStyles = ({
     actionButtons: {
       flexDirection: 'row',
       gap: spacing.md,
-      paddingHorizontal: spacing.xl,
-      paddingBottom: spacing.xl,
     },
     consumeButton: {
       flex: 1,

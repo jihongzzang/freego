@@ -441,6 +441,10 @@ const createStyles = ({
     container: {
       flex: 1,
     },
+    content: {
+      flex: 1,
+      padding: spacing.lg,
+    },
     scrollContent: {
       paddingBottom: 100,
     },
@@ -461,9 +465,6 @@ const createStyles = ({
       borderRadius: borderRadius.full,
       justifyContent: 'center',
       alignItems: 'center',
-    },
-    content: {
-      flex: 1,
     },
     summaryGrid: {
       flexDirection: 'row',

@@ -86,7 +86,7 @@ function SettingsContent() {
 
   const styles = useMemo(
     () => createStyles({ spacing, borderRadius }),
-    [spacing, borderRadius]
+    [spacing, borderRadius],
   );
 
   // Effect 처리
@@ -94,11 +94,11 @@ function SettingsContent() {
     if (effect) {
       switch (effect.type) {
         case 'SHOW_ALERT':
-          alert(
-            effect.payload.title,
-            effect.payload.message,
-            effect.payload.type
-          );
+          alert({
+            title: effect.payload.title,
+            message: effect.payload.message,
+            type: effect.payload.type,
+          });
           break;
       }
     }
@@ -115,7 +115,11 @@ function SettingsContent() {
 
   async function resetThemeToSystem() {
     await setTheme('system');
-    alert('성공', '시스템 설정을 따릅니다.', 'success');
+    alert({
+      title: '성공',
+      message: '시스템 설정을 따릅니다.',
+      type: 'success',
+    });
   }
 
   async function sendFeedback() {
@@ -124,14 +128,18 @@ function SettingsContent() {
     const body = '안녕하세요,\n\n피드백 내용을 입력해주세요:\n\n';
 
     const url = `mailto:${email}?subject=${encodeURIComponent(
-      subject
+      subject,
     )}&body=${encodeURIComponent(body)}`;
 
     const canOpen = await Linking.canOpenURL(url);
     if (canOpen) {
       await Linking.openURL(url);
     } else {
-      alert('오류', '이메일 앱을 열 수 없습니다.', 'error');
+      alert({
+        title: '오류',
+        message: '이메일 앱을 열 수 없습니다.',
+        type: 'error',
+      });
     }
   }
 
@@ -435,10 +443,11 @@ const createStyles = ({
     },
     content: {
       flex: 1,
+      padding: spacing.lg,
     },
     section: {
-      paddingHorizontal: spacing.xl,
-      marginTop: spacing.xxl,
+      // paddingHorizontal: spacing.xl,
+      // marginTop: spacing.xxl,
     },
     sectionHeader: {
       flexDirection: 'row',

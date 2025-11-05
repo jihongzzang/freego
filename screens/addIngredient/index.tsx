@@ -85,11 +85,11 @@ function AddIngredientContent() {
 
     switch (effect.type) {
       case 'SHOW_ALERT':
-        alert(
-          effect.payload.title,
-          effect.payload.message,
-          effect.payload.variant,
-        );
+        alert({
+          title: effect.payload.title,
+          message: effect.payload.message,
+          type: effect.payload.variant,
+        });
         break;
 
       case 'NAVIGATE_HOME':
@@ -161,14 +161,18 @@ function AddIngredientContent() {
       setSelectedCategory('전체');
 
       // 성공 알림
-      alert(
-        '추가 완료',
-        `${selectedTemplates.length}개의 재료가 추가되었습니다.`,
-        'success',
-      );
+      alert({
+        title: '추가 완료',
+        message: `${selectedTemplates.length}개의 재료가 추가되었습니다.`,
+        type: 'success',
+      });
     } catch (error) {
       console.error('Error adding templates:', error);
-      alert('오류', '재료 추가 중 오류가 발생했습니다.', 'error');
+      alert({
+        title: '오류',
+        message: '재료 추가 중 오류가 발생했습니다.',
+        type: 'error',
+      });
     }
   }
 
@@ -193,7 +197,7 @@ function AddIngredientContent() {
           keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
         >
           <ScrollView
-            style={styles.formContainer}
+            style={styles.content}
             contentContainerStyle={{ paddingBottom: spacing.xxxl }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
@@ -661,13 +665,13 @@ const createStyles = ({
     container: {
       flex: 1,
     },
-    formContainer: {
+    content: {
       flex: 1,
+      padding: spacing.lg,
     },
     form: {
-      padding: spacing.xl,
       gap: spacing.xxl,
-      paddingBottom: 40,
+      paddingBottom: 84,
     },
     inputGroup: {
       gap: spacing.sm,

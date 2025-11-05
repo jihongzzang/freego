@@ -21,7 +21,7 @@ interface DialogButton {
 
 interface DialogProps {
   visible: boolean;
-  title: string;
+  title?: string;
   message: string;
   type?: 'default' | 'success' | 'warning' | 'error' | 'info';
   buttons: DialogButton[];
@@ -107,12 +107,14 @@ export function Dialog({
           onPress={onClose}
         />
         <View style={[styles.dialog, { backgroundColor: colors.surface }]}>
-          <View style={styles.titleContainer}>
-            <Text style={[typography.styles.h4, { color: colors.text }]}>
-              {title}
-            </Text>
-            {type !== 'default' && getIcon()}
-          </View>
+          {title && (
+            <View style={styles.titleContainer}>
+              <Text style={[typography.styles.h4, { color: colors.text }]}>
+                {title}
+              </Text>
+              {type !== 'default' && getIcon()}
+            </View>
+          )}
 
           <View style={styles.messageContainer}>
             <Text

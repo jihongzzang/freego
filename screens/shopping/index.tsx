@@ -27,13 +27,13 @@ export default function ShoppingListScreen() {
 }
 
 function ShoppingListContent() {
-  const { colors, spacing, borderRadius } = useTheme();
+  const { colors, spacing, borderRadius, typography } = useTheme();
   const { alert, confirm, DialogComponent } = useDialog();
   const [state, dispatch, effect] = useMVIStore(createShoppingStore);
 
   const styles = useMemo(
     () => createStyles({ spacing, borderRadius }),
-    [spacing, borderRadius],
+    [spacing, borderRadius, typography],
   );
 
   // 디버깅: state 변화 로깅
@@ -50,33 +50,33 @@ function ShoppingListContent() {
     useCallback(() => {
       console.log('Shopping screen focused - loading data');
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
-    }, [dispatch])
+    }, [dispatch]),
   );
   // Effect 처리
   useEffect(() => {
     if (!effect) return;
     switch (effect.type) {
       case 'SHOW_ALERT':
-        alert(
-          effect.payload.title,
-          effect.payload.message,
-          effect.payload.variant,
-        );
+        alert({
+          title: effect.payload.title,
+          message: effect.payload.message,
+          type: effect.payload.variant,
+        });
         break;
       case 'SHOW_CONFIRM':
-        confirm(
-          effect.payload.title,
-          effect.payload.message,
-          async () => {
+        confirm({
+          title: effect.payload.title,
+          message: effect.payload.message,
+          onConfirm: async () => {
             await effect.payload.onConfirm();
             // 삭제 후 목록 새로고침
             dispatch({ type: 'LOAD_SHOPPING_LIST' });
           },
-          undefined,
-          '삭제',
-          '취소',
-          effect.payload.isDanger,
-        );
+          onCancel: undefined,
+          confirmText: '삭제',
+          cancelText: '취소',
+          isDestructive: effect.payload.isDanger,
+        });
         break;
     }
   }, [effect]);
@@ -111,7 +111,10 @@ function ShoppingListContent() {
               >
                 <Trash2 size={16} color={colors.danger} />
                 <Text
-                  style={[styles.clearButtonText, { color: colors.danger }]}
+                  style={[
+                    typography.styles.buttonSmall,
+                    { color: colors.danger },
+                  ]}
                 >
                   구매완료 삭제
                 </Text>
@@ -122,18 +125,31 @@ function ShoppingListContent() {
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {state.loading ? (
             <View style={styles.emptyContainer}>
-              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+              <Text
+                style={[
+                  typography.styles.body,
+                  { color: colors.textSecondary },
+                ]}
+              >
                 로딩 중이에요...
               </Text>
             </View>
           ) : state.shoppingList.length === 0 ? (
             <View style={styles.emptyContainer}>
               <ShoppingCart size={64} color={colors.textTertiary} />
-              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+              <Text
+                style={[
+                  typography.styles.bodyMedium,
+                  { color: colors.textSecondary },
+                ]}
+              >
                 장보기 목록이 비어있습니다
               </Text>
               <Text
-                style={[styles.emptySubtext, { color: colors.textTertiary }]}
+                style={[
+                  typography.styles.bodySmall,
+                  { color: colors.textTertiary },
+                ]}
               >
                 식재료를 소모하면 자동으로 추가됩니다
               </Text>
@@ -142,7 +158,12 @@ function ShoppingListContent() {
             <>
               {unpurchasedItems.length > 0 && (
                 <View style={styles.section}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  <Text
+                    style={[
+                      typography.styles.h5,
+                      { color: colors.text, marginBottom: 24 },
+                    ]}
+                  >
                     구매 예정
                   </Text>
                   <View
@@ -151,12 +172,14 @@ function ShoppingListContent() {
                       { backgroundColor: colors.surface },
                     ]}
                   >
-                    {unpurchasedItems.map((item) => (
+                    {unpurchasedItems.map((item, index) => (
                       <View
                         key={item.id}
                         style={[
                           styles.itemRow,
                           { borderBottomColor: colors.border },
+                          index === unpurchasedItems.length - 1 &&
+                            styles.lastItemRow,
                         ]}
                       >
                         <TouchableOpacity
@@ -181,7 +204,10 @@ function ShoppingListContent() {
                           </View>
                           <View style={styles.itemInfo}>
                             <Text
-                              style={[styles.itemName, { color: colors.text }]}
+                              style={[
+                                typography.styles.bodySemibold,
+                                { color: colors.text },
+                              ]}
                             >
                               {item.name}
                             </Text>
@@ -197,7 +223,7 @@ function ShoppingListContent() {
                               >
                                 <Text
                                   style={[
-                                    styles.categoryText,
+                                    typography.styles.captionBold,
                                     { color: getCategoryColor(item.category) },
                                   ]}
                                 >
@@ -220,7 +246,12 @@ function ShoppingListContent() {
               )}
               {purchasedItems.length > 0 && (
                 <View style={styles.section}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  <Text
+                    style={[
+                      typography.styles.h5,
+                      { color: colors.text, marginBottom: 24 },
+                    ]}
+                  >
                     구매 완료
                   </Text>
                   <View
@@ -229,12 +260,14 @@ function ShoppingListContent() {
                       { backgroundColor: colors.surface },
                     ]}
                   >
-                    {purchasedItems.map((item) => (
+                    {purchasedItems.map((item, index) => (
                       <View
                         key={item.id}
                         style={[
                           styles.itemRow,
                           { borderBottomColor: colors.border },
+                          index === purchasedItems.length - 1 &&
+                            styles.lastItemRow,
                         ]}
                       >
                         <TouchableOpacity
@@ -259,7 +292,7 @@ function ShoppingListContent() {
                           <View style={styles.itemInfo}>
                             <Text
                               style={[
-                                styles.itemName,
+                                typography.styles.bodySemibold,
                                 styles.itemNamePurchased,
                                 { color: colors.textTertiary },
                               ]}
@@ -278,7 +311,7 @@ function ShoppingListContent() {
                               >
                                 <Text
                                   style={[
-                                    styles.categoryText,
+                                    typography.styles.captionBold,
                                     { color: getCategoryColor(item.category) },
                                   ]}
                                 >
@@ -323,12 +356,13 @@ function ShoppingListContent() {
           >
             <View style={styles.bottomSheetContent}>
               <View style={styles.inputGroup}>
-                <Text style={[styles.inputLabel, { color: colors.text }]}>
+                <Text style={[typography.styles.label, { color: colors.text }]}>
                   재료 이름
                 </Text>
                 <TextInput
                   style={[
                     styles.input,
+                    typography.styles.body,
                     {
                       backgroundColor: colors.surface,
                       color: colors.text,
@@ -348,7 +382,7 @@ function ShoppingListContent() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={[styles.inputLabel, { color: colors.text }]}>
+                <Text style={[typography.styles.label, { color: colors.text }]}>
                   카테고리
                 </Text>
                 <ScrollView
@@ -390,7 +424,7 @@ function ShoppingListContent() {
                         {getCategoryIcon(cat, 16)}
                         <Text
                           style={[
-                            styles.categoryChipText,
+                            typography.styles.bodySmall,
                             { color: colors.textSecondary },
                             state.addForm.category === cat && {
                               color: colors.primary,
@@ -431,7 +465,7 @@ function ShoppingListContent() {
             >
               <Text
                 style={[
-                  styles.confirmButtonText,
+                  typography.styles.button,
                   {
                     color: state.addForm.name.trim()
                       ? '#FFFFFF'
@@ -460,6 +494,10 @@ const createStyles = ({
     container: {
       flex: 1,
     },
+    content: {
+      flex: 1,
+      padding: spacing.lg,
+    },
     clearButton: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -468,14 +506,6 @@ const createStyles = ({
       paddingVertical: 6,
       borderRadius: 12,
     },
-    clearButtonText: {
-      fontSize: 13,
-      fontWeight: '600',
-    },
-    content: {
-      flex: 1,
-      padding: spacing.xl,
-    },
     emptyContainer: {
       flex: 1,
       alignItems: 'center',
@@ -483,20 +513,7 @@ const createStyles = ({
       paddingVertical: 100,
       gap: 12,
     },
-    emptyText: {
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    emptySubtext: {
-      fontSize: 14,
-      textAlign: 'center',
-    },
     section: {
-      paddingTop: spacing.xl,
-    },
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: '700',
       marginBottom: 12,
     },
     listCard: {
@@ -509,6 +526,9 @@ const createStyles = ({
       paddingVertical: 12,
       paddingHorizontal: 16,
       borderBottomWidth: 1,
+    },
+    lastItemRow: {
+      borderBottomWidth: 0,
     },
     itemContent: {
       flex: 1,
@@ -531,10 +551,6 @@ const createStyles = ({
       flex: 1,
       gap: 4,
     },
-    itemName: {
-      fontSize: 16,
-      fontWeight: '600',
-    },
     itemNamePurchased: {
       textDecorationLine: 'line-through',
     },
@@ -547,13 +563,6 @@ const createStyles = ({
       paddingHorizontal: 8,
       paddingVertical: 2,
       borderRadius: 8,
-    },
-    categoryText: {
-      fontSize: 12,
-      fontWeight: '600',
-    },
-    itemUnit: {
-      fontSize: 13,
     },
     deleteButton: {
       padding: 8,
@@ -570,15 +579,10 @@ const createStyles = ({
     inputGroup: {
       gap: 8,
     },
-    inputLabel: {
-      fontSize: 14,
-      fontWeight: '600',
-    },
     input: {
       borderRadius: 12,
       paddingHorizontal: 16,
       paddingVertical: 14,
-      fontSize: 16,
       borderWidth: 1,
     },
     categoryScrollContent: {
@@ -595,9 +599,6 @@ const createStyles = ({
       alignItems: 'center',
       gap: 4,
     },
-    categoryChipText: {
-      fontSize: 13,
-    },
     confirmButtonContainer: {
       paddingHorizontal: 20,
       paddingVertical: 16,
@@ -608,9 +609,5 @@ const createStyles = ({
       borderRadius: 12,
       alignItems: 'center',
       width: '100%',
-    },
-    confirmButtonText: {
-      fontSize: 16,
-      fontWeight: '600',
     },
   });
