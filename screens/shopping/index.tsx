@@ -10,7 +10,7 @@ import { useEffect, useCallback, useMemo } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { ShoppingCart, Trash2, Check } from 'lucide-react-native';
 import { useTheme, getCategoryColor } from '@/lib/theme';
-import { useDialog } from '@/hooks/useDialog';
+import { useDialog } from '@/contexts/DialogContext';
 import { useMVIStore } from '@/mvi/base';
 import { createShoppingStore } from '@/mvi/features/shopping';
 import Header from '@/components/Header';
@@ -19,16 +19,12 @@ import BottomSheet from '@/components/BottomSheet';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 
 export default function ShoppingListScreen() {
-  return (
-    <View style={{ flex: 1 }}>
-      <ShoppingListContent />
-    </View>
-  );
+  return <ShoppingListContent />;
 }
 
 function ShoppingListContent() {
   const { colors, spacing, borderRadius, typography } = useTheme();
-  const { alert, confirm, DialogComponent } = useDialog();
+  const { alert, confirm } = useDialog();
   const [state, dispatch, effect] = useMVIStore(createShoppingStore);
 
   const styles = useMemo(
@@ -96,7 +92,6 @@ function ShoppingListContent() {
   const purchasedItems = state.shoppingList.filter((item) => item.is_purchased);
   return (
     <>
-      <DialogComponent />
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header
           title="장보기"

@@ -32,6 +32,7 @@ export type IngredientsIntent =
   | { type: 'DELETE_INGREDIENT'; payload: string }
   | { type: 'NAVIGATE_TO_ADD' }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: string }
+  | { type: 'NAVIGATE_TO_DETAIL_EDIT'; payload: string }
   | { type: 'NAVIGATE_BACK' };
 
 /**

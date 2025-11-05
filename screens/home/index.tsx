@@ -14,13 +14,11 @@ import { useMVIStore } from '@/mvi/base';
 import { createHomeStore, Ingredient } from '@/mvi/features/home';
 import Header from '@/components/Header';
 import FloatingButton from '@/components/FloatingButton';
+import BottomSheet from '@/components/BottomSheet';
+import DatePicker from '@/components/DatePicker';
 
 export default function HomeScreen() {
-  return (
-    <View style={{ flex: 1 }}>
-      <DashboardContent />
-    </View>
-  );
+  return <DashboardContent />;
 }
 
 function DashboardContent() {
@@ -31,6 +29,12 @@ function DashboardContent() {
 
   // 선택된 카테고리 상태
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
+
+  // 유통기한 수정 모달 상태
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedIngredient, setSelectedIngredient] =
+    useState<Ingredient | null>(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   // MVI Store 사용
   const [state, dispatch, effect] = useMVIStore(createHomeStore);
@@ -77,6 +81,58 @@ function DashboardContent() {
     return `D-${daysRemaining} 남음`;
   }
 
+  // 유통기한 수정 모달 열기
+  function openDatePicker(item: Ingredient) {
+    setSelectedIngredient(item);
+    if (item.expiry_date) {
+      setSelectedDate(new Date(item.expiry_date));
+    } else {
+      setSelectedDate(new Date());
+    }
+    setShowDatePicker(true);
+  }
+
+  // 날짜 변경 핸들러
+  function handleDateChange(date: Date) {
+    setSelectedDate(date);
+  }
+
+  // 빠른 선택 핸들러
+  function handleQuickSelect(days: number) {
+    if (!selectedIngredient) return;
+
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+
+    updateExpiryDate(formattedDate);
+  }
+
+  // 유통기한 업데이트
+  function updateExpiryDate(expiryDate: string) {
+    if (!selectedIngredient) return;
+
+    dispatch({
+      type: 'UPDATE_EXPIRY_DATE',
+      payload: { id: selectedIngredient.id, expiryDate },
+    });
+    setShowDatePicker(false);
+  }
+
+  // 날짜 확인 버튼 핸들러
+  function handleConfirmDate() {
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+
+    updateExpiryDate(formattedDate);
+  }
+
   const expiringItems = ingredients.filter((item) => item.status === '만료');
 
   // 카테고리 목록
@@ -109,7 +165,7 @@ function DashboardContent() {
         styles.ingredientCard,
         { backgroundColor: colors.surface, borderColor: colors.border },
       ]}
-      onPress={() => dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: item.id })}
+      onPress={() => openDatePicker(item)}
       activeOpacity={0.7}
     >
       <View style={styles.cardContent}>
@@ -352,6 +408,19 @@ function DashboardContent() {
           </View>
         ) : (
           <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[typography.styles.h5, { color: colors.text }]}>
+                {selectedCategory === '전체' ? '전체 재료' : selectedCategory}
+              </Text>
+              <Text
+                style={[
+                  typography.styles.caption,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                {filteredIngredients.length}개
+              </Text>
+            </View>
             <View style={styles.cardList}>
               {filteredIngredients.map((item) =>
                 renderIngredientCard({ item }),
@@ -361,6 +430,65 @@ function DashboardContent() {
         )}
       </ScrollView>
       <FloatingButton onPress={() => dispatch({ type: 'NAVIGATE_TO_ADD' })} />
+
+      {/* 유통기한 수정 BottomSheet */}
+      <BottomSheet
+        maxHeight={650}
+        visible={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        title={`${selectedIngredient?.name || ''} 유통기한 수정`}
+      >
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.datePickerBottomSheet}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* 빠른 선택 옵션 */}
+          <View style={styles.quickSelectContainer}>
+            {[
+              { label: '3일 뒤', days: 3 },
+              { label: '7일 뒤', days: 7 },
+              { label: '2주 뒤', days: 14 },
+              { label: '한달 뒤', days: 30 },
+            ].map((option) => (
+              <TouchableOpacity
+                key={option.days}
+                style={[
+                  styles.quickSelectBtn,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                  },
+                ]}
+                onPress={() => handleQuickSelect(option.days)}
+              >
+                <Text
+                  style={[
+                    typography.styles.caption,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {option.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <DatePicker value={selectedDate} onDateSelect={handleDateChange} />
+
+          <TouchableOpacity
+            style={[
+              styles.datePickerConfirm,
+              { backgroundColor: colors.primary },
+            ]}
+            onPress={handleConfirmDate}
+          >
+            <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>
+              확인
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </BottomSheet>
     </View>
   );
 }
@@ -493,6 +621,29 @@ const createStyles = ({
     emptyContainer: {
       borderRadius: borderRadius.lg,
       padding: 40,
+      alignItems: 'center',
+    },
+    datePickerBottomSheet: {
+      padding: spacing.lg,
+      gap: spacing.lg,
+    },
+    quickSelectContainer: {
+      flexDirection: 'row',
+      gap: spacing.xs,
+      flexWrap: 'wrap',
+    },
+    quickSelectBtn: {
+      flex: 1,
+      minWidth: '22%',
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs + 2,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      alignItems: 'center',
+    },
+    datePickerConfirm: {
+      paddingVertical: spacing.md,
+      borderRadius: borderRadius.md,
       alignItems: 'center',
     },
   });

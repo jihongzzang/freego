@@ -8,7 +8,7 @@ import {
 import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
-import { Minus, ChevronDown, ChevronUp } from 'lucide-react-native';
+import { Minus, ChevronDown, ChevronUp, Edit3 } from 'lucide-react-native';
 import { useTheme, getStatusColor } from '@/lib/theme';
 import { useMVIStore } from '@/mvi/base';
 import { createIngredientsStore, Ingredient } from '@/mvi/features/ingredients';
@@ -117,13 +117,12 @@ export default function IngredientsScreen() {
   }
 
   const renderIngredientItem = ({ item }: { item: Ingredient }) => (
-    <TouchableOpacity
-      key={item.id}
-      style={styles.ingredientItem}
-      onPress={() => dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: item.id })}
-      activeOpacity={0.7}
-    >
-      <View style={styles.ingredientLeft}>
+    <View key={item.id} style={styles.ingredientItem}>
+      <TouchableOpacity
+        style={styles.ingredientLeft}
+        onPress={() => dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: item.id })}
+        activeOpacity={0.7}
+      >
         <View style={styles.ingredientInfo}>
           <View style={styles.ingredientNameRow}>
             <Text
@@ -182,20 +181,36 @@ export default function IngredientsScreen() {
             </Text>
           )}
         </View>
-      </View>
-      <TouchableOpacity
-        style={[
-          styles.quickButton,
-          { backgroundColor: colors.surfaceSecondary },
-        ]}
-        onPress={(e) => {
-          e.stopPropagation();
-          quickDeduct(item.id);
-        }}
-      >
-        <Minus size={16} color={colors.text} />
       </TouchableOpacity>
-    </TouchableOpacity>
+
+      {/* 액션 버튼 그룹 */}
+      <View style={styles.actionButtons}>
+        <TouchableOpacity
+          style={[
+            styles.actionButton,
+            { backgroundColor: colors.primaryLight },
+          ]}
+          onPress={(e) => {
+            e.stopPropagation();
+            dispatch({ type: 'NAVIGATE_TO_DETAIL_EDIT', payload: item.id });
+          }}
+        >
+          <Edit3 size={16} color={colors.primary} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.actionButton,
+            { backgroundColor: colors.surfaceSecondary },
+          ]}
+          onPress={(e) => {
+            e.stopPropagation();
+            quickDeduct(item.id);
+          }}
+        >
+          <Minus size={16} color={colors.text} />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 
   return (
@@ -364,9 +379,6 @@ const createStyles = ({
     },
     ingredientLeft: {
       flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.md,
     },
     categoryIconWrapper: {
       width: 36,
@@ -389,7 +401,11 @@ const createStyles = ({
       height: 6,
       borderRadius: 3,
     },
-    quickButton: {
+    actionButtons: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    actionButton: {
       width: 32,
       height: 32,
       borderRadius: borderRadius.lg,

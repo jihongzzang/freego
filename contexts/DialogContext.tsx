@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { Dialog } from '@/components/Dialog';
 
 interface DialogButton {
@@ -18,7 +18,28 @@ interface DialogState extends DialogOptions {
   visible: boolean;
 }
 
-export function useDialog() {
+interface DialogContextType {
+  alert: (options: {
+    title: string;
+    message: string;
+    type?: 'success' | 'warning' | 'error' | 'info';
+  }) => void;
+  confirm: (options: {
+    title?: string;
+    message: string;
+    onConfirm: () => void | Promise<void>;
+    onCancel?: () => void;
+    confirmText: string;
+    cancelText: string;
+    isDestructive?: boolean;
+  }) => void;
+  showDialog: (options: DialogOptions) => void;
+  hideDialog: () => void;
+}
+
+const DialogContext = createContext<DialogContextType | undefined>(undefined);
+
+export function DialogProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<DialogState>({
     visible: false,
     title: '',
@@ -27,22 +48,22 @@ export function useDialog() {
     buttons: [],
   });
 
-  console.log('[useDialog] Hook render - visible:', state.visible);
+  console.log('[DialogProvider] Render - visible:', state.visible);
 
-  function showDialog(dialogOptions: DialogOptions) {
-    console.log('[useDialog] showDialog called');
+  const hideDialog = useCallback(() => {
+    console.log('[DialogProvider] hideDialog called');
+    setState((prev) => ({ ...prev, visible: false }));
+  }, []);
+
+  const showDialog = useCallback((dialogOptions: DialogOptions) => {
+    console.log('[DialogProvider] showDialog called');
     setState({
       ...dialogOptions,
       visible: true,
     });
-  }
+  }, []);
 
-  function hideDialog() {
-    console.log('[useDialog] hideDialog called');
-    setState((prev) => ({ ...prev, visible: false }));
-  }
-
-  function alert({
+  const alert = useCallback(({
     title,
     message,
     type,
@@ -50,7 +71,7 @@ export function useDialog() {
     title: string;
     message: string;
     type?: 'success' | 'warning' | 'error' | 'info';
-  }) {
+  }) => {
     showDialog({
       title,
       message,
@@ -62,9 +83,9 @@ export function useDialog() {
         },
       ],
     });
-  }
+  }, [showDialog, hideDialog]);
 
-  function confirm({
+  const confirm = useCallback(({
     title,
     message,
     onConfirm,
@@ -80,7 +101,7 @@ export function useDialog() {
     confirmText: string;
     cancelText: string;
     isDestructive?: boolean;
-  }) {
+  }) => {
     showDialog({
       title,
       message,
@@ -98,7 +119,6 @@ export function useDialog() {
           style: isDestructive ? 'destructive' : 'default',
           onPress: () => {
             hideDialog();
-            // 다이얼로그가 닫힌 후 onConfirm 실행
             setTimeout(() => {
               onConfirm();
             }, 100);
@@ -106,24 +126,29 @@ export function useDialog() {
         },
       ],
     });
-  }
+  }, [showDialog, hideDialog]);
 
-  const DialogComponent = () => (
-    <Dialog
-      visible={state.visible}
-      title={state.title}
-      message={state.message}
-      type={state.type}
-      buttons={state.buttons}
-      onClose={hideDialog}
-    />
+  return (
+    <DialogContext.Provider
+      value={{ alert, confirm, showDialog, hideDialog }}
+    >
+      {children}
+      <Dialog
+        visible={state.visible}
+        title={state.title}
+        message={state.message}
+        type={state.type}
+        buttons={state.buttons}
+        onClose={hideDialog}
+      />
+    </DialogContext.Provider>
   );
+}
 
-  return {
-    alert,
-    confirm,
-    showDialog,
-    hideDialog,
-    DialogComponent,
-  };
+export function useDialog() {
+  const context = useContext(DialogContext);
+  if (!context) {
+    throw new Error('useDialog must be used within a DialogProvider');
+  }
+  return context;
 }

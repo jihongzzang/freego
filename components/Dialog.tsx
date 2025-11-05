@@ -5,8 +5,9 @@ import {
   TouchableOpacity,
   Modal,
   Dimensions,
+  Platform,
 } from 'react-native';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { BlurView } from 'expo-blur';
 import { AlertCircle, CheckCircle, Info, XCircle } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
@@ -36,6 +37,8 @@ export function Dialog({
   buttons,
   onClose,
 }: DialogProps) {
+  console.log('[Dialog] Render - visible:', visible, 'title:', title);
+
   const { colors, typography, spacing, borderRadius, shadows, isDark } =
     useTheme();
 
@@ -43,6 +46,10 @@ export function Dialog({
     () => createStyles({ spacing, borderRadius, shadows }),
     [spacing, borderRadius, shadows],
   );
+
+  useEffect(() => {
+    console.log('[Dialog] useEffect - visible changed to:', visible);
+  }, [visible]);
 
   function getIcon() {
     const iconSize = 24;
@@ -81,9 +88,21 @@ export function Dialog({
   }
 
   function handleButtonPress(button: DialogButton) {
+    console.log('[Dialog] Button pressed:', button.text);
     if (button.onPress) {
       button.onPress();
     }
+  }
+
+  function handleRequestClose() {
+    console.log('[Dialog] onRequestClose called (Android back button)');
+    if (onClose) {
+      onClose();
+    }
+  }
+
+  function handleBackdropPress() {
+    console.log('[Dialog] Backdrop pressed');
     if (onClose) {
       onClose();
     }
@@ -94,7 +113,7 @@ export function Dialog({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onClose}
+      onRequestClose={Platform.OS === 'ios' ? undefined : handleRequestClose}
       statusBarTranslucent
     >
       <BlurView intensity={isDark ? 40 : 60} style={styles.overlay}>

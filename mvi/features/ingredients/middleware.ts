@@ -132,6 +132,13 @@ export const ingredientsMiddleware: Middleware<
         ],
       };
 
+    case 'NAVIGATE_TO_DETAIL_EDIT':
+      return {
+        effects: [
+          { type: 'NAVIGATE', payload: `/ingredient/${intent.payload}?mode=edit` },
+        ],
+      };
+
     case 'NAVIGATE_BACK':
       return {
         effects: [{ type: 'NAVIGATE', payload: 'back' }],

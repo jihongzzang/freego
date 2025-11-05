@@ -120,6 +120,49 @@ export const homeMiddleware: Middleware<
       }
     }
 
+    case 'UPDATE_EXPIRY_DATE': {
+      try {
+        const { id, expiryDate } = intent.payload;
+        console.log('Middleware: UPDATE_EXPIRY_DATE 시작', { id, expiryDate });
+
+        await storage.updateIngredient(id, { expiry_date: expiryDate });
+        console.log('Middleware: storage.updateIngredient 완료');
+
+        // 업데이트 후 다시 로드
+        const data = await storage.getIngredients();
+        console.log('Middleware: 재료 개수:', data.length);
+
+        const ingredients: Ingredient[] = data.map((item) => ({
+          ...item,
+          status: calculateStatus(item.expiry_date),
+          daysRemaining: calculateDaysRemaining(item.expiry_date),
+        }));
+
+        return {
+          state: {
+            ...state,
+            ingredients,
+          },
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: '유통기한이 수정되었습니다.',
+            },
+          ],
+        };
+      } catch (error) {
+        console.error('Middleware: UPDATE_EXPIRY_DATE 에러', error);
+        return {
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: '유통기한 수정에 실패했습니다.',
+            },
+          ],
+        };
+      }
+    }
+
     case 'NAVIGATE_TO_ADD':
       return {
         effects: [{ type: 'NAVIGATE', payload: '/add' }],

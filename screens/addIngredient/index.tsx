@@ -12,7 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/lib/theme';
-import { useDialog } from '@/hooks/useDialog';
+import { useDialog } from '@/contexts/DialogContext';
 import { useRouter } from '@/hooks/useRouter';
 import { useMVIStore } from '@/mvi/base';
 import { createAddStore } from '@/mvi/features/add';
@@ -20,6 +20,7 @@ import type { AddFormData } from '@/mvi/features/add';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 import Header from '@/components/Header';
 import BottomSheet from '@/components/BottomSheet';
+import DatePicker from '@/components/DatePicker';
 import {
   getTemplatesByCategory,
   type IngredientTemplate,
@@ -37,7 +38,7 @@ export default function AddIngredientScreen() {
 function AddIngredientContent() {
   const router = useRouter();
   const { colors, typography, borderRadius, spacing } = useTheme();
-  const { alert, DialogComponent } = useDialog();
+  const { alert } = useDialog();
   const [state, dispatch, effect] = useMVIStore(createAddStore);
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('전체');
@@ -46,6 +47,8 @@ function AddIngredientContent() {
   >([]);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const insets = useSafeAreaInsets();
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   // 키보드 이벤트 리스너
   useEffect(() => {
@@ -183,9 +186,34 @@ function AddIngredientContent() {
     );
   }
 
+  // 날짜 변경 핸들러
+  function handleDateChange(date: Date) {
+    setSelectedDate(date);
+    // 로컬 타임존을 유지하면서 YYYY-MM-DD 포맷으로 변환
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    handleFieldChange('expiry_date', formattedDate);
+  }
+
+  // 빠른 선택 핸들러
+  function handleQuickSelect(days: number) {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    setSelectedDate(date);
+    // 로컬 타임존을 유지하면서 YYYY-MM-DD 포맷으로 변환
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    handleFieldChange('expiry_date', formattedDate);
+    setShowDatePicker(false);
+  }
+
   return (
     <>
-      <DialogComponent />
+      {/* <DialogComponent /> */}
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header
           title="추가"
@@ -195,7 +223,7 @@ function AddIngredientContent() {
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
           <ScrollView
             style={styles.content}
@@ -349,23 +377,70 @@ function AddIngredientContent() {
                 >
                   유통기한
                 </Text>
-                <TextInput
+
+                {/* 빠른 선택 옵션 */}
+                <View style={styles.quickSelectContainer}>
+                  {[
+                    { label: '3일 뒤', days: 3 },
+                    { label: '7일 뒤', days: 7 },
+                    { label: '2주 뒤', days: 14 },
+                    { label: '한달 뒤', days: 30 },
+                  ].map((option) => (
+                    <TouchableOpacity
+                      key={option.days}
+                      style={[
+                        styles.quickSelectBtn,
+                        {
+                          backgroundColor: colors.surface,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                      onPress={() => handleQuickSelect(option.days)}
+                    >
+                      <Text
+                        style={[
+                          typography.styles.caption,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        {option.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {/* 날짜 표시 및 선택 */}
+                <TouchableOpacity
                   style={[
-                    styles.input,
+                    styles.dateButton,
                     {
                       backgroundColor: colors.surface,
-                      color: colors.text,
-                      borderColor: colors.border,
+                      borderColor: state.errors.expiry_date
+                        ? colors.danger
+                        : colors.border,
                     },
-                    state.errors.expiry_date && { borderColor: colors.danger },
                   ]}
-                  value={state.form.expiry_date}
-                  onChangeText={(text) =>
-                    handleFieldChange('expiry_date', text)
-                  }
-                  placeholder="YYYY-MM-DD (예: 2025-12-31)"
-                  placeholderTextColor={colors.textTertiary}
-                />
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Ionicons
+                    name="calendar-outline"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      typography.styles.body,
+                      {
+                        color: state.form.expiry_date
+                          ? colors.text
+                          : colors.textTertiary,
+                      },
+                    ]}
+                  >
+                    {state.form.expiry_date || '날짜 선택'}
+                  </Text>
+                </TouchableOpacity>
+
                 {state.errors.expiry_date && (
                   <Text
                     style={[
@@ -493,7 +568,7 @@ function AddIngredientContent() {
         )}
       </View>
 
-      {!isKeyboardVisible && (
+      {!isKeyboardVisible && !isBottomSheetVisible && (
         <TouchableOpacity
           style={[
             styles.floatingButton,
@@ -508,6 +583,34 @@ function AddIngredientContent() {
         </TouchableOpacity>
       )}
 
+      {/* DatePicker BottomSheet */}
+      <BottomSheet
+        maxHeight={600}
+        visible={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        title="유통기한 선택"
+      >
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.datePickerBottomSheet}
+          showsVerticalScrollIndicator={false}
+        >
+          <DatePicker value={selectedDate} onDateSelect={handleDateChange} />
+          <TouchableOpacity
+            style={[
+              styles.datePickerConfirm,
+              { backgroundColor: colors.primary },
+            ]}
+            onPress={() => setShowDatePicker(false)}
+          >
+            <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>
+              확인
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </BottomSheet>
+
+      {/* Templates BottomSheet */}
       <BottomSheet
         maxHeight={600}
         visible={isBottomSheetVisible}
@@ -780,5 +883,37 @@ const createStyles = ({
     },
     templateEmoji: {
       fontSize: 16,
+    },
+    quickSelectContainer: {
+      flexDirection: 'row',
+      gap: spacing.xs,
+      flexWrap: 'wrap',
+    },
+    quickSelectBtn: {
+      flex: 1,
+      minWidth: '22%',
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs + 2,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      alignItems: 'center',
+    },
+    dateButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 14,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+    },
+    datePickerBottomSheet: {
+      padding: spacing.lg,
+      gap: spacing.lg,
+    },
+    datePickerConfirm: {
+      paddingVertical: spacing.md,
+      borderRadius: borderRadius.md,
+      alignItems: 'center',
     },
   });

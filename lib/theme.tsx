@@ -1,4 +1,4 @@
-import { useColorScheme, TextStyle } from 'react-native';
+import { useColorScheme, TextStyle, Platform } from 'react-native';
 import {
   useState,
   useEffect,
@@ -111,16 +111,38 @@ export const borderRadius = {
   full: 9999,
 };
 
+// Pretendard 폰트 패밀리 매핑
+const getFontFamily = (weight: '400' | '500' | '600' | '700') => {
+  const fontMap = {
+    '400': 'Pretendard-Regular',
+    '500': 'Pretendard-Medium',
+    '600': 'Pretendard-SemiBold',
+    '700': 'Pretendard-Bold',
+  };
+  return fontMap[weight];
+};
+
+// iOS에서 폰트가 약간 작게 보이므로 1.05 스케일 적용
+const fontScale = Platform.OS === 'ios' ? 1.06 : 1;
+
+const scaleFontSize = (size: number) => Math.round(size * fontScale);
+
 export const typography = {
+  fontFamily: {
+    regular: 'Pretendard-Regular',
+    medium: 'Pretendard-Medium',
+    semibold: 'Pretendard-SemiBold',
+    bold: 'Pretendard-Bold',
+  },
   fontSize: {
-    xs: 12,
-    sm: 14,
-    md: 16,
-    lg: 18,
-    xl: 20,
-    xxl: 24,
-    xxxl: 28,
-    huge: 32,
+    xs: scaleFontSize(12),
+    sm: scaleFontSize(14),
+    md: scaleFontSize(16),
+    lg: scaleFontSize(18),
+    xl: scaleFontSize(20),
+    xxl: scaleFontSize(24),
+    xxxl: scaleFontSize(28),
+    huge: scaleFontSize(32),
   },
   fontWeight: {
     normal: '400' as const,
@@ -137,104 +159,123 @@ export const typography = {
   styles: {
     // 헤딩 스타일
     h1: {
-      fontSize: 32,
+      fontFamily: 'Pretendard-Bold',
+      fontSize: scaleFontSize(32),
       fontWeight: '700' as const,
-      lineHeight: 38,
+      lineHeight: scaleFontSize(38),
     },
     h2: {
-      fontSize: 28,
+      fontFamily: 'Pretendard-Bold',
+      fontSize: scaleFontSize(28),
       fontWeight: '700' as const,
-      lineHeight: 34,
+      lineHeight: scaleFontSize(34),
     },
     h3: {
-      fontSize: 24,
+      fontFamily: 'Pretendard-SemiBold',
+      fontSize: scaleFontSize(24),
       fontWeight: '600' as const,
-      lineHeight: 29,
+      lineHeight: scaleFontSize(29),
     },
     h4: {
-      fontSize: 20,
+      fontFamily: 'Pretendard-SemiBold',
+      fontSize: scaleFontSize(20),
       fontWeight: '600' as const,
-      lineHeight: 24,
+      lineHeight: scaleFontSize(24),
     },
     h5: {
-      fontSize: 18,
+      fontFamily: 'Pretendard-SemiBold',
+      fontSize: scaleFontSize(18),
       fontWeight: '600' as const,
-      lineHeight: 22,
+      lineHeight: scaleFontSize(22),
     },
     h6: {
-      fontSize: 16,
+      fontFamily: 'Pretendard-SemiBold',
+      fontSize: scaleFontSize(16),
       fontWeight: '600' as const,
-      lineHeight: 19,
+      lineHeight: scaleFontSize(19),
     },
     // 본문 스타일
     body: {
-      fontSize: 16,
+      fontFamily: 'Pretendard-Regular',
+      fontSize: scaleFontSize(16),
       fontWeight: '400' as const,
-      lineHeight: 24,
+      lineHeight: scaleFontSize(24),
     },
     bodyMedium: {
-      fontSize: 16,
+      fontFamily: 'Pretendard-Medium',
+      fontSize: scaleFontSize(16),
       fontWeight: '500' as const,
-      lineHeight: 24,
+      lineHeight: scaleFontSize(24),
     },
     bodySemibold: {
-      fontSize: 16,
+      fontFamily: 'Pretendard-SemiBold',
+      fontSize: scaleFontSize(16),
       fontWeight: '600' as const,
-      lineHeight: 24,
+      lineHeight: scaleFontSize(24),
     },
     bodySmall: {
-      fontSize: 14,
+      fontFamily: 'Pretendard-Regular',
+      fontSize: scaleFontSize(14),
       fontWeight: '400' as const,
-      lineHeight: 21,
+      lineHeight: scaleFontSize(21),
     },
     bodySmallMedium: {
-      fontSize: 14,
+      fontFamily: 'Pretendard-Medium',
+      fontSize: scaleFontSize(14),
       fontWeight: '500' as const,
-      lineHeight: 21,
+      lineHeight: scaleFontSize(21),
     },
     // 캡션 스타일
     caption: {
-      fontSize: 12,
+      fontFamily: 'Pretendard-Regular',
+      fontSize: scaleFontSize(12),
       fontWeight: '400' as const,
-      lineHeight: 18,
+      lineHeight: scaleFontSize(18),
     },
     captionMedium: {
-      fontSize: 12,
+      fontFamily: 'Pretendard-Medium',
+      fontSize: scaleFontSize(12),
       fontWeight: '500' as const,
-      lineHeight: 18,
+      lineHeight: scaleFontSize(18),
     },
     captionBold: {
-      fontSize: 12,
+      fontFamily: 'Pretendard-Bold',
+      fontSize: scaleFontSize(12),
       fontWeight: '700' as const,
-      lineHeight: 18,
+      lineHeight: scaleFontSize(18),
     },
     // 버튼 스타일
     button: {
-      fontSize: 16,
+      fontFamily: 'Pretendard-SemiBold',
+      fontSize: scaleFontSize(16),
       fontWeight: '600' as const,
-      lineHeight: 19,
+      lineHeight: scaleFontSize(19),
     },
     buttonSmall: {
-      fontSize: 14,
+      fontFamily: 'Pretendard-SemiBold',
+      fontSize: scaleFontSize(14),
       fontWeight: '600' as const,
-      lineHeight: 17,
+      lineHeight: scaleFontSize(17),
     },
     // 라벨 스타일
     label: {
-      fontSize: 14,
+      fontFamily: 'Pretendard-Medium',
+      fontSize: scaleFontSize(14),
       fontWeight: '500' as const,
-      lineHeight: 17,
+      lineHeight: scaleFontSize(17),
     },
     labelSmall: {
-      fontSize: 12,
+      fontFamily: 'Pretendard-Medium',
+      fontSize: scaleFontSize(12),
       fontWeight: '500' as const,
-      lineHeight: 14,
+      lineHeight: scaleFontSize(14),
     },
     // 오버라인 (작은 강조 텍스트)
     overline: {
-      fontSize: 10,
+      fontFamily: 'Pretendard-SemiBold',
+      fontSize: scaleFontSize(10),
       fontWeight: '600' as const,
-      lineHeight: 12,
+      lineHeight: scaleFontSize(12),
       textTransform: 'uppercase' as const,
       letterSpacing: 1,
     },
@@ -268,21 +309,40 @@ export const shadows = {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [themePreference, setThemePreference] = useState<ThemeMode>('system');
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    loadThemePreference();
+    (async () => {
+      try {
+        const saved = await AsyncStorage.getItem(THEME_KEY);
+        setThemePreference((saved as ThemeMode) || 'system');
+      } catch {
+        setThemePreference('system');
+      } finally {
+        setReady(true);
+      }
+    })();
   }, []);
 
-  async function loadThemePreference() {
-    try {
-      const saved = await AsyncStorage.getItem(THEME_KEY);
-      if (saved) {
-        setThemePreference(saved as ThemeMode);
-      }
-    } catch (error) {
-      console.error('Error loading theme preference:', error);
-    }
+  // 아직 로드 안됐으면 children 렌더링하지 않음
+  if (!ready || themePreference === null) {
+    return null;
   }
+
+  // useEffect(() => {
+  //   loadThemePreference();
+  // }, []);
+
+  // async function loadThemePreference() {
+  //   try {
+  //     const saved = await AsyncStorage.getItem(THEME_KEY);
+  //     if (saved) {
+  //       setThemePreference(saved as ThemeMode);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error loading theme preference:', error);
+  //   }
+  // }
 
   const isDark =
     themePreference === 'system'
@@ -335,14 +395,14 @@ export function getStatusColor(status: string): string {
 
 export function getCategoryColor(category: string): string {
   const categoryColors: Record<string, string> = {
-    채소: '#10B981',      // 초록
-    과일: '#EF4444',      // 빨강
-    육류: '#F97316',      // 주황
-    생선류: '#06B6D4',    // 시안/청록
-    유제품: '#3B82F6',    // 파랑
-    가공식품: '#F59E0B',  // 노랑/금색
-    조미료: '#8B5CF6',    // 보라
-    기타: '#6B7280',      // 회색
+    채소: '#10B981', // 초록
+    과일: '#EF4444', // 빨강
+    육류: '#F97316', // 주황
+    생선류: '#06B6D4', // 시안/청록
+    유제품: '#3B82F6', // 파랑
+    가공식품: '#F59E0B', // 노랑/금색
+    조미료: '#8B5CF6', // 보라
+    기타: '#6B7280', // 회색
   };
   return categoryColors[category] || '#6B7280';
 }

@@ -11,6 +11,7 @@ import {
   PanResponder,
   Keyboard,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/lib/theme';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -33,6 +34,7 @@ export default function BottomSheet({
   children,
 }: BottomSheetProps) {
   const { colors, typography } = useTheme();
+  const insets = useSafeAreaInsets();
   const translateY = useRef(new Animated.Value(0)).current;
   const keyboardTranslateY = useRef(new Animated.Value(0)).current;
 
@@ -50,15 +52,15 @@ export default function BottomSheet({
         }
       },
       onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dy > 100 || gestureState.vy > 0.5) {
+        // 닫기 조건:
+        // 1. BottomSheet 높이의 35% 이상 드래그 OR
+        // 2. 빠른 스와이프 속도 (1.0 이상)
+        const threshold = maxHeight * 0.35;
+        if (gestureState.dy > threshold || gestureState.vy > 1.0) {
           // 아래로 충분히 드래그했거나 빠르게 스와이프한 경우 닫기
-          Animated.timing(translateY, {
-            toValue: SCREEN_HEIGHT,
-            duration: 300,
-            useNativeDriver: true,
-          }).start(() => {
-            onClose();
-          });
+          // 즉시 onClose 호출하여 상태 업데이트
+          onClose();
+          // 애니메이션은 useEffect에서 처리됨
         } else {
           // 원래 위치로 복귀
           Animated.spring(translateY, {
@@ -77,8 +79,14 @@ export default function BottomSheet({
     const keyboardWillShow = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
       (e) => {
+        // iOS에서는 키보드 높이에서 Safe Area bottom을 빼고 8px 더 올림
+        const offset =
+          Platform.OS === 'ios'
+            ? -(e.endCoordinates.height - insets.bottom + 8)
+            : -(e.endCoordinates.height - 16);
+
         Animated.timing(keyboardTranslateY, {
-          toValue: -(e.endCoordinates.height - 16),
+          toValue: offset,
           duration: Platform.OS === 'ios' ? 250 : 200,
           useNativeDriver: true,
         }).start();
@@ -134,19 +142,32 @@ export default function BottomSheet({
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlay}>
+        <View
+          style={[
+            styles.overlay,
+            {
+              paddingBottom:
+                Platform.OS === 'ios' ? Math.max(insets.bottom, 8) : 8,
+            },
+          ]}
+        >
           <TouchableWithoutFeedback>
             <Animated.View
               style={[
                 styles.bottomSheetContainer,
-                { transform: [{ translateY }] },
-                // {
-                //   transform: [
-                //     {
-                //       translateY: Animated.add(translateY, keyboardTranslateY),
-                //     },
-                //   ],
-                // },
+                {
+                  transform:
+                    Platform.OS === 'ios'
+                      ? [
+                          {
+                            translateY: Animated.add(
+                              translateY,
+                              keyboardTranslateY,
+                            ),
+                          },
+                        ]
+                      : [{ translateY }],
+                },
               ]}
             >
               <View
@@ -158,31 +179,33 @@ export default function BottomSheet({
                   },
                 ]}
               >
-                <View
-                  style={styles.handleContainer}
-                  {...panResponder.panHandlers}
-                >
-                  <View
-                    style={[styles.handle, { backgroundColor: colors.border }]}
-                  />
-                </View>
+                <View {...panResponder.panHandlers}>
+                  <View style={styles.handleContainer}>
+                    <View
+                      style={[
+                        styles.handle,
+                        { backgroundColor: colors.border },
+                      ]}
+                    />
+                  </View>
 
-                <View
-                  style={[
-                    styles.header,
-                    {
-                      borderBottomColor: colors.border,
-                    },
-                  ]}
-                >
-                  <Text
+                  <View
                     style={[
-                      typography.styles.h3,
-                      { color: colors.text, flex: 1 },
+                      styles.header,
+                      {
+                        borderBottomColor: colors.border,
+                      },
                     ]}
                   >
-                    {title}
-                  </Text>
+                    <Text
+                      style={[
+                        typography.styles.h3,
+                        { color: colors.text, flex: 1 },
+                      ]}
+                    >
+                      {title}
+                    </Text>
+                  </View>
                 </View>
 
                 <View style={{ flex: 1 }}>{children}</View>
@@ -201,7 +224,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
     paddingHorizontal: 12,
-    paddingBottom: 8,
   },
   bottomSheetContainer: {
     width: '100%',

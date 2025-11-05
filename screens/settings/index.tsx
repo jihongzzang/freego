@@ -3,12 +3,12 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Switch,
-  Animated,
   Linking,
   Alert,
   Platform,
+  ScrollView,
 } from 'react-native';
+import { Switch } from 'react-native-switch';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Bell,
@@ -20,20 +20,19 @@ import {
 } from 'lucide-react-native';
 import * as Notifications from 'expo-notifications';
 import { useTheme } from '@/lib/theme';
-import { useDialog } from '@/hooks/useDialog';
+import { useDialog } from '@/contexts/DialogContext';
 import { useMVIStore } from '@/mvi/base';
 import { createSettingsStore } from '@/mvi/features/settings';
 import Header from '@/components/Header';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
-  return (
-    <View style={{ flex: 1 }}>
-      <SettingsContent />
-    </View>
-  );
+  return <SettingsContent />;
 }
 
 function SettingsContent() {
+  const insets = useSafeAreaInsets();
+
   const {
     colors,
     typography,
@@ -43,7 +42,8 @@ function SettingsContent() {
     themePreference,
     setTheme,
   } = useTheme();
-  const { alert, confirm, DialogComponent } = useDialog();
+
+  const { alert, confirm } = useDialog();
 
   // MVI Store 사용
   const [state, dispatch, effect] = useMVIStore(createSettingsStore);
@@ -108,9 +108,9 @@ function SettingsContent() {
     dispatch({ type: 'SET_NOTIFICATION_DAYS', payload: days });
   }
 
-  async function toggleTheme() {
+  function toggleTheme() {
     const newMode = isDark ? 'light' : 'dark';
-    await setTheme(newMode);
+    setTheme(newMode);
   }
 
   async function resetThemeToSystem() {
@@ -144,289 +144,294 @@ function SettingsContent() {
   }
 
   return (
-    <>
-      <DialogComponent />
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Header title="설정" />
-
-        <Animated.ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Bell size={20} color={colors.primary} />
-              <Text style={[typography.styles.h5, { color: colors.text }]}>
-                알림 설정
-              </Text>
-            </View>
-
-            <View style={[styles.card, { backgroundColor: colors.surface }]}>
-              {hasNotificationPermission ? (
-                <>
-                  <Text
-                    style={[
-                      typography.styles.bodySemibold,
-                      { color: colors.text },
-                    ]}
-                  >
-                    유통기한 알림 주기
-                  </Text>
-                  <Text
-                    style={[
-                      typography.styles.bodySmall,
-                      { color: colors.textSecondary },
-                    ]}
-                  >
-                    유통기한 며칠 전부터 알림을 받을지 선택하세요
-                  </Text>
-
-                  <View style={styles.notificationOptions}>
-                    {[1, 2, 3, 5, 7].map((days) => (
-                      <TouchableOpacity
-                        key={days}
-                        style={[
-                          styles.notificationOption,
-                          {
-                            backgroundColor: colors.surfaceSecondary,
-                            borderColor: colors.border,
-                          },
-                          notificationDays === days && {
-                            backgroundColor: colors.primaryLight,
-                            borderColor: colors.primary,
-                          },
-                        ]}
-                        onPress={() => updateNotificationDays(days)}
-                      >
-                        <Text
-                          style={[
-                            typography.styles.label,
-                            { color: colors.textSecondary },
-                            notificationDays === days && {
-                              color: colors.primary,
-                            },
-                          ]}
-                        >
-                          {days}일
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </>
-              ) : (
-                <>
-                  <View style={styles.permissionContent}>
-                    <BellOff size={40} color={colors.textTertiary} />
-                    <Text
-                      style={[
-                        typography.styles.bodySemibold,
-                        { color: colors.text, marginTop: spacing.md },
-                      ]}
-                    >
-                      알림 권한이 필요합니다
-                    </Text>
-                    <Text
-                      style={[
-                        typography.styles.bodySmall,
-                        {
-                          color: colors.textSecondary,
-                          textAlign: 'center',
-                          marginTop: spacing.xs,
-                        },
-                      ]}
-                    >
-                      유통기한 알림을 받으려면{'\n'}알림 권한을 허용해주세요
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    style={[
-                      styles.permissionButton,
-                      { backgroundColor: colors.primaryLight },
-                    ]}
-                    onPress={requestNotificationPermission}
-                  >
-                    <Bell size={20} color={colors.primary} />
-                    <Text
-                      style={[
-                        typography.styles.bodySemibold,
-                        { color: colors.primary },
-                      ]}
-                    >
-                      알림 권한 허용하기
-                    </Text>
-                  </TouchableOpacity>
-                </>
-              )}
-            </View>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Header title="설정" />
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: insets.bottom + 80, // 👈 추가 (네비+여백)
+        }}
+      >
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Bell size={20} color={colors.primary} />
+            <Text style={[typography.styles.h5, { color: colors.text }]}>
+              알림 설정
+            </Text>
           </View>
 
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              {isDark ? (
-                <Moon size={20} color={colors.primary} />
-              ) : (
-                <Sun size={20} color={colors.primary} />
-              )}
-              <Text style={[typography.styles.h5, { color: colors.text }]}>
-                테마
-              </Text>
-            </View>
-
-            <View style={[styles.card, { backgroundColor: colors.surface }]}>
-              <View style={styles.settingRow}>
-                <View style={styles.settingInfo}>
-                  <Text
-                    style={[
-                      typography.styles.bodySemibold,
-                      { color: colors.text },
-                    ]}
-                  >
-                    다크 모드
-                  </Text>
-                  <Text
-                    style={[
-                      typography.styles.bodySmall,
-                      { color: colors.textSecondary },
-                    ]}
-                  >
-                    {themePreference === 'system'
-                      ? '시스템 설정 따름'
-                      : '어두운 테마 사용'}
-                  </Text>
-                </View>
-                <Switch
-                  value={isDark}
-                  onValueChange={toggleTheme}
-                  trackColor={{
-                    false: colors.surfaceSecondary,
-                    true: colors.primaryLight,
-                  }}
-                  thumbColor={isDark ? colors.primary : colors.textTertiary}
-                />
-              </View>
-              {themePreference !== 'system' && (
-                <TouchableOpacity
-                  style={[
-                    styles.settingRow,
-                    styles.systemResetButton,
-                    { borderTopColor: colors.border },
-                  ]}
-                  onPress={resetThemeToSystem}
-                >
-                  <Text
-                    style={[typography.styles.label, { color: colors.primary }]}
-                  >
-                    시스템 설정으로 되돌리기
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <MessageSquare size={20} color={colors.primary} />
-              <Text style={[typography.styles.h5, { color: colors.text }]}>
-                개발자에게 피드백
-              </Text>
-            </View>
-
-            <View style={[styles.card, { backgroundColor: colors.surface }]}>
-              <TouchableOpacity
-                style={styles.feedbackButton}
-                onPress={sendFeedback}
-              >
-                <MessageSquare size={20} color={colors.primary} />
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
+            {hasNotificationPermission ? (
+              <>
                 <Text
                   style={[
                     typography.styles.bodySemibold,
                     { color: colors.text },
                   ]}
                 >
-                  의견 보내기
+                  유통기한 알림 주기
+                </Text>
+                <Text
+                  style={[
+                    typography.styles.bodySmall,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  유통기한 며칠 전부터 알림을 받을지 선택하세요
+                </Text>
+
+                <View style={styles.notificationOptions}>
+                  {[1, 2, 3, 5, 7].map((days) => (
+                    <TouchableOpacity
+                      key={days}
+                      style={[
+                        styles.notificationOption,
+                        {
+                          backgroundColor: colors.surfaceSecondary,
+                          borderColor: colors.border,
+                        },
+                        notificationDays === days && {
+                          backgroundColor: colors.primaryLight,
+                          borderColor: colors.primary,
+                        },
+                      ]}
+                      onPress={() => updateNotificationDays(days)}
+                    >
+                      <Text
+                        style={[
+                          typography.styles.label,
+                          { color: colors.textSecondary },
+                          notificationDays === days && {
+                            color: colors.primary,
+                          },
+                        ]}
+                      >
+                        {days}일
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </>
+            ) : (
+              <>
+                <View style={styles.permissionContent}>
+                  <BellOff size={40} color={colors.textTertiary} />
+                  <Text
+                    style={[
+                      typography.styles.bodySemibold,
+                      { color: colors.text, marginTop: spacing.md },
+                    ]}
+                  >
+                    알림 권한이 필요합니다
+                  </Text>
+                  <Text
+                    style={[
+                      typography.styles.bodySmall,
+                      {
+                        color: colors.textSecondary,
+                        textAlign: 'center',
+                        marginTop: spacing.xs,
+                      },
+                    ]}
+                  >
+                    유통기한 알림을 받으려면{'\n'}알림 권한을 허용해주세요
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.permissionButton,
+                    { backgroundColor: colors.primaryLight },
+                  ]}
+                  onPress={requestNotificationPermission}
+                >
+                  <Bell size={20} color={colors.primary} />
+                  <Text
+                    style={[
+                      typography.styles.bodySemibold,
+                      { color: colors.primary },
+                    ]}
+                  >
+                    알림 권한 허용하기
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            {isDark ? (
+              <Moon size={20} color={colors.primary} />
+            ) : (
+              <Sun size={20} color={colors.primary} />
+            )}
+            <Text style={[typography.styles.h5, { color: colors.text }]}>
+              테마
+            </Text>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
+            <View style={styles.settingRow}>
+              <View style={styles.settingInfo}>
+                <Text
+                  style={[
+                    typography.styles.bodySemibold,
+                    { color: colors.text },
+                  ]}
+                >
+                  다크 모드
+                </Text>
+                <Text
+                  style={[
+                    typography.styles.bodySmall,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {themePreference === 'system'
+                    ? '시스템 설정 따름'
+                    : '어두운 테마 사용'}
+                </Text>
+              </View>
+              <Switch
+                value={isDark}
+                onValueChange={(value) => {
+                  setTheme(value ? 'dark' : 'light');
+                }}
+                disabled={false}
+                circleSize={24}
+                barHeight={30}
+                circleBorderWidth={0}
+                backgroundActive={colors.primaryLight}
+                backgroundInactive={colors.surfaceSecondary}
+                circleActiveColor={colors.primary}
+                circleInActiveColor={colors.textTertiary}
+                changeValueImmediately={true}
+                renderActiveText={false}
+                renderInActiveText={false}
+                switchLeftPx={2}
+                switchRightPx={2}
+                switchWidthMultiplier={2}
+                switchBorderRadius={15}
+              />
+            </View>
+            {themePreference !== 'system' && (
+              <TouchableOpacity
+                style={[
+                  styles.settingRow,
+                  styles.systemResetButton,
+                  { borderTopColor: colors.border },
+                ]}
+                onPress={resetThemeToSystem}
+              >
+                <Text
+                  style={[typography.styles.label, { color: colors.primary }]}
+                >
+                  시스템 설정으로 되돌리기
                 </Text>
               </TouchableOpacity>
-            </View>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <MessageSquare size={20} color={colors.primary} />
+            <Text style={[typography.styles.h5, { color: colors.text }]}>
+              개발자에게 피드백
+            </Text>
           </View>
 
-          <View style={(styles.section, { marginBottom: 0 })}>
-            <View style={styles.sectionHeader}>
-              <Info size={20} color={colors.primary} />
-              <Text style={[typography.styles.h5, { color: colors.text }]}>
-                앱 정보
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
+            <TouchableOpacity
+              style={styles.feedbackButton}
+              onPress={sendFeedback}
+            >
+              <MessageSquare size={20} color={colors.primary} />
+              <Text
+                style={[typography.styles.bodySemibold, { color: colors.text }]}
+              >
+                의견 보내기
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={(styles.section, { marginBottom: 0 })}>
+          <View style={styles.sectionHeader}>
+            <Info size={20} color={colors.primary} />
+            <Text style={[typography.styles.h5, { color: colors.text }]}>
+              앱 정보
+            </Text>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
+            <View style={styles.infoRow}>
+              <Text
+                style={[
+                  typography.styles.bodySmall,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                버전
+              </Text>
+              <Text style={[typography.styles.label, { color: colors.text }]}>
+                1.0.0
               </Text>
             </View>
-
-            <View style={[styles.card, { backgroundColor: colors.surface }]}>
-              <View style={styles.infoRow}>
-                <Text
-                  style={[
-                    typography.styles.bodySmall,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  버전
-                </Text>
-                <Text style={[typography.styles.label, { color: colors.text }]}>
-                  1.0.0
-                </Text>
-              </View>
-              <View
-                style={[styles.divider, { backgroundColor: colors.border }]}
-              />
-              <View style={styles.infoRow}>
-                <Text
-                  style={[
-                    typography.styles.bodySmall,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  개발자
-                </Text>
-                <Text style={[typography.styles.label, { color: colors.text }]}>
-                  냉장고 관리 팀
-                </Text>
-              </View>
-              <View
-                style={[styles.divider, { backgroundColor: colors.border }]}
-              />
-              <View style={styles.infoRow}>
-                <Text
-                  style={[
-                    typography.styles.bodySmall,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  문의
-                </Text>
-                <Text style={[typography.styles.label, { color: colors.text }]}>
-                  support@fridge.app
-                </Text>
-              </View>
+            <View
+              style={[styles.divider, { backgroundColor: colors.border }]}
+            />
+            <View style={styles.infoRow}>
+              <Text
+                style={[
+                  typography.styles.bodySmall,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                개발자
+              </Text>
+              <Text style={[typography.styles.label, { color: colors.text }]}>
+                냉장고 관리 팀
+              </Text>
+            </View>
+            <View
+              style={[styles.divider, { backgroundColor: colors.border }]}
+            />
+            <View style={styles.infoRow}>
+              <Text
+                style={[
+                  typography.styles.bodySmall,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                문의
+              </Text>
+              <Text style={[typography.styles.label, { color: colors.text }]}>
+                support@fridge.app
+              </Text>
             </View>
           </View>
+        </View>
 
-          <View style={styles.footer}>
-            <Text
-              style={[
-                typography.styles.bodySemibold,
-                { color: colors.textSecondary },
-              ]}
-            >
-              냉장고 재고관리 앱
-            </Text>
-            <Text
-              style={[
-                typography.styles.caption,
-                { color: colors.textTertiary },
-              ]}
-            >
-              음식물 쓰레기를 줄이고 현명한 소비를
-            </Text>
-          </View>
-        </Animated.ScrollView>
-      </View>
-    </>
+        <View style={styles.footer}>
+          <Text
+            style={[
+              typography.styles.bodySemibold,
+              { color: colors.textSecondary },
+            ]}
+          >
+            냉장고 재고관리 앱
+          </Text>
+          <Text
+            style={[typography.styles.caption, { color: colors.textTertiary }]}
+          >
+            음식물 쓰레기를 줄이고 현명한 소비를
+          </Text>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
