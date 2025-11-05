@@ -13,8 +13,8 @@ import { AddState, AddIntent } from './types';
 const initialFormData = {
   name: '',
   category: '채소',
-  quantity: '1',
-  unit: '개',
+  quantity: undefined,
+  unit: undefined,
   expiry_date: '',
   storage_location: '냉장실',
   memo: '',

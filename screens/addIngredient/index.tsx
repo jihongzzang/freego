@@ -140,15 +140,16 @@ function AddIngredientContent() {
     }
 
     try {
-      // 선택한 템플릿들을 재고에 추가 (이름과 카테고리만)
+      // 선택한 템플릿들을 재고에 추가 (이름, 카테고리, 이모지)
       const { storage } = await import('@/lib/storage');
       const ingredients = selectedTemplates.map((template) => ({
         name: template.name,
         category: template.category,
+        emoji: template.emoji,
         storage_location: '냉장실',
         quantity: 1,
         unit: template.defaultUnit || '개',
-        expiry_date: null,
+        expiry_date: undefined,
         memo: '',
         purchase_date: new Date().toISOString().split('T')[0],
       }));
@@ -395,7 +396,6 @@ function AddIngredientContent() {
                         color: colors.text,
                         borderColor: colors.border,
                       },
-                      state.errors.quantity && { borderColor: colors.danger },
                     ]}
                     value={state.form.quantity}
                     onChangeText={(text) => handleFieldChange('quantity', text)}
@@ -403,16 +403,6 @@ function AddIngredientContent() {
                     placeholder="입력"
                     placeholderTextColor={colors.textTertiary}
                   />
-                  {state.errors.quantity && (
-                    <Text
-                      style={[
-                        typography.styles.caption,
-                        { color: colors.danger },
-                      ]}
-                    >
-                      {state.errors.quantity}
-                    </Text>
-                  )}
                 </View>
                 <View
                   style={[
@@ -526,7 +516,7 @@ function AddIngredientContent() {
           setSelectedTemplates([]);
           setSelectedCategory('전체');
         }}
-        title="재료 추가하기"
+        title="재료 여러개 추가하기"
       >
         <View style={styles.bottomSheetContainer}>
           <ScrollView
@@ -777,18 +767,18 @@ const createStyles = ({
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'space-between',
-      gap: spacing.sm,
+      gap: spacing.xs,
     },
     templateItem: {
       width: '31%',
       alignItems: 'center',
       gap: spacing.xs,
-      paddingVertical: spacing.md,
+      paddingVertical: spacing.xs,
       paddingHorizontal: spacing.sm,
       borderRadius: borderRadius.md,
       borderWidth: 1,
     },
     templateEmoji: {
-      fontSize: 32,
+      fontSize: 16,
     },
   });

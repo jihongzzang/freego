@@ -52,8 +52,8 @@ export const Colors: Record<'light' | 'dark', ColorPalette> = {
     background: '#F9FAFB',
     surface: '#FFFFFF',
     surfaceSecondary: '#F2F4F6',
-    primary: '#0064FF',
-    primaryLight: '#E8F3FF',
+    primary: '#2563EB',
+    primaryLight: '#EFF6FF',
     secondary: '#FF6B00',
     secondaryLight: '#FFF5E6',
     danger: '#F04452',
@@ -326,10 +326,9 @@ export function useTheme() {
 
 export function getStatusColor(status: string): string {
   const statusColors: Record<string, string> = {
-    신선: '#10B981',
-    주의: '#F59E0B',
-    임박: '#F04452',
-    만료: '#9CA3AF',
+    유효: '#10B981',
+    만료: '#F04452',
+    미설정: '#9CA3AF',
   };
   return statusColors[status] || '#6B7280';
 }

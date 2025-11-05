@@ -5,14 +5,13 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
-import { Plus, Clock, Minus, Bell, Package } from 'lucide-react-native';
-import { useTheme, getStatusColor } from '@/lib/theme';
+import { Bell } from 'lucide-react-native';
+import { useTheme } from '@/lib/theme';
 import { useMVIStore } from '@/mvi/base';
 import { createHomeStore, Ingredient } from '@/mvi/features/home';
-import { getCategoryIcon } from '@/utils/categoryIcons';
 import Header from '@/components/Header';
 import FloatingButton from '@/components/FloatingButton';
 
@@ -29,6 +28,9 @@ function DashboardContent() {
   const { colors, typography, borderRadius, spacing } = useTheme();
   const scrollViewRef = useRef<ScrollView>(null);
   const expiringRef = useRef<View>(null);
+
+  // 선택된 카테고리 상태
+  const [selectedCategory, setSelectedCategory] = useState<string>('전체');
 
   // MVI Store 사용
   const [state, dispatch, effect] = useMVIStore(createHomeStore);
@@ -62,89 +64,87 @@ function DashboardContent() {
     }, [dispatch]),
   );
 
-  function getDaysRemaining(daysRemaining: number | null): string {
+  function getExpiryDisplay(
+    status: '유효' | '만료' | '미설정',
+    daysRemaining: number | null,
+  ): string {
+    if (status === '미설정') return '유통기한 입력필요';
     if (daysRemaining === null) return '';
 
-    if (daysRemaining < 0) return '만료';
-    if (daysRemaining === 0) return '오늘';
-    if (daysRemaining === 1) return '내일';
-    return `${daysRemaining}일`;
+    if (daysRemaining < 0) {
+      return `소비기한 지남 (D+${Math.abs(daysRemaining)})`;
+    }
+    return `D-${daysRemaining} 남음`;
   }
 
-  const expiringItems = ingredients.filter(
-    (item) => item.status === '주의' || item.status === '소모됨',
+  const expiringItems = ingredients.filter((item) => item.status === '만료');
+
+  // 카테고리 목록
+  const allCategories = useMemo(
+    () => [
+      '전체',
+      '채소',
+      '과일',
+      '육류',
+      '생선류',
+      '유제품',
+      '가공식품',
+      '조미료',
+    ],
+    [],
   );
 
-  // 카테고리별 재료 개수
-  const categoryStats = useMemo(() => {
-    const stats: Record<string, number> = {};
-    ingredients.forEach((item) => {
-      stats[item.category] = (stats[item.category] || 0) + 1;
-    });
-    return stats;
-  }, [ingredients]);
+  // 선택된 카테고리에 따른 재료 필터링
+  const filteredIngredients = useMemo(() => {
+    if (selectedCategory === '전체') {
+      return ingredients;
+    }
+    return ingredients.filter((item) => item.category === selectedCategory);
+  }, [ingredients, selectedCategory]);
 
-  // 모든 카테고리 정렬 (많은 순)
-  const sortedCategories = useMemo(() => {
-    return Object.entries(categoryStats).sort(([, a], [, b]) => b - a);
-  }, [categoryStats]);
-
-  async function quickDeduct(id: string) {
-    dispatch({ type: 'DELETE_INGREDIENT', payload: id });
-  }
-
-  const renderIngredientItem = ({ item }: { item: Ingredient }) => (
+  const renderIngredientCard = ({ item }: { item: Ingredient }) => (
     <TouchableOpacity
       key={item.id}
-      style={styles.ingredientItem}
+      style={[
+        styles.ingredientCard,
+        { backgroundColor: colors.surface, borderColor: colors.border },
+      ]}
       onPress={() => dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: item.id })}
       activeOpacity={0.7}
     >
-      <View style={styles.ingredientLeft}>
-        <View
-          style={[
-            styles.categoryIconWrapper,
-            { backgroundColor: colors.primaryLight },
-          ]}
-        >
-          {getCategoryIcon(item.category)}
-        </View>
-        <View style={styles.ingredientInfo}>
-          <View style={styles.ingredientNameRow}>
-            <Text
-              style={[typography.styles.bodySemibold, { color: colors.text }]}
-            >
-              {item.name}
-            </Text>
+      <View style={styles.cardContent}>
+        <View style={styles.emojiContainer}>
+          <Text style={styles.emojiText}>{item.emoji || '🍽️'}</Text>
+          {item.status === '만료' && (
             <View
               style={[
-                styles.statusDot,
-                { backgroundColor: getStatusColor(item.status) },
+                styles.statusBadge,
+                {
+                  backgroundColor: colors.danger,
+                },
               ]}
             />
-          </View>
-          <Text
-            style={[typography.styles.caption, { color: colors.textSecondary }]}
-          >
-            {item.quantity}
-            {item.unit} · {item.storage_location}
-            {item.daysRemaining !== null &&
-              ` · ${getDaysRemaining(item.daysRemaining)}`}
-          </Text>
+          )}
         </View>
+        <Text
+          style={[styles.ingredientName, { color: colors.text }]}
+          numberOfLines={1}
+        >
+          {item.name}
+        </Text>
+        <Text
+          style={[
+            styles.expiryText,
+            {
+              color:
+                item.status === '만료' ? colors.danger : colors.textTertiary,
+            },
+          ]}
+          numberOfLines={1}
+        >
+          {getExpiryDisplay(item.status, item.daysRemaining)}
+        </Text>
       </View>
-      <TouchableOpacity
-        style={[
-          styles.quickButton,
-          { backgroundColor: colors.surfaceSecondary },
-        ]}
-        onPress={(e) => {
-          e.stopPropagation();
-          quickDeduct(item.id);
-        }}
-      >
-        <Minus size={16} color={colors.text} />
-      </TouchableOpacity>
     </TouchableOpacity>
   );
 
@@ -164,9 +164,7 @@ function DashboardContent() {
               },
             ]}
             onPress={() => {
-              if (expiringItems.length > 0) {
-                dispatch({ type: 'NAVIGATE_TO_EXPIRING' });
-              }
+              dispatch({ type: 'NAVIGATE_TO_EXPIRING' });
             }}
           >
             <Bell
@@ -188,193 +186,126 @@ function DashboardContent() {
         }
       />
 
+      {/* 카테고리 캐러셀 - 고정 */}
+      <View
+        style={[
+          styles.categoryCarouselContainer,
+          { backgroundColor: colors.surface },
+        ]}
+      >
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoryCarousel}
+          contentContainerStyle={styles.categoryCarouselContent}
+        >
+          {allCategories.map((category) => {
+            const isSelected = category === selectedCategory;
+            const categoryCount =
+              category === '전체'
+                ? ingredients.length
+                : ingredients.filter((item) => item.category === category)
+                    .length;
+
+            return (
+              <TouchableOpacity
+                key={category}
+                style={[
+                  styles.categoryChip,
+                  {
+                    backgroundColor: isSelected
+                      ? colors.primary
+                      : colors.surface,
+                    borderColor: isSelected ? colors.primary : colors.border,
+                  },
+                ]}
+                onPress={() => setSelectedCategory(category)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.categoryChipContent}>
+                  <Text
+                    style={[
+                      typography.styles.bodySmallMedium,
+                      {
+                        color: isSelected ? '#FFFFFF' : colors.textSecondary,
+                      },
+                    ]}
+                  >
+                    {category}
+                  </Text>
+                  {categoryCount > 0 && (
+                    <View
+                      style={[
+                        styles.categoryCount,
+                        {
+                          backgroundColor: isSelected
+                            ? 'rgba(255, 255, 255, 0.3)'
+                            : colors.surfaceSecondary,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          typography.styles.captionBold,
+                          {
+                            color: isSelected
+                              ? '#FFFFFF'
+                              : colors.textSecondary,
+                          },
+                        ]}
+                      >
+                        {categoryCount}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
+
       <ScrollView
         ref={scrollViewRef}
         style={styles.content}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Summary Grid 2x2 */}
-        <View style={styles.summaryGrid}>
-          <TouchableOpacity
-            style={[
-              styles.summaryGridItem,
-              { backgroundColor: colors.surface },
-            ]}
-            onPress={() => dispatch({ type: 'NAVIGATE_TO_INGREDIENTS' })}
-            activeOpacity={0.7}
-          >
-            <Text style={[typography.styles.h1, { color: colors.text }]}>
-              {ingredients.length}
-            </Text>
-            <View style={styles.summaryBottomRow}>
-              <Package size={16} color={colors.primary} />
-              <Text
-                style={[
-                  typography.styles.caption,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                나의 식재료
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.summaryGridItem,
-              {
-                backgroundColor:
-                  expiringItems.length > 0
-                    ? colors.dangerLight
-                    : colors.surface,
-              },
-            ]}
-            onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
-            activeOpacity={0.7}
-          >
-            <Text
-              style={[
-                typography.styles.h1,
-                {
-                  color: expiringItems.length > 0 ? colors.danger : colors.text,
-                },
-              ]}
-            >
-              {expiringItems.length}
-            </Text>
-            <View style={styles.summaryBottomRow}>
-              <Clock
-                size={16}
-                color={
-                  expiringItems.length > 0 ? colors.danger : colors.textTertiary
-                }
-              />
-              <Text
-                style={[
-                  typography.styles.caption,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                유통기한 임박
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {/* 카테고리별 요약 - 캐러셀 */}
-        {sortedCategories.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionHeaderLeft}>
-                <Text style={[typography.styles.h5, { color: colors.text }]}>
-                  카테고리별 현황
-                </Text>
-              </View>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoryCarouselContent}
-            >
-              {sortedCategories.map(([category, count]) => (
-                <TouchableOpacity
-                  key={category}
-                  style={[
-                    styles.categoryStatItem,
-                    { backgroundColor: colors.surface },
-                  ]}
-                  onPress={() =>
-                    dispatch({
-                      type: 'NAVIGATE_TO_INGREDIENTS',
-                      payload: category,
-                    })
-                  }
-                  activeOpacity={0.7}
-                >
-                  <Text style={[typography.styles.h2, { color: colors.text }]}>
-                    {count}
-                  </Text>
-                  <View style={styles.categoryBottomRow}>
-                    {getCategoryIcon(category, 14)}
-                    <Text
-                      style={[
-                        typography.styles.caption,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      {category}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        )}
-
         {expiringItems.length > 0 && (
           <View ref={expiringRef} style={styles.section}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionHeaderLeft}>
                 <Bell size={20} color={colors.danger} />
                 <Text style={[typography.styles.h5, { color: colors.text }]}>
-                  유통기한 임박
+                  소비기한 지남
                 </Text>
               </View>
-              {expiringItems.length > 3 && (
+              {expiringItems.length > 8 && (
                 <TouchableOpacity
                   onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
                   activeOpacity={0.7}
                 >
                   <Text
                     style={[
-                      typography.styles.bodySemibold,
-                      { color: colors.primary },
+                      typography.styles.caption,
+                      { color: colors.textSecondary },
                     ]}
                   >
-                    더 보기
+                    더보기
                   </Text>
                 </TouchableOpacity>
               )}
             </View>
-            <View
-              style={[
-                styles.alertCard,
-                { backgroundColor: colors.dangerLight },
-              ]}
-            >
+            <View style={styles.cardList}>
               {expiringItems
-                .slice(0, 3)
-                .map((item) => renderIngredientItem({ item }))}
+                .slice(0, 8)
+                .map((item) => renderIngredientCard({ item }))}
             </View>
           </View>
         )}
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionHeaderLeft}>
-              <Package size={20} color={colors.primary} />
-              <Text style={[typography.styles.h5, { color: colors.text }]}>
-                나의 식재료
-              </Text>
-            </View>
-            {ingredients.length > 5 && (
-              <TouchableOpacity
-                onPress={() => dispatch({ type: 'NAVIGATE_TO_INGREDIENTS' })}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    typography.styles.bodySemibold,
-                    { color: colors.primary },
-                  ]}
-                >
-                  더 보기
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          {loading ? (
+        {loading ? (
+          <View style={styles.section}>
             <View
               style={[
                 styles.emptyContainer,
@@ -390,7 +321,9 @@ function DashboardContent() {
                 로딩 중이에요...
               </Text>
             </View>
-          ) : ingredients.length === 0 ? (
+          </View>
+        ) : filteredIngredients.length === 0 ? (
+          <View style={styles.section}>
             <View
               style={[
                 styles.emptyContainer,
@@ -399,11 +332,13 @@ function DashboardContent() {
             >
               <Text
                 style={[
-                  typography.styles.bodySemibold,
-                  { color: colors.textTertiary, marginBottom: 8 },
+                  typography.styles.bodyMedium,
+                  { color: colors.textSecondary, marginBottom: 8 },
                 ]}
               >
-                관리할 재료가 없어요
+                {selectedCategory === '전체'
+                  ? '관리할 재료가 없어요'
+                  : `${selectedCategory} 재료가 없어요`}
               </Text>
               <Text
                 style={[
@@ -414,16 +349,16 @@ function DashboardContent() {
                 기억하고 싶은 재료만 추가해보세요
               </Text>
             </View>
-          ) : (
-            <View
-              style={[styles.listCard, { backgroundColor: colors.surface }]}
-            >
-              {ingredients
-                .slice(0, 5)
-                .map((item) => renderIngredientItem({ item }))}
+          </View>
+        ) : (
+          <View style={styles.section}>
+            <View style={styles.cardList}>
+              {filteredIngredients.map((item) =>
+                renderIngredientCard({ item }),
+              )}
             </View>
-          )}
-        </View>
+          </View>
+        )}
       </ScrollView>
       <FloatingButton onPress={() => dispatch({ type: 'NAVIGATE_TO_ADD' })} />
     </View>
@@ -446,7 +381,7 @@ const createStyles = ({
       padding: spacing.lg,
     },
     scrollContent: {
-      paddingBottom: 100,
+      paddingBottom: 200,
     },
     notificationButton: {
       width: 44,
@@ -466,47 +401,39 @@ const createStyles = ({
       justifyContent: 'center',
       alignItems: 'center',
     },
-    summaryGrid: {
-      flexDirection: 'row',
-      paddingHorizontal: spacing.xl,
-      paddingTop: spacing.xl,
-      gap: spacing.md,
+    categoryCarouselContainer: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: '#F2F4F6',
     },
-    summaryGridItem: {
-      flex: 1,
-      borderRadius: borderRadius.lg,
-      padding: spacing.md,
-      paddingVertical: spacing.lg,
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      minHeight: 85,
-    },
-    summaryBottomRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.xs,
+    categoryCarousel: {
+      flexGrow: 0,
     },
     categoryCarouselContent: {
-      gap: spacing.md,
-      paddingRight: spacing.xl,
+      gap: spacing.sm,
     },
-    categoryStatItem: {
-      width: 90,
-      borderRadius: borderRadius.lg,
-      padding: spacing.sm,
-      paddingVertical: spacing.md,
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      minHeight: 80,
+    categoryChip: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+      borderRadius: borderRadius.sm,
+      borderWidth: 1,
     },
-    categoryBottomRow: {
+    categoryChipContent: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.xs,
+    },
+    categoryCount: {
+      marginLeft: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 2,
+      borderRadius: borderRadius.sm,
+      minWidth: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     section: {
-      paddingHorizontal: spacing.xl,
-      paddingTop: 28,
+      paddingTop: spacing.lg,
     },
     sectionHeader: {
       flexDirection: 'row',
@@ -519,54 +446,49 @@ const createStyles = ({
       alignItems: 'center',
       gap: spacing.sm,
     },
-    alertCard: {
-      borderRadius: borderRadius.lg,
-      padding: spacing.xs,
-    },
-    listCard: {
-      borderRadius: borderRadius.lg,
-      padding: spacing.xs,
-    },
-    ingredientItem: {
+    cardList: {
       flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: spacing.lg,
-      borderRadius: borderRadius.md,
-    },
-    ingredientLeft: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexWrap: 'wrap',
       gap: spacing.md,
     },
-    categoryIconWrapper: {
-      width: 36,
-      height: 36,
-      borderRadius: borderRadius.full,
-      justifyContent: 'center',
-      alignItems: 'center',
+    ingredientCard: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      width: '48%',
     },
-    ingredientNameRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.sm,
+    cardContent: {
+      alignItems: 'flex-start',
+      width: '100%',
+    },
+    emojiContainer: {
+      position: 'relative',
       marginBottom: spacing.xs,
     },
-    statusDot: {
-      width: 6,
-      height: 6,
+    emojiText: {
+      fontSize: 16,
+    },
+    ingredientName: {
+      fontSize: 13,
+      fontWeight: '600',
+      lineHeight: 18,
+    },
+    expiryText: {
+      fontSize: 11,
+      fontWeight: '400',
+      lineHeight: 16,
+      marginTop: 2,
+    },
+    statusBadge: {
+      position: 'absolute',
+      top: -2,
+      right: -2,
+      width: 12,
+      height: 12,
       borderRadius: borderRadius.full,
-    },
-    ingredientInfo: {
-      flex: 1,
-    },
-    quickButton: {
-      width: 32,
-      height: 32,
-      borderRadius: borderRadius.lg,
-      justifyContent: 'center',
-      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: '#FFFFFF',
     },
     emptyContainer: {
       borderRadius: borderRadius.lg,

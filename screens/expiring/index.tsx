@@ -25,7 +25,7 @@ export default function ExpiringScreen() {
 
   const styles = useMemo(
     () => createStyles({ borderRadius, spacing }),
-    [spacing, borderRadius]
+    [spacing, borderRadius],
   );
 
   // Effect 처리
@@ -50,7 +50,7 @@ export default function ExpiringScreen() {
   useFocusEffect(
     useCallback(() => {
       dispatch({ type: 'LOAD_INGREDIENTS' });
-    }, [dispatch])
+    }, [dispatch]),
   );
 
   function getDaysRemaining(daysRemaining: number | null): string {
@@ -128,10 +128,7 @@ export default function ExpiringScreen() {
         onBackPress={() => dispatch({ type: 'NAVIGATE_BACK' })}
       />
 
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {loading ? (
           <View
             style={[styles.emptyContainer, { backgroundColor: colors.surface }]}
@@ -146,18 +143,12 @@ export default function ExpiringScreen() {
             </Text>
           </View>
         ) : ingredients.length === 0 ? (
-          <View
-            style={[styles.emptyContainer, { backgroundColor: colors.surface }]}
-          >
-            <Clock
-              size={48}
-              color={colors.textTertiary}
-              style={{ marginBottom: 16 }}
-            />
+          <View style={styles.emptyContainer}>
+            <Clock size={64} color={colors.textTertiary} />
             <Text
               style={[
-                typography.styles.bodySemibold,
-                { color: colors.textTertiary, marginBottom: 8 },
+                typography.styles.bodyMedium,
+                { color: colors.textSecondary },
               ]}
             >
               임박한 재료가 없어요
@@ -244,8 +235,10 @@ const createStyles = ({
       alignItems: 'center',
     },
     emptyContainer: {
-      borderRadius: borderRadius.lg,
-      padding: 40,
+      flex: 1,
       alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 100,
+      gap: 12,
     },
   });

@@ -9,7 +9,7 @@ import { Ingredient as StoredIngredient } from '@/lib/storage';
  * Ingredient with status
  */
 export interface Ingredient extends StoredIngredient {
-  status: '신선' | '주의' | '소모됨';
+  status: '유효' | '만료' | '미설정';
   daysRemaining: number | null;
 }
 

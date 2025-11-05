@@ -16,8 +16,8 @@ const initialState: AddState = {
   form: {
     name: '',
     category: '채소',
-    quantity: '',
-    unit: '',
+    quantity: undefined,
+    unit: undefined,
     expiry_date: '',
     storage_location: '냉장실',
     memo: '',

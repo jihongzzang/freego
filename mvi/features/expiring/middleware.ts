@@ -12,24 +12,25 @@ import { storage } from '@/lib/storage';
  * 유통기한 상태 계산
  */
 function calculateStatus(
-  expiryDate: string | null,
-): '신선' | '주의' | '소모됨' {
-  if (!expiryDate) return '신선';
+  expiryDate: string | null | undefined,
+): '유효' | '만료' | '미설정' {
+  if (!expiryDate) return '미설정';
 
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const expiry = new Date(expiryDate);
+  expiry.setHours(0, 0, 0, 0);
   const diffTime = expiry.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays < 0) return '소모됨';
-  if (diffDays <= 3) return '주의';
-  return '신선';
+  if (diffDays < 0) return '만료';
+  return '유효';
 }
 
 /**
  * 남은 일수 계산
  */
-function calculateDaysRemaining(expiryDate: string | null): number | null {
+function calculateDaysRemaining(expiryDate: string | null | undefined): number | null {
   if (!expiryDate) return null;
 
   const today = new Date();
@@ -52,7 +53,7 @@ export const expiringMiddleware: Middleware<
     case 'LOAD_INGREDIENTS': {
       try {
         const data = await storage.getIngredients();
-        // 주의 또는 소모됨 상태인 재료만 필터링
+        // 만료된 상태인 재료만 필터링
         const allIngredients: Ingredient[] = data.map((item) => ({
           ...item,
           status: calculateStatus(item.expiry_date),
@@ -60,7 +61,7 @@ export const expiringMiddleware: Middleware<
         }));
 
         const ingredients = allIngredients.filter(
-          (item) => item.status === '주의' || item.status === '소모됨'
+          (item) => item.status === '만료'
         );
 
         return {
@@ -101,7 +102,7 @@ export const expiringMiddleware: Middleware<
         }));
 
         const ingredients = allIngredients.filter(
-          (item) => item.status === '주의' || item.status === '소모됨'
+          (item) => item.status === '만료'
         );
 
         return {

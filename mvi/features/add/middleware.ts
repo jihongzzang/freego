@@ -7,6 +7,7 @@
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { AddState, AddIntent, AddEffect } from './types';
 import { storage } from '@/lib/storage';
+import { categoryDefaultEmojis } from '@/utils/ingredientTemplates';
 
 /**
  * 폼 유효성 검사
@@ -20,10 +21,10 @@ function validateForm(form: AddState['form']): { isValid: boolean; errors: AddSt
   }
 
   // 수량 검증 (선택적)
-  if (form.quantity.trim()) {
+  if (form.quantity && form.quantity.trim()) {
     const quantity = parseInt(form.quantity);
     if (isNaN(quantity) || quantity <= 0) {
-      errors.quantity = '올바른 수량을 입력해주세요.';
+      errors.name = '올바른 수량을 입력해주세요.';
     }
   }
 
@@ -94,10 +95,11 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
         await storage.addIngredient({
           name: state.form.name,
           category: state.form.category,
-          quantity: state.form.quantity.trim() ? parseInt(state.form.quantity) : null,
-          unit: state.form.unit.trim() || null,
+          emoji: categoryDefaultEmojis[state.form.category] || '🍴',
+          quantity: state.form.quantity && state.form.quantity.trim() ? parseInt(state.form.quantity) : undefined,
+          unit: state.form.unit && state.form.unit.trim() ? state.form.unit : undefined,
           purchase_date: new Date().toISOString().split('T')[0],
-          expiry_date: state.form.expiry_date.trim() || null,
+          expiry_date: state.form.expiry_date.trim() || undefined,
           storage_location: state.form.storage_location,
           memo: state.form.memo,
         });
@@ -109,8 +111,8 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
             form: {
               name: '',
               category: '채소',
-              quantity: '',
-              unit: '',
+              quantity: undefined,
+              unit: undefined,
               expiry_date: '',
               storage_location: '냉장실',
               memo: '',

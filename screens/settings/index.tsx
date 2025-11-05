@@ -349,7 +349,7 @@ function SettingsContent() {
             </View>
           </View>
 
-          <View style={styles.section}>
+          <View style={(styles.section, { marginBottom: 0 })}>
             <View style={styles.sectionHeader}>
               <Info size={20} color={colors.primary} />
               <Text style={[typography.styles.h5, { color: colors.text }]}>
@@ -447,7 +447,7 @@ const createStyles = ({
     },
     section: {
       // paddingHorizontal: spacing.xl,
-      // marginTop: spacing.xxl,
+      marginBottom: spacing.xxl,
     },
     sectionHeader: {
       flexDirection: 'row',

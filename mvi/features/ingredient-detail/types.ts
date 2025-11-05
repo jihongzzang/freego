@@ -9,7 +9,7 @@ import { Ingredient as StoredIngredient } from '@/lib/storage';
  * Ingredient with status
  */
 export interface Ingredient extends StoredIngredient {
-  status: string;
+  status: '유효' | '만료' | '미설정';
 }
 
 /**
@@ -18,8 +18,8 @@ export interface Ingredient extends StoredIngredient {
 export interface EditFormData {
   name: string;
   category: string;
-  quantity: string;
-  unit: string;
+  quantity?: string;
+  unit?: string;
   expiry_date: string;
   storage_location: string;
   memo: string;

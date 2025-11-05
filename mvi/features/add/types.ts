@@ -10,8 +10,8 @@ import { Intent, State, Effect } from '@/mvi/base';
 export interface AddFormData {
   name: string;
   category: string;
-  quantity: string;
-  unit: string;
+  quantity?: string;
+  unit?: string;
   expiry_date: string;
   storage_location: string;
   memo: string;
@@ -22,7 +22,6 @@ export interface AddFormData {
  */
 export interface ValidationErrors {
   name?: string;
-  quantity?: string;
   expiry_date?: string;
 }
 

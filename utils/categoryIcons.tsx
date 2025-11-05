@@ -1,8 +1,8 @@
 import { Carrot, Apple, Beef, Milk, Package, Fish, Cookie, Soup } from 'lucide-react-native';
 import { getCategoryColor } from '@/lib/theme';
 
-export function getCategoryIcon(category: string, size: number = 16) {
-  const color = getCategoryColor(category);
+export function getCategoryIcon(category: string, size: number = 16, customColor?: string) {
+  const color = customColor || getCategoryColor(category);
 
   switch (category) {
     case '채소':

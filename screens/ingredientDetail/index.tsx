@@ -469,7 +469,7 @@ export default function IngredientDetailScreen() {
                           { color: colors.text },
                         ]}
                       >
-                        {state.ingredient.quantity} {state.ingredient.unit}
+                        {state.ingredient.quantity || '-'}
                       </Text>
                     </View>
                     <View style={styles.infoItem}>

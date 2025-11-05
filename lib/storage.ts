@@ -4,10 +4,11 @@ export interface Ingredient {
   id: string;
   name: string;
   category: string;
-  quantity: number | null;
-  unit: string | null;
+  emoji?: string;
+  quantity?: number;
+  unit?: string;
   purchase_date: string;
-  expiry_date: string | null;
+  expiry_date?: string;
   storage_location: string;
   memo: string;
   created_at: string;
