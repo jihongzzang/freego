@@ -3,7 +3,7 @@ import { CategoryType } from '@/constants/categories';
 export function getCategoryColor(category: CategoryType): string {
   switch (category) {
     case 'vegetables':
-      return '#10B981';
+      return '#047857';
     case 'fruits':
       return '#EF4444';
     case 'meat':

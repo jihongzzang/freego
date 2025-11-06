@@ -110,7 +110,7 @@ export default function ExpiringScreen() {
             <Text style={[typography.styles.bodySmall, { color: colors.textTertiary }]}>모든 재료가 신선해요!</Text>
           </View>
         ) : (
-          <View style={[styles.listCard, { backgroundColor: colors.dangerLight }]}>
+          <View style={[styles.listCard, { backgroundColor: colors.surface }]}>
             {ingredients.map((item) => renderIngredientItem({ item }))}
           </View>
         )}
@@ -135,7 +135,7 @@ const createStyles = ({
       padding: spacing.xl,
     },
     listCard: {
-      borderRadius: borderRadius.lg,
+      borderRadius: borderRadius.xl,
       overflow: 'hidden',
     },
     ingredientItem: {
@@ -175,7 +175,7 @@ const createStyles = ({
     quickButton: {
       width: 32,
       height: 32,
-      borderRadius: borderRadius.lg,
+      borderRadius: borderRadius.xl,
       justifyContent: 'center',
       alignItems: 'center',
     },

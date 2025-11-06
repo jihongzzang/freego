@@ -53,13 +53,13 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
         };
       case 'destructive':
         return {
-          backgroundColor: colors.primaryLight,
-          textColor: colors.primary,
+          backgroundColor: colors.primary,
+          textColor: colors.white,
         };
       default:
         return {
-          backgroundColor: colors.primaryLight,
-          textColor: colors.primary,
+          backgroundColor: colors.primary,
+          textColor: colors.white,
         };
     }
   }
@@ -182,9 +182,9 @@ const createStyles = ({
     },
     button: {
       flex: 1,
-      paddingVertical: 14,
+      paddingVertical: 20,
       paddingHorizontal: spacing.xl,
-      borderRadius: borderRadius.md,
+      borderRadius: borderRadius.xl,
       alignItems: 'center',
       justifyContent: 'center',
     },

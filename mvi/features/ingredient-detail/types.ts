@@ -20,6 +20,7 @@ export interface Ingredient extends StoredIngredient {
  */
 export interface EditFormData {
   name: string;
+  emoji?: string;
   category: CategoryType;
   quantity?: string;
   unit?: string;

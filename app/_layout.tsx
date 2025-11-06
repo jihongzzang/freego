@@ -15,8 +15,7 @@ function RootStack({ isOnboardingComplete }: { isOnboardingComplete: boolean }) 
     <DialogProvider>
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <Stack
-          // initialRouteName={isOnboardingComplete ? '(tabs)' : 'onboarding'}
-          initialRouteName="onboarding"
+          initialRouteName={isOnboardingComplete ? '(tabs)' : 'onboarding'}
           screenOptions={{
             headerShown: false,
             contentStyle: { backgroundColor: colors.background },

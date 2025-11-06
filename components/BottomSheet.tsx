@@ -133,6 +133,7 @@ export default function BottomSheet({ maxHeight, visible, onClose, title, childr
           style={[
             styles.overlay,
             {
+              paddingHorizontal: Platform.OS === 'ios' ? 10 : 10,
               paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 8) : 8,
             },
           ]}
@@ -157,6 +158,7 @@ export default function BottomSheet({ maxHeight, visible, onClose, title, childr
                 style={[
                   styles.bottomSheet,
                   {
+                    borderRadius: Platform.OS === 'ios' ? 28 : 28,
                     backgroundColor: colors.background,
                     height: maxHeight,
                   },
@@ -175,10 +177,9 @@ export default function BottomSheet({ maxHeight, visible, onClose, title, childr
                       },
                     ]}
                   >
-                    <Text style={[typography.styles.h3, { color: colors.text, flex: 1 }]}>{title}</Text>
+                    <Text style={[typography.styles.h4, { color: colors.text, flex: 1 }]}>{title}</Text>
                   </View>
                 </View>
-
                 <View style={{ flex: 1 }}>{children}</View>
               </View>
             </Animated.View>
@@ -194,13 +195,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
-    paddingHorizontal: 12,
   },
   bottomSheetContainer: {
     width: '100%',
   },
   bottomSheet: {
-    borderRadius: 20,
     overflow: 'hidden',
   },
   handleContainer: {
@@ -208,7 +207,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   handle: {
-    width: 40,
+    width: 48,
     height: 4,
     borderRadius: 2,
   },

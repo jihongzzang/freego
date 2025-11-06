@@ -148,7 +148,7 @@ export default function SettingsScreen() {
       >
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Bell size={20} color={colors.primary} />
+            <Bell size={20} color={colors.textSecondary} />
             <Text style={[typography.styles.h5, { color: colors.text }]}>알림 설정</Text>
           </View>
 
@@ -167,12 +167,12 @@ export default function SettingsScreen() {
                       style={[
                         styles.notificationOption,
                         {
-                          backgroundColor: colors.surfaceSecondary,
-                          borderColor: colors.border,
+                          backgroundColor: colors.surface,
+                          borderColor: colors.borderLight,
                         },
                         notificationDays === days && {
-                          backgroundColor: colors.primaryLight,
-                          borderColor: colors.primary,
+                          backgroundColor: colors.surfaceSecondary,
+                          borderColor: colors.border,
                         },
                       ]}
                       onPress={() => updateNotificationDays(days)}
@@ -182,7 +182,7 @@ export default function SettingsScreen() {
                           typography.styles.label,
                           { color: colors.textSecondary },
                           notificationDays === days && {
-                            color: colors.primary,
+                            color: colors.text,
                           },
                         ]}
                       >
@@ -226,7 +226,7 @@ export default function SettingsScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            {isDark ? <Moon size={20} color={colors.primary} /> : <Sun size={20} color={colors.primary} />}
+            {isDark ? <Moon size={20} color={colors.textSecondary} /> : <Sun size={20} color={colors.textSecondary} />}
             <Text style={[typography.styles.h5, { color: colors.text }]}>테마</Text>
           </View>
 
@@ -247,10 +247,10 @@ export default function SettingsScreen() {
                 circleSize={24}
                 barHeight={30}
                 circleBorderWidth={0}
-                backgroundActive={colors.primaryLight}
-                backgroundInactive={colors.surfaceSecondary}
-                circleActiveColor={colors.primary}
+                circleActiveColor={colors.text}
+                backgroundActive={colors.textSecondary}
                 circleInActiveColor={colors.textTertiary}
+                backgroundInactive={colors.surfaceSecondary}
                 changeValueImmediately={true}
                 renderActiveText={false}
                 renderInActiveText={false}
@@ -265,38 +265,22 @@ export default function SettingsScreen() {
                 style={[styles.settingRow, styles.systemResetButton, { borderTopColor: colors.border }]}
                 onPress={resetThemeToSystem}
               >
-                <Text style={[typography.styles.label, { color: colors.primary }]}>시스템 설정으로 되돌리기</Text>
+                <Text style={[typography.styles.label, { color: colors.textSecondary }]}>시스템 설정으로 되돌리기</Text>
               </TouchableOpacity>
             )}
           </View>
         </View>
-
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <MessageSquare size={20} color={colors.primary} />
-            <Text style={[typography.styles.h5, { color: colors.text }]}>개발자에게 피드백</Text>
-          </View>
-
-          <View style={[styles.card, { backgroundColor: colors.surface }]}>
-            <TouchableOpacity style={styles.feedbackButton} onPress={sendFeedback}>
-              <MessageSquare size={20} color={colors.primary} />
-              <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>의견 보내기</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Database size={20} color={colors.primary} />
+            <Database size={20} color={colors.textSecondary} />
             <Text style={[typography.styles.h5, { color: colors.text }]}>데이터 관리</Text>
           </View>
 
           <View style={[styles.card, { backgroundColor: colors.surface }]}>
             <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAllData}>
               <View style={styles.deleteButtonContent}>
-                <Trash2 size={20} color={colors.danger} />
                 <View style={styles.deleteButtonText}>
-                  <Text style={[typography.styles.bodySemibold, { color: colors.danger }]}>
+                  <Text style={[typography.styles.bodySemibold, { color: colors.textSecondary }]}>
                     모든 냉장고 데이터 삭제
                   </Text>
                   <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>
@@ -308,9 +292,22 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <MessageSquare size={20} color={colors.textSecondary} />
+            <Text style={[typography.styles.h5, { color: colors.text }]}>개발자에게 피드백</Text>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
+            <TouchableOpacity style={styles.feedbackButton} onPress={sendFeedback}>
+              <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>의견 보내기</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <View style={(styles.section, { marginBottom: 0 })}>
           <View style={styles.sectionHeader}>
-            <Info size={20} color={colors.primary} />
+            <Info size={20} color={colors.textSecondary} />
             <Text style={[typography.styles.h5, { color: colors.text }]}>앱 정보</Text>
           </View>
 
@@ -322,12 +319,12 @@ export default function SettingsScreen() {
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.infoRow}>
               <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>개발자</Text>
-              <Text style={[typography.styles.label, { color: colors.text }]}>냉장고 관리 팀</Text>
+              <Text style={[typography.styles.label, { color: colors.text }]}>주민준</Text>
             </View>
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.infoRow}>
               <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>문의</Text>
-              <Text style={[typography.styles.label, { color: colors.text }]}>support@fridge.app</Text>
+              <Text style={[typography.styles.label, { color: colors.text }]}>jujihong2@gmail.com</Text>
             </View>
           </View>
         </View>
@@ -368,7 +365,7 @@ const createStyles = ({
       marginBottom: spacing.md,
     },
     card: {
-      borderRadius: borderRadius.lg,
+      borderRadius: borderRadius.xl,
       padding: spacing.xl,
     },
     notificationOptions: {
@@ -408,9 +405,7 @@ const createStyles = ({
     feedbackButton: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
       gap: spacing.sm,
-      paddingVertical: spacing.lg,
       borderRadius: borderRadius.md,
     },
     infoRow: {
@@ -427,8 +422,9 @@ const createStyles = ({
       paddingVertical: 40,
     },
     systemResetButton: {
+      marginTop: 4,
       paddingVertical: spacing.md,
-      justifyContent: 'center',
+      // justifyContent: 'center',
       borderTopWidth: 1,
     },
     deleteButton: {

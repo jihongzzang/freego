@@ -1,35 +1,33 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import BottomSheet from '@/components/BottomSheet';
-import { ALL_CATEGORIES, ALL_CATEGORY, AllCategoryType } from '@/constants/categories';
+import { CategoryType } from '@/constants/categories';
 import { getTemplatesByCategory, type IngredientTemplate } from '@/constants/ingredientTemplates';
-import { getCategoryIcon } from '@/utils/getCategoryIcons';
 import { useMemo } from 'react';
 
-interface BulkAddBottomSheetProps {
+interface AddEmojiBottomSheetProps {
   visible: boolean;
   onClose: () => void;
-  selectedCategoryId: AllCategoryType;
-  onCategoryChange: (categoryId: AllCategoryType) => void;
+  selectedCategoryId: CategoryType;
   selectedTemplates: IngredientTemplate[];
   onTemplateToggle: (template: IngredientTemplate) => void;
   onConfirm: () => void;
 }
 
-export default function BulkAddBottomSheet({
+export default function AddEmojiBottomSheet({
   visible,
   onClose,
   selectedCategoryId,
-  onCategoryChange,
   selectedTemplates,
   onTemplateToggle,
   onConfirm,
-}: BulkAddBottomSheetProps) {
+}: AddEmojiBottomSheetProps) {
   const { colors, typography, borderRadius, spacing } = useTheme();
 
+  // ✅ 화면 너비 기반으로 균등 3열 계산
   const screenWidth = Dimensions.get('window').width;
-  const H_PADDING = spacing.md * 2;
-  const GAP = spacing.sm;
+  const H_PADDING = spacing.md * 2; // ScrollView padding 좌우 합
+  const GAP = spacing.sm; // 아이템 간 동일 간격
   const ITEM_WIDTH = (screenWidth - H_PADDING - GAP * 2 - 24) / 3; // 3열 균등 분할
 
   const filteredTemplates = useMemo(() => {
@@ -41,46 +39,15 @@ export default function BulkAddBottomSheet({
   }
 
   return (
-    <BottomSheet maxHeight={600} visible={visible} onClose={onClose} title="한꺼번에 등록">
+    <BottomSheet maxHeight={600} visible={visible} onClose={onClose} title="이모지 추가">
       <View style={styles.container}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           style={{ flex: 1 }}
-          contentContainerStyle={{ padding: spacing.md, gap: spacing.lg }}
+          contentContainerStyle={{ padding: spacing.md }}
         >
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
-            {ALL_CATEGORIES.map((cat) => (
-              <TouchableOpacity
-                key={cat.id}
-                style={[
-                  styles.categoryTab,
-                  {
-                    backgroundColor: selectedCategoryId === cat.id ? colors.primaryLight : colors.surface,
-                    borderColor: selectedCategoryId === cat.id ? colors.primary : colors.border,
-                    paddingHorizontal: spacing.md,
-                    paddingVertical: spacing.xs + 2,
-                    borderRadius: borderRadius.xl,
-                  },
-                ]}
-                onPress={() => onCategoryChange(cat.id)}
-              >
-                {cat.id !== ALL_CATEGORY.id && getCategoryIcon(cat.id, 16)}
-                <Text
-                  style={[
-                    typography.styles.body,
-                    {
-                      color: selectedCategoryId === cat.id ? colors.white : colors.textSecondary,
-                    },
-                  ]}
-                >
-                  {cat.krLabel}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          <View style={[styles.templatesGrid]}>
+          <View style={styles.templatesGrid}>
             {filteredTemplates.map((template) => {
               const isSelected = isTemplateSelected(template);
               return (
@@ -143,9 +110,7 @@ export default function BulkAddBottomSheet({
               ]}
               onPress={onConfirm}
             >
-              <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>
-                {selectedTemplates.length}개 추가하기
-              </Text>
+              <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>추가하기</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -154,28 +119,22 @@ export default function BulkAddBottomSheet({
   );
 }
 
-// 🎨 스타일 정의
+// 🎨 스타일
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     maxHeight: 600,
   },
-  categoryTab: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    borderWidth: 1,
-  },
   templatesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between', // ✅ 가로 간격 균등
+    justifyContent: 'space-between',
   },
   templateItem: {
     alignItems: 'center',
   },
   templateEmoji: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 4,
   },
   confirmButtonContainer: {

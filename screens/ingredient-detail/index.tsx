@@ -13,7 +13,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { Trash2, Edit3, Minus, Check } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/lib/theme';
+import { ColorPalette, useTheme } from '@/lib/theme';
 import { useDialog } from '@/contexts/DialogContext';
 import { useRouter } from '@/hooks/useRouter';
 import { useMVIStore } from '@/mvi/base';
@@ -24,24 +24,40 @@ import { CATEGORIES, findCategoryById } from '@/constants/categories';
 import { STORAGE_LOCATIONS, findStorageLocationById } from '@/constants/storageLocations';
 import { QUICK_SELECT_OPTIONS } from '@/constants/quickSelectOptions';
 import { findStatusById } from '@/constants/itemStatus';
-import { UNITS, findUnitById } from '@/constants/units';
+import { findUnitById } from '@/constants/units';
 import Header from '@/components/Header';
 import FloatingButton from '@/components/FloatingButton';
-import BottomSheet from '@/components/BottomSheet';
-import DatePicker from '@/components/DatePicker';
+import SelectUnitBottomSheet from '@/components/SelectUnitBottomSheet';
+import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
+import { useUnitPicker } from '@/hooks/useUnitPicker';
+import { useExpiryDatePicker } from '@/hooks/useExpiryDatePicker';
+import { type IngredientTemplate } from '@/constants/ingredientTemplates';
+import AddEmojiBottomSheet from '@/components/AddEmojiBottomSheet';
 
 export default function IngredientDetailScreen() {
   const router = useRouter();
-  const { colors, typography, spacing, borderRadius, shadows } = useTheme();
+  const { colors, typography, spacing, borderRadius } = useTheme();
   const { id, mode } = useLocalSearchParams();
   const { alert, confirm } = useDialog();
   const [state, dispatch, effect] = useMVIStore(createIngredientDetailStore);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showPurchaseDatePicker, setShowPurchaseDatePicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showUnitPicker, setShowUnitPicker] = useState(false);
+  const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
+  const [selectedEmoji, setSelectedEmoji] = useState<IngredientTemplate | null>(null);
 
-  const styles = useMemo(() => createStyles({ spacing, borderRadius, shadows }), [spacing, borderRadius]);
+  const unitPicker = useUnitPicker({
+    onUnitChange: (unitId) => handleFieldChange('unit', unitId),
+  });
+
+  // 유통기한 선택 훅
+  const expiryDatePicker = useExpiryDatePicker({
+    onDateConfirm: (formattedDate) => handleFieldChange('expiry_date', formattedDate),
+  });
+
+  // 구매일 선택 훅
+  const purchaseDatePicker = useExpiryDatePicker({
+    onDateConfirm: (formattedDate) => handleFieldChange('purchase_date', formattedDate),
+  });
+
+  const styles = useMemo(() => createStyles({ colors, spacing, borderRadius }), [spacing, borderRadius]);
 
   // 식재료 데이터 로드
   useEffect(() => {
@@ -56,6 +72,19 @@ export default function IngredientDetailScreen() {
       dispatch({ type: 'SET_EDITING', payload: true });
     }
   }, [mode, state.ingredient]);
+
+  // 재료가 로드되면 이모지 상태 초기화
+  useEffect(() => {
+    if (state.ingredient?.emoji && state.editForm.emoji) {
+      // editForm의 emoji를 기반으로 템플릿 찾기
+      const { getTemplatesByCategory } = require('@/constants/ingredientTemplates');
+      const templates = getTemplatesByCategory(state.ingredient.category);
+      const matchedTemplate = templates.find((t: IngredientTemplate) => t.emoji === state.editForm.emoji);
+      if (matchedTemplate) {
+        setSelectedEmoji(matchedTemplate);
+      }
+    }
+  }, [state.ingredient, state.editForm.emoji]);
 
   // Effect 처리
   useEffect(() => {
@@ -130,10 +159,10 @@ export default function IngredientDetailScreen() {
     dispatch({ type: 'UPDATE_INGREDIENT' });
   }
 
-  // 날짜 변경 핸들러
-  function handleDateChange(date: Date) {
-    setSelectedDate(date);
-    // 로컬 타임존을 유지하면서 YYYY-MM-DD 포맷으로 변환
+  // 빠른 선택 핸들러
+  function handleQuickSelect(days: number) {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -141,18 +170,13 @@ export default function IngredientDetailScreen() {
     handleFieldChange('expiry_date', formattedDate);
   }
 
-  // 빠른 선택 핸들러
-  function handleQuickSelect(days: number) {
-    const date = new Date();
-    date.setDate(date.getDate() + days);
-    setSelectedDate(date);
-    // 로컬 타임존을 유지하면서 YYYY-MM-DD 포맷으로 변환
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
-    handleFieldChange('expiry_date', formattedDate);
-    setShowDatePicker(false);
+  function handleEmojiSelect(template: IngredientTemplate) {
+    setSelectedEmoji(template);
+    handleFieldChange('emoji', template.emoji);
+  }
+
+  function handleEmojiConfirm() {
+    setIsEmojiPickerVisible(false);
   }
 
   if (!state.ingredient) {
@@ -181,12 +205,28 @@ export default function IngredientDetailScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
-          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            <View style={[state.isEditing ? styles.editCard : styles.card, { backgroundColor: colors.surface }]}>
+          <ScrollView
+            style={styles.content}
+            contentContainerStyle={{ paddingBottom: state.isEditing ? 200 : 24 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <View>
               {state.isEditing ? (
                 <View style={styles.editSection}>
                   <View style={styles.inputGroup}>
-                    <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>이름</Text>
+                    <View style={styles.inputHeader}>
+                      <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>이름</Text>
+                      <TouchableOpacity style={styles.emojiButton} onPress={() => setIsEmojiPickerVisible(true)}>
+                        {selectedEmoji ? (
+                          <View style={styles.emojiButtonContent}>
+                            <Text style={typography.styles.bodySmall}>{selectedEmoji.emoji}</Text>
+                            <Text style={[typography.styles.bodySmall, { color: colors.textTertiary }]}>+</Text>
+                          </View>
+                        ) : (
+                          <Text style={[typography.styles.bodySmall, { color: colors.textTertiary }]}>이모지 +</Text>
+                        )}
+                      </TouchableOpacity>
+                    </View>
                     <TextInput
                       style={[
                         styles.input,
@@ -233,7 +273,7 @@ export default function IngredientDetailScreen() {
                                 typography.styles.bodySemibold,
                                 { color: colors.textSecondary },
                                 state.editForm.category === cat.id && {
-                                  color: colors.primary,
+                                  color: colors.white,
                                 },
                               ]}
                             >
@@ -277,7 +317,7 @@ export default function IngredientDetailScreen() {
                             justifyContent: 'space-between',
                           },
                         ]}
-                        onPress={() => setShowUnitPicker(true)}
+                        onPress={unitPicker.open}
                       >
                         <Text
                           style={[
@@ -291,7 +331,7 @@ export default function IngredientDetailScreen() {
                             ? findUnitById(state.editForm.unit as any)?.krLabel || state.editForm.unit
                             : '선택'}
                         </Text>
-                        <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
+                        <Ionicons name="chevron-down" size={20} color={colors.textTertiary} />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -300,7 +340,6 @@ export default function IngredientDetailScreen() {
                     <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
                       <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>구매일</Text>
 
-                      {/* 등록일과 동일 체크박스 */}
                       <TouchableOpacity
                         style={styles.checkboxRow}
                         onPress={() => {
@@ -318,7 +357,10 @@ export default function IngredientDetailScreen() {
                           style={[
                             styles.checkbox,
                             {
-                              borderColor: colors.border,
+                              borderColor:
+                                state.editForm.purchase_date === new Date().toISOString().split('T')[0]
+                                  ? colors.primary
+                                  : colors.border,
                               backgroundColor:
                                 state.editForm.purchase_date === new Date().toISOString().split('T')[0]
                                   ? colors.primary
@@ -330,11 +372,10 @@ export default function IngredientDetailScreen() {
                             <Ionicons name="checkmark" size={16} color="#FFFFFF" />
                           )}
                         </View>
-                        <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>등록일과 동일</Text>
+                        <Text style={[typography.styles.bodySmall, { color: colors.textTertiary }]}>등록일과 동일</Text>
                       </TouchableOpacity>
                     </View>
 
-                    {/* 날짜 선택 버튼 */}
                     <TouchableOpacity
                       style={[
                         styles.dateButton,
@@ -343,7 +384,7 @@ export default function IngredientDetailScreen() {
                           borderColor: colors.border,
                         },
                       ]}
-                      onPress={() => setShowPurchaseDatePicker(true)}
+                      onPress={() => purchaseDatePicker.open(state.editForm.purchase_date || new Date())}
                     >
                       <Ionicons name="calendar-outline" size={20} color={colors.textSecondary} />
                       <Text
@@ -362,7 +403,6 @@ export default function IngredientDetailScreen() {
                   <View style={styles.inputGroup}>
                     <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>유통기한</Text>
 
-                    {/* 빠른 선택 옵션 */}
                     <View style={styles.quickSelectContainer}>
                       {QUICK_SELECT_OPTIONS.map((option) => (
                         <TouchableOpacity
@@ -391,7 +431,7 @@ export default function IngredientDetailScreen() {
                           borderColor: colors.border,
                         },
                       ]}
-                      onPress={() => setShowDatePicker(true)}
+                      onPress={() => expiryDatePicker.open(state.editForm.expiry_date || new Date())}
                     >
                       <Ionicons name="calendar-outline" size={20} color={colors.textSecondary} />
                       <Text
@@ -431,7 +471,7 @@ export default function IngredientDetailScreen() {
                               typography.styles.bodySemibold,
                               { color: colors.textSecondary },
                               state.editForm.storage_location === loc.id && {
-                                color: colors.primary,
+                                color: colors.white,
                               },
                             ]}
                           >
@@ -551,7 +591,6 @@ export default function IngredientDetailScreen() {
           </ScrollView>
         </KeyboardAvoidingView>
 
-        {/* 플로팅 버튼 */}
         {state.isEditing ? (
           <FloatingButton
             onPress={handleUpdate}
@@ -570,102 +609,51 @@ export default function IngredientDetailScreen() {
         )}
       </View>
 
-      {/* Purchase DatePicker BottomSheet */}
-      <BottomSheet
-        maxHeight={600}
-        visible={showPurchaseDatePicker}
-        onClose={() => setShowPurchaseDatePicker(false)}
+      <SelectDateBottomSheet
+        visible={purchaseDatePicker.visible}
+        onClose={purchaseDatePicker.close}
         title="구매일 선택"
-      >
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={styles.datePickerBottomSheet}
-          showsVerticalScrollIndicator={false}
-        >
-          <DatePicker
-            value={state.editForm.purchase_date ? new Date(state.editForm.purchase_date) : new Date()}
-            onDateSelect={(date) => {
-              handleFieldChange('purchase_date', date.toISOString().split('T')[0]);
-            }}
-          />
-          <TouchableOpacity
-            style={[styles.datePickerConfirm, { backgroundColor: colors.primary }]}
-            onPress={() => setShowPurchaseDatePicker(false)}
-          >
-            <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>확인</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </BottomSheet>
+        selectedDate={purchaseDatePicker.selectedDate}
+        onDateChange={purchaseDatePicker.handleDateChange}
+        onConfirm={purchaseDatePicker.handleConfirm}
+      />
 
-      {/* Expiry DatePicker BottomSheet */}
-      <BottomSheet
-        maxHeight={600}
-        visible={showDatePicker}
-        onClose={() => setShowDatePicker(false)}
+      <SelectDateBottomSheet
+        visible={expiryDatePicker.visible}
+        onClose={expiryDatePicker.close}
         title="유통기한 선택"
-      >
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={styles.datePickerBottomSheet}
-          showsVerticalScrollIndicator={false}
-        >
-          <DatePicker value={selectedDate} onDateSelect={handleDateChange} />
-          <TouchableOpacity
-            style={[styles.datePickerConfirm, { backgroundColor: colors.primary }]}
-            onPress={() => setShowDatePicker(false)}
-          >
-            <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>확인</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </BottomSheet>
+        selectedDate={expiryDatePicker.selectedDate}
+        onDateChange={expiryDatePicker.handleDateChange}
+        onConfirm={expiryDatePicker.handleConfirm}
+      />
 
-      {/* Unit Picker BottomSheet */}
-      <BottomSheet maxHeight={400} visible={showUnitPicker} onClose={() => setShowUnitPicker(false)} title="단위 선택">
-        <View style={styles.unitPickerContainer}>
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.unitPickerContent}>
-            {UNITS.map((unit) => (
-              <TouchableOpacity
-                key={unit.id}
-                style={[
-                  styles.unitItem,
-                  {
-                    backgroundColor: state.editForm.unit === unit.id ? colors.primaryLight : colors.surface,
-                    borderColor: state.editForm.unit === unit.id ? colors.primary : colors.border,
-                  },
-                ]}
-                onPress={() => {
-                  handleFieldChange('unit', unit.id);
-                  setShowUnitPicker(false);
-                }}
-              >
-                <Text
-                  style={[
-                    typography.styles.bodyMedium,
-                    {
-                      color: state.editForm.unit === unit.id ? colors.primary : colors.text,
-                    },
-                  ]}
-                >
-                  {unit.krLabel}
-                </Text>
-                {state.editForm.unit === unit.id && <Ionicons name="checkmark" size={20} color={colors.primary} />}
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      </BottomSheet>
+      <SelectUnitBottomSheet
+        visible={unitPicker.visible}
+        onClose={unitPicker.close}
+        selectedUnit={state.editForm.unit as any}
+        onUnitSelect={unitPicker.handleUnitSelect}
+      />
+
+      <AddEmojiBottomSheet
+        visible={isEmojiPickerVisible}
+        onClose={() => setIsEmojiPickerVisible(false)}
+        selectedCategoryId={state.editForm.category}
+        selectedTemplates={selectedEmoji ? [selectedEmoji] : []}
+        onTemplateToggle={handleEmojiSelect}
+        onConfirm={handleEmojiConfirm}
+      />
     </>
   );
 }
 
 const createStyles = ({
+  colors,
   spacing,
   borderRadius,
-  shadows,
 }: {
+  colors: ColorPalette;
   spacing: typeof import('@/lib/theme').spacing;
   borderRadius: typeof import('@/lib/theme').borderRadius;
-  shadows: typeof import('@/lib/theme').shadows;
 }) =>
   StyleSheet.create({
     container: {
@@ -674,18 +662,6 @@ const createStyles = ({
     content: {
       flex: 1,
       padding: spacing.xl,
-    },
-    card: {
-      marginBottom: spacing.xl,
-      borderRadius: borderRadius.lg,
-      padding: spacing.xl,
-      ...shadows.md,
-    },
-    editCard: {
-      borderRadius: borderRadius.lg,
-      padding: spacing.xl,
-      marginBottom: 84,
-      ...shadows.md,
     },
     detailSection: {
       gap: spacing.xl,
@@ -754,9 +730,27 @@ const createStyles = ({
       alignItems: 'center',
       gap: 4,
     },
+    emojiSelectButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 14,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+    },
+    emojiSelectContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    selectedEmojiText: {
+      fontSize: 24,
+    },
     actionButtons: {
       flexDirection: 'row',
       gap: spacing.md,
+      marginTop: spacing.xxl,
     },
     consumeButton: {
       flex: 1,
@@ -764,7 +758,7 @@ const createStyles = ({
       alignItems: 'center',
       justifyContent: 'center',
       paddingVertical: spacing.lg,
-      borderRadius: borderRadius.md,
+      borderRadius: borderRadius.xl,
       gap: spacing.sm,
     },
     deleteButton: {
@@ -773,7 +767,7 @@ const createStyles = ({
       alignItems: 'center',
       justifyContent: 'center',
       paddingVertical: spacing.lg,
-      borderRadius: borderRadius.md,
+      borderRadius: borderRadius.xl,
       gap: spacing.sm,
     },
     dateButton: {
@@ -782,7 +776,7 @@ const createStyles = ({
       gap: spacing.sm,
       paddingHorizontal: spacing.lg,
       paddingVertical: 14,
-      borderRadius: borderRadius.md,
+      borderRadius: borderRadius.xl,
       borderWidth: 1,
     },
     quickSelectContainer: {
@@ -808,23 +802,6 @@ const createStyles = ({
       borderRadius: borderRadius.md,
       alignItems: 'center',
     },
-    unitPickerContainer: {
-      flex: 1,
-      maxHeight: 400,
-    },
-    unitPickerContent: {
-      padding: spacing.md,
-      gap: spacing.xs,
-    },
-    unitItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: spacing.lg,
-      paddingVertical: spacing.md,
-      borderRadius: borderRadius.md,
-      borderWidth: 1,
-    },
     checkboxRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -837,5 +814,25 @@ const createStyles = ({
       borderWidth: 2,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    inputHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    emojiButton: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      backgroundColor: colors.surface,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    emojiButtonContent: {
+      width: 48,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.xs,
     },
   });

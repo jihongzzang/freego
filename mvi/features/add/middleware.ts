@@ -102,7 +102,7 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
         await storage.addIngredient({
           name: state.form.name,
           category: state.form.category,
-          emoji: categoryDefaultEmojis[state.form.category] || '🍴',
+          emoji: state.form.emoji || categoryDefaultEmojis[state.form.category] || '🍴',
           quantity: state.form.quantity && state.form.quantity.trim() ? parseInt(state.form.quantity) : undefined,
           unit: state.form.unit && state.form.unit.trim() ? (state.form.unit as any) : undefined,
           registration_date: registrationDate,

@@ -20,6 +20,8 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export type ColorPalette = {
+  white: string;
+  black: string;
   background: string;
   surface: string;
   surfaceSecondary: string;
@@ -39,15 +41,19 @@ export type ColorPalette = {
   border: string;
   borderLight: string;
   overlay: string;
+  gray: string;
+  grayLight: string;
 };
 
 export const Colors: Record<'light' | 'dark', ColorPalette> = {
   light: {
+    white: '#FFFFFF',
+    black: '#000000',
     background: '#F9FAFB',
     surface: '#FFFFFF',
     surfaceSecondary: '#F2F4F6',
-    primary: '#2563EB',
-    primaryLight: '#EFF6FF',
+    primary: '#66C08A',
+    primaryLight: '#7BD9A3',
     secondary: '#FF6B00',
     secondaryLight: '#FFF5E6',
     danger: '#F04452',
@@ -62,13 +68,17 @@ export const Colors: Record<'light' | 'dark', ColorPalette> = {
     border: '#E5E7EB',
     borderLight: '#F2F4F6',
     overlay: 'rgba(0, 0, 0, 0.5)',
+    gray: '#6B7280',
+    grayLight: '#F3F4F6',
   },
   dark: {
+    white: '#FFFFFF',
+    black: '#000000',
     background: '#121212',
     surface: '#1E1E1E',
     surfaceSecondary: '#2C2C2C',
-    primary: '#3D8BFF',
-    primaryLight: '#1A3A5C',
+    primary: '#4CA777',
+    primaryLight: '#66C08A',
     secondary: '#FF8C3D',
     secondaryLight: '#3D2A1A',
     danger: '#FF5C6C',
@@ -83,6 +93,8 @@ export const Colors: Record<'light' | 'dark', ColorPalette> = {
     border: '#3D3D3D',
     borderLight: '#2C2C2C',
     overlay: 'rgba(0, 0, 0, 0.7)',
+    gray: '#9CA3AF',
+    grayLight: '#374151',
   },
 };
 
@@ -219,6 +231,12 @@ export const typography = {
       fontWeight: '500' as const,
       lineHeight: scaleFontSize(21),
     },
+    bodySmallSemiBold: {
+      fontFamily: 'Pretendard-Medium',
+      fontSize: scaleFontSize(14),
+      fontWeight: '600' as const,
+      lineHeight: scaleFontSize(21),
+    },
     // 캡션 스타일
     caption: {
       fontFamily: 'Pretendard-Regular',
@@ -238,12 +256,18 @@ export const typography = {
       fontWeight: '700' as const,
       lineHeight: scaleFontSize(18),
     },
+    smallCaption: {
+      fontFamily: 'Pretendard-Regular',
+      fontSize: scaleFontSize(11),
+      fontWeight: '400' as const,
+      lineHeight: scaleFontSize(16),
+    },
     // 버튼 스타일
     button: {
       fontFamily: 'Pretendard-SemiBold',
-      fontSize: scaleFontSize(16),
+      fontSize: scaleFontSize(17),
       fontWeight: '600' as const,
-      lineHeight: scaleFontSize(19),
+      lineHeight: scaleFontSize(25),
     },
     buttonSmall: {
       fontFamily: 'Pretendard-SemiBold',

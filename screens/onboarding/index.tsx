@@ -41,13 +41,15 @@ export default function OnboardingScreen() {
       icon: <ShoppingCart size={80} color="#ffffff" />,
       title: '장보기도 간편하게',
       description: '다 떨어진 재료는 손쉽게\n장보기 목록에 추가해요',
-      color: '#f59e0b',
+      // color: '#f59e0b',
+      color: '#10b981',
     },
     {
       icon: <Sparkles size={80} color="#ffffff" />,
       title: '시작해볼까요?',
       description: '현명한 소비 습관을 만들고\n지구를 지키는 작은 실천을 시작해요',
-      color: '#8b5cf6',
+      // color: '#8b5cf6',
+      color: '#10b981',
     },
   ];
 
@@ -152,9 +154,10 @@ export default function OnboardingScreen() {
       ? LIFESTYLE_PACKAGES.find((pkg) => pkg.id === state.selectedLifestyle)
       : null;
 
+    // color: '',
     return (
       <GestureHandlerRootView style={styles.container}>
-        <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.gradient}>
+        <LinearGradient colors={['#10b981', '#10b981']} style={styles.gradient}>
           {!state.selectedLifestyle ? (
             // 1단계: 라이프스타일 선택
             <View style={[styles.packageChoiceContainer, { paddingTop: insets.top + 20 }]}>
@@ -185,24 +188,24 @@ export default function OnboardingScreen() {
                     >
                       <View style={styles.lifestyleCardLeft}>
                         <View style={styles.lifestyleIconBadge}>
-                          <Text style={styles.lifestyleIcon}>{lifestyle.icon}</Text>
+                          <Text style={typography.styles.h3}>{lifestyle.icon}</Text>
                         </View>
                         <View style={styles.lifestyleInfo}>
                           <Text style={[typography.styles.h6, styles.lifestyleLabel]}>{lifestyle.krLabel}</Text>
-                          <Text style={[typography.styles.caption, styles.lifestyleDesc]} numberOfLines={2}>
+                          <Text style={[typography.styles.bodySmall, styles.lifestyleDesc]} numberOfLines={2}>
                             {lifestyle.description}
                           </Text>
                         </View>
                       </View>
                       <View style={styles.arrowIcon}>
-                        <Text style={styles.arrowText}>›</Text>
+                        <Text style={[typography.styles.h2, styles.arrowText]}>›</Text>
                       </View>
                     </TouchableOpacity>
                   ))}
                 </View>
 
                 <TouchableOpacity style={styles.skipPackageButton} onPress={handleSkipPackage} activeOpacity={0.8}>
-                  <Text style={[typography.styles.body, styles.skipPackageText]}>건너뛰고 직접 등록할게요</Text>
+                  <Text style={[typography.styles.bodySemibold, styles.skipPackageText]}>건너뛰고 직접 등록할게요</Text>
                 </TouchableOpacity>
               </ScrollView>
             </View>
@@ -217,17 +220,17 @@ export default function OnboardingScreen() {
                   style={styles.backButton}
                   onPress={() => dispatch({ type: 'SELECT_LIFESTYLE', payload: null as any })}
                 >
-                  <Text style={styles.backButtonText}>‹</Text>
+                  <Text style={[typography.styles.h1, styles.backButtonText]}>‹</Text>
                 </TouchableOpacity>
                 <View style={styles.selectedPackageInfo}>
-                  <Text style={styles.selectedPackageIcon}>{selectedPackage?.icon}</Text>
-                  <Text style={[typography.styles.h1, styles.confirmTitle]}>{selectedPackage?.krLabel}</Text>
+                  <Text style={typography.styles.h3}>{selectedPackage?.icon}</Text>
+                  <Text style={[typography.styles.h2, styles.confirmTitle]}>{selectedPackage?.krLabel}</Text>
                 </View>
               </View>
 
               <Text style={[typography.styles.h5, styles.confirmDescription]}>기본 재료를 자동으로 추가할까요?</Text>
 
-              <View style={styles.ingredientsCard}>
+              <View style={[styles.ingredientsCard, { ...shadows.lg }]}>
                 <View style={styles.ingredientsCardHeader}>
                   <Text style={[typography.styles.bodySemibold, styles.ingredientsCardTitle]}>
                     포함된 재료 {selectedPackage?.ingredients.length}개
@@ -236,7 +239,7 @@ export default function OnboardingScreen() {
                 <View style={styles.ingredientsGrid}>
                   {selectedPackage?.ingredients.map((item, index) => (
                     <View key={index} style={styles.ingredientChip}>
-                      <Text style={[typography.styles.caption, styles.ingredientChipText]}>{item.name}</Text>
+                      <Text style={[typography.styles.bodySmall, styles.ingredientChipText]}>{item.name}</Text>
                     </View>
                   ))}
                 </View>
@@ -268,14 +271,12 @@ export default function OnboardingScreen() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <LinearGradient colors={[currentStep.color, currentStep.color + 'dd']} style={styles.gradient}>
-        {/* 상단 고정: 건너뛰기 버튼 */}
         {state.currentStep < steps.length - 1 && (
           <TouchableOpacity style={[styles.skipButton, { top: insets.top + 10 }]} onPress={handleSkip}>
             <Text style={[typography.styles.bodySemibold, styles.skipText]}>건너뛰기</Text>
           </TouchableOpacity>
         )}
 
-        {/* 가운데 컨텐츠: 캐러셀 */}
         <GestureDetector gesture={panGesture}>
           <View style={styles.contentWrapper}>
             <Animated.View style={[styles.carouselContainer, animatedStyle]}>
@@ -293,7 +294,6 @@ export default function OnboardingScreen() {
           </View>
         </GestureDetector>
 
-        {/* 하단 고정: pagination과 버튼 */}
         <View style={styles.footer}>
           <View style={styles.pagination}>
             {steps.map((_, dotIndex) => (
@@ -305,7 +305,7 @@ export default function OnboardingScreen() {
           </View>
 
           <TouchableOpacity style={styles.nextButton} onPress={handleNext} activeOpacity={0.8}>
-            <Text style={[typography.styles.h5, styles.nextButtonText]}>
+            <Text style={[typography.styles.h5, { color: '#4E5968' }]}>
               {state.currentStep < steps.length - 1 ? '다음' : '시작하기'}
             </Text>
           </TouchableOpacity>
@@ -354,7 +354,7 @@ const createStyles = ({
     slideContent: {
       justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: 40,
+      paddingHorizontal: 16,
       height: '100%',
     },
     iconContainer: {
@@ -378,8 +378,8 @@ const createStyles = ({
     footer: {
       position: 'absolute',
       bottom: 60,
-      left: 40,
-      right: 40,
+      left: 20,
+      right: 20,
       alignItems: 'center',
       gap: spacing.xxxl,
     },
@@ -400,15 +400,15 @@ const createStyles = ({
     },
     nextButton: {
       width: '100%',
+      flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: '#ffffff',
       paddingVertical: spacing.lg,
-      paddingHorizontal: spacing.xxxl,
-      borderRadius: borderRadius.lg,
+      paddingHorizontal: spacing.sm,
+      borderRadius: borderRadius.xl,
       gap: spacing.sm,
-      minWidth: 160,
       ...shadows.lg,
     },
     nextButtonText: {},
@@ -432,15 +432,11 @@ const createStyles = ({
       color: '#ffffff',
       textAlign: 'left',
       marginBottom: spacing.md,
-      fontWeight: '800',
-      fontSize: 32,
     },
     packageDescription: {
       color: '#ffffff',
       textAlign: 'left',
       opacity: 0.9,
-      fontSize: 17,
-      fontWeight: '500',
     },
     lifestyleList: {
       gap: spacing.lg,
@@ -463,27 +459,20 @@ const createStyles = ({
     lifestyleIconBadge: {
       width: 64,
       height: 64,
-      borderRadius: borderRadius.lg,
+      borderRadius: borderRadius.xl,
       backgroundColor: '#f8f9ff',
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    lifestyleIcon: {
-      fontSize: 36,
     },
     lifestyleInfo: {
       flex: 1,
       gap: spacing.xs,
     },
     lifestyleLabel: {
-      fontSize: 17,
-      fontWeight: '600',
-      color: '#1f2937',
+      color: '#4E5968',
     },
     lifestyleDesc: {
-      fontSize: 13,
-      color: '#6b7280',
-      lineHeight: 18,
+      color: '#9CA3AF',
     },
     arrowIcon: {
       width: 24,
@@ -492,9 +481,7 @@ const createStyles = ({
       justifyContent: 'center',
     },
     arrowText: {
-      fontSize: 28,
       color: '#d1d5db',
-      fontWeight: '300',
     },
     skipPackageButton: {
       paddingVertical: spacing.xl,
@@ -504,7 +491,6 @@ const createStyles = ({
     skipPackageText: {
       color: '#ffffff',
       opacity: 0.9,
-      fontSize: 16,
     },
     // 패키지 확인 화면
     confirmHeaderSection: {
@@ -522,7 +508,6 @@ const createStyles = ({
       justifyContent: 'center',
     },
     backButtonText: {
-      fontSize: 32,
       color: '#ffffff',
       marginTop: -4,
     },
@@ -537,15 +522,11 @@ const createStyles = ({
     },
     confirmTitle: {
       color: '#ffffff',
-      fontSize: 28,
-      fontWeight: '700',
     },
     confirmDescription: {
       color: '#ffffff',
       opacity: 0.9,
       marginBottom: spacing.xxxl,
-      fontSize: 17,
-      fontWeight: '500',
     },
     ingredientsCard: {
       backgroundColor: '#ffffff',
@@ -557,7 +538,6 @@ const createStyles = ({
       marginBottom: spacing.lg,
     },
     ingredientsCardTitle: {
-      fontSize: 16,
       color: '#1f2937',
     },
     ingredientsGrid: {
@@ -572,30 +552,26 @@ const createStyles = ({
       borderRadius: borderRadius.full,
     },
     ingredientChipText: {
-      fontSize: 13,
       color: '#4b5563',
     },
     confirmButtons: {
       gap: spacing.md,
     },
     primaryButton: {
-      backgroundColor: '#ffffff',
-      borderRadius: borderRadius.lg,
+      backgroundColor: '#66C08A',
+      borderRadius: borderRadius.xl,
       paddingVertical: spacing.xl,
       alignItems: 'center',
     },
     primaryButtonText: {
-      color: '#6366f1',
-      fontSize: 16,
+      color: '#FFFFFF',
     },
     secondaryButton: {
       paddingVertical: spacing.xl,
       alignItems: 'center',
-      borderRadius: borderRadius.lg,
-      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      borderRadius: borderRadius.xl,
     },
     secondaryButtonText: {
-      color: '#ffffff',
-      fontSize: 16,
+      color: '#FFFFFF',
     },
   });

@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, Platfor
 import { useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
-import { Minus, ChevronDown, ChevronUp, Edit3, Grid3x3, Receipt, QrCode } from 'lucide-react-native';
+import { Minus, ChevronDown, ChevronUp, Edit3, QrCode, Grid3x3 } from 'lucide-react-native';
 import { ColorPalette, useTheme } from '@/lib/theme';
 import { useMVIStore } from '@/mvi/base';
 import { createIngredientsStore, Ingredient } from '@/mvi/features/ingredients';
@@ -12,11 +12,11 @@ import { getStatusColor } from '@/utils/getStatusColors';
 import { CATEGORIES, CategoryType, findCategoryById } from '@/constants/categories';
 import { STORAGE_LOCATIONS, StorageLocationType, findStorageLocationById } from '@/constants/storageLocations';
 import Header from '@/components/Header';
-import FloatingButton from '@/components/FloatingButton';
 import { findUnitById } from '@/constants/units';
-import BulkAddBottomSheet from '@/components/BulkAddBottomSheet';
-import { useBulkAdd } from '@/hooks/useBulkAdd';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FloatingButton from '@/components/FloatingButton';
+import { useBulkAdd } from '@/hooks/useBulkAdd';
+import BulkAddBottomSheet from '@/components/BulkAddBottomSheet';
 
 type ViewMode = 'category' | 'storage';
 
@@ -49,7 +49,7 @@ export default function IngredientsScreen() {
 
   const inset = useSafeAreaInsets();
 
-  // Bulk Add Hook
+  // BulkAdd 훅 - 성공 시 데이터 자동 로드
   const bulkAdd = useBulkAdd(() => {
     dispatch({ type: 'LOAD_INGREDIENTS' });
   });
@@ -184,7 +184,7 @@ export default function IngredientsScreen() {
                 : `${item.quantity} · ${findStorageLocationById(item.storage_location)?.krLabel}`
               : findStorageLocationById(item.storage_location)?.krLabel}
           </Text>
-          {/* 유통기한 정보 */}
+
           {item.expiry_date ? (
             <Text
               style={[
@@ -205,7 +205,6 @@ export default function IngredientsScreen() {
                 {
                   color: colors.textTertiary,
                   marginTop: spacing.xs,
-                  fontStyle: 'italic',
                 },
               ]}
             >
@@ -215,16 +214,15 @@ export default function IngredientsScreen() {
         </View>
       </TouchableOpacity>
 
-      {/* 액션 버튼 그룹 */}
       <View style={styles.actionButtons}>
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: colors.primaryLight }]}
+          style={[styles.actionButton, { backgroundColor: colors.surfaceSecondary }]}
           onPress={(e) => {
             e.stopPropagation();
             dispatch({ type: 'NAVIGATE_TO_DETAIL_EDIT', payload: item.id });
           }}
         >
-          <Edit3 size={16} color={colors.primary} />
+          <Edit3 size={16} color={colors.textSecondary} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: colors.surfaceSecondary }]}
@@ -233,7 +231,7 @@ export default function IngredientsScreen() {
             quickDeduct(item.id);
           }}
         >
-          <Minus size={16} color={colors.text} />
+          <Minus size={16} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
     </View>
@@ -244,7 +242,7 @@ export default function IngredientsScreen() {
       <Animated.View
         style={{
           transform: [{ translateY: headerTranslateY }],
-          backgroundColor: colors.background,
+          backgroundColor: colors.surface,
           position: 'absolute',
           top: 0,
           left: 0,
@@ -256,12 +254,11 @@ export default function IngredientsScreen() {
           <Header title="재료 관리" />
         </Animated.View>
 
-        {/* 탭 */}
         <View
           style={[
             styles.tabContainer,
             {
-              backgroundColor: colors.background,
+              backgroundColor: colors.surface,
             },
           ]}
         >
@@ -335,15 +332,15 @@ export default function IngredientsScreen() {
                       <Text style={[typography.styles.h6, { color: colors.text }]}>{categoryItem?.krLabel}</Text>
                     </View>
                     <View style={styles.categoryHeaderRight}>
-                      <View style={[styles.categoryBadge, { backgroundColor: colors.primaryLight }]}>
-                        <Text style={[typography.styles.captionBold, { color: colors.primary }]}>
+                      <View style={[styles.categoryBadge, { backgroundColor: colors.textTertiary }]}>
+                        <Text style={[typography.styles.captionBold, { color: colors.white }]}>
                           {categoryItems.length}
                         </Text>
                       </View>
                       {isCollapsed ? (
-                        <ChevronDown size={20} color={colors.textSecondary} />
+                        <ChevronDown size={20} color={colors.textTertiary} />
                       ) : (
-                        <ChevronUp size={20} color={colors.textSecondary} />
+                        <ChevronUp size={20} color={colors.textTertiary} />
                       )}
                     </View>
                   </TouchableOpacity>
@@ -382,12 +379,12 @@ export default function IngredientsScreen() {
                     activeOpacity={0.7}
                   >
                     <View style={styles.categoryHeaderLeft}>
-                      {getStorageLocationIcon(storageId, 20, colors.text)}
+                      {getStorageLocationIcon(storageId, 20)}
                       <Text style={[typography.styles.h6, { color: colors.text }]}>{storageItem?.krLabel}</Text>
                     </View>
                     <View style={styles.categoryHeaderRight}>
                       <View style={[styles.categoryBadge, { backgroundColor: colors.primaryLight }]}>
-                        <Text style={[typography.styles.captionBold, { color: colors.primary }]}>
+                        <Text style={[typography.styles.captionBold, { color: colors.white }]}>
                           {storageItems.length}
                         </Text>
                       </View>
@@ -419,31 +416,35 @@ export default function IngredientsScreen() {
           </View>
         )}
       </Animated.ScrollView>
+
       <FloatingButton
         menuItems={[
           {
+            icon: <QrCode size={24} color="#FFFFFF" />,
+            label: '영수증으로 재료 등록',
+            onPress: bulkAdd.handleRegisterReceipt,
+            labelColor: colors.white,
+            backgroundColor: colors.primary,
+          },
+          {
             icon: <Edit3 size={24} color="#FFFFFF" />,
-            label: '직접 등록',
-            onPress: () => dispatch({ type: 'NAVIGATE_TO_ADD' }),
+            label: '직접 재료 등록',
+            onPress: () => {
+              router.push('/add');
+            },
+            labelColor: colors.white,
+            backgroundColor: colors.primary,
           },
           {
             icon: <Grid3x3 size={24} color="#FFFFFF" />,
-            label: '한꺼번에 등록',
-            onPress: () => {
-              bulkAdd.open();
-            },
-            backgroundColor: colors.secondary,
-          },
-          {
-            icon: <QrCode size={24} color="#FFFFFF" />,
-            label: '영수증으로 등록',
-            onPress: () => {
-              bulkAdd.handleRegisterReceipt();
-            },
-            backgroundColor: colors.danger,
+            label: '한꺼번에 재료 등록',
+            onPress: bulkAdd.open,
+            labelColor: colors.white,
+            backgroundColor: colors.primary,
           },
         ]}
       />
+
       <BulkAddBottomSheet
         visible={bulkAdd.isVisible}
         onClose={bulkAdd.close}
@@ -516,7 +517,7 @@ const createStyles = ({
       borderRadius: borderRadius.full,
     },
     listCard: {
-      borderRadius: borderRadius.lg,
+      borderRadius: borderRadius.xl,
       overflow: 'hidden',
     },
     ingredientItem: {
@@ -557,7 +558,7 @@ const createStyles = ({
     actionButton: {
       width: 32,
       height: 32,
-      borderRadius: borderRadius.lg,
+      borderRadius: borderRadius.xl,
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -570,7 +571,7 @@ const createStyles = ({
     },
     emptyCategory: {
       padding: spacing.lg,
-      borderRadius: borderRadius.lg,
+      borderRadius: borderRadius.xl,
       alignItems: 'center',
       justifyContent: 'center',
     },

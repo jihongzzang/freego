@@ -103,7 +103,6 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surface }]}>
-      {/* 헤더: 월/년 표시 및 네비게이션 */}
       <View style={styles.header}>
         <TouchableOpacity onPress={goToPreviousMonth} style={styles.navButton}>
           <ChevronLeft size={20} color={colors.text} />
@@ -118,7 +117,6 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
         </TouchableOpacity>
       </View>
 
-      {/* 요일 헤더 */}
       <View style={styles.weekHeader}>
         {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
           <View key={day} style={styles.weekDay}>
@@ -136,7 +134,6 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
         ))}
       </View>
 
-      {/* 날짜 그리드 */}
       <View style={styles.daysGrid}>
         {calendarDays.map((date, index) => {
           if (!date) {
@@ -181,12 +178,14 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
                 ]}
               >
                 <Text
-                  style={{
-                    fontSize: 16,
-                    color: textColor,
-                    fontWeight: selected ? '600' : '400',
-                    textAlign: 'center',
-                  }}
+                  style={[
+                    typography.styles.body,
+                    {
+                      color: textColor,
+                      fontWeight: selected ? '600' : '400',
+                      textAlign: 'center',
+                    },
+                  ]}
                 >
                   {date.getDate()}
                 </Text>
@@ -208,7 +207,7 @@ const createStyles = ({
 }) =>
   StyleSheet.create({
     container: {
-      borderRadius: borderRadius.lg,
+      borderRadius: borderRadius.xl,
       padding: spacing.lg,
       gap: spacing.md,
     },

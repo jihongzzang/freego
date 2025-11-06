@@ -58,6 +58,7 @@ export const ingredientDetailMiddleware: Middleware<
               ingredient,
               editForm: {
                 name: data.name,
+                emoji: data.emoji,
                 category: data.category,
                 quantity: data.quantity?.toString() || '',
                 unit: data.unit || '',
@@ -174,6 +175,7 @@ export const ingredientDetailMiddleware: Middleware<
       try {
         await storage.updateIngredient(state.ingredient.id, {
           name: state.editForm.name,
+          emoji: state.editForm.emoji,
           category: state.editForm.category,
           quantity: state.editForm.quantity ? parseInt(state.editForm.quantity) || undefined : undefined,
           unit: state.editForm.unit as any,
@@ -199,6 +201,7 @@ export const ingredientDetailMiddleware: Middleware<
               ingredient,
               editForm: {
                 name: data.name,
+                emoji: data.emoji,
                 category: data.category,
                 quantity: data.quantity?.toString() || '',
                 unit: data.unit || '',

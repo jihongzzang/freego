@@ -12,6 +12,7 @@ import { UnitType } from '@/constants/units';
  */
 export interface AddFormData {
   name: string;
+  emoji?: string;
   category: CategoryType;
   quantity?: string;
   unit?: UnitType;

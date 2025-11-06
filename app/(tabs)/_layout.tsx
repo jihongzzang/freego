@@ -10,6 +10,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      detachInactiveScreens={false}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
@@ -52,9 +53,7 @@ export default function TabLayout() {
         options={{
           title: '재료 관리',
           sceneStyle: { backgroundColor: colors.background },
-          tabBarIcon: ({ size, color }) => (
-            <Package size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Package size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -62,9 +61,7 @@ export default function TabLayout() {
         options={{
           title: '장보기',
           sceneStyle: { backgroundColor: colors.background },
-          tabBarIcon: ({ size, color }) => (
-            <Package size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Package size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -72,9 +69,7 @@ export default function TabLayout() {
         options={{
           title: '설정',
           sceneStyle: { backgroundColor: colors.background },
-          tabBarIcon: ({ size, color }) => (
-            <Settings size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Settings size={size} color={color} />,
         }}
       />
     </Tabs>

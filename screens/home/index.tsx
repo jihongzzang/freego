@@ -2,18 +2,17 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Platfor
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
-import { Bell, Edit3, Grid3x3, QrCode, Receipt } from 'lucide-react-native';
+import { Bell, Edit3, Grid3x3, QrCode, Receipt, Calendar } from 'lucide-react-native';
 import { ColorPalette, useTheme } from '@/lib/theme';
 import { useMVIStore } from '@/mvi/base';
 import { createHomeStore, Ingredient } from '@/mvi/features/home';
 import Header from '@/components/Header';
 import FloatingButton from '@/components/FloatingButton';
-import BottomSheet from '@/components/BottomSheet';
-import DatePicker from '@/components/DatePicker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ALL_CATEGORIES, ALL_CATEGORY, AllCategoryType } from '@/constants/categories';
 import { StatusType } from '@/constants/itemStatus';
-import { QUICK_SELECT_OPTIONS } from '@/constants/quickSelectOptions';
+import { useExpiryDatePicker } from '@/hooks/useExpiryDatePicker';
+import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
 import { useBulkAdd } from '@/hooks/useBulkAdd';
 import BulkAddBottomSheet from '@/components/BulkAddBottomSheet';
 
@@ -29,21 +28,32 @@ export default function HomeScreen() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<AllCategoryType>(ALL_CATEGORY.id);
 
   // 유통기한 수정 모달 상태
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
-  // 한꺼번에 등록 훅
-  const bulkAdd = useBulkAdd(() => {
-    dispatch({ type: 'LOAD_INGREDIENTS' });
-  });
 
   // MVI Store 사용
   const [state, dispatch, effect] = useMVIStore(createHomeStore);
   const { ingredients, loading } = state;
 
-  // 동적 스타일 생성
+  // 유통기한 업데이트 함수
+  const updateExpiryDate = (expiryDate: string) => {
+    if (!selectedIngredient) return;
+    dispatch({
+      type: 'UPDATE_EXPIRY_DATE',
+      payload: { id: selectedIngredient.id, expiryDate },
+    });
+  };
 
+  // 유통기한 선택 훅 - 빠른 선택 시 즉시 저장
+  const expiryDatePicker = useExpiryDatePicker({
+    onDateConfirm: updateExpiryDate,
+  });
+
+  // BulkAdd 훅 - 성공 시 데이터 자동 로드
+  const bulkAdd = useBulkAdd(() => {
+    dispatch({ type: 'LOAD_INGREDIENTS' });
+  });
+
+  // 동적 스타일 생성
   const styles = useMemo(() => createStyles({ colors, borderRadius, spacing }), [spacing, borderRadius]);
 
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -94,53 +104,7 @@ export default function HomeScreen() {
   // 유통기한 수정 모달 열기
   function openDatePicker(item: Ingredient) {
     setSelectedIngredient(item);
-    if (item.expiry_date) {
-      setSelectedDate(new Date(item.expiry_date));
-    } else {
-      setSelectedDate(new Date());
-    }
-    setShowDatePicker(true);
-  }
-
-  // 날짜 변경 핸들러
-  function handleDateChange(date: Date) {
-    setSelectedDate(date);
-  }
-
-  // 빠른 선택 핸들러
-  function handleQuickSelect(days: number) {
-    if (!selectedIngredient) return;
-
-    const date = new Date();
-    date.setDate(date.getDate() + days);
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
-
-    updateExpiryDate(formattedDate);
-  }
-
-  // 유통기한 업데이트
-  function updateExpiryDate(expiryDate: string) {
-    if (!selectedIngredient) return;
-
-    dispatch({
-      type: 'UPDATE_EXPIRY_DATE',
-      payload: { id: selectedIngredient.id, expiryDate },
-    });
-    setShowDatePicker(false);
-  }
-
-  // 날짜 확인 버튼 핸들러
-  function handleConfirmDate() {
-    const year = selectedDate.getFullYear();
-    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-    const day = String(selectedDate.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
-
-    updateExpiryDate(formattedDate);
+    expiryDatePicker.open(item.expiry_date || new Date());
   }
 
   const expiringItems = ingredients.filter((item) => item.status === 'expired');
@@ -163,30 +127,43 @@ export default function HomeScreen() {
     <TouchableOpacity
       key={item.id}
       style={[styles.ingredientCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-      onPress={() => openDatePicker(item)}
+      onPress={() => router.push(`/ingredient/${item.id}`)}
       activeOpacity={0.7}
     >
       <View style={styles.cardContent}>
-        <View style={styles.emojiContainer}>
-          <Text style={styles.emojiText}>{item.emoji || '🍽️'}</Text>
-          {item.status === 'expired' && (
-            <View
-              style={[
-                styles.statusBadge,
-                {
-                  backgroundColor: colors.danger,
-                },
-              ]}
-            />
-          )}
+        <View style={styles.cardHeader}>
+          <View style={styles.emojiContainer}>
+            <Text style={typography.styles.body}>{item.emoji || '🍽️'}</Text>
+            {item.status === 'expired' && (
+              <View
+                style={[
+                  styles.statusBadge,
+                  {
+                    backgroundColor: colors.danger,
+                  },
+                ]}
+              />
+            )}
+          </View>
+          <TouchableOpacity
+            style={styles.calendarIcon}
+            onPress={(e) => {
+              e.stopPropagation();
+              openDatePicker(item);
+            }}
+            activeOpacity={0.7}
+          >
+            <Calendar size={20} color={colors.textTertiary} />
+          </TouchableOpacity>
         </View>
-        <Text style={[styles.ingredientName, { color: colors.text }]} numberOfLines={1}>
+        <Text style={[typography.styles.bodySemibold, { color: colors.text }]} numberOfLines={1}>
           {item.name}
         </Text>
         <Text
           style={[
-            styles.expiryText,
+            typography.styles.smallCaption,
             {
+              marginTop: 2,
               color: item.status === 'expired' ? colors.danger : colors.textTertiary,
             },
           ]}
@@ -374,80 +351,47 @@ export default function HomeScreen() {
           </View>
         )}
       </Animated.ScrollView>
+
       <FloatingButton
         menuItems={[
           {
+            icon: <QrCode size={24} color="#FFFFFF" />,
+            label: '영수증으로 재료 등록',
+            onPress: bulkAdd.handleRegisterReceipt,
+            labelColor: colors.white,
+            backgroundColor: colors.primary,
+          },
+          {
             icon: <Edit3 size={24} color="#FFFFFF" />,
-            label: '직접 등록',
+            label: '직접 재료 등록',
             onPress: () => {
               dispatch({
                 type: 'NAVIGATE_TO_ADD',
                 payload: selectedCategoryId === ALL_CATEGORY.id ? undefined : selectedCategoryId,
               });
             },
+            labelColor: colors.white,
+            backgroundColor: colors.primary,
           },
           {
             icon: <Grid3x3 size={24} color="#FFFFFF" />,
-            label: '한꺼번에 등록',
-            onPress: () => {
-              bulkAdd.open();
-            },
-            backgroundColor: colors.secondary,
-          },
-          {
-            icon: <QrCode size={24} color="#FFFFFF" />,
-            label: '영수증으로 등록',
-            onPress: () => {
-              bulkAdd.handleRegisterReceipt();
-            },
-            backgroundColor: colors.danger,
+            label: '한꺼번에 재료 등록',
+            onPress: bulkAdd.open,
+            labelColor: colors.white,
+            backgroundColor: colors.primary,
           },
         ]}
       />
 
-      {/* 유통기한 수정 BottomSheet */}
-      <BottomSheet
-        maxHeight={650}
-        visible={showDatePicker}
-        onClose={() => setShowDatePicker(false)}
+      <SelectDateBottomSheet
+        visible={expiryDatePicker.visible}
+        onClose={expiryDatePicker.close}
         title={`${selectedIngredient?.name || ''} 유통기한 수정`}
-      >
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={styles.datePickerBottomSheet}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* 빠른 선택 옵션 */}
-          <View style={styles.quickSelectContainer}>
-            {QUICK_SELECT_OPTIONS.map((option) => (
-              <TouchableOpacity
-                key={option.id}
-                style={[
-                  styles.quickSelectBtn,
-                  {
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border,
-                  },
-                ]}
-                onPress={() => handleQuickSelect(option.days)}
-              >
-                <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>{option.krLabel}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+        selectedDate={expiryDatePicker.selectedDate}
+        onDateChange={expiryDatePicker.handleDateChange}
+        onConfirm={expiryDatePicker.handleConfirm}
+      />
 
-          <DatePicker value={selectedDate} onDateSelect={handleDateChange} />
-
-          <TouchableOpacity
-            style={[styles.datePickerConfirm, { backgroundColor: colors.primary }]}
-            onPress={handleConfirmDate}
-          >
-            <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>확인</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </BottomSheet>
-
-      {/* 한꺼번에 등록 BottomSheet */}
       <BulkAddBottomSheet
         visible={bulkAdd.isVisible}
         onClose={bulkAdd.close}
@@ -559,23 +503,20 @@ const createStyles = ({
       alignItems: 'flex-start',
       width: '100%',
     },
-    emojiContainer: {
-      position: 'relative',
+    cardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      width: '100%',
       marginBottom: spacing.xs,
     },
-    emojiText: {
-      fontSize: 16,
+    emojiContainer: {
+      position: 'relative',
     },
-    ingredientName: {
-      fontSize: 13,
-      fontWeight: '600',
-      lineHeight: 18,
-    },
-    expiryText: {
-      fontSize: 11,
-      fontWeight: '400',
-      lineHeight: 16,
-      marginTop: 2,
+    calendarIcon: {
+      padding: 4,
+      marginTop: -4,
+      marginRight: -4,
     },
     statusBadge: {
       position: 'absolute',
@@ -588,31 +529,8 @@ const createStyles = ({
       borderColor: '#FFFFFF',
     },
     emptyContainer: {
-      borderRadius: borderRadius.lg,
+      borderRadius: borderRadius.xl,
       padding: 40,
-      alignItems: 'center',
-    },
-    datePickerBottomSheet: {
-      padding: spacing.lg,
-      gap: spacing.lg,
-    },
-    quickSelectContainer: {
-      flexDirection: 'row',
-      gap: spacing.xs,
-      flexWrap: 'wrap',
-    },
-    quickSelectBtn: {
-      flex: 1,
-      minWidth: '22%',
-      paddingHorizontal: spacing.sm,
-      paddingVertical: spacing.xs + 2,
-      borderRadius: borderRadius.md,
-      borderWidth: 1,
-      alignItems: 'center',
-    },
-    datePickerConfirm: {
-      paddingVertical: spacing.md,
-      borderRadius: borderRadius.md,
       alignItems: 'center',
     },
   });

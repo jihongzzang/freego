@@ -8,6 +8,7 @@ export interface FloatingMenuItem {
   icon: ReactNode;
   label: string;
   onPress: () => void;
+  labelColor?: string;
   backgroundColor?: string;
 }
 
@@ -36,6 +37,18 @@ export default function FloatingButton({
 
   // 탭바 높이를 고려한 bottom 위치 계산
   const bottomPosition = hasTabBar ? (insets.bottom > 0 ? 48 + insets.bottom : 48) + 16 : insets.bottom + 20;
+
+  // 전역 함수로 메뉴 열기
+  useEffect(() => {
+    if (menuItems && menuItems.length > 0) {
+      (global as any).openAddMenu = () => {
+        setIsExpanded(true);
+      };
+      return () => {
+        (global as any).openAddMenu = undefined;
+      };
+    }
+  }, [menuItems]);
 
   useEffect(() => {
     console.log('[FloatingButton] isExpanded changed to:', isExpanded);
@@ -83,7 +96,6 @@ export default function FloatingButton({
 
   return (
     <>
-      {/* Modal로 감싸서 바텀 네비게이션 위로 렌더링 */}
       <Modal
         visible={isExpanded}
         transparent
@@ -91,7 +103,6 @@ export default function FloatingButton({
         onRequestClose={() => setIsExpanded(false)}
         statusBarTranslucent
       >
-        {/* 배경 오버레이 */}
         <TouchableOpacity
           style={styles.overlay}
           activeOpacity={1}
@@ -101,7 +112,6 @@ export default function FloatingButton({
           }}
         />
 
-        {/* 메뉴 아이템들 */}
         {menuItems && menuItems.length > 0 && (
           <View style={[styles.menuContainer, { bottom: bottomPosition + 70 }]}>
             {menuItems.map((item, index) => {
@@ -130,7 +140,6 @@ export default function FloatingButton({
                 >
                   <TouchableOpacity
                     onPress={() => {
-                      console.log(`[FloatingButton] Menu item ${index} pressed:`, item.label);
                       item.onPress();
                       setIsExpanded(false);
                     }}
@@ -140,11 +149,11 @@ export default function FloatingButton({
                   >
                     <Text
                       style={[
-                        typography.styles.bodySemibold,
+                        typography.styles.captionMedium,
                         {
-                          color: colors.text,
+                          color: item.labelColor ? item.labelColor : colors.text,
                           marginRight: spacing.sm,
-                          backgroundColor: colors.surface,
+                          backgroundColor: colors.primaryLight,
                           paddingHorizontal: spacing.md,
                           paddingVertical: spacing.xs,
                           borderRadius: borderRadius.md,
@@ -194,7 +203,6 @@ export default function FloatingButton({
         )}
       </Modal>
 
-      {/* 메인 플로팅 버튼 */}
       <Animated.View
         style={[
           styles.floatingButton,
@@ -204,7 +212,6 @@ export default function FloatingButton({
             borderRadius: borderRadius.full,
             bottom: bottomPosition,
             zIndex: 1000,
-            transform: [{ rotate: menuItems && menuItems.length > 0 ? rotateIcon : '0deg' }],
             ...Platform.select({
               ios: {
                 shadowColor: '#000',
@@ -225,11 +232,7 @@ export default function FloatingButton({
           activeOpacity={0.8}
         >
           {menuItems && menuItems.length > 0 ? (
-            isExpanded ? (
-              <X size={28} color="#FFFFFF" />
-            ) : (
-              <Plus size={28} color="#FFFFFF" />
-            )
+            <Plus size={28} color="#FFFFFF" />
           ) : (
             icon || <Plus size={28} color="#FFFFFF" />
           )}

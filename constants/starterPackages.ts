@@ -63,7 +63,7 @@ export const LIFESTYLE_PACKAGES: LifestylePackage[] = [
     id: 'single',
     krLabel: '1인 가구',
     enLabel: 'Single Household',
-    description: '혼자 살면서 기본적인 요리를 하는 분들을 위한 패키지예요',
+    description: '혼자 살면서 기본적인 요리를 하는 분들을 위한 패키지',
     icon: '👤',
     ingredients: [
       ingredient({ id: 'egg' }),
@@ -84,7 +84,7 @@ export const LIFESTYLE_PACKAGES: LifestylePackage[] = [
     id: 'office_worker',
     krLabel: '바쁜 직장인',
     enLabel: 'Busy Worker',
-    description: '간편하게 식사를 해결하는 직장인을 위한 패키지예요',
+    description: '간편하게 식사를 해결하는 직장인을 위한 패키지',
     icon: '💼',
     ingredients: [
       ingredient({ id: 'instant_cooked_rice', overrides: { storage_location: 'room_temp' } }),
@@ -103,7 +103,7 @@ export const LIFESTYLE_PACKAGES: LifestylePackage[] = [
     id: 'healthy',
     krLabel: '건강 식단',
     enLabel: 'Healthy Diet',
-    description: '건강하고 깨끗한 식단을 선호하는 분들을 위한 패키지예요',
+    description: '건강하고 깨끗한 식단을 선호하는 분들을 위한 패키지',
     icon: '🥗',
     ingredients: [
       ingredient({ id: 'chicken_breast', overrides: { storage_location: 'freezer' } }),
@@ -121,7 +121,7 @@ export const LIFESTYLE_PACKAGES: LifestylePackage[] = [
     id: 'family',
     krLabel: '가족 단위',
     enLabel: 'Family',
-    description: '온 가족이 함께 식사하는 가정을 위한 패키지예요',
+    description: '온 가족이 함께 식사하는 가정을 위한 패키지',
     icon: '👨‍👩‍👧‍👦',
     ingredients: [
       ingredient({ id: 'rice', overrides: { storage_location: 'room_temp' } }),
@@ -142,7 +142,7 @@ export const LIFESTYLE_PACKAGES: LifestylePackage[] = [
     id: 'beginner',
     krLabel: '자취 초보',
     enLabel: 'Beginner',
-    description: '처음 자취를 시작하는 분들을 위한 기본 패키지예요',
+    description: '처음 자취를 시작하는 분들을 위한 기본 패키지',
     icon: '🔰',
     ingredients: [
       ingredient({ id: 'ramen', overrides: { storage_location: 'room_temp' } }),
