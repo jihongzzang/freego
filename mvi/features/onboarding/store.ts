@@ -15,6 +15,8 @@ import { onboardingMiddleware } from './middleware';
 const initialState: OnboardingState = {
   currentStep: 0,
   totalSteps: 3, // 온보딩 단계 수
+  selectedLifestyle: null,
+  showPackageChoice: false,
 };
 
 /**

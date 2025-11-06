@@ -20,6 +20,8 @@ export interface OnboardingStep {
 export interface OnboardingState extends State {
   currentStep: number;
   totalSteps: number;
+  selectedLifestyle: string | null;
+  showPackageChoice: boolean;
 }
 
 /**
@@ -29,9 +31,13 @@ export type OnboardingIntent =
   | { type: 'NEXT_STEP' }
   | { type: 'PREVIOUS_STEP' }
   | { type: 'SKIP_ONBOARDING' }
+  | { type: 'SELECT_LIFESTYLE'; payload: string }
+  | { type: 'SHOW_PACKAGE_CHOICE' }
+  | { type: 'ADD_STARTER_PACKAGE' }
+  | { type: 'SKIP_PACKAGE' }
   | { type: 'COMPLETE_ONBOARDING' };
 
 /**
  * Onboarding Effect (부수 효과)
  */
-export type OnboardingEffect = { type: 'NAVIGATE_TO_HOME' };
+export type OnboardingEffect = { type: 'NAVIGATE_TO_HOME' } | { type: 'ADD_PACKAGE'; payload: string };

@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Linking, Platform, ScrollView } from 'react-native';
 import { Switch } from 'react-native-switch';
 import { useEffect, useMemo, useState } from 'react';
-import { Bell, Moon, Sun, Info, MessageSquare, BellOff } from 'lucide-react-native';
+import { Bell, Moon, Sun, Info, MessageSquare, BellOff, Trash2, Database } from 'lucide-react-native';
 import * as Notifications from 'expo-notifications';
 import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/contexts/DialogContext';
@@ -9,13 +9,14 @@ import { useMVIStore } from '@/mvi/base';
 import { createSettingsStore } from '@/mvi/features/settings';
 import Header from '@/components/Header';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { storage } from '@/lib/storage';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
 
   const { colors, typography, spacing, borderRadius, isDark, themePreference, setTheme } = useTheme();
 
-  const { alert } = useDialog();
+  const { alert, confirm } = useDialog();
 
   // MVI Store 사용
   const [state, dispatch, effect] = useMVIStore(createSettingsStore);
@@ -39,19 +40,19 @@ export default function SettingsScreen() {
     setHasNotificationPermission((settings as any).granted);
 
     if (!(settings as any).granted) {
-      Alert.alert('알림 권한 필요', '설정에서 알림 권한을 허용해주세요.', [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '설정 열기',
-          onPress: () => {
-            if (Platform.OS === 'ios') {
-              Linking.openURL('app-settings:');
-            } else {
-              Linking.openSettings();
-            }
-          },
+      confirm({
+        title: '알림 권한 필요',
+        message: '설정에서 알림 권한을 허용해주세요.',
+        confirmText: '설정 열기',
+        cancelText: '취소',
+        onConfirm: () => {
+          if (Platform.OS === 'ios') {
+            Linking.openURL('app-settings:');
+          } else {
+            Linking.openSettings();
+          }
         },
-      ]);
+      });
     }
   }
 
@@ -107,6 +108,32 @@ export default function SettingsScreen() {
         type: 'error',
       });
     }
+  }
+
+  function handleDeleteAllData() {
+    confirm({
+      title: '모든 데이터 삭제',
+      message: '등록된 모든 냉장고 재료가 삭제돼요.\n이 작업은 되돌릴 수 없어요.\n\n정말 삭제하시겠어요?',
+      confirmText: '삭제',
+      cancelText: '취소',
+      isDestructive: true,
+      onConfirm: async () => {
+        try {
+          await storage.clearAll();
+          alert({
+            title: '완료',
+            message: '모든 데이터가 삭제되었어요.',
+            type: 'success',
+          });
+        } catch (error) {
+          alert({
+            title: '오류',
+            message: '데이터 삭제 중 문제가 발생했어요.',
+            type: 'error',
+          });
+        }
+      },
+    });
   }
 
   return (
@@ -258,6 +285,29 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Database size={20} color={colors.primary} />
+            <Text style={[typography.styles.h5, { color: colors.text }]}>데이터 관리</Text>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: colors.surface }]}>
+            <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAllData}>
+              <View style={styles.deleteButtonContent}>
+                <Trash2 size={20} color={colors.danger} />
+                <View style={styles.deleteButtonText}>
+                  <Text style={[typography.styles.bodySemibold, { color: colors.danger }]}>
+                    모든 냉장고 데이터 삭제
+                  </Text>
+                  <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>
+                    등록된 모든 재료가 삭제돼요
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <View style={(styles.section, { marginBottom: 0 })}>
           <View style={styles.sectionHeader}>
             <Info size={20} color={colors.primary} />
@@ -380,5 +430,17 @@ const createStyles = ({
       paddingVertical: spacing.md,
       justifyContent: 'center',
       borderTopWidth: 1,
+    },
+    deleteButton: {
+      paddingVertical: spacing.lg,
+    },
+    deleteButtonContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+    },
+    deleteButtonText: {
+      flex: 1,
+      gap: spacing.xs,
     },
   });

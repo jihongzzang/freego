@@ -7,6 +7,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { OnboardingState, OnboardingIntent, OnboardingEffect } from './types';
+import { storage } from '@/lib/storage';
+import { findLifestylePackageById } from '@/constants/starterPackages';
+import { categoryDefaultEmojis } from '@/constants/ingredientTemplates';
 
 const ONBOARDING_KEY = '@onboarding_completed';
 
@@ -20,6 +23,45 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
   switch (intent.type) {
     case 'SKIP_ONBOARDING':
       // 온보딩 건너뛰기 -> AsyncStorage에 저장하고 홈으로 이동
+      await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
+      return {
+        effects: [{ type: 'NAVIGATE_TO_HOME' }],
+      };
+
+    case 'SKIP_PACKAGE':
+      // 패키지 추가 건너뛰기 -> 홈으로 이동
+      await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
+      return {
+        effects: [{ type: 'NAVIGATE_TO_HOME' }],
+      };
+
+    case 'ADD_STARTER_PACKAGE':
+      // 스타터 패키지 추가
+      if (state.selectedLifestyle) {
+        const lifestylePackage = findLifestylePackageById(state.selectedLifestyle);
+
+        if (lifestylePackage) {
+          try {
+            const ingredientsToAdd = lifestylePackage.ingredients.map((item) => ({
+              name: item.name,
+              category: item.category,
+              emoji: categoryDefaultEmojis[item.category] || '🍴',
+              quantity: item.quantity,
+              unit: item.unit,
+              storage_location: item.storage_location,
+              registration_date: new Date().toISOString().split('T')[0],
+              purchase_date: undefined,
+              expiry_date: undefined,
+              memo: '',
+            }));
+
+            await storage.addMultipleIngredients(ingredientsToAdd);
+          } catch (error) {
+            console.error('Error adding starter package:', error);
+          }
+        }
+      }
+
       await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
       return {
         effects: [{ type: 'NAVIGATE_TO_HOME' }],

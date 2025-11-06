@@ -1,21 +1,16 @@
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, BackHandler } from 'react-native';
 import { useEffect, useMemo } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
-import {
-  // ChevronRight,
-  Refrigerator,
-  ShoppingCart,
-  TrendingDown,
-  Sparkles,
-} from 'lucide-react-native';
+import { Refrigerator, ShoppingCart, Sparkles } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/lib/theme';
 import { useMVIStore } from '@/mvi/base';
 import { createOnboardingStore } from '@/mvi/features/onboarding';
 import { useRouter } from '@/hooks/useRouter';
+import { LIFESTYLE_PACKAGES } from '@/constants/starterPackages';
 
 const { width } = Dimensions.get('window');
 
@@ -42,12 +37,6 @@ export default function OnboardingScreen() {
       description: '식재료를 체계적으로 관리하고\n유통기한을 놓치지 마세요',
       color: '#10b981',
     },
-    // {
-    //   icon: <TrendingDown size={80} color="#ffffff" />,
-    //   title: '음식물 쓰레기 줄이기',
-    //   description: '소비 패턴을 분석하고\n낭비를 최소화 해요',
-    //   color: '#3b82f6',
-    // },
     {
       icon: <ShoppingCart size={80} color="#ffffff" />,
       title: '장보기도 간편하게',
@@ -76,8 +65,25 @@ export default function OnboardingScreen() {
     translateX.value = withSpring(-state.currentStep * width);
   }, [state.currentStep]);
 
+  // Handle Android back button for package confirmation screen
+  useEffect(() => {
+    if (!state.showPackageChoice || !state.selectedLifestyle) return;
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      dispatch({ type: 'SELECT_LIFESTYLE', payload: null as any });
+      return true;
+    });
+
+    return () => backHandler.remove();
+  }, [state.showPackageChoice, state.selectedLifestyle]);
+
   function handleNext() {
-    dispatch({ type: 'NEXT_STEP' });
+    // 마지막 온보딩 단계에서 라이프스타일 선택 화면으로
+    if (state.currentStep === steps.length - 1) {
+      dispatch({ type: 'SHOW_PACKAGE_CHOICE' });
+    } else {
+      dispatch({ type: 'NEXT_STEP' });
+    }
   }
 
   function handlePrevious() {
@@ -88,6 +94,18 @@ export default function OnboardingScreen() {
 
   function handleSkip() {
     dispatch({ type: 'SKIP_ONBOARDING' });
+  }
+
+  function handleSelectLifestyle(lifestyleId: string) {
+    dispatch({ type: 'SELECT_LIFESTYLE', payload: lifestyleId });
+  }
+
+  function handleAddPackage() {
+    dispatch({ type: 'ADD_STARTER_PACKAGE' });
+  }
+
+  function handleSkipPackage() {
+    dispatch({ type: 'SKIP_PACKAGE' });
   }
 
   // Swipe gesture
@@ -128,6 +146,125 @@ export default function OnboardingScreen() {
 
   const currentStep = steps[state.currentStep];
 
+  // 라이프스타일 선택 화면
+  if (state.showPackageChoice) {
+    const selectedPackage = state.selectedLifestyle
+      ? LIFESTYLE_PACKAGES.find((pkg) => pkg.id === state.selectedLifestyle)
+      : null;
+
+    return (
+      <GestureHandlerRootView style={styles.container}>
+        <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.gradient}>
+          {!state.selectedLifestyle ? (
+            // 1단계: 라이프스타일 선택
+            <View style={[styles.packageChoiceContainer, { paddingTop: insets.top + 20 }]}>
+              <View style={styles.headerSection}>
+                <Text style={[typography.styles.h1, styles.packageTitle]}>"나의 라이프스타일은?"</Text>
+                <Text style={[typography.styles.h5, styles.packageDescription]}>
+                  "맞춤형 재료 리스트를 만들어드려요"
+                </Text>
+              </View>
+
+              <ScrollView
+                style={styles.lifestyleScrollView}
+                contentContainerStyle={styles.lifestyleScrollContent}
+                showsVerticalScrollIndicator={false}
+              >
+                <View style={styles.lifestyleList}>
+                  {LIFESTYLE_PACKAGES.map((lifestyle, index) => (
+                    <TouchableOpacity
+                      key={lifestyle.id}
+                      style={[
+                        styles.lifestyleCard,
+                        {
+                          ...shadows.lg,
+                        },
+                      ]}
+                      onPress={() => handleSelectLifestyle(lifestyle.id)}
+                      activeOpacity={0.9}
+                    >
+                      <View style={styles.lifestyleCardLeft}>
+                        <View style={styles.lifestyleIconBadge}>
+                          <Text style={styles.lifestyleIcon}>{lifestyle.icon}</Text>
+                        </View>
+                        <View style={styles.lifestyleInfo}>
+                          <Text style={[typography.styles.h6, styles.lifestyleLabel]}>{lifestyle.krLabel}</Text>
+                          <Text style={[typography.styles.caption, styles.lifestyleDesc]} numberOfLines={2}>
+                            {lifestyle.description}
+                          </Text>
+                        </View>
+                      </View>
+                      <View style={styles.arrowIcon}>
+                        <Text style={styles.arrowText}>›</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                <TouchableOpacity style={styles.skipPackageButton} onPress={handleSkipPackage} activeOpacity={0.8}>
+                  <Text style={[typography.styles.body, styles.skipPackageText]}>건너뛰고 직접 등록할게요</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
+          ) : (
+            // 2단계: 패키지 확인 및 등록
+            <ScrollView
+              contentContainerStyle={[styles.packageChoiceContainer, { paddingTop: insets.top + 20 }]}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.confirmHeaderSection}>
+                <TouchableOpacity
+                  style={styles.backButton}
+                  onPress={() => dispatch({ type: 'SELECT_LIFESTYLE', payload: null as any })}
+                >
+                  <Text style={styles.backButtonText}>‹</Text>
+                </TouchableOpacity>
+                <View style={styles.selectedPackageInfo}>
+                  <Text style={styles.selectedPackageIcon}>{selectedPackage?.icon}</Text>
+                  <Text style={[typography.styles.h1, styles.confirmTitle]}>{selectedPackage?.krLabel}</Text>
+                </View>
+              </View>
+
+              <Text style={[typography.styles.h5, styles.confirmDescription]}>기본 재료를 자동으로 추가할까요?</Text>
+
+              <View style={styles.ingredientsCard}>
+                <View style={styles.ingredientsCardHeader}>
+                  <Text style={[typography.styles.bodySemibold, styles.ingredientsCardTitle]}>
+                    포함된 재료 {selectedPackage?.ingredients.length}개
+                  </Text>
+                </View>
+                <View style={styles.ingredientsGrid}>
+                  {selectedPackage?.ingredients.map((item, index) => (
+                    <View key={index} style={styles.ingredientChip}>
+                      <Text style={[typography.styles.caption, styles.ingredientChipText]}>{item.name}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.confirmButtons}>
+                <TouchableOpacity
+                  style={[styles.primaryButton, { ...shadows.lg }]}
+                  onPress={handleAddPackage}
+                  activeOpacity={0.9}
+                >
+                  <Text style={[typography.styles.bodySemibold, styles.primaryButtonText]}>
+                    네, 자동으로 추가할게요
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.secondaryButton} onPress={handleSkipPackage} activeOpacity={0.9}>
+                  <Text style={[typography.styles.body, styles.secondaryButtonText]}>아니요, 직접 등록할게요</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          )}
+        </LinearGradient>
+      </GestureHandlerRootView>
+    );
+  }
+
+  // 기존 온보딩 캐러셀
   return (
     <GestureHandlerRootView style={styles.container}>
       <LinearGradient colors={[currentStep.color, currentStep.color + 'dd']} style={styles.gradient}>
@@ -275,4 +412,190 @@ const createStyles = ({
       ...shadows.lg,
     },
     nextButtonText: {},
+    // 라이프스타일 선택 화면
+    packageChoiceContainer: {
+      flex: 1,
+      paddingHorizontal: spacing.xl,
+      paddingBottom: 60,
+    },
+    headerSection: {
+      marginBottom: spacing.xxl,
+      paddingHorizontal: spacing.xs,
+    },
+    lifestyleScrollView: {
+      flex: 1,
+    },
+    lifestyleScrollContent: {
+      paddingBottom: spacing.xxl,
+    },
+    packageTitle: {
+      color: '#ffffff',
+      textAlign: 'left',
+      marginBottom: spacing.md,
+      fontWeight: '800',
+      fontSize: 32,
+    },
+    packageDescription: {
+      color: '#ffffff',
+      textAlign: 'left',
+      opacity: 0.9,
+      fontSize: 17,
+      fontWeight: '500',
+    },
+    lifestyleList: {
+      gap: spacing.lg,
+      marginBottom: spacing.xxl,
+    },
+    lifestyleCard: {
+      backgroundColor: '#ffffff',
+      borderRadius: borderRadius.xl,
+      padding: spacing.xl,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    lifestyleCardLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      gap: spacing.lg,
+    },
+    lifestyleIconBadge: {
+      width: 64,
+      height: 64,
+      borderRadius: borderRadius.lg,
+      backgroundColor: '#f8f9ff',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    lifestyleIcon: {
+      fontSize: 36,
+    },
+    lifestyleInfo: {
+      flex: 1,
+      gap: spacing.xs,
+    },
+    lifestyleLabel: {
+      fontSize: 17,
+      fontWeight: '600',
+      color: '#1f2937',
+    },
+    lifestyleDesc: {
+      fontSize: 13,
+      color: '#6b7280',
+      lineHeight: 18,
+    },
+    arrowIcon: {
+      width: 24,
+      height: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    arrowText: {
+      fontSize: 28,
+      color: '#d1d5db',
+      fontWeight: '300',
+    },
+    skipPackageButton: {
+      paddingVertical: spacing.xl,
+      alignItems: 'center',
+      marginTop: spacing.md,
+    },
+    skipPackageText: {
+      color: '#ffffff',
+      opacity: 0.9,
+      fontSize: 16,
+    },
+    // 패키지 확인 화면
+    confirmHeaderSection: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.xxl,
+      gap: spacing.lg,
+    },
+    backButton: {
+      width: 44,
+      height: 44,
+      borderRadius: borderRadius.full,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    backButtonText: {
+      fontSize: 32,
+      color: '#ffffff',
+      marginTop: -4,
+    },
+    selectedPackageInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+      flex: 1,
+    },
+    selectedPackageIcon: {
+      fontSize: 40,
+    },
+    confirmTitle: {
+      color: '#ffffff',
+      fontSize: 28,
+      fontWeight: '700',
+    },
+    confirmDescription: {
+      color: '#ffffff',
+      opacity: 0.9,
+      marginBottom: spacing.xxxl,
+      fontSize: 17,
+      fontWeight: '500',
+    },
+    ingredientsCard: {
+      backgroundColor: '#ffffff',
+      borderRadius: borderRadius.xl,
+      padding: spacing.xl,
+      marginBottom: spacing.xxl,
+    },
+    ingredientsCardHeader: {
+      marginBottom: spacing.lg,
+    },
+    ingredientsCardTitle: {
+      fontSize: 16,
+      color: '#1f2937',
+    },
+    ingredientsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+    },
+    ingredientChip: {
+      backgroundColor: '#f3f4f6',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.full,
+    },
+    ingredientChipText: {
+      fontSize: 13,
+      color: '#4b5563',
+    },
+    confirmButtons: {
+      gap: spacing.md,
+    },
+    primaryButton: {
+      backgroundColor: '#ffffff',
+      borderRadius: borderRadius.lg,
+      paddingVertical: spacing.xl,
+      alignItems: 'center',
+    },
+    primaryButtonText: {
+      color: '#6366f1',
+      fontSize: 16,
+    },
+    secondaryButton: {
+      paddingVertical: spacing.xl,
+      alignItems: 'center',
+      borderRadius: borderRadius.lg,
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    secondaryButtonText: {
+      color: '#ffffff',
+      fontSize: 16,
+    },
   });

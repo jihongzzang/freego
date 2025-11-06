@@ -36,6 +36,14 @@ export function useBulkAdd(onSuccess?: () => void) {
     });
   }
 
+  function handleRegisterReceipt() {
+    alert({
+      title: '준비중이에요',
+      message: '빠른 시일내에 업데이트 할게요.',
+      type: 'info',
+    });
+  }
+
   async function handleConfirm() {
     if (selectedTemplates.length === 0) {
       close();
@@ -88,5 +96,6 @@ export function useBulkAdd(onSuccess?: () => void) {
     handleCategoryChange,
     handleTemplateToggle,
     handleConfirm,
+    handleRegisterReceipt,
   };
 }

@@ -37,6 +37,14 @@ export const ingredientTemplates: IngredientTemplate[] = [
     defaultUnit: findUnitById('piece').id,
   },
   {
+    id: 'cherry_tomatoes',
+    krLabel: '방울토마토',
+    enLabel: 'Cherry Tomatoes',
+    emoji: '🍅',
+    category: findCategoryById('vegetables').id,
+    defaultUnit: findUnitById('gram').id,
+  },
+  {
     id: 'tomato',
     krLabel: '토마토',
     enLabel: 'Tomato',
@@ -1311,6 +1319,14 @@ export const ingredientTemplates: IngredientTemplate[] = [
 
   // 가공 식품
   {
+    id: 'tuna_can',
+    krLabel: '참치캔',
+    enLabel: 'Canned Tuna',
+    emoji: '🥫',
+    category: findCategoryById('processed').id,
+    defaultUnit: findUnitById('can').id,
+  },
+  {
     id: 'bread',
     krLabel: '빵',
     enLabel: 'Bread',
@@ -1347,6 +1363,14 @@ export const ingredientTemplates: IngredientTemplate[] = [
     krLabel: '베이글',
     enLabel: 'Bagel',
     emoji: '🥯',
+    category: findCategoryById('processed').id,
+    defaultUnit: findUnitById('piece').id,
+  },
+  {
+    id: 'instant_cooked_rice',
+    krLabel: '즉석밥',
+    enLabel: 'Instant Cooked Rice',
+    emoji: '🍚',
     category: findCategoryById('processed').id,
     defaultUnit: findUnitById('piece').id,
   },
@@ -1431,6 +1455,14 @@ export const ingredientTemplates: IngredientTemplate[] = [
     defaultUnit: findUnitById('sheet').id,
   },
   {
+    id: 'salad',
+    krLabel: '샐러드',
+    enLabel: 'Salad',
+    emoji: '🥗',
+    category: findCategoryById('vegetables').id,
+    defaultUnit: findUnitById('pack').id,
+  },
+  {
     id: 'green_laver',
     krLabel: '파래',
     enLabel: 'Green Laver',
@@ -1461,6 +1493,14 @@ export const ingredientTemplates: IngredientTemplate[] = [
     emoji: '🍜',
     category: findCategoryById('processed').id,
     defaultUnit: findUnitById('piece').id,
+  },
+  {
+    id: 'frozen_dumplings',
+    krLabel: '냉동만두',
+    enLabel: 'Frozen Dumplings',
+    emoji: '🥟',
+    category: findCategoryById('processed').id,
+    defaultUnit: findUnitById('pack').id,
   },
   {
     id: 'chapagetti',

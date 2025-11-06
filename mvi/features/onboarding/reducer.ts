@@ -32,6 +32,18 @@ export const onboardingReducer: Reducer<OnboardingState, OnboardingIntent> = (
       }
       return state;
 
+    case 'SELECT_LIFESTYLE':
+      return {
+        ...state,
+        selectedLifestyle: intent.payload,
+      };
+
+    case 'SHOW_PACKAGE_CHOICE':
+      return {
+        ...state,
+        showPackageChoice: true,
+      };
+
     default:
       return state;
   }

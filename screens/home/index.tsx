@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from '
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
-import { Bell, Edit3, Grid3x3 } from 'lucide-react-native';
+import { Bell, Edit3, Grid3x3, QrCode, Receipt } from 'lucide-react-native';
 import { ColorPalette, useTheme } from '@/lib/theme';
 import { useMVIStore } from '@/mvi/base';
 import { createHomeStore, Ingredient } from '@/mvi/features/home';
@@ -237,7 +237,6 @@ export default function HomeScreen() {
           />
         </Animated.View>
 
-        {/* 카테고리 캐러셀 - 고정 */}
         <View style={[styles.categoryCarouselContainer, { backgroundColor: colors.surface }]}>
           <ScrollView
             horizontal
@@ -367,18 +366,18 @@ export default function HomeScreen() {
             <View style={styles.cardList}>{filteredIngredients.map((item) => renderIngredientCard({ item }))}</View>
           </View>
         )}
-        {/* </ScrollView> */}
       </Animated.ScrollView>
       <FloatingButton
         menuItems={[
           {
             icon: <Edit3 size={24} color="#FFFFFF" />,
             label: '직접 등록',
-            onPress: () =>
+            onPress: () => {
               dispatch({
                 type: 'NAVIGATE_TO_ADD',
                 payload: selectedCategoryId === ALL_CATEGORY.id ? undefined : selectedCategoryId,
-              }),
+              });
+            },
           },
           {
             icon: <Grid3x3 size={24} color="#FFFFFF" />,
@@ -387,6 +386,14 @@ export default function HomeScreen() {
               bulkAdd.open();
             },
             backgroundColor: colors.secondary,
+          },
+          {
+            icon: <QrCode size={24} color="#FFFFFF" />,
+            label: '영수증으로 등록',
+            onPress: () => {
+              bulkAdd.handleRegisterReceipt();
+            },
+            backgroundColor: colors.danger,
           },
         ]}
       />
