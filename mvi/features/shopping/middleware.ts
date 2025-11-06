@@ -15,6 +15,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
   state,
   intent,
 ): Promise<MiddlewareResult<ShoppingState, ShoppingEffect>> => {
+  console.log('shoppingMiddleware called with intent:', intent.type);
   switch (intent.type) {
     case 'LOAD_SHOPPING_LIST': {
       try {
@@ -185,6 +186,50 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
                   // 삭제 후 목록 새로고침은 컴포넌트에서 처리
                 } catch (error) {
                   console.error('Error clearing purchased items:', error);
+                }
+              },
+              isDanger: true,
+            },
+          },
+        ],
+      };
+    }
+
+    case 'CLEAR_UNPURCHASED': {
+      console.log('CLEAR_UNPURCHASED middleware called');
+      const unpurchasedItems = state.shoppingList.filter((item) => !item.is_purchased);
+      console.log('unpurchasedItems:', unpurchasedItems.length);
+
+      if (unpurchasedItems.length === 0) {
+        return {
+          effects: [
+            {
+              type: 'SHOW_ALERT',
+              payload: {
+                title: '알림',
+                message: '구매 예정 항목이 없어요.',
+                variant: 'info',
+              },
+            },
+          ],
+        };
+      }
+
+      return {
+        effects: [
+          {
+            type: 'SHOW_CONFIRM',
+            payload: {
+              title: '구매 예정 항목 삭제',
+              message: `${unpurchasedItems.length}개의 구매 예정 항목을 삭제할까요?`,
+              onConfirm: async () => {
+                try {
+                  for (const item of unpurchasedItems) {
+                    await storage.deleteShoppingItem(item.id);
+                  }
+                  // 삭제 후 목록 새로고침은 컴포넌트에서 처리
+                } catch (error) {
+                  console.error('Error clearing unpurchased items:', error);
                 }
               },
               isDanger: true,

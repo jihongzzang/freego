@@ -31,6 +31,7 @@ export type ShoppingIntent =
     }
   | { type: 'DELETE_ITEM'; payload: { id: string; name: string } }
   | { type: 'CLEAR_PURCHASED' }
+  | { type: 'CLEAR_UNPURCHASED' }
   | { type: 'TOGGLE_ADD_MODAL'; payload: boolean }
   | {
       type: 'UPDATE_ADD_FORM';

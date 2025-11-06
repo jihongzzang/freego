@@ -72,6 +72,10 @@ export default function ShoppingListScreen() {
   function handleClearPurchased() {
     dispatch({ type: 'CLEAR_PURCHASED' });
   }
+  function handleClearUnpurchased() {
+    console.log('handleClearUnpurchased called', { unpurchasedCount: unpurchasedItems.length });
+    dispatch({ type: 'CLEAR_UNPURCHASED' });
+  }
   const unpurchasedItems = state.shoppingList.filter((item) => !item.is_purchased);
   const purchasedItems = state.shoppingList.filter((item) => item.is_purchased);
   return (
@@ -96,7 +100,16 @@ export default function ShoppingListScreen() {
           <>
             {unpurchasedItems.length > 0 && (
               <View style={styles.section}>
-                <Text style={[typography.styles.h5, { color: colors.text, marginBottom: 24 }]}>구매 예정</Text>
+                <View style={styles.sectionHeader}>
+                  <Text style={[typography.styles.h5, { color: colors.text }]}>구매 예정</Text>
+                  <TouchableOpacity
+                    style={[styles.clearButton, { backgroundColor: colors.dangerLight }]}
+                    onPress={handleClearUnpurchased}
+                  >
+                    <Trash2 size={14} color={colors.danger} />
+                    <Text style={[typography.styles.captionBold, { color: colors.danger }]}>삭제</Text>
+                  </TouchableOpacity>
+                </View>
                 <View style={[styles.listCard, { backgroundColor: colors.surface }]}>
                   {unpurchasedItems.map((item, index) => (
                     <View
