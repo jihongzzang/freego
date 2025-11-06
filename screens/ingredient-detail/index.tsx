@@ -173,11 +173,12 @@ export default function IngredientDetailScreen() {
   function handleEmojiSelect(template: IngredientTemplate) {
     setSelectedEmoji(template);
     handleFieldChange('emoji', template.emoji);
-  }
-
-  function handleEmojiConfirm() {
     setIsEmojiPickerVisible(false);
   }
+
+  // function handleEmojiConfirm() {
+  //   setIsEmojiPickerVisible(false);
+  // }
 
   if (!state.ingredient) {
     return (
@@ -640,7 +641,7 @@ export default function IngredientDetailScreen() {
         selectedCategoryId={state.editForm.category}
         selectedTemplates={selectedEmoji ? [selectedEmoji] : []}
         onTemplateToggle={handleEmojiSelect}
-        onConfirm={handleEmojiConfirm}
+        // onConfirm={handleEmojiConfirm}
       />
     </>
   );
@@ -829,10 +830,9 @@ const createStyles = ({
       borderColor: colors.border,
     },
     emojiButtonContent: {
-      width: 48,
+      width: 40,
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
       gap: spacing.xs,
     },
   });

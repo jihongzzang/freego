@@ -332,11 +332,13 @@ export default function IngredientsScreen() {
                       <Text style={[typography.styles.h6, { color: colors.text }]}>{categoryItem?.krLabel}</Text>
                     </View>
                     <View style={styles.categoryHeaderRight}>
-                      <View style={[styles.categoryBadge, { backgroundColor: colors.textTertiary }]}>
-                        <Text style={[typography.styles.captionBold, { color: colors.white }]}>
-                          {categoryItems.length}
-                        </Text>
-                      </View>
+                      {categoryItems.length > 0 && (
+                        <View style={[styles.categoryBadge, { backgroundColor: colors.textTertiary }]}>
+                          <Text style={[typography.styles.captionBold, { color: colors.white }]}>
+                            {categoryItems.length}
+                          </Text>
+                        </View>
+                      )}
                       {isCollapsed ? (
                         <ChevronDown size={20} color={colors.textTertiary} />
                       ) : (
@@ -383,11 +385,13 @@ export default function IngredientsScreen() {
                       <Text style={[typography.styles.h6, { color: colors.text }]}>{storageItem?.krLabel}</Text>
                     </View>
                     <View style={styles.categoryHeaderRight}>
-                      <View style={[styles.categoryBadge, { backgroundColor: colors.primaryLight }]}>
-                        <Text style={[typography.styles.captionBold, { color: colors.white }]}>
-                          {storageItems.length}
-                        </Text>
-                      </View>
+                      {storageItems.length > 0 && (
+                        <View style={[styles.categoryBadge, { backgroundColor: colors.textTertiary }]}>
+                          <Text style={[typography.styles.captionBold, { color: colors.white }]}>
+                            {storageItems.length}
+                          </Text>
+                        </View>
+                      )}
                       {isCollapsed ? (
                         <ChevronDown size={20} color={colors.textSecondary} />
                       ) : (

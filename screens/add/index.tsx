@@ -132,11 +132,12 @@ export default function AddIngredientScreen() {
   function handleEmojiSelect(template: IngredientTemplate) {
     setSelectedEmoji(template);
     handleFieldChange('emoji', template.emoji);
-  }
-
-  function handleEmojiConfirm() {
     setIsEmojiPickerVisible(false);
   }
+
+  // function handleEmojiConfirm() {
+  //   setIsEmojiPickerVisible(false);
+  // }
 
   function handleSubmit() {
     dispatch({ type: 'SUBMIT_FORM' });
@@ -513,7 +514,7 @@ export default function AddIngredientScreen() {
         selectedCategoryId={state.form.category}
         selectedTemplates={selectedEmoji ? [selectedEmoji] : []}
         onTemplateToggle={handleEmojiSelect}
-        onConfirm={handleEmojiConfirm}
+        // onConfirm={handleEmojiConfirm}
       />
     </View>
   );

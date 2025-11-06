@@ -11,7 +11,7 @@ interface AddEmojiBottomSheetProps {
   selectedCategoryId: CategoryType;
   selectedTemplates: IngredientTemplate[];
   onTemplateToggle: (template: IngredientTemplate) => void;
-  onConfirm: () => void;
+  // onConfirm: () => void;
 }
 
 export default function AddEmojiBottomSheet({
@@ -20,7 +20,7 @@ export default function AddEmojiBottomSheet({
   selectedCategoryId,
   selectedTemplates,
   onTemplateToggle,
-  onConfirm,
+  // onConfirm,
 }: AddEmojiBottomSheetProps) {
   const { colors, typography, borderRadius, spacing } = useTheme();
 
@@ -87,7 +87,7 @@ export default function AddEmojiBottomSheet({
           </View>
         </ScrollView>
 
-        {selectedTemplates.length > 0 && (
+        {/* {selectedTemplates.length > 0 && (
           <View
             style={[
               styles.confirmButtonContainer,
@@ -113,7 +113,7 @@ export default function AddEmojiBottomSheet({
               <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>추가하기</Text>
             </TouchableOpacity>
           </View>
-        )}
+        )} */}
       </View>
     </BottomSheet>
   );
