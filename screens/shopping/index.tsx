@@ -1,50 +1,31 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { useEffect, useCallback, useMemo } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { ShoppingCart, Trash2, Check } from 'lucide-react-native';
-import { useTheme, getCategoryColor } from '@/lib/theme';
+import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/contexts/DialogContext';
 import { useMVIStore } from '@/mvi/base';
 import { createShoppingStore } from '@/mvi/features/shopping';
 import Header from '@/components/Header';
 import FloatingButton from '@/components/FloatingButton';
 import BottomSheet from '@/components/BottomSheet';
-import { getCategoryIcon } from '@/utils/categoryIcons';
+import { getCategoryIcon } from '@/utils/getCategoryIcons';
+import { getCategoryColor } from '@/utils/getCategoryColors';
+import { CATEGORIES } from '@/constants/categories';
 
 export default function ShoppingListScreen() {
-  return <ShoppingListContent />;
-}
-
-function ShoppingListContent() {
   const { colors, spacing, borderRadius, typography } = useTheme();
   const { alert, confirm } = useDialog();
   const [state, dispatch, effect] = useMVIStore(createShoppingStore);
 
-  const styles = useMemo(
-    () => createStyles({ spacing, borderRadius }),
-    [spacing, borderRadius, typography],
-  );
+  const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius, typography]);
 
   // 디버깅: state 변화 로깅
-  useEffect(() => {
-    console.log('Shopping state:', {
-      loading: state.loading,
-      itemCount: state.shoppingList.length,
-      error: state.error,
-    });
-  }, [state.loading, state.shoppingList.length, state.error]);
+  useEffect(() => {}, [state.loading, state.shoppingList.length, state.error]);
 
   // 화면 포커스 시 데이터 로드
   useFocusEffect(
     useCallback(() => {
-      console.log('Shopping screen focused - loading data');
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
     }, [dispatch]),
   );
@@ -86,9 +67,7 @@ function ShoppingListContent() {
   function handleClearPurchased() {
     dispatch({ type: 'CLEAR_PURCHASED' });
   }
-  const unpurchasedItems = state.shoppingList.filter(
-    (item) => !item.is_purchased,
-  );
+  const unpurchasedItems = state.shoppingList.filter((item) => !item.is_purchased);
   const purchasedItems = state.shoppingList.filter((item) => item.is_purchased);
   return (
     <>
@@ -98,21 +77,11 @@ function ShoppingListContent() {
           rightComponent={
             purchasedItems.length > 0 ? (
               <TouchableOpacity
-                style={[
-                  styles.clearButton,
-                  { backgroundColor: colors.dangerLight },
-                ]}
+                style={[styles.clearButton, { backgroundColor: colors.dangerLight }]}
                 onPress={handleClearPurchased}
               >
                 <Trash2 size={16} color={colors.danger} />
-                <Text
-                  style={[
-                    typography.styles.buttonSmall,
-                    { color: colors.danger },
-                  ]}
-                >
-                  구매완료 삭제
-                </Text>
+                <Text style={[typography.styles.buttonSmall, { color: colors.danger }]}>구매완료 삭제</Text>
               </TouchableOpacity>
             ) : undefined
           }
@@ -120,68 +89,36 @@ function ShoppingListContent() {
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {state.loading ? (
             <View style={styles.emptyContainer}>
-              <Text
-                style={[
-                  typography.styles.body,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                로딩 중이에요...
-              </Text>
+              <Text style={[typography.styles.body, { color: colors.textSecondary }]}>로딩 중이에요...</Text>
             </View>
           ) : state.shoppingList.length === 0 ? (
             <View style={styles.emptyContainer}>
               <ShoppingCart size={64} color={colors.textTertiary} />
-              <Text
-                style={[
-                  typography.styles.bodyMedium,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                장보기 목록이 비어있습니다
+              <Text style={[typography.styles.bodyMedium, { color: colors.textSecondary }]}>
+                장보기 목록이 비어있어요.
               </Text>
-              <Text
-                style={[
-                  typography.styles.bodySmall,
-                  { color: colors.textTertiary },
-                ]}
-              >
-                식재료를 소모하면 자동으로 추가됩니다
+              <Text style={[typography.styles.bodySmall, { color: colors.textTertiary }]}>
+                식재료를 소모하면 자동으로 추가돼요
               </Text>
             </View>
           ) : (
             <>
               {unpurchasedItems.length > 0 && (
                 <View style={styles.section}>
-                  <Text
-                    style={[
-                      typography.styles.h5,
-                      { color: colors.text, marginBottom: 24 },
-                    ]}
-                  >
-                    구매 예정
-                  </Text>
-                  <View
-                    style={[
-                      styles.listCard,
-                      { backgroundColor: colors.surface },
-                    ]}
-                  >
+                  <Text style={[typography.styles.h5, { color: colors.text, marginBottom: 24 }]}>구매 예정</Text>
+                  <View style={[styles.listCard, { backgroundColor: colors.surface }]}>
                     {unpurchasedItems.map((item, index) => (
                       <View
                         key={item.id}
                         style={[
                           styles.itemRow,
                           { borderBottomColor: colors.border },
-                          index === unpurchasedItems.length - 1 &&
-                            styles.lastItemRow,
+                          index === unpurchasedItems.length - 1 && styles.lastItemRow,
                         ]}
                       >
                         <TouchableOpacity
                           style={styles.itemContent}
-                          onPress={() =>
-                            handleTogglePurchased(item.id, item.is_purchased)
-                          }
+                          onPress={() => handleTogglePurchased(item.id, item.is_purchased)}
                           activeOpacity={0.7}
                         >
                           <View
@@ -193,34 +130,21 @@ function ShoppingListContent() {
                               },
                             ]}
                           >
-                            {item.is_purchased && (
-                              <Check size={16} color={colors.primary} />
-                            )}
+                            {item.is_purchased && <Check size={16} color={colors.primary} />}
                           </View>
                           <View style={styles.itemInfo}>
-                            <Text
-                              style={[
-                                typography.styles.bodySemibold,
-                                { color: colors.text },
-                              ]}
-                            >
-                              {item.name}
-                            </Text>
+                            <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>{item.name}</Text>
                             <View style={styles.itemMeta}>
                               <View
                                 style={[
                                   styles.categoryBadge,
                                   {
-                                    backgroundColor:
-                                      getCategoryColor(item.category) + '20',
+                                    backgroundColor: getCategoryColor(item.category) + '20',
                                   },
                                 ]}
                               >
                                 <Text
-                                  style={[
-                                    typography.styles.captionBold,
-                                    { color: getCategoryColor(item.category) },
-                                  ]}
+                                  style={[typography.styles.captionBold, { color: getCategoryColor(item.category) }]}
                                 >
                                   {item.category}
                                 </Text>
@@ -241,35 +165,20 @@ function ShoppingListContent() {
               )}
               {purchasedItems.length > 0 && (
                 <View style={styles.section}>
-                  <Text
-                    style={[
-                      typography.styles.h5,
-                      { color: colors.text, marginBottom: 24 },
-                    ]}
-                  >
-                    구매 완료
-                  </Text>
-                  <View
-                    style={[
-                      styles.listCard,
-                      { backgroundColor: colors.surface },
-                    ]}
-                  >
+                  <Text style={[typography.styles.h5, { color: colors.text, marginBottom: 24 }]}>구매 완료</Text>
+                  <View style={[styles.listCard, { backgroundColor: colors.surface }]}>
                     {purchasedItems.map((item, index) => (
                       <View
                         key={item.id}
                         style={[
                           styles.itemRow,
                           { borderBottomColor: colors.border },
-                          index === purchasedItems.length - 1 &&
-                            styles.lastItemRow,
+                          index === purchasedItems.length - 1 && styles.lastItemRow,
                         ]}
                       >
                         <TouchableOpacity
                           style={styles.itemContent}
-                          onPress={() =>
-                            handleTogglePurchased(item.id, item.is_purchased)
-                          }
+                          onPress={() => handleTogglePurchased(item.id, item.is_purchased)}
                           activeOpacity={0.7}
                         >
                           <View
@@ -299,16 +208,12 @@ function ShoppingListContent() {
                                 style={[
                                   styles.categoryBadge,
                                   {
-                                    backgroundColor:
-                                      getCategoryColor(item.category) + '20',
+                                    backgroundColor: getCategoryColor(item.category) + '20',
                                   },
                                 ]}
                               >
                                 <Text
-                                  style={[
-                                    typography.styles.captionBold,
-                                    { color: getCategoryColor(item.category) },
-                                  ]}
+                                  style={[typography.styles.captionBold, { color: getCategoryColor(item.category) }]}
                                 >
                                   {item.category}
                                 </Text>
@@ -332,28 +237,20 @@ function ShoppingListContent() {
         </ScrollView>
 
         {/* 플로팅 버튼 */}
-        <FloatingButton
-          onPress={() => dispatch({ type: 'TOGGLE_ADD_MODAL', payload: true })}
-        />
+        <FloatingButton onPress={() => dispatch({ type: 'TOGGLE_ADD_MODAL', payload: true })} />
       </View>
 
       <BottomSheet
         maxHeight={372}
         visible={state.isAddingItem}
         onClose={() => dispatch({ type: 'TOGGLE_ADD_MODAL', payload: false })}
-        title="장보기 항목 추가"
+        title="항목 추가"
       >
         <View style={styles.bottomSheetContainer}>
-          <ScrollView
-            style={{ flex: 1 }}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
+          <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
             <View style={styles.bottomSheetContent}>
               <View style={styles.inputGroup}>
-                <Text style={[typography.styles.label, { color: colors.text }]}>
-                  재료 이름
-                </Text>
+                <Text style={[typography.styles.label, { color: colors.text }]}>구매예정 재료</Text>
                 <TextInput
                   style={[
                     styles.input,
@@ -377,33 +274,22 @@ function ShoppingListContent() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={[typography.styles.label, { color: colors.text }]}>
-                  카테고리
-                </Text>
+                <Text style={[typography.styles.label, { color: colors.text }]}>카테고리</Text>
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.categoryScrollContent}
                 >
-                  {[
-                    '채소',
-                    '과일',
-                    '육류',
-                    '생선류',
-                    '유제품',
-                    '가공식품',
-                    '조미료',
-                    '기타',
-                  ].map((cat) => (
+                  {CATEGORIES.map((cat) => (
                     <TouchableOpacity
-                      key={cat}
+                      key={cat.id}
                       style={[
                         styles.categoryChip,
                         {
                           backgroundColor: colors.surface,
                           borderColor: colors.border,
                         },
-                        state.addForm.category === cat && {
+                        state.addForm.category === cat.id && {
                           backgroundColor: colors.primaryLight,
                           borderColor: colors.primary,
                         },
@@ -411,23 +297,23 @@ function ShoppingListContent() {
                       onPress={() =>
                         dispatch({
                           type: 'UPDATE_ADD_FORM',
-                          payload: { field: 'category', value: cat },
+                          payload: { field: 'category', value: cat.id },
                         })
                       }
                     >
                       <View style={styles.categoryChipContent}>
-                        {getCategoryIcon(cat, 16)}
+                        {getCategoryIcon(cat.id, 16)}
                         <Text
                           style={[
                             typography.styles.bodySmall,
                             { color: colors.textSecondary },
-                            state.addForm.category === cat && {
+                            state.addForm.category === cat.id && {
                               color: colors.primary,
                               fontWeight: '600',
                             },
                           ]}
                         >
-                          {cat}
+                          {cat.krLabel}
                         </Text>
                       </View>
                     </TouchableOpacity>
@@ -450,9 +336,7 @@ function ShoppingListContent() {
               style={[
                 styles.confirmButton,
                 {
-                  backgroundColor: state.addForm.name.trim()
-                    ? colors.primary
-                    : colors.border,
+                  backgroundColor: state.addForm.name.trim() ? colors.primary : colors.border,
                 },
               ]}
               onPress={() => dispatch({ type: 'SUBMIT_ADD_ITEM' })}
@@ -462,9 +346,7 @@ function ShoppingListContent() {
                 style={[
                   typography.styles.button,
                   {
-                    color: state.addForm.name.trim()
-                      ? '#FFFFFF'
-                      : colors.textTertiary,
+                    color: state.addForm.name.trim() ? '#FFFFFF' : colors.textTertiary,
                   },
                 ]}
               >

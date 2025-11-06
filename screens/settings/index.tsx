@@ -1,23 +1,7 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Linking,
-  Alert,
-  Platform,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert, Platform, ScrollView } from 'react-native';
 import { Switch } from 'react-native-switch';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Bell,
-  Moon,
-  Sun,
-  Info,
-  MessageSquare,
-  BellOff,
-} from 'lucide-react-native';
+import { Bell, Moon, Sun, Info, MessageSquare, BellOff } from 'lucide-react-native';
 import * as Notifications from 'expo-notifications';
 import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/contexts/DialogContext';
@@ -27,31 +11,18 @@ import Header from '@/components/Header';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
-  return <SettingsContent />;
-}
-
-function SettingsContent() {
   const insets = useSafeAreaInsets();
 
-  const {
-    colors,
-    typography,
-    spacing,
-    borderRadius,
-    isDark,
-    themePreference,
-    setTheme,
-  } = useTheme();
+  const { colors, typography, spacing, borderRadius, isDark, themePreference, setTheme } = useTheme();
 
-  const { alert, confirm } = useDialog();
+  const { alert } = useDialog();
 
   // MVI Store 사용
   const [state, dispatch, effect] = useMVIStore(createSettingsStore);
   const { notificationDays } = state;
 
   // 알림 권한 상태
-  const [hasNotificationPermission, setHasNotificationPermission] =
-    useState(false);
+  const [hasNotificationPermission, setHasNotificationPermission] = useState(false);
 
   // 알림 권한 확인
   useEffect(() => {
@@ -84,10 +55,7 @@ function SettingsContent() {
     }
   }
 
-  const styles = useMemo(
-    () => createStyles({ spacing, borderRadius }),
-    [spacing, borderRadius],
-  );
+  const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
 
   // Effect 처리
   useEffect(() => {
@@ -117,7 +85,7 @@ function SettingsContent() {
     await setTheme('system');
     alert({
       title: '성공',
-      message: '시스템 설정을 따릅니다.',
+      message: '시스템 설정을 따라요.',
       type: 'success',
     });
   }
@@ -127,9 +95,7 @@ function SettingsContent() {
     const subject = '냉장고 관리 앱 피드백';
     const body = '안녕하세요,\n\n피드백 내용을 입력해주세요:\n\n';
 
-    const url = `mailto:${email}?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(body)}`;
+    const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
     const canOpen = await Linking.canOpenURL(url);
     if (canOpen) {
@@ -137,7 +103,7 @@ function SettingsContent() {
     } else {
       alert({
         title: '오류',
-        message: '이메일 앱을 열 수 없습니다.',
+        message: '이메일 앱을 열 수 없어요.',
         type: 'error',
       });
     }
@@ -156,28 +122,14 @@ function SettingsContent() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Bell size={20} color={colors.primary} />
-            <Text style={[typography.styles.h5, { color: colors.text }]}>
-              알림 설정
-            </Text>
+            <Text style={[typography.styles.h5, { color: colors.text }]}>알림 설정</Text>
           </View>
 
           <View style={[styles.card, { backgroundColor: colors.surface }]}>
             {hasNotificationPermission ? (
               <>
-                <Text
-                  style={[
-                    typography.styles.bodySemibold,
-                    { color: colors.text },
-                  ]}
-                >
-                  유통기한 알림 주기
-                </Text>
-                <Text
-                  style={[
-                    typography.styles.bodySmall,
-                    { color: colors.textSecondary },
-                  ]}
-                >
+                <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>유통기한 알림 주기</Text>
+                <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>
                   유통기한 며칠 전부터 알림을 받을지 선택하세요
                 </Text>
 
@@ -217,13 +169,8 @@ function SettingsContent() {
               <>
                 <View style={styles.permissionContent}>
                   <BellOff size={40} color={colors.textTertiary} />
-                  <Text
-                    style={[
-                      typography.styles.bodySemibold,
-                      { color: colors.text, marginTop: spacing.md },
-                    ]}
-                  >
-                    알림 권한이 필요합니다
+                  <Text style={[typography.styles.bodySemibold, { color: colors.text, marginTop: spacing.md }]}>
+                    알림 권한이 필요해요
                   </Text>
                   <Text
                     style={[
@@ -239,21 +186,11 @@ function SettingsContent() {
                   </Text>
                 </View>
                 <TouchableOpacity
-                  style={[
-                    styles.permissionButton,
-                    { backgroundColor: colors.primaryLight },
-                  ]}
+                  style={[styles.permissionButton, { backgroundColor: colors.primaryLight }]}
                   onPress={requestNotificationPermission}
                 >
                   <Bell size={20} color={colors.primary} />
-                  <Text
-                    style={[
-                      typography.styles.bodySemibold,
-                      { color: colors.primary },
-                    ]}
-                  >
-                    알림 권한 허용하기
-                  </Text>
+                  <Text style={[typography.styles.bodySemibold, { color: colors.primary }]}>알림 권한 허용하기</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -262,36 +199,16 @@ function SettingsContent() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            {isDark ? (
-              <Moon size={20} color={colors.primary} />
-            ) : (
-              <Sun size={20} color={colors.primary} />
-            )}
-            <Text style={[typography.styles.h5, { color: colors.text }]}>
-              테마
-            </Text>
+            {isDark ? <Moon size={20} color={colors.primary} /> : <Sun size={20} color={colors.primary} />}
+            <Text style={[typography.styles.h5, { color: colors.text }]}>테마</Text>
           </View>
 
           <View style={[styles.card, { backgroundColor: colors.surface }]}>
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Text
-                  style={[
-                    typography.styles.bodySemibold,
-                    { color: colors.text },
-                  ]}
-                >
-                  다크 모드
-                </Text>
-                <Text
-                  style={[
-                    typography.styles.bodySmall,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  {themePreference === 'system'
-                    ? '시스템 설정 따름'
-                    : '어두운 테마 사용'}
+                <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>다크 모드</Text>
+                <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>
+                  {themePreference === 'system' ? '시스템 설정 따름' : '어두운 테마 사용'}
                 </Text>
               </View>
               <Switch
@@ -318,18 +235,10 @@ function SettingsContent() {
             </View>
             {themePreference !== 'system' && (
               <TouchableOpacity
-                style={[
-                  styles.settingRow,
-                  styles.systemResetButton,
-                  { borderTopColor: colors.border },
-                ]}
+                style={[styles.settingRow, styles.systemResetButton, { borderTopColor: colors.border }]}
                 onPress={resetThemeToSystem}
               >
-                <Text
-                  style={[typography.styles.label, { color: colors.primary }]}
-                >
-                  시스템 설정으로 되돌리기
-                </Text>
+                <Text style={[typography.styles.label, { color: colors.primary }]}>시스템 설정으로 되돌리기</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -338,22 +247,13 @@ function SettingsContent() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <MessageSquare size={20} color={colors.primary} />
-            <Text style={[typography.styles.h5, { color: colors.text }]}>
-              개발자에게 피드백
-            </Text>
+            <Text style={[typography.styles.h5, { color: colors.text }]}>개발자에게 피드백</Text>
           </View>
 
           <View style={[styles.card, { backgroundColor: colors.surface }]}>
-            <TouchableOpacity
-              style={styles.feedbackButton}
-              onPress={sendFeedback}
-            >
+            <TouchableOpacity style={styles.feedbackButton} onPress={sendFeedback}>
               <MessageSquare size={20} color={colors.primary} />
-              <Text
-                style={[typography.styles.bodySemibold, { color: colors.text }]}
-              >
-                의견 보내기
-              </Text>
+              <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>의견 보내기</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -361,72 +261,30 @@ function SettingsContent() {
         <View style={(styles.section, { marginBottom: 0 })}>
           <View style={styles.sectionHeader}>
             <Info size={20} color={colors.primary} />
-            <Text style={[typography.styles.h5, { color: colors.text }]}>
-              앱 정보
-            </Text>
+            <Text style={[typography.styles.h5, { color: colors.text }]}>앱 정보</Text>
           </View>
 
           <View style={[styles.card, { backgroundColor: colors.surface }]}>
             <View style={styles.infoRow}>
-              <Text
-                style={[
-                  typography.styles.bodySmall,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                버전
-              </Text>
-              <Text style={[typography.styles.label, { color: colors.text }]}>
-                1.0.0
-              </Text>
+              <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>버전</Text>
+              <Text style={[typography.styles.label, { color: colors.text }]}>1.0.0</Text>
             </View>
-            <View
-              style={[styles.divider, { backgroundColor: colors.border }]}
-            />
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.infoRow}>
-              <Text
-                style={[
-                  typography.styles.bodySmall,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                개발자
-              </Text>
-              <Text style={[typography.styles.label, { color: colors.text }]}>
-                냉장고 관리 팀
-              </Text>
+              <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>개발자</Text>
+              <Text style={[typography.styles.label, { color: colors.text }]}>냉장고 관리 팀</Text>
             </View>
-            <View
-              style={[styles.divider, { backgroundColor: colors.border }]}
-            />
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.infoRow}>
-              <Text
-                style={[
-                  typography.styles.bodySmall,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                문의
-              </Text>
-              <Text style={[typography.styles.label, { color: colors.text }]}>
-                support@fridge.app
-              </Text>
+              <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>문의</Text>
+              <Text style={[typography.styles.label, { color: colors.text }]}>support@fridge.app</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.footer}>
-          <Text
-            style={[
-              typography.styles.bodySemibold,
-              { color: colors.textSecondary },
-            ]}
-          >
-            냉장고 재고관리 앱
-          </Text>
-          <Text
-            style={[typography.styles.caption, { color: colors.textTertiary }]}
-          >
+          <Text style={[typography.styles.bodySemibold, { color: colors.textSecondary }]}>냉장고 재고관리 앱</Text>
+          <Text style={[typography.styles.caption, { color: colors.textTertiary }]}>
             음식물 쓰레기를 줄이고 현명한 소비를
           </Text>
         </View>
@@ -451,7 +309,6 @@ const createStyles = ({
       padding: spacing.lg,
     },
     section: {
-      // paddingHorizontal: spacing.xl,
       marginBottom: spacing.xxl,
     },
     sectionHeader: {

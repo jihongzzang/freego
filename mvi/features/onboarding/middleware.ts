@@ -13,13 +13,9 @@ const ONBOARDING_KEY = '@onboarding_completed';
 /**
  * Onboarding Middleware
  */
-export const onboardingMiddleware: Middleware<
-  OnboardingState,
-  OnboardingIntent,
-  OnboardingEffect
-> = async (
+export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent, OnboardingEffect> = async (
   state,
-  intent
+  intent,
 ): Promise<MiddlewareResult<OnboardingState, OnboardingEffect>> => {
   switch (intent.type) {
     case 'SKIP_ONBOARDING':
@@ -37,10 +33,7 @@ export const onboardingMiddleware: Middleware<
       };
 
     case 'NEXT_STEP':
-      // 마지막 단계에서 다음 버튼을 누르면 완료 처리
-      console.log('NEXT_STEP middleware, currentStep:', state.currentStep, 'totalSteps:', state.totalSteps);
       if (state.currentStep >= state.totalSteps - 1) {
-        console.log('Emitting NAVIGATE_TO_HOME effect');
         await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
         return {
           effects: [{ type: 'NAVIGATE_TO_HOME' }],

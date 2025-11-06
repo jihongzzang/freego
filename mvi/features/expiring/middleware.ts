@@ -7,14 +7,13 @@
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { ExpiringState, ExpiringIntent, ExpiringEffect, Ingredient } from './types';
 import { storage } from '@/lib/storage';
+import { StatusType } from '@/constants/itemStatus';
 
 /**
  * 유통기한 상태 계산
  */
-function calculateStatus(
-  expiryDate: string | null | undefined,
-): '유효' | '만료' | '미설정' {
-  if (!expiryDate) return '미설정';
+function calculateStatus(expiryDate: string | null | undefined): StatusType {
+  if (!expiryDate) return 'not_set';
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -23,8 +22,8 @@ function calculateStatus(
   const diffTime = expiry.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays < 0) return '만료';
-  return '유효';
+  if (diffDays < 0) return 'expired';
+  return 'valid';
 }
 
 /**
@@ -60,9 +59,7 @@ export const expiringMiddleware: Middleware<
           daysRemaining: calculateDaysRemaining(item.expiry_date),
         }));
 
-        const ingredients = allIngredients.filter(
-          (item) => item.status === '만료'
-        );
+        const ingredients = allIngredients.filter((item) => item.status === 'expired');
 
         return {
           state: {
@@ -82,7 +79,7 @@ export const expiringMiddleware: Middleware<
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료 데이터를 불러오는데 실패했습니다.',
+              payload: '식재료 데이터를 불러오는데 실패했어요.',
             },
           ],
         };
@@ -101,9 +98,7 @@ export const expiringMiddleware: Middleware<
           daysRemaining: calculateDaysRemaining(item.expiry_date),
         }));
 
-        const ingredients = allIngredients.filter(
-          (item) => item.status === '만료'
-        );
+        const ingredients = allIngredients.filter((item) => item.status === 'expired');
 
         return {
           state: {
@@ -113,7 +108,7 @@ export const expiringMiddleware: Middleware<
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료가 삭제되었습니다.',
+              payload: '식재료가 삭제됐어요.',
             },
           ],
         };
@@ -122,7 +117,7 @@ export const expiringMiddleware: Middleware<
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료 삭제에 실패했습니다.',
+              payload: '식재료 삭제에 실패했어요.',
             },
           ],
         };

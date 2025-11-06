@@ -4,12 +4,13 @@
 
 import { Intent, State, Effect } from '@/mvi/base';
 import { Ingredient as StoredIngredient } from '@/lib/storage';
+import { StatusType } from '@/constants/itemStatus';
 
 /**
  * Ingredient with status
  */
 export interface Ingredient extends StoredIngredient {
-  status: '유효' | '만료' | '미설정';
+  status: StatusType;
   daysRemaining: number | null;
 }
 
@@ -31,7 +32,7 @@ export type HomeIntent =
   | { type: 'LOAD_INGREDIENTS_ERROR'; payload: string }
   | { type: 'DELETE_INGREDIENT'; payload: string }
   | { type: 'UPDATE_EXPIRY_DATE'; payload: { id: string; expiryDate: string } }
-  | { type: 'NAVIGATE_TO_ADD' }
+  | { type: 'NAVIGATE_TO_ADD'; payload?: string }
   | { type: 'NAVIGATE_TO_INGREDIENTS'; payload?: string }
   | { type: 'NAVIGATE_TO_EXPIRING' }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: string };
@@ -39,6 +40,4 @@ export type HomeIntent =
 /**
  * Home Effect (부수 효과)
  */
-export type HomeEffect =
-  | { type: 'NAVIGATE'; payload: string }
-  | { type: 'SHOW_TOAST'; payload: string };
+export type HomeEffect = { type: 'NAVIGATE'; payload: string } | { type: 'SHOW_TOAST'; payload: string };

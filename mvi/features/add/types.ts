@@ -3,17 +3,21 @@
  */
 
 import { Intent, State, Effect } from '@/mvi/base';
+import { CategoryType } from '@/constants/categories';
+import { StorageLocationType } from '@/constants/storageLocations';
+import { UnitType } from '@/constants/units';
 
 /**
  * Add Form State
  */
 export interface AddFormData {
   name: string;
-  category: string;
+  category: CategoryType;
   quantity?: string;
-  unit?: string;
+  unit?: UnitType;
+  purchase_date?: string;
   expiry_date: string;
-  storage_location: string;
+  storage_location: StorageLocationType;
   memo: string;
 }
 

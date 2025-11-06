@@ -1,38 +1,41 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
-import { Minus, ChevronDown, ChevronUp, Edit3 } from 'lucide-react-native';
-import { useTheme, getStatusColor } from '@/lib/theme';
+import { Minus, ChevronDown, ChevronUp, Edit3, Grid3x3 } from 'lucide-react-native';
+import { useTheme } from '@/lib/theme';
 import { useMVIStore } from '@/mvi/base';
 import { createIngredientsStore, Ingredient } from '@/mvi/features/ingredients';
-import { getCategoryIcon } from '@/utils/categoryIcons';
+import { getCategoryIcon } from '@/utils/getCategoryIcons';
+import { getStatusColor } from '@/utils/getStatusColors';
+import { CATEGORIES, CategoryType, findCategoryById } from '@/constants/categories';
+import { findStorageLocationById } from '@/constants/storageLocations';
 import Header from '@/components/Header';
 import FloatingButton from '@/components/FloatingButton';
+import { findUnitById } from '@/constants/units';
+import BulkAddBottomSheet from '@/components/BulkAddBottomSheet';
+import { useBulkAdd } from '@/hooks/useBulkAdd';
 
 export default function IngredientsScreen() {
   const router = useRouter();
   const { colors, typography, spacing, borderRadius } = useTheme();
 
-  // 아코디언 상태 관리 (카테고리별 접힘/펼침)
-  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(
-    new Set(),
-  );
+  // 카테고리 순서 (id 기반)
+  const categoryOrder: CategoryType[] = CATEGORIES.map((cat) => cat.id);
+
+  // 아코디언 상태 관리 (카테고리별 접힘/펼침) - 처음에는 모두 접힌 상태
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<CategoryType>>(new Set(categoryOrder));
 
   // MVI Store 사용
   const [state, dispatch, effect] = useMVIStore(createIngredientsStore);
   const { ingredients, loading } = state;
 
-  const styles = useMemo(
-    () => createStyles({ borderRadius, spacing }),
-    [spacing, borderRadius],
-  );
+  // Bulk Add Hook
+  const bulkAdd = useBulkAdd(() => {
+    dispatch({ type: 'LOAD_INGREDIENTS' });
+  });
+
+  const styles = useMemo(() => createStyles({ borderRadius, spacing }), [spacing, borderRadius]);
 
   // Effect 처리
   useEffect(() => {
@@ -46,7 +49,6 @@ export default function IngredientsScreen() {
           }
           break;
         case 'SHOW_TOAST':
-          console.log(effect.payload);
           break;
       }
     }
@@ -61,7 +63,7 @@ export default function IngredientsScreen() {
 
   // 카테고리별로 재료 그룹화
   const groupedIngredients = useMemo(() => {
-    const grouped: Record<string, Ingredient[]> = {};
+    const grouped: Record<CategoryType, Ingredient[]> = {} as Record<CategoryType, Ingredient[]>;
 
     ingredients.forEach((item) => {
       if (!grouped[item.category]) {
@@ -73,25 +75,13 @@ export default function IngredientsScreen() {
     return grouped;
   }, [ingredients]);
 
-  // 카테고리 순서
-  const categoryOrder = [
-    '채소',
-    '과일',
-    '육류',
-    '생선류',
-    '유제품',
-    '가공식품',
-    '조미료',
-    '기타',
-  ];
-
   const sortedCategories = useMemo(() => {
     // 모든 카테고리를 표시 (재료가 없어도)
     return categoryOrder;
-  }, []);
+  }, [categoryOrder]);
 
   // 카테고리 접기/펼치기 토글
-  const toggleCategory = (category: string) => {
+  const toggleCategory = (category: CategoryType) => {
     setCollapsedCategories((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(category)) {
@@ -125,26 +115,15 @@ export default function IngredientsScreen() {
       >
         <View style={styles.ingredientInfo}>
           <View style={styles.ingredientNameRow}>
-            <Text
-              style={[typography.styles.bodySemibold, { color: colors.text }]}
-            >
-              {item.name}
-            </Text>
-            <View
-              style={[
-                styles.statusDot,
-                { backgroundColor: getStatusColor(item.status) },
-              ]}
-            />
+            <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>{item.name}</Text>
+            <View style={[styles.statusDot, { backgroundColor: getStatusColor(item.status) }]} />
           </View>
-          <Text
-            style={[typography.styles.caption, { color: colors.textSecondary }]}
-          >
+          <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>
             {item.quantity
               ? item.unit
-                ? `${item.quantity}${item.unit} · ${item.storage_location}`
-                : `${item.quantity} · ${item.storage_location}`
-              : item.storage_location}
+                ? `${item.quantity}${findUnitById(item.unit)?.krLabel} · ${findStorageLocationById(item.storage_location)?.krLabel}`
+                : `${item.quantity} · ${findStorageLocationById(item.storage_location)?.krLabel}`
+              : findStorageLocationById(item.storage_location)?.krLabel}
           </Text>
           {/* 유통기한 정보 */}
           {item.expiry_date ? (
@@ -152,19 +131,13 @@ export default function IngredientsScreen() {
               style={[
                 typography.styles.caption,
                 {
-                  color:
-                    item.status === '만료'
-                      ? colors.danger
-                      : item.status === '미설정'
-                        ? colors.warning
-                        : colors.success,
+                  color: getStatusColor(item.status),
                   marginTop: spacing.xs,
                 },
               ]}
             >
               유통기한: {item.expiry_date}
-              {item.daysRemaining !== null &&
-                ` (${getDaysRemaining(item.daysRemaining)})`}
+              {item.daysRemaining !== null && ` (${getDaysRemaining(item.daysRemaining)})`}
             </Text>
           ) : (
             <Text
@@ -186,10 +159,7 @@ export default function IngredientsScreen() {
       {/* 액션 버튼 그룹 */}
       <View style={styles.actionButtons}>
         <TouchableOpacity
-          style={[
-            styles.actionButton,
-            { backgroundColor: colors.primaryLight },
-          ]}
+          style={[styles.actionButton, { backgroundColor: colors.primaryLight }]}
           onPress={(e) => {
             e.stopPropagation();
             dispatch({ type: 'NAVIGATE_TO_DETAIL_EDIT', payload: item.id });
@@ -198,10 +168,7 @@ export default function IngredientsScreen() {
           <Edit3 size={16} color={colors.primary} />
         </TouchableOpacity>
         <TouchableOpacity
-          style={[
-            styles.actionButton,
-            { backgroundColor: colors.surfaceSecondary },
-          ]}
+          style={[styles.actionButton, { backgroundColor: colors.surfaceSecondary }]}
           onPress={(e) => {
             e.stopPropagation();
             quickDeduct(item.id);
@@ -222,52 +189,30 @@ export default function IngredientsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {loading ? (
-          <View
-            style={[styles.emptyContainer, { backgroundColor: colors.surface }]}
-          >
-            <Text
-              style={[
-                typography.styles.bodySemibold,
-                { color: colors.textTertiary },
-              ]}
-            >
-              로딩 중이에요...
-            </Text>
+          <View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
+            <Text style={[typography.styles.bodySemibold, { color: colors.textTertiary }]}>로딩 중이에요...</Text>
           </View>
         ) : (
           <View style={styles.categoriesContainer}>
-            {sortedCategories.map((cat) => {
-              const categoryItems = groupedIngredients[cat] || [];
-              const isCollapsed = collapsedCategories.has(cat);
+            {sortedCategories.map((catId) => {
+              const categoryItems = groupedIngredients[catId] || [];
+              const isCollapsed = collapsedCategories.has(catId);
+              const categoryItem = findCategoryById(catId);
 
               return (
-                <View key={cat} style={styles.categorySection}>
+                <View key={catId} style={styles.categorySection}>
                   <TouchableOpacity
                     style={styles.categoryHeader}
-                    onPress={() => toggleCategory(cat)}
+                    onPress={() => toggleCategory(catId)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.categoryHeaderLeft}>
-                      {getCategoryIcon(cat, 20)}
-                      <Text
-                        style={[typography.styles.h6, { color: colors.text }]}
-                      >
-                        {cat}
-                      </Text>
+                      {getCategoryIcon(catId, 20)}
+                      <Text style={[typography.styles.h6, { color: colors.text }]}>{categoryItem?.krLabel}</Text>
                     </View>
                     <View style={styles.categoryHeaderRight}>
-                      <View
-                        style={[
-                          styles.categoryBadge,
-                          { backgroundColor: colors.primaryLight },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            typography.styles.captionBold,
-                            { color: colors.primary },
-                          ]}
-                        >
+                      <View style={[styles.categoryBadge, { backgroundColor: colors.primaryLight }]}>
+                        <Text style={[typography.styles.captionBold, { color: colors.primary }]}>
                           {categoryItems.length}
                         </Text>
                       </View>
@@ -281,30 +226,13 @@ export default function IngredientsScreen() {
                   {!isCollapsed && (
                     <>
                       {categoryItems.length > 0 ? (
-                        <View
-                          style={[
-                            styles.listCard,
-                            { backgroundColor: colors.surface },
-                          ]}
-                        >
-                          {categoryItems.map((item) =>
-                            renderIngredientItem({ item }),
-                          )}
+                        <View style={[styles.listCard, { backgroundColor: colors.surface }]}>
+                          {categoryItems.map((item) => renderIngredientItem({ item }))}
                         </View>
                       ) : (
-                        <View
-                          style={[
-                            styles.emptyCategory,
-                            { backgroundColor: colors.surface },
-                          ]}
-                        >
-                          <Text
-                            style={[
-                              typography.styles.bodySmall,
-                              { color: colors.textTertiary },
-                            ]}
-                          >
-                            재료가 없습니다
+                        <View style={[styles.emptyCategory, { backgroundColor: colors.surface }]}>
+                          <Text style={[typography.styles.bodySmall, { color: colors.textTertiary }]}>
+                            재료가 없어요
                           </Text>
                         </View>
                       )}
@@ -316,7 +244,32 @@ export default function IngredientsScreen() {
           </View>
         )}
       </ScrollView>
-      <FloatingButton onPress={() => dispatch({ type: 'NAVIGATE_TO_ADD' })} />
+      <FloatingButton
+        menuItems={[
+          {
+            icon: <Edit3 size={24} color="#FFFFFF" />,
+            label: '직접 등록',
+            onPress: () => dispatch({ type: 'NAVIGATE_TO_ADD' }),
+          },
+          {
+            icon: <Grid3x3 size={24} color="#FFFFFF" />,
+            label: '한꺼번에 등록',
+            onPress: () => {
+              bulkAdd.open();
+            },
+            backgroundColor: colors.secondary,
+          },
+        ]}
+      />
+      <BulkAddBottomSheet
+        visible={bulkAdd.isVisible}
+        onClose={bulkAdd.close}
+        selectedCategoryId={bulkAdd.selectedCategoryId}
+        onCategoryChange={bulkAdd.handleCategoryChange}
+        selectedTemplates={bulkAdd.selectedTemplates}
+        onTemplateToggle={bulkAdd.handleTemplateToggle}
+        onConfirm={bulkAdd.handleConfirm}
+      />
     </View>
   );
 }

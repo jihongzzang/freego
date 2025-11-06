@@ -7,14 +7,13 @@
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { HomeState, HomeIntent, HomeEffect, Ingredient } from './types';
 import { storage } from '@/lib/storage';
+import { StatusType } from '@/constants/itemStatus';
 
 /**
  * 유통기한 상태 계산
  */
-function calculateStatus(
-  expiryDate: string | null | undefined,
-): '유효' | '만료' | '미설정' {
-  if (!expiryDate) return '미설정';
+function calculateStatus(expiryDate: string | null | undefined): StatusType {
+  if (!expiryDate) return 'not_set';
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -23,8 +22,8 @@ function calculateStatus(
   const diffTime = expiry.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays < 0) return '만료';
-  return '유효';
+  if (diffDays < 0) return 'expired';
+  return 'valid';
 }
 
 /**
@@ -44,11 +43,10 @@ function calculateDaysRemaining(expiryDate: string | null | undefined): number |
 /**
  * Home Middleware
  */
-export const homeMiddleware: Middleware<
-  HomeState,
-  HomeIntent,
-  HomeEffect
-> = async (state, intent): Promise<MiddlewareResult<HomeState, HomeEffect>> => {
+export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = async (
+  state,
+  intent,
+): Promise<MiddlewareResult<HomeState, HomeEffect>> => {
   switch (intent.type) {
     case 'LOAD_INGREDIENTS': {
       try {
@@ -77,7 +75,7 @@ export const homeMiddleware: Middleware<
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료 데이터를 불러오는데 실패했습니다.',
+              payload: '식재료 데이터를 불러오는데 실패했어요.',
             },
           ],
         };
@@ -104,7 +102,7 @@ export const homeMiddleware: Middleware<
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료가 삭제되었습니다.',
+              payload: '식재료가 삭제됐어요.',
             },
           ],
         };
@@ -113,7 +111,7 @@ export const homeMiddleware: Middleware<
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료 삭제에 실패했습니다.',
+              payload: '식재료 삭제에 실패했어요.',
             },
           ],
         };
@@ -123,14 +121,11 @@ export const homeMiddleware: Middleware<
     case 'UPDATE_EXPIRY_DATE': {
       try {
         const { id, expiryDate } = intent.payload;
-        console.log('Middleware: UPDATE_EXPIRY_DATE 시작', { id, expiryDate });
 
         await storage.updateIngredient(id, { expiry_date: expiryDate });
-        console.log('Middleware: storage.updateIngredient 완료');
 
         // 업데이트 후 다시 로드
         const data = await storage.getIngredients();
-        console.log('Middleware: 재료 개수:', data.length);
 
         const ingredients: Ingredient[] = data.map((item) => ({
           ...item,
@@ -146,7 +141,7 @@ export const homeMiddleware: Middleware<
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '유통기한이 수정되었습니다.',
+              payload: '유통기한이 수정됐어요.',
             },
           ],
         };
@@ -156,17 +151,23 @@ export const homeMiddleware: Middleware<
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '유통기한 수정에 실패했습니다.',
+              payload: '유통기한 수정에 실패했어요.',
             },
           ],
         };
       }
     }
 
-    case 'NAVIGATE_TO_ADD':
+    case 'NAVIGATE_TO_ADD': {
       return {
-        effects: [{ type: 'NAVIGATE', payload: '/add' }],
+        effects: [
+          {
+            type: 'NAVIGATE',
+            payload: intent.payload ? `/add?category=${encodeURIComponent(intent.payload)}` : '/add',
+          },
+        ],
       };
+    }
 
     case 'NAVIGATE_TO_INGREDIENTS':
       return {
@@ -187,9 +188,7 @@ export const homeMiddleware: Middleware<
 
     case 'NAVIGATE_TO_DETAIL':
       return {
-        effects: [
-          { type: 'NAVIGATE', payload: `/ingredient/${intent.payload}` },
-        ],
+        effects: [{ type: 'NAVIGATE', payload: `/ingredient/${intent.payload}` }],
       };
 
     default:

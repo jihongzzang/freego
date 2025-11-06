@@ -1,19 +1,16 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useEffect, useCallback, useMemo } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Clock, Minus } from 'lucide-react-native';
 import { useRouter } from '@/hooks/useRouter';
-import { useTheme, getStatusColor } from '@/lib/theme';
+import { useTheme } from '@/lib/theme';
 import { useMVIStore } from '@/mvi/base';
 import { createExpiringStore, Ingredient } from '@/mvi/features/expiring';
-import { getCategoryIcon } from '@/utils/categoryIcons';
+import { getCategoryIcon } from '@/utils/getCategoryIcons';
 import Header from '@/components/Header';
+import { getStatusColor } from '@/utils/getStatusColors';
+import { findStorageLocationById } from '@/constants/storageLocations';
+import { findUnitById } from '@/constants/units';
 
 export default function ExpiringScreen() {
   const router = useRouter();
@@ -23,10 +20,7 @@ export default function ExpiringScreen() {
   const [state, dispatch, effect] = useMVIStore(createExpiringStore);
   const { ingredients, loading } = state;
 
-  const styles = useMemo(
-    () => createStyles({ borderRadius, spacing }),
-    [spacing, borderRadius],
-  );
+  const styles = useMemo(() => createStyles({ borderRadius, spacing }), [spacing, borderRadius]);
 
   // Effect 처리
   useEffect(() => {
@@ -40,7 +34,6 @@ export default function ExpiringScreen() {
           }
           break;
         case 'SHOW_TOAST':
-          console.log(effect.payload);
           break;
       }
     }
@@ -74,43 +67,23 @@ export default function ExpiringScreen() {
       activeOpacity={0.7}
     >
       <View style={styles.ingredientLeft}>
-        <View
-          style={[
-            styles.categoryIconWrapper,
-            { backgroundColor: colors.primaryLight },
-          ]}
-        >
+        <View style={[styles.categoryIconWrapper, { backgroundColor: colors.primaryLight }]}>
           {getCategoryIcon(item.category)}
         </View>
         <View style={styles.ingredientInfo}>
           <View style={styles.ingredientNameRow}>
-            <Text
-              style={[typography.styles.bodySemibold, { color: colors.text }]}
-            >
-              {item.name}
-            </Text>
-            <View
-              style={[
-                styles.statusDot,
-                { backgroundColor: getStatusColor(item.status) },
-              ]}
-            />
+            <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>{item.name}</Text>
+            <View style={[styles.statusDot, { backgroundColor: getStatusColor(item.status) }]} />
           </View>
-          <Text
-            style={[typography.styles.caption, { color: colors.textSecondary }]}
-          >
+          <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>
             {item.quantity}
-            {item.unit} · {item.storage_location}
-            {item.daysRemaining !== null &&
-              ` · ${getDaysRemaining(item.daysRemaining)}`}
+            {item.unit && findUnitById(item.unit)?.krLabel} · {findStorageLocationById(item.storage_location)?.krLabel}
+            {item.daysRemaining !== null && ` · ${getDaysRemaining(item.daysRemaining)}`}
           </Text>
         </View>
       </View>
       <TouchableOpacity
-        style={[
-          styles.quickButton,
-          { backgroundColor: colors.surfaceSecondary },
-        ]}
+        style={[styles.quickButton, { backgroundColor: colors.surfaceSecondary }]}
         onPress={(e) => {
           e.stopPropagation();
           quickDeduct(item.id);
@@ -123,49 +96,21 @@ export default function ExpiringScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header
-        title="빨리 먹어야 해요"
-        onBackPress={() => dispatch({ type: 'NAVIGATE_BACK' })}
-      />
+      <Header title="빨리 먹어야 해요" onBackPress={() => dispatch({ type: 'NAVIGATE_BACK' })} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {loading ? (
-          <View
-            style={[styles.emptyContainer, { backgroundColor: colors.surface }]}
-          >
-            <Text
-              style={[
-                typography.styles.bodySemibold,
-                { color: colors.textTertiary },
-              ]}
-            >
-              로딩 중이에요...
-            </Text>
+          <View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
+            <Text style={[typography.styles.bodySemibold, { color: colors.textTertiary }]}>로딩 중이에요...</Text>
           </View>
         ) : ingredients.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Clock size={64} color={colors.textTertiary} />
-            <Text
-              style={[
-                typography.styles.bodyMedium,
-                { color: colors.textSecondary },
-              ]}
-            >
-              임박한 재료가 없어요
-            </Text>
-            <Text
-              style={[
-                typography.styles.bodySmall,
-                { color: colors.textTertiary },
-              ]}
-            >
-              모든 재료가 신선해요!
-            </Text>
+            <Text style={[typography.styles.bodyMedium, { color: colors.textSecondary }]}>임박한 재료가 없어요</Text>
+            <Text style={[typography.styles.bodySmall, { color: colors.textTertiary }]}>모든 재료가 신선해요!</Text>
           </View>
         ) : (
-          <View
-            style={[styles.listCard, { backgroundColor: colors.dangerLight }]}
-          >
+          <View style={[styles.listCard, { backgroundColor: colors.dangerLight }]}>
             {ingredients.map((item) => renderIngredientItem({ item }))}
           </View>
         )}

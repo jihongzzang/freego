@@ -19,7 +19,7 @@ const initialState: ShoppingState = {
   isAddingItem: false,
   addForm: {
     name: '',
-    category: '채소',
+    category: 'vegetables',
   },
 };
 

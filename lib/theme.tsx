@@ -1,11 +1,5 @@
 import { useColorScheme, TextStyle, Platform } from 'react-native';
-import {
-  useState,
-  useEffect,
-  createContext,
-  useContext,
-  ReactNode,
-} from 'react';
+import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const THEME_KEY = '@theme_preference';
@@ -344,10 +338,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   //   }
   // }
 
-  const isDark =
-    themePreference === 'system'
-      ? systemColorScheme === 'dark'
-      : themePreference === 'dark';
+  const isDark = themePreference === 'system' ? systemColorScheme === 'dark' : themePreference === 'dark';
 
   const colors = isDark ? Colors.dark : Colors.light;
 
@@ -371,9 +362,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     shadows,
   };
 
-  return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {
@@ -382,36 +371,4 @@ export function useTheme() {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
-}
-
-export function getStatusColor(status: string): string {
-  const statusColors: Record<string, string> = {
-    유효: '#10B981',
-    만료: '#F04452',
-    미설정: '#9CA3AF',
-  };
-  return statusColors[status] || '#6B7280';
-}
-
-export function getCategoryColor(category: string): string {
-  const categoryColors: Record<string, string> = {
-    채소: '#10B981', // 초록
-    과일: '#EF4444', // 빨강
-    육류: '#F97316', // 주황
-    생선류: '#06B6D4', // 시안/청록
-    유제품: '#3B82F6', // 파랑
-    가공식품: '#F59E0B', // 노랑/금색
-    조미료: '#8B5CF6', // 보라
-    기타: '#6B7280', // 회색
-  };
-  return categoryColors[category] || '#6B7280';
-}
-
-export function getStorageColor(location: string): string {
-  const storageColors: Record<string, string> = {
-    냉장실: '#3B82F6',
-    냉동실: '#8B5CF6',
-    실온: '#10B981',
-  };
-  return storageColors[location] || '#6B7280';
 }

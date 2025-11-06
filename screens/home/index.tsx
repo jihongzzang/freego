@@ -1,40 +1,42 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
-import { Bell } from 'lucide-react-native';
-import { useTheme } from '@/lib/theme';
+import { Bell, Edit3, Grid3x3 } from 'lucide-react-native';
+import { ColorPalette, useTheme } from '@/lib/theme';
 import { useMVIStore } from '@/mvi/base';
 import { createHomeStore, Ingredient } from '@/mvi/features/home';
 import Header from '@/components/Header';
 import FloatingButton from '@/components/FloatingButton';
 import BottomSheet from '@/components/BottomSheet';
 import DatePicker from '@/components/DatePicker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ALL_CATEGORIES, ALL_CATEGORY, AllCategoryType } from '@/constants/categories';
+import { StatusType } from '@/constants/itemStatus';
+import { QUICK_SELECT_OPTIONS } from '@/constants/quickSelectOptions';
+import { useBulkAdd } from '@/hooks/useBulkAdd';
+import BulkAddBottomSheet from '@/components/BulkAddBottomSheet';
 
 export default function HomeScreen() {
-  return <DashboardContent />;
-}
-
-function DashboardContent() {
   const router = useRouter();
   const { colors, typography, borderRadius, spacing } = useTheme();
   const scrollViewRef = useRef<ScrollView>(null);
   const expiringRef = useRef<View>(null);
 
-  // 선택된 카테고리 상태
-  const [selectedCategory, setSelectedCategory] = useState<string>('전체');
+  const inset = useSafeAreaInsets();
+
+  // 선택된 카테고리 상태 (id 기반)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<AllCategoryType>(ALL_CATEGORY.id);
 
   // 유통기한 수정 모달 상태
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedIngredient, setSelectedIngredient] =
-    useState<Ingredient | null>(null);
+  const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  // 한꺼번에 등록 훅
+  const bulkAdd = useBulkAdd(() => {
+    dispatch({ type: 'LOAD_INGREDIENTS' });
+  });
 
   // MVI Store 사용
   const [state, dispatch, effect] = useMVIStore(createHomeStore);
@@ -42,10 +44,21 @@ function DashboardContent() {
 
   // 동적 스타일 생성
 
-  const styles = useMemo(
-    () => createStyles({ borderRadius, spacing }),
-    [spacing, borderRadius],
-  );
+  const styles = useMemo(() => createStyles({ colors, borderRadius, spacing }), [spacing, borderRadius]);
+
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [0, -60], // 헤더 높이만큼
+    extrapolate: 'clamp',
+  });
+
+  const contentOpacity = scrollY.interpolate({
+    inputRange: [0, 60],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
 
   // Effect 처리
   useEffect(() => {
@@ -55,7 +68,6 @@ function DashboardContent() {
           router.push(effect.payload as any);
           break;
         case 'SHOW_TOAST':
-          console.log(effect.payload);
           break;
       }
     }
@@ -68,11 +80,9 @@ function DashboardContent() {
     }, [dispatch]),
   );
 
-  function getExpiryDisplay(
-    status: '유효' | '만료' | '미설정',
-    daysRemaining: number | null,
-  ): string {
-    if (status === '미설정') return '유통기한 입력필요';
+  function getExpiryDisplay(status: StatusType, daysRemaining: number | null): string {
+    if (status === 'not_set') return '유통기한 입력필요';
+
     if (daysRemaining === null) return '';
 
     if (daysRemaining < 0) {
@@ -133,45 +143,33 @@ function DashboardContent() {
     updateExpiryDate(formattedDate);
   }
 
-  const expiringItems = ingredients.filter((item) => item.status === '만료');
+  const expiringItems = ingredients.filter((item) => item.status === 'expired');
 
-  // 카테고리 목록
-  const allCategories = useMemo(
-    () => [
-      '전체',
-      '채소',
-      '과일',
-      '육류',
-      '생선류',
-      '유제품',
-      '가공식품',
-      '조미료',
-    ],
-    [],
+  // 선택된 카테고리 정보
+  const selectedCategoryItem = useMemo(
+    () => ALL_CATEGORIES.find((cat) => cat.id === selectedCategoryId),
+    [selectedCategoryId],
   );
 
   // 선택된 카테고리에 따른 재료 필터링
   const filteredIngredients = useMemo(() => {
-    if (selectedCategory === '전체') {
+    if (selectedCategoryId === ALL_CATEGORY.id) {
       return ingredients;
     }
-    return ingredients.filter((item) => item.category === selectedCategory);
-  }, [ingredients, selectedCategory]);
+    return ingredients.filter((item) => item.category === selectedCategoryId);
+  }, [ingredients, selectedCategoryId]);
 
   const renderIngredientCard = ({ item }: { item: Ingredient }) => (
     <TouchableOpacity
       key={item.id}
-      style={[
-        styles.ingredientCard,
-        { backgroundColor: colors.surface, borderColor: colors.border },
-      ]}
+      style={[styles.ingredientCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
       onPress={() => openDatePicker(item)}
       activeOpacity={0.7}
     >
       <View style={styles.cardContent}>
         <View style={styles.emojiContainer}>
           <Text style={styles.emojiText}>{item.emoji || '🍽️'}</Text>
-          {item.status === '만료' && (
+          {item.status === 'expired' && (
             <View
               style={[
                 styles.statusBadge,
@@ -182,18 +180,14 @@ function DashboardContent() {
             />
           )}
         </View>
-        <Text
-          style={[styles.ingredientName, { color: colors.text }]}
-          numberOfLines={1}
-        >
+        <Text style={[styles.ingredientName, { color: colors.text }]} numberOfLines={1}>
           {item.name}
         </Text>
         <Text
           style={[
             styles.expiryText,
             {
-              color:
-                item.status === '만료' ? colors.danger : colors.textTertiary,
+              color: item.status === 'expired' ? colors.danger : colors.textTertiary,
             },
           ]}
           numberOfLines={1}
@@ -206,125 +200,120 @@ function DashboardContent() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header
-        title="내 냉장고"
-        rightComponent={
-          <TouchableOpacity
-            style={[
-              styles.notificationButton,
-              {
-                backgroundColor:
-                  expiringItems.length > 0
-                    ? colors.dangerLight
-                    : colors.surfaceSecondary,
-              },
-            ]}
-            onPress={() => {
-              dispatch({ type: 'NAVIGATE_TO_EXPIRING' });
-            }}
-          >
-            <Bell
-              size={20}
-              color={
-                expiringItems.length > 0 ? colors.danger : colors.textSecondary
-              }
-            />
-            {expiringItems.length > 0 && (
-              <View style={[styles.badge, { backgroundColor: colors.danger }]}>
-                <Text
-                  style={[typography.styles.captionBold, { color: '#FFFFFF' }]}
-                >
-                  {expiringItems.length}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        }
-      />
-
-      {/* 카테고리 캐러셀 - 고정 */}
-      <View
-        style={[
-          styles.categoryCarouselContainer,
-          { backgroundColor: colors.surface },
-        ]}
+      <Animated.View
+        style={{
+          transform: [{ translateY: headerTranslateY }],
+          backgroundColor: colors.surface, // 👈 배경색 유지
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10,
+        }}
       >
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.categoryCarousel}
-          contentContainerStyle={styles.categoryCarouselContent}
-        >
-          {allCategories.map((category) => {
-            const isSelected = category === selectedCategory;
-            const categoryCount =
-              category === '전체'
-                ? ingredients.length
-                : ingredients.filter((item) => item.category === category)
-                    .length;
-
-            return (
+        <Animated.View style={{ opacity: contentOpacity }}>
+          <Header
+            title="내 냉장고"
+            rightComponent={
               <TouchableOpacity
-                key={category}
                 style={[
-                  styles.categoryChip,
+                  styles.notificationButton,
                   {
-                    backgroundColor: isSelected
-                      ? colors.primary
-                      : colors.surface,
-                    borderColor: isSelected ? colors.primary : colors.border,
+                    backgroundColor: expiringItems.length > 0 ? colors.dangerLight : colors.surfaceSecondary,
                   },
                 ]}
-                onPress={() => setSelectedCategory(category)}
-                activeOpacity={0.7}
+                onPress={() => {
+                  dispatch({ type: 'NAVIGATE_TO_EXPIRING' });
+                }}
               >
-                <View style={styles.categoryChipContent}>
-                  <Text
-                    style={[
-                      typography.styles.bodySmallMedium,
-                      {
-                        color: isSelected ? '#FFFFFF' : colors.textSecondary,
-                      },
-                    ]}
-                  >
-                    {category}
-                  </Text>
-                  {categoryCount > 0 && (
-                    <View
+                <Bell size={20} color={expiringItems.length > 0 ? colors.danger : colors.textSecondary} />
+                {expiringItems.length > 0 && (
+                  <View style={[styles.badge, { backgroundColor: colors.danger }]}>
+                    <Text style={[typography.styles.captionBold, { color: '#FFFFFF' }]}>{expiringItems.length}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            }
+          />
+        </Animated.View>
+
+        {/* 카테고리 캐러셀 - 고정 */}
+        <View style={[styles.categoryCarouselContainer, { backgroundColor: colors.surface }]}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.categoryCarousel}
+            contentContainerStyle={styles.categoryCarouselContent}
+          >
+            {ALL_CATEGORIES.map((categoryItem) => {
+              const isSelected = categoryItem.id === selectedCategoryId;
+              const categoryCount =
+                categoryItem.id === ALL_CATEGORY.id
+                  ? ingredients.length
+                  : ingredients.filter((item) => item.category === categoryItem.id).length;
+
+              return (
+                <TouchableOpacity
+                  key={categoryItem.id}
+                  style={[
+                    styles.categoryChip,
+                    {
+                      backgroundColor: isSelected ? colors.primary : colors.surface,
+                      borderColor: isSelected ? colors.primary : colors.border,
+                    },
+                  ]}
+                  onPress={() => setSelectedCategoryId(categoryItem.id)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.categoryChipContent}>
+                    <Text
                       style={[
-                        styles.categoryCount,
+                        typography.styles.bodySmallMedium,
                         {
-                          backgroundColor: isSelected
-                            ? 'rgba(255, 255, 255, 0.3)'
-                            : colors.surfaceSecondary,
+                          color: isSelected ? '#FFFFFF' : colors.textSecondary,
                         },
                       ]}
                     >
-                      <Text
+                      {categoryItem.krLabel}
+                    </Text>
+                    {categoryCount > 0 && (
+                      <View
                         style={[
-                          typography.styles.captionBold,
+                          styles.categoryCount,
                           {
-                            color: isSelected
-                              ? '#FFFFFF'
-                              : colors.textSecondary,
+                            backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.3)' : colors.surfaceSecondary,
                           },
                         ]}
                       >
-                        {categoryCount}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
+                        <Text
+                          style={[
+                            typography.styles.captionBold,
+                            {
+                              color: isSelected ? '#FFFFFF' : colors.textSecondary,
+                            },
+                          ]}
+                        >
+                          {categoryCount}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+      </Animated.View>
 
-      <ScrollView
+      <Animated.ScrollView
         ref={scrollViewRef}
-        style={styles.content}
-        contentContainerStyle={styles.scrollContent}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+        scrollEventThrottle={16}
+        contentContainerStyle={{
+          paddingTop: 56 + inset.top + 56,
+          paddingBottom: 200,
+          paddingHorizontal: spacing.lg,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {expiringItems.length > 0 && (
@@ -332,76 +321,35 @@ function DashboardContent() {
             <View style={styles.sectionHeader}>
               <View style={styles.sectionHeaderLeft}>
                 <Bell size={20} color={colors.danger} />
-                <Text style={[typography.styles.h5, { color: colors.text }]}>
-                  소비기한 지남
-                </Text>
+                <Text style={[typography.styles.h5, { color: colors.text }]}>소비기한 지남</Text>
               </View>
               {expiringItems.length > 8 && (
-                <TouchableOpacity
-                  onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
-                  activeOpacity={0.7}
-                >
-                  <Text
-                    style={[
-                      typography.styles.caption,
-                      { color: colors.textSecondary },
-                    ]}
-                  >
-                    더보기
-                  </Text>
+                <TouchableOpacity onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })} activeOpacity={0.7}>
+                  <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>더보기</Text>
                 </TouchableOpacity>
               )}
             </View>
             <View style={styles.cardList}>
-              {expiringItems
-                .slice(0, 8)
-                .map((item) => renderIngredientCard({ item }))}
+              {expiringItems.slice(0, 8).map((item) => renderIngredientCard({ item }))}
             </View>
           </View>
         )}
 
         {loading ? (
           <View style={styles.section}>
-            <View
-              style={[
-                styles.emptyContainer,
-                { backgroundColor: colors.surface },
-              ]}
-            >
-              <Text
-                style={[
-                  typography.styles.bodySemibold,
-                  { color: colors.textTertiary },
-                ]}
-              >
-                로딩 중이에요...
-              </Text>
+            <View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
+              <Text style={[typography.styles.bodySemibold, { color: colors.textTertiary }]}>로딩 중이에요...</Text>
             </View>
           </View>
         ) : filteredIngredients.length === 0 ? (
           <View style={styles.section}>
-            <View
-              style={[
-                styles.emptyContainer,
-                { backgroundColor: colors.surface },
-              ]}
-            >
-              <Text
-                style={[
-                  typography.styles.bodyMedium,
-                  { color: colors.textSecondary, marginBottom: 8 },
-                ]}
-              >
-                {selectedCategory === '전체'
+            <View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
+              <Text style={[typography.styles.bodyMedium, { color: colors.textSecondary, marginBottom: 8 }]}>
+                {selectedCategoryId === ALL_CATEGORY.id
                   ? '관리할 재료가 없어요'
-                  : `${selectedCategory} 재료가 없어요`}
+                  : `${selectedCategoryItem?.krLabel} 재료가 없어요`}
               </Text>
-              <Text
-                style={[
-                  typography.styles.bodySmall,
-                  { color: colors.textTertiary },
-                ]}
-              >
+              <Text style={[typography.styles.bodySmall, { color: colors.textTertiary }]}>
                 기억하고 싶은 재료만 추가해보세요
               </Text>
             </View>
@@ -410,26 +358,38 @@ function DashboardContent() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={[typography.styles.h5, { color: colors.text }]}>
-                {selectedCategory === '전체' ? '전체 재료' : selectedCategory}
+                {selectedCategoryId === ALL_CATEGORY.id ? '전체 재료' : selectedCategoryItem?.krLabel}
               </Text>
-              <Text
-                style={[
-                  typography.styles.caption,
-                  { color: colors.textSecondary },
-                ]}
-              >
+              <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>
                 {filteredIngredients.length}개
               </Text>
             </View>
-            <View style={styles.cardList}>
-              {filteredIngredients.map((item) =>
-                renderIngredientCard({ item }),
-              )}
-            </View>
+            <View style={styles.cardList}>{filteredIngredients.map((item) => renderIngredientCard({ item }))}</View>
           </View>
         )}
-      </ScrollView>
-      <FloatingButton onPress={() => dispatch({ type: 'NAVIGATE_TO_ADD' })} />
+        {/* </ScrollView> */}
+      </Animated.ScrollView>
+      <FloatingButton
+        menuItems={[
+          {
+            icon: <Edit3 size={24} color="#FFFFFF" />,
+            label: '직접 등록',
+            onPress: () =>
+              dispatch({
+                type: 'NAVIGATE_TO_ADD',
+                payload: selectedCategoryId === ALL_CATEGORY.id ? undefined : selectedCategoryId,
+              }),
+          },
+          {
+            icon: <Grid3x3 size={24} color="#FFFFFF" />,
+            label: '한꺼번에 등록',
+            onPress: () => {
+              bulkAdd.open();
+            },
+            backgroundColor: colors.secondary,
+          },
+        ]}
+      />
 
       {/* 유통기한 수정 BottomSheet */}
       <BottomSheet
@@ -445,14 +405,9 @@ function DashboardContent() {
         >
           {/* 빠른 선택 옵션 */}
           <View style={styles.quickSelectContainer}>
-            {[
-              { label: '3일 뒤', days: 3 },
-              { label: '7일 뒤', days: 7 },
-              { label: '2주 뒤', days: 14 },
-              { label: '한달 뒤', days: 30 },
-            ].map((option) => (
+            {QUICK_SELECT_OPTIONS.map((option) => (
               <TouchableOpacity
-                key={option.days}
+                key={option.id}
                 style={[
                   styles.quickSelectBtn,
                   {
@@ -462,14 +417,7 @@ function DashboardContent() {
                 ]}
                 onPress={() => handleQuickSelect(option.days)}
               >
-                <Text
-                  style={[
-                    typography.styles.caption,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  {option.label}
-                </Text>
+                <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>{option.krLabel}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -477,26 +425,34 @@ function DashboardContent() {
           <DatePicker value={selectedDate} onDateSelect={handleDateChange} />
 
           <TouchableOpacity
-            style={[
-              styles.datePickerConfirm,
-              { backgroundColor: colors.primary },
-            ]}
+            style={[styles.datePickerConfirm, { backgroundColor: colors.primary }]}
             onPress={handleConfirmDate}
           >
-            <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>
-              확인
-            </Text>
+            <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>확인</Text>
           </TouchableOpacity>
         </ScrollView>
       </BottomSheet>
+
+      {/* 한꺼번에 등록 BottomSheet */}
+      <BulkAddBottomSheet
+        visible={bulkAdd.isVisible}
+        onClose={bulkAdd.close}
+        selectedCategoryId={bulkAdd.selectedCategoryId}
+        onCategoryChange={bulkAdd.handleCategoryChange}
+        selectedTemplates={bulkAdd.selectedTemplates}
+        onTemplateToggle={bulkAdd.handleTemplateToggle}
+        onConfirm={bulkAdd.handleConfirm}
+      />
     </View>
   );
 }
 
 const createStyles = ({
+  colors,
   borderRadius,
   spacing,
 }: {
+  colors: ColorPalette;
   borderRadius: typeof import('@/lib/theme').borderRadius;
   spacing: typeof import('@/lib/theme').spacing;
 }) =>
@@ -533,7 +489,7 @@ const createStyles = ({
       paddingHorizontal: spacing.lg,
       paddingVertical: spacing.md,
       borderBottomWidth: 1,
-      borderBottomColor: '#F2F4F6',
+      borderBottomColor: colors.borderLight,
     },
     categoryCarousel: {
       flexGrow: 0,

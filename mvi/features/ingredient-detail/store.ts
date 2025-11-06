@@ -20,11 +20,11 @@ const initialState: IngredientDetailState = {
   ingredient: null,
   editForm: {
     name: '',
-    category: '',
+    category: 'vegetables',
     quantity: '',
     unit: '',
     expiry_date: '',
-    storage_location: '',
+    storage_location: 'fridge',
     memo: '',
   },
   isEditing: false,

@@ -1,12 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-  Dimensions,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Dimensions, Platform } from 'react-native';
 import { useMemo, useEffect } from 'react';
 import { BlurView } from 'expo-blur';
 import { AlertCircle, CheckCircle, Info, XCircle } from 'lucide-react-native';
@@ -29,27 +21,12 @@ interface DialogProps {
   onClose?: () => void;
 }
 
-export function Dialog({
-  visible,
-  title,
-  message,
-  type = 'default',
-  buttons,
-  onClose,
-}: DialogProps) {
-  console.log('[Dialog] Render - visible:', visible, 'title:', title);
+export function Dialog({ visible, title, message, type = 'default', buttons, onClose }: DialogProps) {
+  const { colors, typography, spacing, borderRadius, shadows, isDark } = useTheme();
 
-  const { colors, typography, spacing, borderRadius, shadows, isDark } =
-    useTheme();
+  const styles = useMemo(() => createStyles({ spacing, borderRadius, shadows }), [spacing, borderRadius, shadows]);
 
-  const styles = useMemo(
-    () => createStyles({ spacing, borderRadius, shadows }),
-    [spacing, borderRadius, shadows],
-  );
-
-  useEffect(() => {
-    console.log('[Dialog] useEffect - visible changed to:', visible);
-  }, [visible]);
+  useEffect(() => {}, [visible]);
 
   function getIcon() {
     const iconSize = 24;
@@ -76,8 +53,8 @@ export function Dialog({
         };
       case 'destructive':
         return {
-          backgroundColor: colors.dangerLight,
-          textColor: colors.danger,
+          backgroundColor: colors.primaryLight,
+          textColor: colors.primary,
         };
       default:
         return {
@@ -88,21 +65,18 @@ export function Dialog({
   }
 
   function handleButtonPress(button: DialogButton) {
-    console.log('[Dialog] Button pressed:', button.text);
     if (button.onPress) {
       button.onPress();
     }
   }
 
   function handleRequestClose() {
-    console.log('[Dialog] onRequestClose called (Android back button)');
     if (onClose) {
       onClose();
     }
   }
 
   function handleBackdropPress() {
-    console.log('[Dialog] Backdrop pressed');
     if (onClose) {
       onClose();
     }
@@ -118,29 +92,20 @@ export function Dialog({
     >
       <BlurView intensity={isDark ? 40 : 60} style={styles.overlay}>
         <TouchableOpacity
-          style={[
-            styles.backdrop,
-            { backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)' },
-          ]}
+          style={[styles.backdrop, { backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)' }]}
           activeOpacity={1}
           onPress={onClose}
         />
         <View style={[styles.dialog, { backgroundColor: colors.surface }]}>
           {title && (
             <View style={styles.titleContainer}>
-              <Text style={[typography.styles.h4, { color: colors.text }]}>
-                {title}
-              </Text>
+              <Text style={[typography.styles.h4, { color: colors.text }]}>{title}</Text>
               {type !== 'default' && getIcon()}
             </View>
           )}
 
           <View style={styles.messageContainer}>
-            <Text
-              style={[typography.styles.body, { color: colors.textSecondary }]}
-            >
-              {message}
-            </Text>
+            <Text style={[typography.styles.body, { color: colors.textSecondary }]}>{message}</Text>
           </View>
 
           <View style={styles.buttonsContainer}>
@@ -157,14 +122,7 @@ export function Dialog({
                   onPress={() => handleButtonPress(button)}
                   activeOpacity={0.7}
                 >
-                  <Text
-                    style={[
-                      typography.styles.bodySemibold,
-                      { color: buttonStyles.textColor },
-                    ]}
-                  >
-                    {button.text}
-                  </Text>
+                  <Text style={[typography.styles.bodySemibold, { color: buttonStyles.textColor }]}>{button.text}</Text>
                 </TouchableOpacity>
               );
             })}

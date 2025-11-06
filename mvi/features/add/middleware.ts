@@ -7,12 +7,17 @@
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { AddState, AddIntent, AddEffect } from './types';
 import { storage } from '@/lib/storage';
-import { categoryDefaultEmojis } from '@/utils/ingredientTemplates';
+import { categoryDefaultEmojis } from '@/constants/ingredientTemplates';
+import { CATEGORIES } from '@/constants/categories';
+import { STORAGE_LOCATIONS } from '@/constants/storageLocations';
 
 /**
  * 폼 유효성 검사
  */
-function validateForm(form: AddState['form']): { isValid: boolean; errors: AddState['errors'] } {
+function validateForm(form: AddState['form']): {
+  isValid: boolean;
+  errors: AddState['errors'];
+} {
   const errors: AddState['errors'] = {};
 
   // 이름 검증 (필수)
@@ -32,7 +37,7 @@ function validateForm(form: AddState['form']): { isValid: boolean; errors: AddSt
   if (form.expiry_date.trim()) {
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!dateRegex.test(form.expiry_date)) {
-      errors.expiry_date = '날짜 형식이 올바르지 않습니다. (YYYY-MM-DD)';
+      errors.expiry_date = '날짜 형식이 올바르지 않아요. (YYYY-MM-DD)';
     }
   }
 
@@ -47,7 +52,7 @@ function validateForm(form: AddState['form']): { isValid: boolean; errors: AddSt
  */
 export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
   state,
-  intent
+  intent,
 ): Promise<MiddlewareResult<AddState, AddEffect>> => {
   switch (intent.type) {
     case 'VALIDATE_FORM': {
@@ -91,18 +96,25 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
       }
 
       try {
+        const registrationDate = new Date().toISOString().split('T')[0];
+
         // 스토리지에 저장
         await storage.addIngredient({
           name: state.form.name,
           category: state.form.category,
           emoji: categoryDefaultEmojis[state.form.category] || '🍴',
           quantity: state.form.quantity && state.form.quantity.trim() ? parseInt(state.form.quantity) : undefined,
-          unit: state.form.unit && state.form.unit.trim() ? state.form.unit : undefined,
-          purchase_date: new Date().toISOString().split('T')[0],
+          unit: state.form.unit && state.form.unit.trim() ? (state.form.unit as any) : undefined,
+          registration_date: registrationDate,
+          purchase_date: state.form.purchase_date && state.form.purchase_date.trim() ? state.form.purchase_date : undefined,
           expiry_date: state.form.expiry_date.trim() || undefined,
           storage_location: state.form.storage_location,
           memo: state.form.memo,
         });
+
+        // 기본 카테고리와 보관 위치 찾기
+        const defaultCategory = CATEGORIES.find((cat) => cat.id === 'vegetables');
+        const defaultStorageLocation = STORAGE_LOCATIONS.find((loc) => loc.id === 'fridge');
 
         return {
           state: {
@@ -110,11 +122,12 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
             isSubmitting: false,
             form: {
               name: '',
-              category: '채소',
+              category: defaultCategory?.id || 'vegetables',
               quantity: undefined,
               unit: undefined,
+              purchase_date: undefined,
               expiry_date: '',
-              storage_location: '냉장실',
+              storage_location: defaultStorageLocation?.id || 'fridge',
               memo: '',
             },
             mode: 'select',
@@ -125,7 +138,7 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
               type: 'SHOW_ALERT',
               payload: {
                 title: '성공',
-                message: '식재료가 등록되었습니다.',
+                message: '식재료가 등록됐어요.',
                 variant: 'success',
               },
             },
@@ -143,7 +156,7 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
               type: 'SHOW_ALERT',
               payload: {
                 title: '오류',
-                message: '식재료 등록에 실패했습니다.',
+                message: '식재료 등록에 실패했어요.',
                 variant: 'error',
               },
             },

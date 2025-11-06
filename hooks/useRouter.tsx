@@ -9,14 +9,14 @@ export function useRouter() {
     (href: Href, options?: NavigationOptions) => {
       router.push(href, options);
     },
-    [router.push]
+    [router.push],
   );
 
   const replace = useCallback(
     (href: Href, options?: NavigationOptions) => {
       router.replace(href, options);
     },
-    [router.replace]
+    [router.replace],
   );
 
   const back = useCallback(() => {
@@ -31,14 +31,14 @@ export function useRouter() {
     (params: Record<string, string>) => {
       router.setParams(params);
     },
-    [router.setParams]
+    [router.setParams],
   );
 
   const navigate = useCallback(
     (href: Href, options?: NavigationOptions) => {
       router.navigate(href, options);
     },
-    [router.navigate]
+    [router.navigate],
   );
 
   return {

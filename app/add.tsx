@@ -1,1 +1,1 @@
-export { default } from '@/screens/addIngredient';
+export { default } from '@/screens/add';

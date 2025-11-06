@@ -15,11 +15,12 @@ import { addMiddleware } from './middleware';
 const initialState: AddState = {
   form: {
     name: '',
-    category: '채소',
+    category: 'vegetables',
     quantity: undefined,
     unit: undefined,
+    purchase_date: undefined,
     expiry_date: '',
-    storage_location: '냉장실',
+    storage_location: 'fridge',
     memo: '',
   },
   mode: 'select',

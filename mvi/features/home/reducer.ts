@@ -7,10 +7,7 @@
 import { Reducer } from '@/mvi/base';
 import { HomeState, HomeIntent } from './types';
 
-export const homeReducer: Reducer<HomeState, HomeIntent> = (
-  state,
-  intent
-): HomeState => {
+export const homeReducer: Reducer<HomeState, HomeIntent> = (state, intent): HomeState => {
   switch (intent.type) {
     // LOAD_INGREDIENTS는 미들웨어에서 처리하므로 리듀서에서는 상태 변경 없음
     case 'LOAD_INGREDIENTS':

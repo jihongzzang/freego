@@ -13,15 +13,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { Trash2, Edit3, Minus, Check } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme, getStatusColor } from '@/lib/theme';
+import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/contexts/DialogContext';
 import { useRouter } from '@/hooks/useRouter';
 import { useMVIStore } from '@/mvi/base';
-import {
-  createIngredientDetailStore,
-  EditFormData,
-} from '@/mvi/features/ingredient-detail';
-import { getCategoryIcon } from '@/utils/categoryIcons';
+import { createIngredientDetailStore, EditFormData } from '@/mvi/features/ingredient-detail';
+import { getCategoryIcon } from '@/utils/getCategoryIcons';
+import { getStatusColor } from '@/utils/getStatusColors';
+import { CATEGORIES, findCategoryById } from '@/constants/categories';
+import { STORAGE_LOCATIONS, findStorageLocationById } from '@/constants/storageLocations';
+import { QUICK_SELECT_OPTIONS } from '@/constants/quickSelectOptions';
+import { findStatusById } from '@/constants/itemStatus';
+import { UNITS, findUnitById } from '@/constants/units';
 import Header from '@/components/Header';
 import FloatingButton from '@/components/FloatingButton';
 import BottomSheet from '@/components/BottomSheet';
@@ -34,12 +37,11 @@ export default function IngredientDetailScreen() {
   const { alert, confirm } = useDialog();
   const [state, dispatch, effect] = useMVIStore(createIngredientDetailStore);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showPurchaseDatePicker, setShowPurchaseDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showUnitPicker, setShowUnitPicker] = useState(false);
 
-  const styles = useMemo(
-    () => createStyles({ spacing, borderRadius, shadows }),
-    [spacing, borderRadius],
-  );
+  const styles = useMemo(() => createStyles({ spacing, borderRadius, shadows }), [spacing, borderRadius]);
 
   // 식재료 데이터 로드
   useEffect(() => {
@@ -99,18 +101,15 @@ export default function IngredientDetailScreen() {
 
   // Android 시스템 백버튼 핸들링
   useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        if (state.isEditing) {
-          // 수정 모드일 때는 수정 모드 취소
-          dispatch({ type: 'SET_EDITING', payload: false });
-          return true; // 기본 동작 방지
-        }
-        // 일반 모드일 때는 기본 동작 허용 (뒤로가기)
-        return false;
-      },
-    );
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (state.isEditing) {
+        // 수정 모드일 때는 수정 모드 취소
+        dispatch({ type: 'SET_EDITING', payload: false });
+        return true; // 기본 동작 방지
+      }
+      // 일반 모드일 때는 기본 동작 허용 (뒤로가기)
+      return false;
+    });
 
     return () => backHandler.remove();
   }, [state.isEditing, dispatch]);
@@ -159,9 +158,7 @@ export default function IngredientDetailScreen() {
   if (!state.ingredient) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[typography.styles.body, { color: colors.text }]}>
-          로딩 중이에요...
-        </Text>
+        <Text style={[typography.styles.body, { color: colors.text }]}>로딩 중이에요...</Text>
       </View>
     );
   }
@@ -170,7 +167,7 @@ export default function IngredientDetailScreen() {
     <>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header
-          title="재료 정보"
+          title=""
           onBackPress={() => {
             if (state.isEditing) {
               dispatch({ type: 'SET_EDITING', payload: false });
@@ -184,27 +181,12 @@ export default function IngredientDetailScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
-          <ScrollView
-            style={styles.content}
-            showsVerticalScrollIndicator={false}
-          >
-            <View
-              style={[
-                state.isEditing ? styles.editCard : styles.card,
-                { backgroundColor: colors.surface },
-              ]}
-            >
+          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+            <View style={[state.isEditing ? styles.editCard : styles.card, { backgroundColor: colors.surface }]}>
               {state.isEditing ? (
                 <View style={styles.editSection}>
                   <View style={styles.inputGroup}>
-                    <Text
-                      style={[
-                        typography.styles.bodySemibold,
-                        { color: colors.text },
-                      ]}
-                    >
-                      이름
-                    </Text>
+                    <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>이름</Text>
                     <TextInput
                       style={[
                         styles.input,
@@ -222,56 +204,40 @@ export default function IngredientDetailScreen() {
                   </View>
 
                   <View style={styles.inputGroup}>
-                    <Text
-                      style={[
-                        typography.styles.bodySemibold,
-                        { color: colors.text },
-                      ]}
-                    >
-                      카테고리
-                    </Text>
+                    <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>카테고리</Text>
                     <ScrollView
                       horizontal
                       showsHorizontalScrollIndicator={false}
                       contentContainerStyle={styles.categoryScrollContent}
                     >
-                      {[
-                        '채소',
-                        '과일',
-                        '육류',
-                        '생선류',
-                        '유제품',
-                        '가공식품',
-                        '조미료',
-                        '기타',
-                      ].map((cat) => (
+                      {CATEGORIES.map((cat) => (
                         <TouchableOpacity
-                          key={cat}
+                          key={cat.id}
                           style={[
                             styles.categoryBtn,
                             {
                               backgroundColor: colors.surfaceSecondary,
                               borderColor: colors.surfaceSecondary,
                             },
-                            state.editForm.category === cat && {
+                            state.editForm.category === cat.id && {
                               backgroundColor: colors.primaryLight,
                               borderColor: colors.primary,
                             },
                           ]}
-                          onPress={() => handleFieldChange('category', cat)}
+                          onPress={() => handleFieldChange('category', cat.id)}
                         >
                           <View style={styles.categoryBtnContent}>
-                            {getCategoryIcon(cat, 18)}
+                            {getCategoryIcon(cat.id, 18)}
                             <Text
                               style={[
                                 typography.styles.bodySemibold,
                                 { color: colors.textSecondary },
-                                state.editForm.category === cat && {
+                                state.editForm.category === cat.id && {
                                   color: colors.primary,
                                 },
                               ]}
                             >
-                              {cat}
+                              {cat.krLabel}
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -281,14 +247,7 @@ export default function IngredientDetailScreen() {
 
                   <View style={styles.row}>
                     <View style={[styles.inputGroup, { flex: 1 }]}>
-                      <Text
-                        style={[
-                          typography.styles.bodySemibold,
-                          { color: colors.text },
-                        ]}
-                      >
-                        수량
-                      </Text>
+                      <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>수량</Text>
                       <TextInput
                         style={[
                           styles.input,
@@ -299,65 +258,115 @@ export default function IngredientDetailScreen() {
                           },
                         ]}
                         value={state.editForm.quantity}
-                        onChangeText={(text) =>
-                          handleFieldChange('quantity', text)
-                        }
+                        onChangeText={(text) => handleFieldChange('quantity', text)}
                         keyboardType="numeric"
-                        placeholder="0"
+                        placeholder="입력"
                         placeholderTextColor={colors.textTertiary}
                       />
                     </View>
-                    <View
-                      style={[
-                        styles.inputGroup,
-                        { flex: 1, marginLeft: spacing.md },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          typography.styles.bodySemibold,
-                          { color: colors.text },
-                        ]}
-                      >
-                        단위
-                      </Text>
-                      <TextInput
+                    <View style={[styles.inputGroup, { flex: 1, marginLeft: spacing.md }]}>
+                      <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>단위</Text>
+                      <TouchableOpacity
                         style={[
                           styles.input,
                           {
                             backgroundColor: colors.surface,
-                            color: colors.text,
                             borderColor: colors.border,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
                           },
                         ]}
-                        value={state.editForm.unit}
-                        onChangeText={(text) => handleFieldChange('unit', text)}
-                        placeholder="개, g, ml"
-                        placeholderTextColor={colors.textTertiary}
-                      />
+                        onPress={() => setShowUnitPicker(true)}
+                      >
+                        <Text
+                          style={[
+                            typography.styles.body,
+                            {
+                              color: state.editForm.unit ? colors.text : colors.textTertiary,
+                            },
+                          ]}
+                        >
+                          {state.editForm.unit
+                            ? findUnitById(state.editForm.unit as any)?.krLabel || state.editForm.unit
+                            : '선택'}
+                        </Text>
+                        <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
+                      </TouchableOpacity>
                     </View>
                   </View>
 
                   <View style={styles.inputGroup}>
-                    <Text
+                    <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
+                      <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>구매일</Text>
+
+                      {/* 등록일과 동일 체크박스 */}
+                      <TouchableOpacity
+                        style={styles.checkboxRow}
+                        onPress={() => {
+                          if (state.editForm.purchase_date) {
+                            // 이미 선택된 경우 undefined로 초기화
+                            handleFieldChange('purchase_date', '');
+                          } else {
+                            // 등록일과 동일하게 설정 (오늘)
+                            handleFieldChange('purchase_date', new Date().toISOString().split('T')[0]);
+                          }
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <View
+                          style={[
+                            styles.checkbox,
+                            {
+                              borderColor: colors.border,
+                              backgroundColor:
+                                state.editForm.purchase_date === new Date().toISOString().split('T')[0]
+                                  ? colors.primary
+                                  : 'transparent',
+                            },
+                          ]}
+                        >
+                          {state.editForm.purchase_date === new Date().toISOString().split('T')[0] && (
+                            <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+                          )}
+                        </View>
+                        <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>등록일과 동일</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* 날짜 선택 버튼 */}
+                    <TouchableOpacity
                       style={[
-                        typography.styles.bodySemibold,
-                        { color: colors.text },
+                        styles.dateButton,
+                        {
+                          backgroundColor: colors.surface,
+                          borderColor: colors.border,
+                        },
                       ]}
+                      onPress={() => setShowPurchaseDatePicker(true)}
                     >
-                      유통기한
-                    </Text>
+                      <Ionicons name="calendar-outline" size={20} color={colors.textSecondary} />
+                      <Text
+                        style={[
+                          typography.styles.body,
+                          {
+                            color: state.editForm.purchase_date ? colors.text : colors.textTertiary,
+                          },
+                        ]}
+                      >
+                        {state.editForm.purchase_date || '날짜 선택'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.inputGroup}>
+                    <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>유통기한</Text>
 
                     {/* 빠른 선택 옵션 */}
                     <View style={styles.quickSelectContainer}>
-                      {[
-                        { label: '3일 뒤', days: 3 },
-                        { label: '7일 뒤', days: 7 },
-                        { label: '2주 뒤', days: 14 },
-                        { label: '한달 뒤', days: 30 },
-                      ].map((option) => (
+                      {QUICK_SELECT_OPTIONS.map((option) => (
                         <TouchableOpacity
-                          key={option.days}
+                          key={option.id}
                           style={[
                             styles.quickSelectBtn,
                             {
@@ -367,13 +376,8 @@ export default function IngredientDetailScreen() {
                           ]}
                           onPress={() => handleQuickSelect(option.days)}
                         >
-                          <Text
-                            style={[
-                              typography.styles.caption,
-                              { color: colors.textSecondary },
-                            ]}
-                          >
-                            {option.label}
+                          <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>
+                            {option.krLabel}
                           </Text>
                         </TouchableOpacity>
                       ))}
@@ -389,18 +393,12 @@ export default function IngredientDetailScreen() {
                       ]}
                       onPress={() => setShowDatePicker(true)}
                     >
-                      <Ionicons
-                        name="calendar-outline"
-                        size={20}
-                        color={colors.textSecondary}
-                      />
+                      <Ionicons name="calendar-outline" size={20} color={colors.textSecondary} />
                       <Text
                         style={[
                           typography.styles.body,
                           {
-                            color: state.editForm.expiry_date
-                              ? colors.text
-                              : colors.textTertiary,
+                            color: state.editForm.expiry_date ? colors.text : colors.textTertiary,
                           },
                         ]}
                       >
@@ -410,43 +408,34 @@ export default function IngredientDetailScreen() {
                   </View>
 
                   <View style={styles.inputGroup}>
-                    <Text
-                      style={[
-                        typography.styles.bodySemibold,
-                        { color: colors.text },
-                      ]}
-                    >
-                      보관 위치
-                    </Text>
+                    <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>보관 위치</Text>
                     <View style={styles.categoryButtons}>
-                      {['냉장실', '냉동실', '실온'].map((loc) => (
+                      {STORAGE_LOCATIONS.map((loc) => (
                         <TouchableOpacity
-                          key={loc}
+                          key={loc.id}
                           style={[
                             styles.categoryBtn,
                             {
                               backgroundColor: colors.surfaceSecondary,
                               borderColor: colors.surfaceSecondary,
                             },
-                            state.editForm.storage_location === loc && {
+                            state.editForm.storage_location === loc.id && {
                               backgroundColor: colors.primaryLight,
                               borderColor: colors.primary,
                             },
                           ]}
-                          onPress={() =>
-                            handleFieldChange('storage_location', loc)
-                          }
+                          onPress={() => handleFieldChange('storage_location', loc.id)}
                         >
                           <Text
                             style={[
                               typography.styles.bodySemibold,
                               { color: colors.textSecondary },
-                              state.editForm.storage_location === loc && {
+                              state.editForm.storage_location === loc.id && {
                                 color: colors.primary,
                               },
                             ]}
                           >
-                            {loc}
+                            {loc.krLabel}
                           </Text>
                         </TouchableOpacity>
                       ))}
@@ -454,14 +443,7 @@ export default function IngredientDetailScreen() {
                   </View>
 
                   <View style={styles.inputGroup}>
-                    <Text
-                      style={[
-                        typography.styles.bodySemibold,
-                        { color: colors.text },
-                      ]}
-                    >
-                      메모
-                    </Text>
+                    <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>메모</Text>
                     <TextInput
                       style={[
                         styles.input,
@@ -483,154 +465,65 @@ export default function IngredientDetailScreen() {
                 </View>
               ) : (
                 <View style={styles.detailSection}>
-                  <View
-                    style={[
-                      styles.mainInfo,
-                      { borderBottomColor: colors.border },
-                    ]}
-                  >
-                    <Text
-                      style={[typography.styles.h3, { color: colors.text }]}
-                    >
-                      {state.ingredient.name}
-                    </Text>
+                  <View style={[styles.mainInfo, { borderBottomColor: colors.border }]}>
+                    <Text style={[typography.styles.h3, { color: colors.text }]}>{state.ingredient.name}</Text>
                     <View
                       style={[
                         styles.statusBadge,
                         {
-                          backgroundColor: getStatusColor(
-                            state.ingredient.status,
-                          ),
+                          backgroundColor: getStatusColor(state.ingredient.status),
                         },
                       ]}
                     >
-                      <Text
-                        style={[
-                          typography.styles.captionBold,
-                          { color: '#ffffff' },
-                        ]}
-                      >
-                        {state.ingredient.status}
+                      <Text style={[typography.styles.captionBold, { color: '#ffffff' }]}>
+                        {findStatusById(state.ingredient.status)?.krLabel}
                       </Text>
                     </View>
                   </View>
 
                   <View style={styles.infoGrid}>
                     <View style={styles.infoItem}>
-                      <Text
-                        style={[
-                          typography.styles.bodySmall,
-                          { color: colors.textSecondary },
-                        ]}
-                      >
-                        카테고리
-                      </Text>
-                      <Text
-                        style={[
-                          typography.styles.bodySemibold,
-                          { color: colors.text },
-                        ]}
-                      >
-                        {state.ingredient.category}
+                      <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>카테고리</Text>
+                      <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>
+                        {findCategoryById(state.ingredient.category)?.krLabel}
                       </Text>
                     </View>
                     <View style={styles.infoItem}>
-                      <Text
-                        style={[
-                          typography.styles.bodySmall,
-                          { color: colors.textSecondary },
-                        ]}
-                      >
-                        수량
-                      </Text>
-                      <Text
-                        style={[
-                          typography.styles.bodySemibold,
-                          { color: colors.text },
-                        ]}
-                      >
+                      <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>수량</Text>
+                      <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>
                         {state.ingredient.quantity || '-'}
                       </Text>
                     </View>
                     <View style={styles.infoItem}>
-                      <Text
-                        style={[
-                          typography.styles.bodySmall,
-                          { color: colors.textSecondary },
-                        ]}
-                      >
-                        보관 위치
-                      </Text>
-                      <Text
-                        style={[
-                          typography.styles.bodySemibold,
-                          { color: colors.text },
-                        ]}
-                      >
-                        {state.ingredient.storage_location}
+                      <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>보관 위치</Text>
+                      <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>
+                        {findStorageLocationById(state.ingredient.storage_location)?.krLabel}
                       </Text>
                     </View>
                     <View style={styles.infoItem}>
-                      <Text
-                        style={[
-                          typography.styles.bodySmall,
-                          { color: colors.textSecondary },
-                        ]}
-                      >
-                        구매일
+                      <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>등록일</Text>
+                      <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>
+                        {state.ingredient.registration_date || '-'}
                       </Text>
-                      <Text
-                        style={[
-                          typography.styles.bodySemibold,
-                          { color: colors.text },
-                        ]}
-                      >
+                    </View>
+                    <View style={styles.infoItem}>
+                      <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>구매일</Text>
+                      <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>
                         {state.ingredient.purchase_date || '-'}
                       </Text>
                     </View>
                     <View style={styles.infoItem}>
-                      <Text
-                        style={[
-                          typography.styles.bodySmall,
-                          { color: colors.textSecondary },
-                        ]}
-                      >
-                        유통기한
-                      </Text>
-                      <Text
-                        style={[
-                          typography.styles.bodySemibold,
-                          { color: colors.text },
-                        ]}
-                      >
+                      <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>유통기한</Text>
+                      <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>
                         {state.ingredient.expiry_date || '-'}
                       </Text>
                     </View>
                   </View>
 
                   {state.ingredient.memo && (
-                    <View
-                      style={[
-                        styles.memoSection,
-                        { borderTopColor: colors.border },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          typography.styles.label,
-                          { color: colors.textSecondary },
-                        ]}
-                      >
-                        메모
-                      </Text>
-                      <Text
-                        style={[
-                          typography.styles.bodySmall,
-                          { color: colors.text },
-                        ]}
-                      >
-                        {state.ingredient.memo}
-                      </Text>
+                    <View style={[styles.memoSection, { borderTopColor: colors.border }]}>
+                      <Text style={[typography.styles.label, { color: colors.textSecondary }]}>메모</Text>
+                      <Text style={[typography.styles.bodySmall, { color: colors.text }]}>{state.ingredient.memo}</Text>
                     </View>
                   )}
                 </View>
@@ -640,32 +533,18 @@ export default function IngredientDetailScreen() {
             {!state.isEditing && (
               <View style={styles.actionButtons}>
                 <TouchableOpacity
-                  style={[
-                    styles.consumeButton,
-                    { backgroundColor: colors.primary },
-                  ]}
+                  style={[styles.consumeButton, { backgroundColor: colors.primary }]}
                   onPress={handleConsume}
                 >
                   <Minus size={20} color="#ffffff" />
-                  <Text
-                    style={[typography.styles.button, { color: '#ffffff' }]}
-                  >
-                    소모
-                  </Text>
+                  <Text style={[typography.styles.button, { color: '#ffffff' }]}>소모</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[
-                    styles.deleteButton,
-                    { backgroundColor: colors.danger },
-                  ]}
+                  style={[styles.deleteButton, { backgroundColor: colors.danger }]}
                   onPress={handleDelete}
                 >
                   <Trash2 size={20} color="#ffffff" />
-                  <Text
-                    style={[typography.styles.button, { color: '#ffffff' }]}
-                  >
-                    삭제
-                  </Text>
+                  <Text style={[typography.styles.button, { color: '#ffffff' }]}>삭제</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -691,7 +570,34 @@ export default function IngredientDetailScreen() {
         )}
       </View>
 
-      {/* DatePicker BottomSheet */}
+      {/* Purchase DatePicker BottomSheet */}
+      <BottomSheet
+        maxHeight={600}
+        visible={showPurchaseDatePicker}
+        onClose={() => setShowPurchaseDatePicker(false)}
+        title="구매일 선택"
+      >
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.datePickerBottomSheet}
+          showsVerticalScrollIndicator={false}
+        >
+          <DatePicker
+            value={state.editForm.purchase_date ? new Date(state.editForm.purchase_date) : new Date()}
+            onDateSelect={(date) => {
+              handleFieldChange('purchase_date', date.toISOString().split('T')[0]);
+            }}
+          />
+          <TouchableOpacity
+            style={[styles.datePickerConfirm, { backgroundColor: colors.primary }]}
+            onPress={() => setShowPurchaseDatePicker(false)}
+          >
+            <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>확인</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </BottomSheet>
+
+      {/* Expiry DatePicker BottomSheet */}
       <BottomSheet
         maxHeight={600}
         visible={showDatePicker}
@@ -705,17 +611,48 @@ export default function IngredientDetailScreen() {
         >
           <DatePicker value={selectedDate} onDateSelect={handleDateChange} />
           <TouchableOpacity
-            style={[
-              styles.datePickerConfirm,
-              { backgroundColor: colors.primary },
-            ]}
+            style={[styles.datePickerConfirm, { backgroundColor: colors.primary }]}
             onPress={() => setShowDatePicker(false)}
           >
-            <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>
-              확인
-            </Text>
+            <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>확인</Text>
           </TouchableOpacity>
         </ScrollView>
+      </BottomSheet>
+
+      {/* Unit Picker BottomSheet */}
+      <BottomSheet maxHeight={400} visible={showUnitPicker} onClose={() => setShowUnitPicker(false)} title="단위 선택">
+        <View style={styles.unitPickerContainer}>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.unitPickerContent}>
+            {UNITS.map((unit) => (
+              <TouchableOpacity
+                key={unit.id}
+                style={[
+                  styles.unitItem,
+                  {
+                    backgroundColor: state.editForm.unit === unit.id ? colors.primaryLight : colors.surface,
+                    borderColor: state.editForm.unit === unit.id ? colors.primary : colors.border,
+                  },
+                ]}
+                onPress={() => {
+                  handleFieldChange('unit', unit.id);
+                  setShowUnitPicker(false);
+                }}
+              >
+                <Text
+                  style={[
+                    typography.styles.bodyMedium,
+                    {
+                      color: state.editForm.unit === unit.id ? colors.primary : colors.text,
+                    },
+                  ]}
+                >
+                  {unit.krLabel}
+                </Text>
+                {state.editForm.unit === unit.id && <Ionicons name="checkmark" size={20} color={colors.primary} />}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
       </BottomSheet>
     </>
   );
@@ -870,5 +807,35 @@ const createStyles = ({
       paddingVertical: spacing.md,
       borderRadius: borderRadius.md,
       alignItems: 'center',
+    },
+    unitPickerContainer: {
+      flex: 1,
+      maxHeight: 400,
+    },
+    unitPickerContent: {
+      padding: spacing.md,
+      gap: spacing.xs,
+    },
+    unitItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+    },
+    checkboxRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    checkbox: {
+      width: 20,
+      height: 20,
+      borderRadius: 4,
+      borderWidth: 2,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
   });

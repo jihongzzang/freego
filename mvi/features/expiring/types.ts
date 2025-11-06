@@ -4,12 +4,13 @@
 
 import { Intent, State, Effect } from '@/mvi/base';
 import { Ingredient as StoredIngredient } from '@/lib/storage';
+import { StatusType } from '@/constants/itemStatus';
 
 /**
  * Ingredient with status
  */
 export interface Ingredient extends StoredIngredient {
-  status: '유효' | '만료' | '미설정';
+  status: StatusType;
   daysRemaining: number | null;
 }
 

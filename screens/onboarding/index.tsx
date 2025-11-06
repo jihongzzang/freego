@@ -1,22 +1,8 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { useEffect, useMemo } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import {
-  GestureDetector,
-  Gesture,
-  GestureHandlerRootView,
-} from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
+import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 import {
   // ChevronRight,
@@ -47,10 +33,7 @@ export default function OnboardingScreen() {
   const translateX = useSharedValue(0);
   const router = useRouter();
 
-  const styles = useMemo(
-    () => createStyles({ spacing, borderRadius, shadows }),
-    [spacing, borderRadius, shadows],
-  );
+  const styles = useMemo(() => createStyles({ spacing, borderRadius, shadows }), [spacing, borderRadius, shadows]);
 
   const steps: OnboardingStep[] = [
     {
@@ -74,19 +57,16 @@ export default function OnboardingScreen() {
     {
       icon: <Sparkles size={80} color="#ffffff" />,
       title: '시작해볼까요?',
-      description:
-        '현명한 소비 습관을 만들고\n지구를 지키는 작은 실천을 시작해요',
+      description: '현명한 소비 습관을 만들고\n지구를 지키는 작은 실천을 시작해요',
       color: '#8b5cf6',
     },
   ];
 
   // Handle effects
   useEffect(() => {
-    console.log('Effect changed:', effect);
     if (!effect) return;
 
     if (effect.type === 'NAVIGATE_TO_HOME') {
-      console.log('Navigating to home...');
       router.replace('/(tabs)');
     }
   }, [effect]);
@@ -97,12 +77,6 @@ export default function OnboardingScreen() {
   }, [state.currentStep]);
 
   function handleNext() {
-    console.log(
-      'handleNext called, currentStep:',
-      state.currentStep,
-      'totalSteps:',
-      state.totalSteps,
-    );
     dispatch({ type: 'NEXT_STEP' });
   }
 
@@ -135,11 +109,8 @@ export default function OnboardingScreen() {
       translateX.value = basePosition + newTranslation;
     })
     .onEnd((event) => {
-      const shouldGoNext =
-        event.translationX < -width * 0.2 &&
-        state.currentStep < steps.length - 1;
-      const shouldGoPrev =
-        event.translationX > width * 0.2 && state.currentStep > 0;
+      const shouldGoNext = event.translationX < -width * 0.2 && state.currentStep < steps.length - 1;
+      const shouldGoPrev = event.translationX > width * 0.2 && state.currentStep > 0;
 
       if (shouldGoNext) {
         scheduleOnRN(handleNext);
@@ -159,19 +130,11 @@ export default function OnboardingScreen() {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <LinearGradient
-        colors={[currentStep.color, currentStep.color + 'dd']}
-        style={styles.gradient}
-      >
+      <LinearGradient colors={[currentStep.color, currentStep.color + 'dd']} style={styles.gradient}>
         {/* 상단 고정: 건너뛰기 버튼 */}
         {state.currentStep < steps.length - 1 && (
-          <TouchableOpacity
-            style={[styles.skipButton, { top: insets.top + 10 }]}
-            onPress={handleSkip}
-          >
-            <Text style={[typography.styles.bodySemibold, styles.skipText]}>
-              건너뛰기
-            </Text>
+          <TouchableOpacity style={[styles.skipButton, { top: insets.top + 10 }]} onPress={handleSkip}>
+            <Text style={[typography.styles.bodySemibold, styles.skipText]}>건너뛰기</Text>
           </TouchableOpacity>
         )}
 
@@ -184,12 +147,8 @@ export default function OnboardingScreen() {
                   <View style={styles.iconContainer}>{step.icon}</View>
 
                   <View style={styles.textContainer}>
-                    <Text style={[typography.styles.h1, styles.title]}>
-                      {step.title}
-                    </Text>
-                    <Text style={[typography.styles.h5, styles.description]}>
-                      {step.description}
-                    </Text>
+                    <Text style={[typography.styles.h1, styles.title]}>{step.title}</Text>
+                    <Text style={[typography.styles.h5, styles.description]}>{step.description}</Text>
                   </View>
                 </View>
               ))}
@@ -203,19 +162,12 @@ export default function OnboardingScreen() {
             {steps.map((_, dotIndex) => (
               <View
                 key={dotIndex}
-                style={[
-                  styles.paginationDot,
-                  dotIndex === state.currentStep && styles.paginationDotActive,
-                ]}
+                style={[styles.paginationDot, dotIndex === state.currentStep && styles.paginationDotActive]}
               />
             ))}
           </View>
 
-          <TouchableOpacity
-            style={styles.nextButton}
-            onPress={handleNext}
-            activeOpacity={0.8}
-          >
+          <TouchableOpacity style={styles.nextButton} onPress={handleNext} activeOpacity={0.8}>
             <Text style={[typography.styles.h5, styles.nextButtonText]}>
               {state.currentStep < steps.length - 1 ? '다음' : '시작하기'}
             </Text>

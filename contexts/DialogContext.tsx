@@ -19,11 +19,7 @@ interface DialogState extends DialogOptions {
 }
 
 interface DialogContextType {
-  alert: (options: {
-    title: string;
-    message: string;
-    type?: 'success' | 'warning' | 'error' | 'info';
-  }) => void;
+  alert: (options: { title: string; message: string; type?: 'success' | 'warning' | 'error' | 'info' }) => void;
   confirm: (options: {
     title?: string;
     message: string;
@@ -48,90 +44,82 @@ export function DialogProvider({ children }: { children: ReactNode }) {
     buttons: [],
   });
 
-  console.log('[DialogProvider] Render - visible:', state.visible);
-
   const hideDialog = useCallback(() => {
-    console.log('[DialogProvider] hideDialog called');
     setState((prev) => ({ ...prev, visible: false }));
   }, []);
 
   const showDialog = useCallback((dialogOptions: DialogOptions) => {
-    console.log('[DialogProvider] showDialog called');
     setState({
       ...dialogOptions,
       visible: true,
     });
   }, []);
 
-  const alert = useCallback(({
-    title,
-    message,
-    type,
-  }: {
-    title: string;
-    message: string;
-    type?: 'success' | 'warning' | 'error' | 'info';
-  }) => {
-    showDialog({
-      title,
-      message,
-      type,
-      buttons: [
-        {
-          text: '확인',
-          onPress: hideDialog,
-        },
-      ],
-    });
-  }, [showDialog, hideDialog]);
+  const alert = useCallback(
+    ({ title, message, type }: { title: string; message: string; type?: 'success' | 'warning' | 'error' | 'info' }) => {
+      showDialog({
+        title,
+        message,
+        type,
+        buttons: [
+          {
+            text: '확인',
+            onPress: hideDialog,
+          },
+        ],
+      });
+    },
+    [showDialog, hideDialog],
+  );
 
-  const confirm = useCallback(({
-    title,
-    message,
-    onConfirm,
-    onCancel,
-    confirmText = '확인',
-    cancelText = '취소',
-    isDestructive = false,
-  }: {
-    title?: string;
-    message: string;
-    onConfirm: () => void | Promise<void>;
-    onCancel?: () => void;
-    confirmText: string;
-    cancelText: string;
-    isDestructive?: boolean;
-  }) => {
-    showDialog({
+  const confirm = useCallback(
+    ({
       title,
       message,
-      buttons: [
-        {
-          text: cancelText,
-          style: 'cancel',
-          onPress: () => {
-            if (onCancel) onCancel();
-            hideDialog();
+      onConfirm,
+      onCancel,
+      confirmText = '확인',
+      cancelText = '취소',
+      isDestructive = false,
+    }: {
+      title?: string;
+      message: string;
+      onConfirm: () => void | Promise<void>;
+      onCancel?: () => void;
+      confirmText: string;
+      cancelText: string;
+      isDestructive?: boolean;
+    }) => {
+      showDialog({
+        title,
+        message,
+        buttons: [
+          {
+            text: cancelText,
+            style: 'cancel',
+            onPress: () => {
+              if (onCancel) onCancel();
+              hideDialog();
+            },
           },
-        },
-        {
-          text: confirmText,
-          style: isDestructive ? 'destructive' : 'default',
-          onPress: () => {
-            hideDialog();
-            setTimeout(() => {
-              onConfirm();
-            }, 100);
+          {
+            text: confirmText,
+            style: isDestructive ? 'destructive' : 'default',
+            onPress: () => {
+              hideDialog();
+              setTimeout(() => {
+                onConfirm();
+              }, 100);
+            },
           },
-        },
-      ],
-    });
-  }, [showDialog, hideDialog]);
+        ],
+      });
+    },
+    [showDialog, hideDialog],
+  );
 
   return (
-    <DialogContext.Provider
-      value={{ alert, confirm, showDialog, hideDialog }}
-    >
+    <DialogContext.Provider value={{ alert, confirm, showDialog, hideDialog }}>
       {children}
       <Dialog
         visible={state.visible}

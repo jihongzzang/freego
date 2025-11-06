@@ -12,11 +12,12 @@ import { AddState, AddIntent } from './types';
  */
 const initialFormData = {
   name: '',
-  category: '채소',
+  category: 'vegetables' as const,
   quantity: undefined,
   unit: undefined,
+  purchase_date: undefined,
   expiry_date: '',
-  storage_location: '냉장실',
+  storage_location: 'fridge' as const,
   memo: '',
 };
 

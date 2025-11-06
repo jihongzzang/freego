@@ -4,12 +4,15 @@
 
 import { Intent, State, Effect } from '@/mvi/base';
 import { Ingredient as StoredIngredient } from '@/lib/storage';
+import { StatusType } from '@/constants/itemStatus';
+import { CategoryType } from '@/constants/categories';
+import { StorageLocationType } from '@/constants/storageLocations';
 
 /**
  * Ingredient with status
  */
 export interface Ingredient extends StoredIngredient {
-  status: '유효' | '만료' | '미설정';
+  status: StatusType;
 }
 
 /**
@@ -17,11 +20,12 @@ export interface Ingredient extends StoredIngredient {
  */
 export interface EditFormData {
   name: string;
-  category: string;
+  category: CategoryType;
   quantity?: string;
   unit?: string;
+  purchase_date?: string;
   expiry_date: string;
-  storage_location: string;
+  storage_location: StorageLocationType;
   memo: string;
 }
 

@@ -27,10 +27,7 @@ export function useDialog() {
     buttons: [],
   });
 
-  console.log('[useDialog] Hook render - visible:', state.visible);
-
   function showDialog(dialogOptions: DialogOptions) {
-    console.log('[useDialog] showDialog called');
     setState({
       ...dialogOptions,
       visible: true,
@@ -38,7 +35,6 @@ export function useDialog() {
   }
 
   function hideDialog() {
-    console.log('[useDialog] hideDialog called');
     setState((prev) => ({ ...prev, visible: false }));
   }
 

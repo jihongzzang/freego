@@ -12,12 +12,13 @@ import {
   Ingredient,
 } from './types';
 import { storage } from '@/lib/storage';
+import { StatusType } from '@/constants/itemStatus';
 
 /**
  * 유통기한 상태 계산
  */
-function calculateStatus(expiryDate: string | null | undefined): '유효' | '만료' | '미설정' {
-  if (!expiryDate) return '미설정';
+function calculateStatus(expiryDate: string | null | undefined): StatusType {
+  if (!expiryDate) return 'not_set';
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -26,8 +27,8 @@ function calculateStatus(expiryDate: string | null | undefined): '유효' | '만
   const diffTime = expiry.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays < 0) return '만료';
-  return '유효';
+  if (diffDays < 0) return 'expired';
+  return 'valid';
 }
 
 /**
@@ -60,6 +61,7 @@ export const ingredientDetailMiddleware: Middleware<
                 category: data.category,
                 quantity: data.quantity?.toString() || '',
                 unit: data.unit || '',
+                purchase_date: data.purchase_date || '',
                 expiry_date: data.expiry_date || '',
                 storage_location: data.storage_location,
                 memo: data.memo || '',
@@ -73,7 +75,7 @@ export const ingredientDetailMiddleware: Middleware<
             state: {
               ...state,
               loading: false,
-              error: '식재료를 찾을 수 없습니다.',
+              error: '식재료를 찾을 수 없어요.',
             },
           };
         }
@@ -157,7 +159,7 @@ export const ingredientDetailMiddleware: Middleware<
             type: 'SHOW_ALERT',
             payload: {
               title: '완료',
-              message: `${intent.payload.name}이(가) 장보기 목록에 추가되었습니다.`,
+              message: `${intent.payload.name}이(가) 장보기 목록에 추가됐어요.`,
               variant: 'success',
             },
           },
@@ -174,7 +176,8 @@ export const ingredientDetailMiddleware: Middleware<
           name: state.editForm.name,
           category: state.editForm.category,
           quantity: state.editForm.quantity ? parseInt(state.editForm.quantity) || undefined : undefined,
-          unit: state.editForm.unit,
+          unit: state.editForm.unit as any,
+          purchase_date: state.editForm.purchase_date || undefined,
           expiry_date: state.editForm.expiry_date || undefined,
           storage_location: state.editForm.storage_location,
           memo: state.editForm.memo,
@@ -199,6 +202,7 @@ export const ingredientDetailMiddleware: Middleware<
                 category: data.category,
                 quantity: data.quantity?.toString() || '',
                 unit: data.unit || '',
+                purchase_date: data.purchase_date || '',
                 expiry_date: data.expiry_date || '',
                 storage_location: data.storage_location,
                 memo: data.memo || '',

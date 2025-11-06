@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useState, useMemo } from 'react';
 import { useTheme } from '@/lib/theme';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
@@ -17,12 +10,7 @@ interface DatePickerProps {
   maximumDate?: Date;
 }
 
-export default function DatePicker({
-  value,
-  onDateSelect,
-  minimumDate,
-  maximumDate,
-}: DatePickerProps) {
+export default function DatePicker({ value, onDateSelect, minimumDate, maximumDate }: DatePickerProps) {
   const { colors, typography, spacing, borderRadius } = useTheme();
   const [currentMonth, setCurrentMonth] = useState(
     value
@@ -30,10 +18,7 @@ export default function DatePicker({
       : new Date(new Date().getFullYear(), new Date().getMonth(), 1),
   );
 
-  const styles = useMemo(
-    () => createStyles({ spacing, borderRadius }),
-    [spacing, borderRadius],
-  );
+  const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
 
   // 달력 데이터 생성
   const calendarDays = useMemo(() => {
@@ -67,43 +52,27 @@ export default function DatePicker({
 
   // 이전 달로 이동
   const goToPreviousMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1),
-    );
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
   };
 
   // 다음 달로 이동
   const goToNextMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
-    );
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
 
   // 날짜 선택 가능 여부 확인 (시간 제거하고 비교)
   const isDateDisabled = (date: Date) => {
-    const dateOnly = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-    );
+    const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
     if (minimumDate) {
-      const minDateOnly = new Date(
-        minimumDate.getFullYear(),
-        minimumDate.getMonth(),
-        minimumDate.getDate(),
-      );
+      const minDateOnly = new Date(minimumDate.getFullYear(), minimumDate.getMonth(), minimumDate.getDate());
       if (dateOnly < minDateOnly) {
         return true;
       }
     }
 
     if (maximumDate) {
-      const maxDateOnly = new Date(
-        maximumDate.getFullYear(),
-        maximumDate.getMonth(),
-        maximumDate.getDate(),
-      );
+      const maxDateOnly = new Date(maximumDate.getFullYear(), maximumDate.getMonth(), maximumDate.getDate());
       if (dateOnly > maxDateOnly) {
         return true;
       }
@@ -157,12 +126,7 @@ export default function DatePicker({
               style={[
                 typography.styles.captionBold,
                 {
-                  color:
-                    index === 0
-                      ? colors.danger
-                      : index === 6
-                        ? colors.primary
-                        : colors.textSecondary,
+                  color: index === 0 ? colors.danger : index === 6 ? colors.primary : colors.textSecondary,
                 },
               ]}
             >

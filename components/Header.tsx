@@ -12,11 +12,7 @@ interface HeaderProps {
 
 const HEADER_CONTENT_HEIGHT = 56;
 
-export default function Header({
-  title,
-  onBackPress,
-  rightComponent,
-}: HeaderProps) {
+export default function Header({ title, onBackPress, rightComponent }: HeaderProps) {
   const { colors, typography, borderRadius } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -33,26 +29,18 @@ export default function Header({
     >
       <View style={styles.headerContent}>
         {onBackPress && (
-          <TouchableOpacity
-            style={[styles.backButton, { borderRadius: borderRadius.full }]}
-            onPress={onBackPress}
-          >
+          <TouchableOpacity style={[styles.backButton, { borderRadius: borderRadius.full }]} onPress={onBackPress}>
             <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
         )}
 
         <View style={styles.titleContainer}>
-          <Text
-            style={[typography.styles.h3, { color: colors.text }]}
-            numberOfLines={1}
-          >
+          <Text style={[typography.styles.h3, { color: colors.text }]} numberOfLines={1}>
             {title}
           </Text>
         </View>
 
-        {rightComponent && (
-          <View style={styles.rightComponent}>{rightComponent}</View>
-        )}
+        {rightComponent && <View style={styles.rightComponent}>{rightComponent}</View>}
       </View>
     </View>
   );

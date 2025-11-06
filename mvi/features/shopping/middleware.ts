@@ -11,11 +11,7 @@ import { storage } from '@/lib/storage';
 /**
  * Shopping Middleware
  */
-export const shoppingMiddleware: Middleware<
-  ShoppingState,
-  ShoppingIntent,
-  ShoppingEffect
-> = async (
+export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, ShoppingEffect> = async (
   state,
   intent,
 ): Promise<MiddlewareResult<ShoppingState, ShoppingEffect>> => {
@@ -126,7 +122,7 @@ export const shoppingMiddleware: Middleware<
             ...state,
             shoppingList: items,
             isAddingItem: false,
-            addForm: { name: '', category: '채소' },
+            addForm: { name: '', category: 'vegetables' },
           },
           effects: [
             {
@@ -157,9 +153,7 @@ export const shoppingMiddleware: Middleware<
     }
 
     case 'CLEAR_PURCHASED': {
-      const purchasedItems = state.shoppingList.filter(
-        (item) => item.is_purchased,
-      );
+      const purchasedItems = state.shoppingList.filter((item) => item.is_purchased);
 
       if (purchasedItems.length === 0) {
         return {
