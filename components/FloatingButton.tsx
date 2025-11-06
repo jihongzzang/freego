@@ -1,4 +1,4 @@
-import { TouchableOpacity, StyleSheet, Platform, Text, View, Animated, BackHandler } from 'react-native';
+import { TouchableOpacity, StyleSheet, Platform, Text, View, Animated, BackHandler, Modal } from 'react-native';
 import { Plus, X } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/lib/theme';
@@ -42,12 +42,12 @@ export default function FloatingButton({
     Animated.parallel([
       Animated.spring(animatedValue, {
         toValue: isExpanded ? 1 : 0,
-        useNativeDriver: false,
+        useNativeDriver: Platform.OS == 'android' ? false : true,
         friction: 8,
       }),
       Animated.spring(rotation, {
         toValue: isExpanded ? 1 : 0,
-        useNativeDriver: false,
+        useNativeDriver: Platform.OS == 'android' ? false : true,
         friction: 8,
       }),
     ]).start();
@@ -83,113 +83,116 @@ export default function FloatingButton({
 
   return (
     <>
-      {/* 메뉴 아이템들 - 오버레이보다 먼저 렌더링 */}
-      {menuItems && menuItems.length > 0 && (
-        <View
-          style={[styles.menuContainer, { bottom: bottomPosition + 70, zIndex: 999 }]}
-          pointerEvents={isExpanded ? 'auto' : 'none'}
-        >
-          {menuItems.map((item, index) => {
-            const itemIndex = menuItems.length - index;
-            const translateY = animatedValue.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0, -(70 * itemIndex)],
-            });
-
-            const opacity = animatedValue.interpolate({
-              inputRange: [0, 0.5, 1],
-              outputRange: [0, 0, 1],
-            });
-
-            return (
-              <Animated.View
-                key={index}
-                pointerEvents={isExpanded ? 'auto' : 'none'}
-                style={[
-                  styles.menuItem,
-                  {
-                    position: 'absolute',
-                    transform: [{ translateY }],
-                    opacity,
-                  },
-                ]}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    console.log(`[FloatingButton] Menu item ${index} pressed:`, item.label);
-                    item.onPress();
-                    setIsExpanded(false);
-                  }}
-                  activeOpacity={0.8}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  style={styles.menuItemTouchable}
-                >
-                  <Text
-                    style={[
-                      typography.styles.bodySemibold,
-                      {
-                        color: colors.text,
-                        marginRight: spacing.sm,
-                        backgroundColor: colors.surface,
-                        paddingHorizontal: spacing.md,
-                        paddingVertical: spacing.xs,
-                        borderRadius: borderRadius.md,
-                        ...Platform.select({
-                          ios: {
-                            shadowColor: '#000',
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 0.15,
-                            shadowRadius: 4,
-                          },
-                          android: {
-                            elevation: 4,
-                          },
-                        }),
-                      },
-                    ]}
-                  >
-                    {item.label}
-                  </Text>
-                  <View
-                    style={[
-                      styles.menuButton,
-                      {
-                        backgroundColor: item.backgroundColor || colors.primary,
-                        borderRadius: borderRadius.full,
-                        ...Platform.select({
-                          ios: {
-                            shadowColor: '#000',
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 0.2,
-                            shadowRadius: 4,
-                          },
-                          android: {
-                            elevation: 4,
-                          },
-                        }),
-                      },
-                    ]}
-                  >
-                    {item.icon}
-                  </View>
-                </TouchableOpacity>
-              </Animated.View>
-            );
-          })}
-        </View>
-      )}
-
-      {/* 배경 오버레이 - 메뉴 아이템보다 나중에 렌더링 */}
-      {isExpanded && menuItems && menuItems.length > 0 && (
+      {/* Modal로 감싸서 바텀 네비게이션 위로 렌더링 */}
+      <Modal
+        visible={isExpanded}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsExpanded(false)}
+        statusBarTranslucent
+      >
+        {/* 배경 오버레이 */}
         <TouchableOpacity
-          style={[styles.overlay, { zIndex: 998 }]}
+          style={styles.overlay}
           activeOpacity={1}
           onPress={() => {
             console.log('[FloatingButton] Overlay pressed, closing menu');
             setIsExpanded(false);
           }}
         />
-      )}
+
+        {/* 메뉴 아이템들 */}
+        {menuItems && menuItems.length > 0 && (
+          <View style={[styles.menuContainer, { bottom: bottomPosition + 70 }]}>
+            {menuItems.map((item, index) => {
+              const itemIndex = menuItems.length - index;
+              const translateY = animatedValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, -(70 * itemIndex)],
+              });
+
+              const opacity = animatedValue.interpolate({
+                inputRange: [0, 0.5, 1],
+                outputRange: [0, 0, 1],
+              });
+
+              return (
+                <Animated.View
+                  key={index}
+                  style={[
+                    styles.menuItem,
+                    {
+                      position: 'absolute',
+                      transform: [{ translateY }],
+                      opacity,
+                    },
+                  ]}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      console.log(`[FloatingButton] Menu item ${index} pressed:`, item.label);
+                      item.onPress();
+                      setIsExpanded(false);
+                    }}
+                    activeOpacity={0.8}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    style={styles.menuItemTouchable}
+                  >
+                    <Text
+                      style={[
+                        typography.styles.bodySemibold,
+                        {
+                          color: colors.text,
+                          marginRight: spacing.sm,
+                          backgroundColor: colors.surface,
+                          paddingHorizontal: spacing.md,
+                          paddingVertical: spacing.xs,
+                          borderRadius: borderRadius.md,
+                          ...Platform.select({
+                            ios: {
+                              shadowColor: '#000',
+                              shadowOffset: { width: 0, height: 2 },
+                              shadowOpacity: 0.15,
+                              shadowRadius: 4,
+                            },
+                            android: {
+                              elevation: 4,
+                            },
+                          }),
+                        },
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                    <View
+                      style={[
+                        styles.menuButton,
+                        {
+                          backgroundColor: item.backgroundColor || colors.primary,
+                          borderRadius: borderRadius.full,
+                          ...Platform.select({
+                            ios: {
+                              shadowColor: '#000',
+                              shadowOffset: { width: 0, height: 2 },
+                              shadowOpacity: 0.2,
+                              shadowRadius: 4,
+                            },
+                            android: {
+                              elevation: 4,
+                            },
+                          }),
+                        },
+                      ]}
+                    >
+                      {item.icon}
+                    </View>
+                  </TouchableOpacity>
+                </Animated.View>
+              );
+            })}
+          </View>
+        )}
+      </Modal>
 
       {/* 메인 플로팅 버튼 */}
       <Animated.View

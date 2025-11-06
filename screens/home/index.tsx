@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Platform } from 'react-native';
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
@@ -237,7 +237,12 @@ export default function HomeScreen() {
           />
         </Animated.View>
 
-        <View style={[styles.categoryCarouselContainer, { backgroundColor: colors.surface }]}>
+        <View
+          style={[
+            styles.categoryCarouselContainer,
+            { backgroundColor: colors.surface, borderBottomColor: colors.borderLight },
+          ]}
+        >
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -306,7 +311,9 @@ export default function HomeScreen() {
 
       <Animated.ScrollView
         ref={scrollViewRef}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: Platform.OS == 'android' ? false : true,
+        })}
         scrollEventThrottle={16}
         contentContainerStyle={{
           paddingTop: 56 + inset.top + 56,
@@ -496,7 +503,6 @@ const createStyles = ({
       paddingHorizontal: spacing.lg,
       paddingVertical: spacing.md,
       borderBottomWidth: 1,
-      borderBottomColor: colors.borderLight,
     },
     categoryCarousel: {
       flexGrow: 0,

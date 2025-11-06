@@ -26,13 +26,7 @@ interface BottomSheetProps {
   children: React.ReactNode;
 }
 
-export default function BottomSheet({
-  maxHeight,
-  visible,
-  onClose,
-  title,
-  children,
-}: BottomSheetProps) {
+export default function BottomSheet({ maxHeight, visible, onClose, title, children }: BottomSheetProps) {
   const { colors, typography } = useTheme();
   const insets = useSafeAreaInsets();
   const translateY = useRef(new Animated.Value(0)).current;
@@ -65,7 +59,7 @@ export default function BottomSheet({
           // 원래 위치로 복귀
           Animated.spring(translateY, {
             toValue: 0,
-            useNativeDriver: true,
+            useNativeDriver: Platform.OS == 'android' ? false : true,
             tension: 65,
             friction: 11,
           }).start();
@@ -81,14 +75,12 @@ export default function BottomSheet({
       (e) => {
         // iOS에서는 키보드 높이에서 Safe Area bottom을 빼고 8px 더 올림
         const offset =
-          Platform.OS === 'ios'
-            ? -(e.endCoordinates.height - insets.bottom + 8)
-            : -(e.endCoordinates.height - 16);
+          Platform.OS === 'ios' ? -(e.endCoordinates.height - insets.bottom + 8) : -(e.endCoordinates.height - 16);
 
         Animated.timing(keyboardTranslateY, {
           toValue: offset,
           duration: Platform.OS === 'ios' ? 250 : 200,
-          useNativeDriver: true,
+          useNativeDriver: Platform.OS == 'android' ? false : true,
         }).start();
       },
     );
@@ -99,7 +91,7 @@ export default function BottomSheet({
         Animated.timing(keyboardTranslateY, {
           toValue: 0,
           duration: Platform.OS === 'ios' ? 250 : 200,
-          useNativeDriver: true,
+          useNativeDriver: Platform.OS == 'android' ? false : true,
         }).start();
       },
     );
@@ -116,7 +108,7 @@ export default function BottomSheet({
       translateY.setValue(SCREEN_HEIGHT);
       Animated.spring(translateY, {
         toValue: 0,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS == 'android' ? false : true,
         tension: 65,
         friction: 11,
       }).start();
@@ -125,7 +117,7 @@ export default function BottomSheet({
       Animated.timing(translateY, {
         toValue: SCREEN_HEIGHT,
         duration: 300,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS == 'android' ? false : true,
       }).start(() => {
         translateY.setValue(0);
       });
@@ -135,19 +127,13 @@ export default function BottomSheet({
   if (!visible) return null;
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="none"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View
           style={[
             styles.overlay,
             {
-              paddingBottom:
-                Platform.OS === 'ios' ? Math.max(insets.bottom, 8) : 8,
+              paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 8) : 8,
             },
           ]}
         >
@@ -160,10 +146,7 @@ export default function BottomSheet({
                     Platform.OS === 'ios'
                       ? [
                           {
-                            translateY: Animated.add(
-                              translateY,
-                              keyboardTranslateY,
-                            ),
+                            translateY: Animated.add(translateY, keyboardTranslateY),
                           },
                         ]
                       : [{ translateY }],
@@ -181,12 +164,7 @@ export default function BottomSheet({
               >
                 <View {...panResponder.panHandlers}>
                   <View style={styles.handleContainer}>
-                    <View
-                      style={[
-                        styles.handle,
-                        { backgroundColor: colors.border },
-                      ]}
-                    />
+                    <View style={[styles.handle, { backgroundColor: colors.border }]} />
                   </View>
 
                   <View
@@ -197,14 +175,7 @@ export default function BottomSheet({
                       },
                     ]}
                   >
-                    <Text
-                      style={[
-                        typography.styles.h3,
-                        { color: colors.text, flex: 1 },
-                      ]}
-                    >
-                      {title}
-                    </Text>
+                    <Text style={[typography.styles.h3, { color: colors.text, flex: 1 }]}>{title}</Text>
                   </View>
                 </View>
 

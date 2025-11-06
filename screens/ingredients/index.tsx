@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, Platform } from 'react-native';
 import { useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
@@ -26,6 +26,7 @@ export default function IngredientsScreen() {
 
   // 스크롤 애니메이션
   const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollViewRef = useRef<ScrollView>(null);
 
   // 뷰 모드 상태 (카테고리별 / 저장위치별)
   const [viewMode, setViewMode] = useState<ViewMode>('category');
@@ -241,7 +242,6 @@ export default function IngredientsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Animated.View
-        pointerEvents="box-none"
         style={{
           transform: [{ translateY: headerTranslateY }],
           backgroundColor: colors.background,
@@ -297,6 +297,7 @@ export default function IngredientsScreen() {
       </Animated.View>
 
       <Animated.ScrollView
+        ref={scrollViewRef}
         style={styles.content}
         contentContainerStyle={{
           paddingTop: 56 + 56 + inset.top + 16, // 헤더 + 탭 높이만큼 패딩
@@ -305,9 +306,10 @@ export default function IngredientsScreen() {
         }}
         showsVerticalScrollIndicator={false}
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-          useNativeDriver: true,
+          useNativeDriver: Platform.OS == 'android' ? false : true,
         })}
         scrollEventThrottle={16}
+        removeClippedSubviews={false}
       >
         {loading ? (
           <View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
@@ -471,7 +473,7 @@ const createStyles = ({
     tabContainer: {
       flexDirection: 'row',
       paddingHorizontal: spacing.lg,
-      paddingTop: spacing.md,
+      paddingTop: spacing.sm,
       gap: spacing.sm,
     },
     tab: {
