@@ -108,7 +108,7 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
           <ChevronLeft size={20} color={colors.text} />
         </TouchableOpacity>
 
-        <Text style={[typography.styles.h6, { color: colors.text }]}>
+        <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
           {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
         </Text>
 
@@ -122,9 +122,9 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
           <View key={day} style={styles.weekDay}>
             <Text
               style={[
-                typography.styles.captionBold,
+                typography.styles.t7,
                 {
-                  color: index === 0 ? colors.danger : index === 6 ? colors.primary : colors.textSecondary,
+                  color: index === 0 ? colors.danger : index === 6 ? colors.blue500 : colors.textSecondary,
                 },
               ]}
             >
@@ -154,7 +154,7 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
           } else if (dayOfWeek === 0) {
             textColor = colors.danger;
           } else if (dayOfWeek === 6) {
-            textColor = colors.primary;
+            textColor = colors.blue500;
           }
 
           return (
@@ -168,18 +168,18 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
                 style={[
                   styles.dayCellInner,
                   selected && {
-                    backgroundColor: colors.primary,
+                    backgroundColor: colors.grey400,
                   },
                   today &&
                     !selected && {
                       borderWidth: 2,
-                      borderColor: colors.primary,
+                      borderColor: colors.grey400,
                     },
                 ]}
               >
                 <Text
                   style={[
-                    typography.styles.body,
+                    typography.styles.t5,
                     {
                       color: textColor,
                       fontWeight: selected ? '600' : '400',
@@ -222,13 +222,12 @@ const createStyles = ({
     },
     weekHeader: {
       flexDirection: 'row',
-      paddingBottom: spacing.sm,
     },
     weekDay: {
       width: '14.28%', // 100% / 7 = 14.28%
       alignItems: 'center',
       justifyContent: 'center',
-      height: 32,
+      height: 24,
     },
     daysGrid: {
       flexDirection: 'row',
@@ -241,8 +240,8 @@ const createStyles = ({
       justifyContent: 'center',
     },
     dayCellInner: {
-      width: 40,
-      height: 40,
+      width: 36,
+      height: 36,
       alignItems: 'center',
       justifyContent: 'center',
     },

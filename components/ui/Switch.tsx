@@ -30,7 +30,7 @@ export default function Switch({ value, onValueChange, disabled = false, label, 
 
   return (
     <View style={[styles.container, style]}>
-      {label && <Text style={[typography.styles.body, { color: colors.text, marginRight: spacing.md }]}>{label}</Text>}
+      {label && <Text style={[typography.styles.t5, { color: colors.text, marginRight: spacing.md }]}>{label}</Text>}
 
       <TouchableOpacity
         style={[

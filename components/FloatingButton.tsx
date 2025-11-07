@@ -149,11 +149,11 @@ export default function FloatingButton({
                   >
                     <Text
                       style={[
-                        typography.styles.captionMedium,
+                        typography.styles.t7Medium,
                         {
                           color: item.labelColor ? item.labelColor : colors.text,
                           marginRight: spacing.sm,
-                          backgroundColor: colors.primaryLight,
+                          backgroundColor: item.backgroundColor,
                           paddingHorizontal: spacing.md,
                           paddingVertical: spacing.xs,
                           borderRadius: borderRadius.md,
@@ -236,7 +236,7 @@ export default function FloatingButton({
           ) : (
             icon || <Plus size={28} color="#FFFFFF" />
           )}
-          {label && <Text style={[typography.styles.button, { color: '#FFFFFF', marginLeft: 8 }]}>{label}</Text>}
+          {label && <Text style={[typography.styles.st8Semibold, { color: '#FFFFFF', marginLeft: 8 }]}>{label}</Text>}
         </TouchableOpacity>
       </Animated.View>
     </>

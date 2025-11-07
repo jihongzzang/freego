@@ -7,47 +7,16 @@
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { IngredientsState, IngredientsIntent, IngredientsEffect, Ingredient } from './types';
 import { storage } from '@/lib/storage';
-import { StatusType } from '@/constants/itemStatus';
-
-/**
- * 유통기한 상태 계산
- */
-function calculateStatus(expiryDate: string | null | undefined): StatusType {
-  if (!expiryDate) return 'not_set';
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const expiry = new Date(expiryDate);
-  expiry.setHours(0, 0, 0, 0);
-  const diffTime = expiry.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) return 'expired';
-  return 'valid';
-}
-
-/**
- * 남은 일수 계산
- */
-function calculateDaysRemaining(expiryDate: string | null | undefined): number | null {
-  if (!expiryDate) return null;
-
-  const today = new Date();
-  const expiry = new Date(expiryDate);
-  const diffTime = expiry.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  return diffDays;
-}
+import { calculateStatus } from '@/utils/calculateStatus';
+import { calculateDaysRemaining } from '@/utils/calculateDaysRemaining';
 
 /**
  * Ingredients Middleware
  */
-export const ingredientsMiddleware: Middleware<
-  IngredientsState,
-  IngredientsIntent,
-  IngredientsEffect
-> = async (state, intent): Promise<MiddlewareResult<IngredientsState, IngredientsEffect>> => {
+export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsIntent, IngredientsEffect> = async (
+  state,
+  intent,
+): Promise<MiddlewareResult<IngredientsState, IngredientsEffect>> => {
   switch (intent.type) {
     case 'LOAD_INGREDIENTS': {
       try {
@@ -126,16 +95,12 @@ export const ingredientsMiddleware: Middleware<
 
     case 'NAVIGATE_TO_DETAIL':
       return {
-        effects: [
-          { type: 'NAVIGATE', payload: `/ingredient/${intent.payload}` },
-        ],
+        effects: [{ type: 'NAVIGATE', payload: `/ingredient/${intent.payload}` }],
       };
 
     case 'NAVIGATE_TO_DETAIL_EDIT':
       return {
-        effects: [
-          { type: 'NAVIGATE', payload: `/ingredient/${intent.payload}?mode=edit` },
-        ],
+        effects: [{ type: 'NAVIGATE', payload: `/ingredient/${intent.payload}?mode=edit` }],
       };
 
     case 'NAVIGATE_BACK':

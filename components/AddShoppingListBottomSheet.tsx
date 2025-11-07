@@ -23,19 +23,19 @@ export default function AddShoppingListBottomSheet({
   onCategoryChange,
   onSubmit,
 }: AddShoppingListBottomSheetProps) {
-  const { colors, typography } = useTheme();
+  const { colors, typography, isDark } = useTheme();
 
   return (
-    <BottomSheet maxHeight={372} visible={visible} onClose={onClose} title="장보기 항목 추가">
+    <BottomSheet maxHeight={450} visible={visible} onClose={onClose} title="장보기 항목 추가">
       <View style={styles.container}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <View style={styles.content}>
             <View style={styles.inputGroup}>
-              <Text style={[typography.styles.label, { color: colors.text }]}>재료 이름</Text>
+              <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>재료 이름</Text>
               <TextInput
                 style={[
                   styles.input,
-                  typography.styles.body,
+                  typography.styles.t5,
                   {
                     backgroundColor: colors.surface,
                     color: colors.text,
@@ -50,7 +50,7 @@ export default function AddShoppingListBottomSheet({
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[typography.styles.label, { color: colors.text }]}>카테고리</Text>
+              <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>카테고리</Text>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -62,12 +62,16 @@ export default function AddShoppingListBottomSheet({
                     style={[
                       styles.categoryChip,
                       {
-                        backgroundColor: colors.surface,
-                        borderColor: colors.border,
+                        // backgroundColor: colors.surface,
+                        // borderColor: colors.border,
+                        backgroundColor: isDark ? colors.grey400 : colors.grey200,
+                        borderColor: isDark ? colors.grey400 : colors.grey200,
                       },
                       category === cat.id && {
-                        backgroundColor: colors.primaryLight,
-                        borderColor: colors.primary,
+                        // backgroundColor: colors.primaryLight,
+                        // borderColor: colors.primary,
+                        backgroundColor: isDark ? colors.grey600 : colors.grey400,
+                        borderColor: isDark ? colors.grey600 : colors.grey400,
                       },
                     ]}
                     onPress={() => onCategoryChange(cat.id)}
@@ -76,11 +80,10 @@ export default function AddShoppingListBottomSheet({
                       {getCategoryIcon(cat.id, 16)}
                       <Text
                         style={[
-                          typography.styles.bodySmall,
-                          { color: colors.textSecondary },
+                          typography.styles.t6,
+                          { color: colors.grey700 },
                           category === cat.id && {
-                            color: colors.white,
-                            fontWeight: '600',
+                            color: isDark ? colors.text : colors.white,
                           },
                         ]}
                       >
@@ -115,7 +118,7 @@ export default function AddShoppingListBottomSheet({
           >
             <Text
               style={[
-                typography.styles.button,
+                typography.styles.st8Semibold,
                 {
                   color: name.trim() ? '#FFFFFF' : colors.textTertiary,
                 },

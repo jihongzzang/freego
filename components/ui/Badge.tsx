@@ -6,7 +6,7 @@ export type BadgeVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'da
 export type BadgeSize = 'small' | 'medium' | 'large';
 
 interface BadgeProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?: BadgeVariant;
   size?: BadgeSize;
   dot?: boolean;
@@ -71,21 +71,18 @@ export default function Badge({ children, variant = 'primary', size = 'medium', 
     switch (size) {
       case 'small':
         return {
-          paddingHorizontal: spacing.xs,
-          paddingVertical: 2,
-          minWidth: 16,
+          paddingHorizontal: 7,
+          paddingVertical: 3,
         };
       case 'medium':
         return {
-          paddingHorizontal: spacing.sm,
-          paddingVertical: spacing.xs,
-          minWidth: 20,
+          paddingHorizontal: 7,
+          paddingVertical: 3,
         };
       case 'large':
         return {
-          paddingHorizontal: spacing.md,
-          paddingVertical: spacing.sm,
-          minWidth: 24,
+          paddingHorizontal: 8,
+          paddingVertical: 4,
         };
       default:
         return {};
@@ -97,7 +94,7 @@ export default function Badge({ children, variant = 'primary', size = 'medium', 
       case 'small':
         return typography.styles.t7Bold;
       case 'medium':
-        return typography.styles.t7Bold;
+        return typography.styles.t6Bold;
       case 'large':
         return typography.styles.t6Bold;
       default:
@@ -111,7 +108,7 @@ export default function Badge({ children, variant = 'primary', size = 'medium', 
 
   return (
     <View style={[styles.badge, getVariantStyles(), getSizeStyles(), { borderRadius: borderRadius.full }, style]}>
-      <Text style={[getTextSize(), { color: colors.white }]}>{children}</Text>
+      <Text style={[getTextSize(), { color: colors.surface }]}>{children}</Text>
     </View>
   );
 }

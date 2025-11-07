@@ -35,7 +35,7 @@ export default function Header({ title, onBackPress, rightComponent }: HeaderPro
         )}
 
         <View style={styles.titleContainer}>
-          <Text style={[typography.styles.h3, { color: colors.text }]} numberOfLines={1}>
+          <Text style={[typography.styles.st5Semibold, { color: colors.text }]} numberOfLines={1}>
             {title}
           </Text>
         </View>

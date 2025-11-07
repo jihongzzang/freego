@@ -24,9 +24,7 @@ export default function EmptyState({ icon, title, description, actionLabel, onAc
       </Text>
 
       {description && (
-        <Text style={[typography.styles.t6, { color: colors.textTertiary, textAlign: 'center' }]}>
-          {description}
-        </Text>
+        <Text style={[typography.styles.t6, { color: colors.textTertiary, textAlign: 'center' }]}>{description}</Text>
       )}
 
       {actionLabel && onAction && (
@@ -42,7 +40,7 @@ export default function EmptyState({ icon, title, description, actionLabel, onAc
 
 const styles = StyleSheet.create({
   container: {
-    padding: 40,
+    padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },

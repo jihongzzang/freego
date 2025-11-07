@@ -441,20 +441,32 @@ export const Colors: Record<'light' | 'dark', ColorPalette> = {
 };
 
 export const spacing = {
+  /** 4 */
   xs: 4,
+  /** 8 */
   sm: 8,
+  /** 12 */
   md: 12,
+  /** 16 */
   lg: 16,
+  /** 20 */
   xl: 20,
+  /** 24 */
   xxl: 24,
+  /** 32 */
   xxxl: 32,
 };
 
 export const borderRadius = {
+  /** 8 */
   sm: 8,
+  /** 12 */
   md: 12,
+  /** 16 */
   lg: 16,
+  /** 20 */
   xl: 20,
+  /** 24 */
   xxl: 24,
   full: 9999,
 };

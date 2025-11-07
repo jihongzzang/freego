@@ -1,186 +1,58 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, Platform } from 'react-native';
-import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { View, Animated, TouchableOpacity, Platform } from 'react-native';
+import { Bell, QrCode, Edit3, Grid3x3, Dot } from 'lucide-react-native';
+import { useTheme } from '@/lib/theme';
 import { useRouter } from '@/hooks/useRouter';
-import { Bell, Edit3, Grid3x3, QrCode, Receipt, Calendar } from 'lucide-react-native';
-import { ColorPalette, useTheme } from '@/lib/theme';
-import { useMVIStore } from '@/mvi/base';
-import { createHomeStore, Ingredient } from '@/mvi/features/home';
 import Header from '@/components/Header';
 import FloatingButton from '@/components/FloatingButton';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ALL_CATEGORIES, ALL_CATEGORY, AllCategoryType } from '@/constants/categories';
-import { StatusType } from '@/constants/itemStatus';
-import { useExpiryDatePicker } from '@/hooks/useExpiryDatePicker';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
-import { useBulkAdd } from '@/hooks/useBulkAdd';
 import BulkAddBottomSheet from '@/components/BulkAddBottomSheet';
+import EmptyStateUI from '@/components/ui/EmptyState';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ALL_CATEGORY } from '@/constants/categories';
+import { useHomeLogic } from './hooks/useHomeLogic';
+import { useHomeData } from './hooks/useHomeData';
+import { useHomeAnimation } from './hooks/useHomeAnimation';
+import { CategoryCarousel } from './components/CategoryCarousel';
+// import { ExpiringSection } from './components/ExpiringSection';
+import { IngredientsSection } from './components/IngredientsSection';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { colors, typography, borderRadius, spacing } = useTheme();
-  const scrollViewRef = useRef<ScrollView>(null);
-  const expiringRef = useRef<View>(null);
-
+  const { colors, spacing } = useTheme();
   const inset = useSafeAreaInsets();
 
-  // 선택된 카테고리 상태 (id 기반)
-  const [selectedCategoryId, setSelectedCategoryId] = useState<AllCategoryType>(ALL_CATEGORY.id);
+  // Logic hooks
+  const {
+    state,
+    dispatch,
+    selectedCategoryId,
+    setSelectedCategoryId,
+    selectedIngredient,
+    scrollY,
+    openDatePicker,
+    getFloatingMenuItems,
+    expiryDatePicker,
+    bulkAdd,
+  } = useHomeLogic();
 
-  // 유통기한 수정 모달 상태
-  const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
-
-  // MVI Store 사용
-  const [state, dispatch, effect] = useMVIStore(createHomeStore);
-  const { ingredients, loading } = state;
-
-  // 유통기한 업데이트 함수
-  const updateExpiryDate = (expiryDate: string) => {
-    if (!selectedIngredient) return;
-    dispatch({
-      type: 'UPDATE_EXPIRY_DATE',
-      payload: { id: selectedIngredient.id, expiryDate },
-    });
-  };
-
-  // 유통기한 선택 훅 - 빠른 선택 시 즉시 저장
-  const expiryDatePicker = useExpiryDatePicker({
-    onDateConfirm: updateExpiryDate,
-  });
-
-  // BulkAdd 훅 - 성공 시 데이터 자동 로드
-  const bulkAdd = useBulkAdd(() => {
-    dispatch({ type: 'LOAD_INGREDIENTS' });
-  });
-
-  // 동적 스타일 생성
-  const styles = useMemo(() => createStyles({ colors, borderRadius, spacing }), [spacing, borderRadius]);
-
-  const scrollY = useRef(new Animated.Value(0)).current;
-
-  const headerTranslateY = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [0, -60], // 헤더 높이만큼
-    extrapolate: 'clamp',
-  });
-
-  const contentOpacity = scrollY.interpolate({
-    inputRange: [0, 60],
-    outputRange: [1, 0],
-    extrapolate: 'clamp',
-  });
-
-  // Effect 처리
-  useEffect(() => {
-    if (effect) {
-      switch (effect.type) {
-        case 'NAVIGATE':
-          router.push(effect.payload as any);
-          break;
-        case 'SHOW_TOAST':
-          break;
-      }
-    }
-  }, [effect, router]);
-
-  // 화면 포커스 시 데이터 로드
-  useFocusEffect(
-    useCallback(() => {
-      dispatch({ type: 'LOAD_INGREDIENTS' });
-    }, [dispatch]),
+  // Data hooks
+  const { expiringItems, selectedCategoryItem, filteredIngredients, getCategoryCount, getExpiryDisplay } = useHomeData(
+    state.ingredients,
+    selectedCategoryId,
   );
 
-  function getExpiryDisplay(status: StatusType, daysRemaining: number | null): string {
-    if (status === 'not_set') return '유통기한 입력필요';
+  // Animation hooks
+  const { headerTranslateY, contentOpacity } = useHomeAnimation(scrollY);
 
-    if (daysRemaining === null) return '';
-
-    if (daysRemaining < 0) {
-      return `소비기한 지남 (D+${Math.abs(daysRemaining)})`;
-    }
-    return `D-${daysRemaining} 남음`;
-  }
-
-  // 유통기한 수정 모달 열기
-  function openDatePicker(item: Ingredient) {
-    setSelectedIngredient(item);
-    expiryDatePicker.open(item.expiry_date || new Date());
-  }
-
-  const expiringItems = ingredients.filter((item) => item.status === 'expired');
-
-  // 선택된 카테고리 정보
-  const selectedCategoryItem = useMemo(
-    () => ALL_CATEGORIES.find((cat) => cat.id === selectedCategoryId),
-    [selectedCategoryId],
-  );
-
-  // 선택된 카테고리에 따른 재료 필터링
-  const filteredIngredients = useMemo(() => {
-    if (selectedCategoryId === ALL_CATEGORY.id) {
-      return ingredients;
-    }
-    return ingredients.filter((item) => item.category === selectedCategoryId);
-  }, [ingredients, selectedCategoryId]);
-
-  const renderIngredientCard = ({ item }: { item: Ingredient }) => (
-    <TouchableOpacity
-      key={item.id}
-      style={[styles.ingredientCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-      onPress={() => router.push(`/ingredient/${item.id}`)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.cardContent}>
-        <View style={styles.cardHeader}>
-          <View style={styles.emojiContainer}>
-            <Text style={typography.styles.body}>{item.emoji || '🍽️'}</Text>
-            {item.status === 'expired' && (
-              <View
-                style={[
-                  styles.statusBadge,
-                  {
-                    backgroundColor: colors.danger,
-                  },
-                ]}
-              />
-            )}
-          </View>
-          <TouchableOpacity
-            style={styles.calendarIcon}
-            onPress={(e) => {
-              e.stopPropagation();
-              openDatePicker(item);
-            }}
-            activeOpacity={0.7}
-          >
-            <Calendar size={20} color={colors.textTertiary} />
-          </TouchableOpacity>
-        </View>
-        <Text style={[typography.styles.bodySemibold, { color: colors.text }]} numberOfLines={1}>
-          {item.name}
-        </Text>
-        <Text
-          style={[
-            typography.styles.smallCaption,
-            {
-              marginTop: 2,
-              color: item.status === 'expired' ? colors.danger : colors.textTertiary,
-            },
-          ]}
-          numberOfLines={1}
-        >
-          {getExpiryDisplay(item.status, item.daysRemaining)}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const floatingMenuItems = getFloatingMenuItems();
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {/* Animated Header */}
       <Animated.View
         style={{
           transform: [{ translateY: headerTranslateY }],
-          backgroundColor: colors.surface, // 👈 배경색 유지
+          backgroundColor: colors.surface,
           position: 'absolute',
           top: 0,
           left: 0,
@@ -193,101 +65,46 @@ export default function HomeScreen() {
             title="내 냉장고"
             rightComponent={
               <TouchableOpacity
-                style={[
-                  styles.notificationButton,
-                  {
-                    backgroundColor: expiringItems.length > 0 ? colors.dangerLight : colors.surfaceSecondary,
-                  },
-                ]}
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 100,
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  position: 'relative',
+                }}
                 onPress={() => {
                   dispatch({ type: 'NAVIGATE_TO_EXPIRING' });
                 }}
               >
-                <Bell size={20} color={expiringItems.length > 0 ? colors.danger : colors.textSecondary} />
+                <Bell size={24} color={expiringItems.length > 0 ? colors.danger : colors.textSecondary} />
                 {expiringItems.length > 0 && (
-                  <View style={[styles.badge, { backgroundColor: colors.danger }]}>
-                    <Text style={[typography.styles.captionBold, { color: '#FFFFFF' }]}>{expiringItems.length}</Text>
-                  </View>
+                  <View
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: 3,
+                      backgroundColor: colors.danger,
+                      position: 'absolute',
+                      top: 10,
+                      right: 5,
+                    }}
+                  />
                 )}
               </TouchableOpacity>
             }
           />
         </Animated.View>
 
-        <View
-          style={[
-            styles.categoryCarouselContainer,
-            { backgroundColor: colors.surface, borderBottomColor: colors.borderLight },
-          ]}
-        >
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.categoryCarousel}
-            contentContainerStyle={styles.categoryCarouselContent}
-          >
-            {ALL_CATEGORIES.map((categoryItem) => {
-              const isSelected = categoryItem.id === selectedCategoryId;
-              const categoryCount =
-                categoryItem.id === ALL_CATEGORY.id
-                  ? ingredients.length
-                  : ingredients.filter((item) => item.category === categoryItem.id).length;
-
-              return (
-                <TouchableOpacity
-                  key={categoryItem.id}
-                  style={[
-                    styles.categoryChip,
-                    {
-                      backgroundColor: isSelected ? colors.primary : colors.surface,
-                      borderColor: isSelected ? colors.primary : colors.border,
-                    },
-                  ]}
-                  onPress={() => setSelectedCategoryId(categoryItem.id)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.categoryChipContent}>
-                    <Text
-                      style={[
-                        typography.styles.bodySmallMedium,
-                        {
-                          color: isSelected ? '#FFFFFF' : colors.textSecondary,
-                        },
-                      ]}
-                    >
-                      {categoryItem.krLabel}
-                    </Text>
-                    {categoryCount > 0 && (
-                      <View
-                        style={[
-                          styles.categoryCount,
-                          {
-                            backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.3)' : colors.surfaceSecondary,
-                          },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            typography.styles.captionBold,
-                            {
-                              color: isSelected ? '#FFFFFF' : colors.textSecondary,
-                            },
-                          ]}
-                        >
-                          {categoryCount}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
+        <CategoryCarousel
+          selectedCategoryId={selectedCategoryId}
+          onCategorySelect={setSelectedCategoryId}
+          getCategoryCount={getCategoryCount}
+        />
       </Animated.View>
 
+      {/* Scrollable Content */}
       <Animated.ScrollView
-        ref={scrollViewRef}
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
           useNativeDriver: Platform.OS == 'android' ? false : true,
         })}
@@ -299,90 +116,75 @@ export default function HomeScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {expiringItems.length > 0 && (
-          <View ref={expiringRef} style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionHeaderLeft}>
-                <Bell size={20} color={colors.danger} />
-                <Text style={[typography.styles.h5, { color: colors.text }]}>소비기한 지남</Text>
-              </View>
-              {expiringItems.length > 8 && (
-                <TouchableOpacity onPress={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })} activeOpacity={0.7}>
-                  <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>더보기</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            <View style={styles.cardList}>
-              {expiringItems.slice(0, 8).map((item) => renderIngredientCard({ item }))}
-            </View>
-          </View>
-        )}
+        {/* {expiringItems.length > 0 && (
+          <ExpiringSection
+            items={
+              selectedCategoryId === ALL_CATEGORY.id
+                ? expiringItems
+                : expiringItems.filter((item) => item.category == selectedCategoryId)
+            }
+            onSeeMore={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
+            onCardPress={(item) => router.push(`/ingredient/${item.id}`)}
+            onCalendarPress={openDatePicker}
+            getExpiryDisplay={getExpiryDisplay}
+          />
+        )} */}
 
-        {loading ? (
-          <View style={styles.section}>
-            <View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
-              <Text style={[typography.styles.bodySemibold, { color: colors.textTertiary }]}>로딩 중이에요...</Text>
-            </View>
+        {state.loading ? (
+          <View style={{ paddingTop: 24 }}>
+            <EmptyStateUI title="로딩 중이에요..." />
           </View>
         ) : filteredIngredients.length === 0 ? (
-          <View style={styles.section}>
-            <View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
-              <Text style={[typography.styles.bodyMedium, { color: colors.textSecondary, marginBottom: 8 }]}>
-                {selectedCategoryId === ALL_CATEGORY.id
+          <View style={{ paddingTop: 24 }}>
+            <EmptyStateUI
+              title={
+                selectedCategoryId === ALL_CATEGORY.id
                   ? '관리할 재료가 없어요'
-                  : `${selectedCategoryItem?.krLabel} 재료가 없어요`}
-              </Text>
-              <Text style={[typography.styles.bodySmall, { color: colors.textTertiary }]}>
-                기억하고 싶은 재료만 추가해보세요
-              </Text>
-            </View>
+                  : `${selectedCategoryItem?.krLabel} 재료가 없어요`
+              }
+              description="기억하고 싶은 재료만 추가해보세요"
+            />
           </View>
         ) : (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={[typography.styles.h5, { color: colors.text }]}>
-                {selectedCategoryId === ALL_CATEGORY.id ? '전체 재료' : selectedCategoryItem?.krLabel}
-              </Text>
-              <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>
-                {filteredIngredients.length}개
-              </Text>
-            </View>
-            <View style={styles.cardList}>{filteredIngredients.map((item) => renderIngredientCard({ item }))}</View>
-          </View>
+          <IngredientsSection
+            title={selectedCategoryId === ALL_CATEGORY.id ? '전체 재료' : selectedCategoryItem?.krLabel || ''}
+            count={filteredIngredients.length}
+            items={filteredIngredients}
+            onCardPress={(item) => router.push(`/ingredient/${item.id}`)}
+            onCalendarPress={openDatePicker}
+            getExpiryDisplay={getExpiryDisplay}
+          />
         )}
       </Animated.ScrollView>
 
+      {/* Floating Action Button */}
       <FloatingButton
         menuItems={[
           {
             icon: <QrCode size={24} color="#FFFFFF" />,
-            label: '영수증으로 재료 등록',
-            onPress: bulkAdd.handleRegisterReceipt,
+            label: floatingMenuItems[0].label,
+            onPress: floatingMenuItems[0].onPress,
             labelColor: colors.white,
-            backgroundColor: colors.primary,
+            backgroundColor: colors.blue500,
           },
           {
             icon: <Edit3 size={24} color="#FFFFFF" />,
-            label: '직접 재료 등록',
-            onPress: () => {
-              dispatch({
-                type: 'NAVIGATE_TO_ADD',
-                payload: selectedCategoryId === ALL_CATEGORY.id ? undefined : selectedCategoryId,
-              });
-            },
+            label: floatingMenuItems[1].label,
+            onPress: floatingMenuItems[1].onPress,
             labelColor: colors.white,
             backgroundColor: colors.primary,
           },
           {
             icon: <Grid3x3 size={24} color="#FFFFFF" />,
-            label: '한꺼번에 재료 등록',
-            onPress: bulkAdd.open,
+            label: floatingMenuItems[2].label,
+            onPress: floatingMenuItems[2].onPress,
             labelColor: colors.white,
-            backgroundColor: colors.primary,
+            backgroundColor: colors.orange500,
           },
         ]}
       />
 
+      {/* Modals */}
       <SelectDateBottomSheet
         visible={expiryDatePicker.visible}
         onClose={expiryDatePicker.close}
@@ -404,133 +206,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-const createStyles = ({
-  colors,
-  borderRadius,
-  spacing,
-}: {
-  colors: ColorPalette;
-  borderRadius: typeof import('@/lib/theme').borderRadius;
-  spacing: typeof import('@/lib/theme').spacing;
-}) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    content: {
-      flex: 1,
-      padding: spacing.lg,
-    },
-    scrollContent: {
-      paddingBottom: 200,
-    },
-    notificationButton: {
-      width: 44,
-      height: 44,
-      borderRadius: borderRadius.full,
-      justifyContent: 'center',
-      alignItems: 'center',
-      position: 'relative',
-    },
-    badge: {
-      position: 'absolute',
-      top: -2,
-      right: -2,
-      width: 18,
-      height: 18,
-      borderRadius: borderRadius.full,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    categoryCarouselContainer: {
-      paddingHorizontal: spacing.lg,
-      paddingVertical: spacing.md,
-      borderBottomWidth: 1,
-    },
-    categoryCarousel: {
-      flexGrow: 0,
-    },
-    categoryCarouselContent: {
-      gap: spacing.sm,
-    },
-    categoryChip: {
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.xs,
-      borderRadius: borderRadius.sm,
-      borderWidth: 1,
-    },
-    categoryChipContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    categoryCount: {
-      marginLeft: spacing.xs,
-      paddingHorizontal: spacing.sm,
-      paddingVertical: 2,
-      borderRadius: borderRadius.sm,
-      minWidth: 20,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    section: {
-      paddingTop: spacing.lg,
-    },
-    sectionHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginBottom: spacing.md,
-    },
-    sectionHeaderLeft: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.sm,
-    },
-    cardList: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: spacing.md,
-    },
-    ingredientCard: {
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
-      borderRadius: borderRadius.md,
-      borderWidth: 1,
-      width: '48%',
-    },
-    cardContent: {
-      alignItems: 'flex-start',
-      width: '100%',
-    },
-    cardHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      width: '100%',
-      marginBottom: spacing.xs,
-    },
-    emojiContainer: {
-      position: 'relative',
-    },
-    calendarIcon: {
-      padding: 4,
-      marginTop: -4,
-      marginRight: -4,
-    },
-    statusBadge: {
-      position: 'absolute',
-      top: -2,
-      right: -2,
-      width: 12,
-      height: 12,
-      borderRadius: borderRadius.full,
-      borderWidth: 2,
-      borderColor: '#FFFFFF',
-    },
-    emptyContainer: {
-      borderRadius: borderRadius.xl,
-      padding: 40,
-      alignItems: 'center',
-    },
-  });

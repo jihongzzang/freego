@@ -31,7 +31,7 @@ export default function Spinner({ size = 'medium', color, label, fullScreen = fa
     <View style={[styles.container, fullScreen && styles.fullScreen, style]}>
       <ActivityIndicator size={getSize()} color={color || colors.primary} />
       {label && (
-        <Text style={[typography.styles.body, { color: colors.textSecondary, marginTop: spacing.md }]}>{label}</Text>
+        <Text style={[typography.styles.t5, { color: colors.textSecondary, marginTop: spacing.md }]}>{label}</Text>
       )}
     </View>
   );

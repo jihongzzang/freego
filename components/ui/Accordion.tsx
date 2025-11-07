@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, LayoutAnimation, Platform, UIManager } from 'react-native';
-import { ChevronDown, ChevronUp } from 'lucide-react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, Animated, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { ChevronDown } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -26,14 +26,33 @@ export default function Accordion({
   onToggle,
   style,
 }: AccordionProps) {
-  const { colors, typography, spacing } = useTheme();
+  const { colors, typography } = useTheme();
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const animatedRotation = useRef(new Animated.Value(defaultExpanded ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(animatedRotation, {
+      toValue: isExpanded ? 1 : 0,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  }, [isExpanded, animatedRotation]);
 
   const handleToggle = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    LayoutAnimation.configureNext({
+      duration: 250,
+      update: {
+        type: LayoutAnimation.Types.easeInEaseOut,
+      },
+    });
     setIsExpanded(!isExpanded);
     onToggle?.(!isExpanded);
   };
+
+  const rotateInterpolate = animatedRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '180deg'],
+  });
 
   return (
     <View style={style}>
@@ -45,11 +64,9 @@ export default function Accordion({
 
         <View style={styles.headerRight}>
           {badge && <View style={styles.badge}>{badge}</View>}
-          {isExpanded ? (
-            <ChevronUp size={20} color={colors.textTertiary} />
-          ) : (
+          <Animated.View style={{ transform: [{ rotate: rotateInterpolate }] }}>
             <ChevronDown size={20} color={colors.textTertiary} />
-          )}
+          </Animated.View>
         </View>
       </TouchableOpacity>
 

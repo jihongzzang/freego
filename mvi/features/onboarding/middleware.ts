@@ -45,7 +45,7 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
             const ingredientsToAdd = lifestylePackage.ingredients.map((item) => ({
               name: item.name,
               category: item.category,
-              emoji: categoryDefaultEmojis[item.category] || '🍴',
+              emoji: item.emoji ? item.emoji : categoryDefaultEmojis[item.category] || '🍴',
               quantity: item.quantity,
               unit: item.unit,
               storage_location: item.storage_location,

@@ -106,7 +106,8 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
           quantity: state.form.quantity && state.form.quantity.trim() ? parseInt(state.form.quantity) : undefined,
           unit: state.form.unit && state.form.unit.trim() ? (state.form.unit as any) : undefined,
           registration_date: registrationDate,
-          purchase_date: state.form.purchase_date && state.form.purchase_date.trim() ? state.form.purchase_date : undefined,
+          purchase_date:
+            state.form.purchase_date && state.form.purchase_date.trim() ? state.form.purchase_date : undefined,
           expiry_date: state.form.expiry_date.trim() || undefined,
           storage_location: state.form.storage_location,
           memo: state.form.memo,
@@ -137,7 +138,8 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
             {
               type: 'SHOW_ALERT',
               payload: {
-                title: '성공',
+                // title: '성공',
+                title: '',
                 message: '식재료가 등록됐어요.',
                 variant: 'success',
               },

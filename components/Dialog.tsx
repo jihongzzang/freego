@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Dimensions, Platform } from 'react-native';
 import { useMemo, useEffect } from 'react';
 import { BlurView } from 'expo-blur';
-import { AlertCircle, CheckCircle, Info, XCircle } from 'lucide-react-native';
+// import { AlertCircle, CheckCircle, Info, XCircle } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 
 const { width } = Dimensions.get('window');
@@ -28,21 +28,21 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
 
   useEffect(() => {}, [visible]);
 
-  function getIcon() {
-    const iconSize = 24;
-    switch (type) {
-      case 'success':
-        return <CheckCircle size={iconSize} color={colors.primary} />;
-      case 'warning':
-        return <AlertCircle size={iconSize} color="#f59e0b" />;
-      case 'error':
-        return <XCircle size={iconSize} color="#ef4444" />;
-      case 'info':
-        return <Info size={iconSize} color="#3b82f6" />;
-      default:
-        return null;
-    }
-  }
+  // function getIcon() {
+  //   const iconSize = 24;
+  //   switch (type) {
+  //     case 'success':
+  //       return <CheckCircle size={iconSize} color={colors.primary} />;
+  //     case 'warning':
+  //       return <AlertCircle size={iconSize} color="#f59e0b" />;
+  //     case 'error':
+  //       return <XCircle size={iconSize} color="#ef4444" />;
+  //     case 'info':
+  //       return <Info size={iconSize} color="#3b82f6" />;
+  //     default:
+  //       return null;
+  //   }
+  // }
 
   function getButtonStyle(buttonStyle: string) {
     switch (buttonStyle) {
@@ -99,13 +99,12 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
         <View style={[styles.dialog, { backgroundColor: colors.surface }]}>
           {title && (
             <View style={styles.titleContainer}>
-              <Text style={[typography.styles.h4, { color: colors.text }]}>{title}</Text>
-              {type !== 'default' && getIcon()}
+              <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>{title}</Text>
             </View>
           )}
 
           <View style={styles.messageContainer}>
-            <Text style={[typography.styles.body, { color: colors.textSecondary }]}>{message}</Text>
+            <Text style={[typography.styles.t5, { color: colors.textSecondary }]}>{message}</Text>
           </View>
 
           <View style={styles.buttonsContainer}>
@@ -122,7 +121,7 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
                   onPress={() => handleButtonPress(button)}
                   activeOpacity={0.7}
                 >
-                  <Text style={[typography.styles.bodySemibold, { color: buttonStyles.textColor }]}>{button.text}</Text>
+                  <Text style={[typography.styles.t5Semibold, { color: buttonStyles.textColor }]}>{button.text}</Text>
                 </TouchableOpacity>
               );
             })}

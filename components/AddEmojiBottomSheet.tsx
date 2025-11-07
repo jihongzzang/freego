@@ -11,7 +11,6 @@ interface AddEmojiBottomSheetProps {
   selectedCategoryId: CategoryType;
   selectedTemplates: IngredientTemplate[];
   onTemplateToggle: (template: IngredientTemplate) => void;
-  // onConfirm: () => void;
 }
 
 export default function AddEmojiBottomSheet({
@@ -20,9 +19,8 @@ export default function AddEmojiBottomSheet({
   selectedCategoryId,
   selectedTemplates,
   onTemplateToggle,
-  // onConfirm,
 }: AddEmojiBottomSheetProps) {
-  const { colors, typography, borderRadius, spacing } = useTheme();
+  const { colors, typography, borderRadius, spacing, isDark } = useTheme();
 
   // ✅ 화면 너비 기반으로 균등 3열 계산
   const screenWidth = Dimensions.get('window').width;
@@ -58,9 +56,9 @@ export default function AddEmojiBottomSheet({
                     {
                       width: ITEM_WIDTH,
                       marginBottom: GAP,
-                      backgroundColor: isSelected ? colors.primaryLight : colors.surface,
-                      borderColor: isSelected ? colors.primary : colors.border,
-                      borderWidth: isSelected ? 2 : 1,
+                      backgroundColor: colors.surface,
+                      borderColor: isSelected ? (isDark ? colors.grey300 : colors.grey700) : colors.border,
+                      borderWidth: isSelected ? 1 : 1,
                       borderRadius: borderRadius.md,
                       paddingVertical: spacing.sm,
                       paddingHorizontal: spacing.sm,
@@ -71,9 +69,15 @@ export default function AddEmojiBottomSheet({
                   <Text style={styles.templateEmoji}>{template.emoji}</Text>
                   <Text
                     style={[
-                      typography.styles.caption,
+                      typography.styles.t7,
                       {
-                        color: isSelected ? colors.white : colors.text,
+                        color: isSelected
+                          ? isDark
+                            ? colors.white
+                            : colors.text
+                          : isDark
+                            ? colors.grey300
+                            : colors.grey600,
                         fontWeight: isSelected ? '600' : '400',
                       },
                     ]}
@@ -86,34 +90,6 @@ export default function AddEmojiBottomSheet({
             })}
           </View>
         </ScrollView>
-
-        {/* {selectedTemplates.length > 0 && (
-          <View
-            style={[
-              styles.confirmButtonContainer,
-              {
-                backgroundColor: colors.background,
-                borderTopColor: colors.border,
-                paddingHorizontal: spacing.xl,
-                paddingVertical: spacing.md,
-              },
-            ]}
-          >
-            <TouchableOpacity
-              style={[
-                styles.confirmButton,
-                {
-                  backgroundColor: colors.primary,
-                  paddingVertical: spacing.lg,
-                  borderRadius: borderRadius.xl,
-                },
-              ]}
-              onPress={onConfirm}
-            >
-              <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>추가하기</Text>
-            </TouchableOpacity>
-          </View>
-        )} */}
       </View>
     </BottomSheet>
   );

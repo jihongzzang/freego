@@ -30,7 +30,7 @@ export default function SelectDateBottomSheet({
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <DatePicker value={selectedDate} onDateSelect={onDateChange} />
         <TouchableOpacity style={[styles.confirmButton, { backgroundColor: colors.primary }]} onPress={onConfirm}>
-          <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>확인</Text>
+          <Text style={[typography.styles.st8Semibold, { color: '#FFFFFF' }]}>확인</Text>
         </TouchableOpacity>
       </ScrollView>
     </BottomSheet>

@@ -17,7 +17,7 @@ export default function SelectUnitBottomSheet({
   selectedUnit,
   onUnitSelect,
 }: SelectUnitBottomSheetProps) {
-  const { colors, typography, spacing, borderRadius } = useTheme();
+  const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const handleUnitSelect = (unitId: string) => {
     onUnitSelect(unitId);
@@ -37,8 +37,8 @@ export default function SelectUnitBottomSheet({
               style={[
                 styles.unitItem,
                 {
-                  backgroundColor: selectedUnit === unit.id ? colors.primaryLight : colors.surface,
-                  borderColor: selectedUnit === unit.id ? colors.primary : colors.border,
+                  backgroundColor: selectedUnit === unit.id ? (isDark ? colors.white : colors.grey400) : colors.surface,
+                  borderColor: selectedUnit === unit.id ? (isDark ? colors.white : colors.grey400) : colors.border,
                   paddingHorizontal: spacing.lg,
                   paddingVertical: spacing.md,
                   borderRadius: borderRadius.md,
@@ -48,15 +48,17 @@ export default function SelectUnitBottomSheet({
             >
               <Text
                 style={[
-                  typography.styles.bodyMedium,
+                  typography.styles.t5Medium,
                   {
-                    color: selectedUnit === unit.id ? colors.primary : colors.text,
+                    color: selectedUnit === unit.id ? (isDark ? colors.black : colors.white) : colors.text,
                   },
                 ]}
               >
                 {unit.krLabel}
               </Text>
-              {selectedUnit === unit.id && <Ionicons name="checkmark" size={20} color={colors.primary} />}
+              {selectedUnit === unit.id && (
+                <Ionicons name="checkmark" size={24} color={isDark ? colors.black : colors.white} />
+              )}
             </TouchableOpacity>
           ))}
         </ScrollView>

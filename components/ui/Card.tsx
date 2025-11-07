@@ -11,14 +11,14 @@ interface CardProps {
 }
 
 export default function Card({ children, style, onPress, variant = 'filled', padding = 'medium' }: CardProps) {
-  const { colors, borderRadius, spacing, shadows } = useTheme();
+  const { colors, borderRadius, spacing } = useTheme();
 
   const getVariantStyles = (): ViewStyle => {
     switch (variant) {
       case 'elevated':
         return {
           backgroundColor: colors.surface,
-          ...shadows.lg,
+          // ...shadows.lg,
         };
       case 'outlined':
         return {
@@ -50,21 +50,17 @@ export default function Card({ children, style, onPress, variant = 'filled', pad
     }
   };
 
-  const content = (
-    <View style={[styles.card, { borderRadius: borderRadius.xl }, getVariantStyles(), getPaddingStyles(), style]}>
-      {children}
-    </View>
-  );
+  const cardStyles = [styles.card, { borderRadius: borderRadius.xl }, getVariantStyles(), getPaddingStyles(), style];
 
   if (onPress) {
     return (
-      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-        {content}
+      <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={cardStyles}>
+        {children}
       </TouchableOpacity>
     );
   }
 
-  return content;
+  return <View style={cardStyles}>{children}</View>;
 }
 
 const styles = StyleSheet.create({

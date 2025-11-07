@@ -25,7 +25,7 @@ export default function BulkAddBottomSheet({
   onTemplateToggle,
   onConfirm,
 }: BulkAddBottomSheetProps) {
-  const { colors, typography, borderRadius, spacing } = useTheme();
+  const { colors, typography, borderRadius, spacing, isDark } = useTheme();
 
   const screenWidth = Dimensions.get('window').width;
   const H_PADDING = spacing.md * 2;
@@ -56,8 +56,22 @@ export default function BulkAddBottomSheet({
                 style={[
                   styles.categoryTab,
                   {
-                    backgroundColor: selectedCategoryId === cat.id ? colors.primaryLight : colors.surface,
-                    borderColor: selectedCategoryId === cat.id ? colors.primary : colors.border,
+                    backgroundColor:
+                      selectedCategoryId === cat.id
+                        ? isDark
+                          ? colors.grey600
+                          : colors.grey400
+                        : isDark
+                          ? colors.grey400
+                          : colors.grey200,
+                    borderColor:
+                      selectedCategoryId === cat.id
+                        ? isDark
+                          ? colors.grey600
+                          : colors.grey400
+                        : isDark
+                          ? colors.grey400
+                          : colors.grey200,
                     paddingHorizontal: spacing.md,
                     paddingVertical: spacing.xs + 2,
                     borderRadius: borderRadius.xl,
@@ -68,9 +82,9 @@ export default function BulkAddBottomSheet({
                 {cat.id !== ALL_CATEGORY.id && getCategoryIcon(cat.id, 16)}
                 <Text
                   style={[
-                    typography.styles.body,
+                    typography.styles.t6,
                     {
-                      color: selectedCategoryId === cat.id ? colors.white : colors.textSecondary,
+                      color: selectedCategoryId === cat.id ? (isDark ? colors.text : colors.white) : colors.grey700,
                     },
                   ]}
                 >
@@ -91,9 +105,9 @@ export default function BulkAddBottomSheet({
                     {
                       width: ITEM_WIDTH,
                       marginBottom: GAP,
-                      backgroundColor: isSelected ? colors.primaryLight : colors.surface,
-                      borderColor: isSelected ? colors.primary : colors.border,
-                      borderWidth: isSelected ? 2 : 1,
+                      backgroundColor: colors.surface,
+                      borderColor: isSelected ? (isDark ? colors.grey300 : colors.grey700) : colors.border,
+                      borderWidth: isSelected ? 1 : 1,
                       borderRadius: borderRadius.md,
                       paddingVertical: spacing.sm,
                       paddingHorizontal: spacing.sm,
@@ -104,9 +118,15 @@ export default function BulkAddBottomSheet({
                   <Text style={styles.templateEmoji}>{template.emoji}</Text>
                   <Text
                     style={[
-                      typography.styles.caption,
+                      typography.styles.t7,
                       {
-                        color: isSelected ? colors.white : colors.text,
+                        color: isSelected
+                          ? isDark
+                            ? colors.white
+                            : colors.text
+                          : isDark
+                            ? colors.grey300
+                            : colors.grey600,
                         fontWeight: isSelected ? '600' : '400',
                       },
                     ]}
@@ -143,7 +163,7 @@ export default function BulkAddBottomSheet({
               ]}
               onPress={onConfirm}
             >
-              <Text style={[typography.styles.button, { color: '#FFFFFF' }]}>
+              <Text style={[typography.styles.st8Semibold, { color: '#FFFFFF' }]}>
                 {selectedTemplates.length}개 추가하기
               </Text>
             </TouchableOpacity>

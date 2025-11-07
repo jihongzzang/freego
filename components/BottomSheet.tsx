@@ -177,7 +177,7 @@ export default function BottomSheet({ maxHeight, visible, onClose, title, childr
                       },
                     ]}
                   >
-                    <Text style={[typography.styles.h4, { color: colors.text, flex: 1 }]}>{title}</Text>
+                    <Text style={[typography.styles.t4Semibold, { color: colors.text, flex: 1 }]}>{title}</Text>
                   </View>
                 </View>
                 <View style={{ flex: 1 }}>{children}</View>

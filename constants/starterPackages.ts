@@ -13,6 +13,7 @@ export interface PackageIngredient {
   category: CategoryType;
   quantity?: number;
   unit?: UnitType;
+  emoji: string;
   storage_location: StorageLocationType;
 }
 
@@ -52,6 +53,7 @@ function ingredient({
     name: template.krLabel,
     category: template.category,
     quantity,
+    emoji: template.emoji,
     unit: quantity ? template.defaultUnit : undefined,
     storage_location: 'fridge', // 기본값
     ...overrides, // 수동 오버라이드

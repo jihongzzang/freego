@@ -1,339 +1,67 @@
-import { View, Text, StyleSheet, TouchableOpacity, Linking, Platform, ScrollView } from 'react-native';
-import { Switch } from 'react-native-switch';
-import { useEffect, useMemo, useState } from 'react';
-import { Bell, Moon, Sun, Info, MessageSquare, BellOff, Trash2, Database } from 'lucide-react-native';
-import * as Notifications from 'expo-notifications';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useMemo } from 'react';
 import { useTheme } from '@/lib/theme';
-import { useDialog } from '@/contexts/DialogContext';
-import { useMVIStore } from '@/mvi/base';
-import { createSettingsStore } from '@/mvi/features/settings';
 import Header from '@/components/Header';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { storage } from '@/lib/storage';
+import { useSettingsLogic } from './hooks/useSettingsLogic';
+import { NotificationSettings } from './components/NotificationSettings';
+import { ThemeSettings } from './components/ThemeSettings';
+import { DataManagement } from './components/DataManagement';
+import { FeedbackSection } from './components/FeedbackSection';
+import { AppInfo } from './components/AppInfo';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
+  const { colors, typography, spacing } = useTheme();
 
-  const { colors, typography, spacing, borderRadius, isDark, themePreference, setTheme } = useTheme();
+  const {
+    isDark,
+    themePreference,
+    notificationDays,
+    hasNotificationPermission,
+    requestNotificationPermission,
+    updateNotificationDays,
+    toggleTheme,
+    resetThemeToSystem,
+    sendFeedback,
+    handleDeleteAllData,
+  } = useSettingsLogic();
 
-  const { alert, confirm } = useDialog();
-
-  // MVI Store 사용
-  const [state, dispatch, effect] = useMVIStore(createSettingsStore);
-  const { notificationDays } = state;
-
-  // 알림 권한 상태
-  const [hasNotificationPermission, setHasNotificationPermission] = useState(false);
-
-  // 알림 권한 확인
-  useEffect(() => {
-    checkNotificationPermission();
-  }, []);
-
-  async function checkNotificationPermission() {
-    const settings = await Notifications.getPermissionsAsync();
-    setHasNotificationPermission((settings as any).granted);
-  }
-
-  async function requestNotificationPermission() {
-    const settings = await Notifications.requestPermissionsAsync();
-    setHasNotificationPermission((settings as any).granted);
-
-    if (!(settings as any).granted) {
-      confirm({
-        title: '알림 권한 필요',
-        message: '설정에서 알림 권한을 허용해주세요.',
-        confirmText: '설정 열기',
-        cancelText: '취소',
-        onConfirm: () => {
-          if (Platform.OS === 'ios') {
-            Linking.openURL('app-settings:');
-          } else {
-            Linking.openSettings();
-          }
-        },
-      });
-    }
-  }
-
-  const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
-
-  // Effect 처리
-  useEffect(() => {
-    if (effect) {
-      switch (effect.type) {
-        case 'SHOW_ALERT':
-          alert({
-            title: effect.payload.title,
-            message: effect.payload.message,
-            type: effect.payload.type,
-          });
-          break;
-      }
-    }
-  }, [effect, alert]);
-
-  function updateNotificationDays(days: number) {
-    dispatch({ type: 'SET_NOTIFICATION_DAYS', payload: days });
-  }
-
-  function toggleTheme() {
-    const newMode = isDark ? 'light' : 'dark';
-    setTheme(newMode);
-  }
-
-  async function resetThemeToSystem() {
-    await setTheme('system');
-    alert({
-      title: '성공',
-      message: '시스템 설정을 따라요.',
-      type: 'success',
-    });
-  }
-
-  async function sendFeedback() {
-    const email = 'support@fridge.app';
-    const subject = '냉장고 관리 앱 피드백';
-    const body = '안녕하세요,\n\n피드백 내용을 입력해주세요:\n\n';
-
-    const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    const canOpen = await Linking.canOpenURL(url);
-    if (canOpen) {
-      await Linking.openURL(url);
-    } else {
-      alert({
-        title: '오류',
-        message: '이메일 앱을 열 수 없어요.',
-        type: 'error',
-      });
-    }
-  }
-
-  function handleDeleteAllData() {
-    confirm({
-      title: '모든 데이터 삭제',
-      message: '등록된 모든 냉장고 재료가 삭제돼요.\n이 작업은 되돌릴 수 없어요.\n\n정말 삭제하시겠어요?',
-      confirmText: '삭제',
-      cancelText: '취소',
-      isDestructive: true,
-      onConfirm: async () => {
-        try {
-          await storage.clearAll();
-          alert({
-            title: '완료',
-            message: '모든 데이터가 삭제되었어요.',
-            type: 'success',
-          });
-        } catch (error) {
-          alert({
-            title: '오류',
-            message: '데이터 삭제 중 문제가 발생했어요.',
-            type: 'error',
-          });
-        }
-      },
-    });
-  }
+  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header title="설정" />
+      <Header title="더보기" />
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingBottom: insets.bottom + 80, // 👈 추가 (네비+여백)
+          paddingBottom: insets.bottom + 80,
         }}
       >
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Bell size={20} color={colors.textSecondary} />
-            <Text style={[typography.styles.h5, { color: colors.text }]}>알림 설정</Text>
-          </View>
+        <NotificationSettings
+          hasPermission={hasNotificationPermission}
+          notificationDays={notificationDays}
+          onRequestPermission={requestNotificationPermission}
+          onUpdateDays={updateNotificationDays}
+        />
 
-          <View style={[styles.card, { backgroundColor: colors.surface }]}>
-            {hasNotificationPermission ? (
-              <>
-                <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>유통기한 알림 주기</Text>
-                <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>
-                  유통기한 며칠 전부터 알림을 받을지 선택하세요
-                </Text>
+        <ThemeSettings
+          isDark={isDark}
+          themePreference={themePreference}
+          onToggleTheme={toggleTheme}
+          onResetToSystem={resetThemeToSystem}
+        />
 
-                <View style={styles.notificationOptions}>
-                  {[1, 2, 3, 5, 7].map((days) => (
-                    <TouchableOpacity
-                      key={days}
-                      style={[
-                        styles.notificationOption,
-                        {
-                          backgroundColor: colors.surface,
-                          borderColor: colors.borderLight,
-                        },
-                        notificationDays === days && {
-                          backgroundColor: colors.surfaceSecondary,
-                          borderColor: colors.border,
-                        },
-                      ]}
-                      onPress={() => updateNotificationDays(days)}
-                    >
-                      <Text
-                        style={[
-                          typography.styles.label,
-                          { color: colors.textSecondary },
-                          notificationDays === days && {
-                            color: colors.text,
-                          },
-                        ]}
-                      >
-                        {days}일
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </>
-            ) : (
-              <>
-                <View style={styles.permissionContent}>
-                  <BellOff size={40} color={colors.textTertiary} />
-                  <Text style={[typography.styles.bodySemibold, { color: colors.text, marginTop: spacing.md }]}>
-                    알림 권한이 필요해요
-                  </Text>
-                  <Text
-                    style={[
-                      typography.styles.bodySmall,
-                      {
-                        color: colors.textSecondary,
-                        textAlign: 'center',
-                        marginTop: spacing.xs,
-                      },
-                    ]}
-                  >
-                    유통기한 알림을 받으려면{'\n'}알림 권한을 허용해주세요
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  style={[styles.permissionButton, { backgroundColor: colors.primaryLight }]}
-                  onPress={requestNotificationPermission}
-                >
-                  <Bell size={20} color={colors.primary} />
-                  <Text style={[typography.styles.bodySemibold, { color: colors.primary }]}>알림 권한 허용하기</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </View>
+        <DataManagement onDeleteAllData={handleDeleteAllData} />
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            {isDark ? <Moon size={20} color={colors.textSecondary} /> : <Sun size={20} color={colors.textSecondary} />}
-            <Text style={[typography.styles.h5, { color: colors.text }]}>테마</Text>
-          </View>
+        <FeedbackSection onSendFeedback={sendFeedback} />
 
-          <View style={[styles.card, { backgroundColor: colors.surface }]}>
-            <View style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>다크 모드</Text>
-                <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>
-                  {themePreference === 'system' ? '시스템 설정 따름' : '어두운 테마 사용'}
-                </Text>
-              </View>
-              <Switch
-                value={isDark}
-                onValueChange={(value) => {
-                  setTheme(value ? 'dark' : 'light');
-                }}
-                disabled={false}
-                circleSize={24}
-                barHeight={30}
-                circleBorderWidth={0}
-                circleActiveColor={colors.text}
-                backgroundActive={colors.textSecondary}
-                circleInActiveColor={colors.textTertiary}
-                backgroundInactive={colors.surfaceSecondary}
-                changeValueImmediately={true}
-                renderActiveText={false}
-                renderInActiveText={false}
-                switchLeftPx={2}
-                switchRightPx={2}
-                switchWidthMultiplier={2}
-                switchBorderRadius={15}
-              />
-            </View>
-            {themePreference !== 'system' && (
-              <TouchableOpacity
-                style={[styles.settingRow, styles.systemResetButton, { borderTopColor: colors.border }]}
-                onPress={resetThemeToSystem}
-              >
-                <Text style={[typography.styles.label, { color: colors.textSecondary }]}>시스템 설정으로 되돌리기</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Database size={20} color={colors.textSecondary} />
-            <Text style={[typography.styles.h5, { color: colors.text }]}>데이터 관리</Text>
-          </View>
-
-          <View style={[styles.card, { backgroundColor: colors.surface }]}>
-            <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAllData}>
-              <View style={styles.deleteButtonContent}>
-                <View style={styles.deleteButtonText}>
-                  <Text style={[typography.styles.bodySemibold, { color: colors.textSecondary }]}>
-                    모든 냉장고 데이터 삭제
-                  </Text>
-                  <Text style={[typography.styles.caption, { color: colors.textSecondary }]}>
-                    등록된 모든 재료가 삭제돼요
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <MessageSquare size={20} color={colors.textSecondary} />
-            <Text style={[typography.styles.h5, { color: colors.text }]}>개발자에게 피드백</Text>
-          </View>
-
-          <View style={[styles.card, { backgroundColor: colors.surface }]}>
-            <TouchableOpacity style={styles.feedbackButton} onPress={sendFeedback}>
-              <Text style={[typography.styles.bodySemibold, { color: colors.text }]}>의견 보내기</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={(styles.section, { marginBottom: 0 })}>
-          <View style={styles.sectionHeader}>
-            <Info size={20} color={colors.textSecondary} />
-            <Text style={[typography.styles.h5, { color: colors.text }]}>앱 정보</Text>
-          </View>
-
-          <View style={[styles.card, { backgroundColor: colors.surface }]}>
-            <View style={styles.infoRow}>
-              <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>버전</Text>
-              <Text style={[typography.styles.label, { color: colors.text }]}>1.0.0</Text>
-            </View>
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-            <View style={styles.infoRow}>
-              <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>개발자</Text>
-              <Text style={[typography.styles.label, { color: colors.text }]}>주민준, 이준</Text>
-            </View>
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-            <View style={styles.infoRow}>
-              <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>문의</Text>
-              <Text style={[typography.styles.label, { color: colors.text }]}>
-                jujihong2@gmail.com, laonzenamoon@gmail.com
-              </Text>
-            </View>
-          </View>
-        </View>
+        <AppInfo />
 
         <View style={styles.footer}>
-          <Text style={[typography.styles.bodySemibold, { color: colors.textSecondary }]}>냉장고 재고관리 앱</Text>
-          <Text style={[typography.styles.caption, { color: colors.textTertiary }]}>
+          <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>프리고 앱</Text>
+          <Text style={[typography.styles.t7, { color: colors.textTertiary, marginTop: spacing.xs }]}>
             음식물 쓰레기를 줄이고 현명한 소비를
           </Text>
         </View>
@@ -342,13 +70,7 @@ export default function SettingsScreen() {
   );
 }
 
-const createStyles = ({
-  spacing,
-  borderRadius,
-}: {
-  spacing: typeof import('@/lib/theme').spacing;
-  borderRadius: typeof import('@/lib/theme').borderRadius;
-}) =>
+const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -357,88 +79,8 @@ const createStyles = ({
       flex: 1,
       padding: spacing.lg,
     },
-    section: {
-      marginBottom: spacing.xxl,
-    },
-    sectionHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.sm,
-      marginBottom: spacing.md,
-    },
-    card: {
-      borderRadius: borderRadius.xl,
-      padding: spacing.xl,
-    },
-    notificationOptions: {
-      flexDirection: 'row',
-      gap: spacing.sm,
-      marginTop: spacing.lg,
-    },
-    notificationOption: {
-      flex: 1,
-      paddingVertical: spacing.md,
-      borderRadius: borderRadius.md,
-      alignItems: 'center',
-      borderWidth: 2,
-      borderColor: 'transparent',
-    },
-    permissionContent: {
-      alignItems: 'center',
-      paddingVertical: spacing.xl,
-    },
-    permissionButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: spacing.sm,
-      paddingVertical: spacing.lg,
-      borderRadius: borderRadius.md,
-      marginTop: spacing.lg,
-    },
-    settingRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    settingInfo: {
-      flex: 1,
-    },
-    feedbackButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.sm,
-      borderRadius: borderRadius.md,
-    },
-    infoRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: spacing.md,
-    },
-    divider: {
-      height: 1,
-    },
     footer: {
       alignItems: 'center',
-      paddingVertical: 40,
-    },
-    systemResetButton: {
-      marginTop: 4,
-      paddingVertical: spacing.md,
-      // justifyContent: 'center',
-      borderTopWidth: 1,
-    },
-    deleteButton: {
-      paddingVertical: spacing.lg,
-    },
-    deleteButtonContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing.md,
-    },
-    deleteButtonText: {
-      flex: 1,
-      gap: spacing.xs,
+      // paddingVertical: spacing.xxl * 2,
     },
   });
