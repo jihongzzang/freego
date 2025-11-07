@@ -1,24 +1,27 @@
 import { CategoryType } from '@/constants/categories';
+import { Colors } from '@/lib/theme';
 
 export function getCategoryColor(category: CategoryType): string {
+  const colors = Colors.light; // 컬러 토큰은 light/dark 동일
+
   switch (category) {
     case 'vegetables':
-      return '#047857';
+      return colors.green600; // 초록 - 채소
     case 'fruits':
-      return '#EF4444';
+      return colors.red500; // 빨강 - 과일
     case 'meat':
-      return '#F97316';
+      return colors.orange600; // 주황 - 고기
     case 'seafood':
-      return '#06B6D4';
+      return colors.teal500; // 청록 - 해산물
     case 'dairy':
-      return '#3B82F6';
+      return colors.blue500; // 파랑 - 유제품
     case 'processed':
-      return '#F59E0B';
+      return colors.yellow600; // 노랑 - 가공식품
     case 'seasoning':
-      return '#F59E0B';
+      return colors.orange500; // 주황 - 조미료
     case 'etc':
-      return '#6B7280';
+      return colors.grey600; // 회색 - 기타
     default:
-      return '#6B7280';
+      return colors.grey600;
   }
 }

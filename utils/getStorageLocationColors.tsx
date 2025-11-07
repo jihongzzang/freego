@@ -1,14 +1,17 @@
 import { StorageLocationType } from '@/constants/storageLocations';
+import { Colors } from '@/lib/theme';
 
-export function getStorageColor(location: StorageLocationType): string {
+export function getStorageLocationColors(location: StorageLocationType): string {
+  const colors = Colors.light; // 컬러 토큰은 light/dark 동일
+
   switch (location) {
     case 'fridge':
-      return '#3B82F6';
+      return colors.blue500; // 파랑 - 냉장
     case 'freezer':
-      return '#8B5CF6';
+      return colors.blue300; // 하늘색 - 냉동
     case 'room_temp':
-      return '#10B981';
+      return colors.orange500; // 주황 - 실온
     default:
-      return '#6B7280';
+      return colors.grey600;
   }
 }

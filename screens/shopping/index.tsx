@@ -107,7 +107,7 @@ export default function ShoppingListScreen() {
                     onPress={handleClearUnpurchased}
                   >
                     <Trash2 size={14} color={colors.danger} />
-                    <Text style={[typography.styles.captionBold, { color: colors.danger }]}>삭제</Text>
+                    <Text style={[typography.styles.captionBold, { color: colors.danger }]}>전체삭제</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={[styles.listCard, { backgroundColor: colors.surface }]}>

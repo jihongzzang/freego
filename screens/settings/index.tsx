@@ -319,12 +319,14 @@ export default function SettingsScreen() {
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.infoRow}>
               <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>개발자</Text>
-              <Text style={[typography.styles.label, { color: colors.text }]}>주민준</Text>
+              <Text style={[typography.styles.label, { color: colors.text }]}>주민준, 이준</Text>
             </View>
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <View style={styles.infoRow}>
               <Text style={[typography.styles.bodySmall, { color: colors.textSecondary }]}>문의</Text>
-              <Text style={[typography.styles.label, { color: colors.text }]}>jujihong2@gmail.com</Text>
+              <Text style={[typography.styles.label, { color: colors.text }]}>
+                jujihong2@gmail.com, laonzenamoon@gmail.com
+              </Text>
             </View>
           </View>
         </View>

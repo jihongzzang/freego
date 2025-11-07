@@ -1,14 +1,17 @@
 import { StatusType } from '@/constants/itemStatus';
+import { Colors } from '@/lib/theme';
 
 export function getStatusColor(status: StatusType): string {
+  const colors = Colors.light; // 컬러 토큰은 light/dark 동일
+
   switch (status) {
     case 'expired':
-      return '#F04452';
+      return colors.danger; // 빨강 - 만료
     case 'valid':
-      return '#10B981';
+      return colors.success; // 초록 - 유효
     case 'not_set':
-      return '#9CA3AF';
+      return colors.grey500; // 회색 - 미설정
     default:
-      return '#6B7280';
+      return colors.grey600;
   }
 }
