@@ -49,12 +49,12 @@ export function NotificationSettings({
             </Text>
           </View>
           <TouchableOpacity
-            style={[styles.permissionButton, { backgroundColor: colors.primaryLight }]}
+            style={[styles.permissionButton, { backgroundColor: colors.primary }]}
             onPress={onRequestPermission}
             activeOpacity={0.7}
           >
-            <Bell size={20} color={colors.primary} />
-            <Text style={[typography.styles.t5Semibold, { color: colors.primary }]}>알림 권한 허용하기</Text>
+            <Bell size={20} color={colors.white} />
+            <Text style={[typography.styles.t5Semibold, { color: colors.white }]}>알림 권한 허용하기</Text>
           </TouchableOpacity>
         </Card>
       </View>
@@ -138,7 +138,7 @@ const createStyles = ({
       justifyContent: 'center',
       gap: spacing.sm,
       paddingVertical: spacing.lg,
-      borderRadius: borderRadius.md,
+      borderRadius: borderRadius.xl,
       marginTop: spacing.lg,
     },
     notificationOptions: {

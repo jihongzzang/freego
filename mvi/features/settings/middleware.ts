@@ -16,7 +16,6 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
           {
             type: 'SHOW_ALERT',
             payload: {
-              // title: '성공',
               title: '',
               message: `알림 주기가 ${intent.payload}일로 변경됐어요.`,
               type: 'success',

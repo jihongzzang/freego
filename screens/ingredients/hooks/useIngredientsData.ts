@@ -3,13 +3,16 @@ import { Ingredient } from '@/mvi/features/ingredients';
 import { CATEGORIES, CategoryType } from '@/constants/categories';
 import { STORAGE_LOCATIONS, StorageLocationType } from '@/constants/storageLocations';
 
+// 미설정을 포함한 보관위치 타입
+type StorageLocationTypeOrUnset = StorageLocationType | 'unset';
+
 export function useIngredientsData(ingredients: Ingredient[]) {
   const categoryOrder: CategoryType[] = CATEGORIES.map((cat) => cat.id);
-  const storageOrder: StorageLocationType[] = STORAGE_LOCATIONS.map((loc) => loc.id);
+  const storageOrder: StorageLocationTypeOrUnset[] = [...STORAGE_LOCATIONS.map((loc) => loc.id), 'unset'];
 
   // 아코디언 상태 관리
   const [collapsedCategories, setCollapsedCategories] = useState<Set<CategoryType>>(new Set(categoryOrder));
-  const [collapsedStorages, setCollapsedStorages] = useState<Set<StorageLocationType>>(new Set(storageOrder));
+  const [collapsedStorages, setCollapsedStorages] = useState<Set<StorageLocationTypeOrUnset>>(new Set(storageOrder));
 
   // 카테고리별로 재료 그룹화
   const groupedByCategory = useMemo(() => {
@@ -25,15 +28,16 @@ export function useIngredientsData(ingredients: Ingredient[]) {
     return grouped;
   }, [ingredients]);
 
-  // 저장위치별로 재료 그룹화
+  // 보관위치별로 재료 그룹화
   const groupedByStorage = useMemo(() => {
-    const grouped: Record<StorageLocationType, Ingredient[]> = {} as Record<StorageLocationType, Ingredient[]>;
+    const grouped: Record<StorageLocationTypeOrUnset, Ingredient[]> = {} as Record<StorageLocationTypeOrUnset, Ingredient[]>;
 
     ingredients.forEach((item) => {
-      if (!grouped[item.storage_location]) {
-        grouped[item.storage_location] = [];
+      const location: StorageLocationTypeOrUnset = item.storage_location || 'unset';
+      if (!grouped[location]) {
+        grouped[location] = [];
       }
-      grouped[item.storage_location].push(item);
+      grouped[location].push(item);
     });
 
     return grouped;
@@ -52,8 +56,8 @@ export function useIngredientsData(ingredients: Ingredient[]) {
     });
   }
 
-  // 저장위치 접기/펼치기 토글
-  function toggleStorage(storage: StorageLocationType) {
+  // 보관위치 접기/펼치기 토글
+  function toggleStorage(storage: StorageLocationTypeOrUnset) {
     setCollapsedStorages((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(storage)) {

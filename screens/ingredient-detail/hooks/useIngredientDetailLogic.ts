@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { BackHandler } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
@@ -16,6 +16,7 @@ export function useIngredientDetailLogic() {
   const [state, dispatch, effect] = useMVIStore(createIngredientDetailStore);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<IngredientTemplate | null>(null);
+  const processedEffectRef = useRef<typeof effect>(null);
 
   const handleFieldChange = (field: keyof EditFormData, value: string) => {
     dispatch({ type: 'UPDATE_FORM_FIELD', payload: { field, value } });
@@ -63,6 +64,10 @@ export function useIngredientDetailLogic() {
   useEffect(() => {
     if (!effect) return;
 
+    // 이미 처리한 effect는 다시 처리하지 않음
+    if (processedEffectRef.current === effect) return;
+    processedEffectRef.current = effect;
+
     switch (effect.type) {
       case 'SHOW_ALERT':
         alert({
@@ -77,14 +82,16 @@ export function useIngredientDetailLogic() {
           title: effect.payload.title,
           message: effect.payload.message,
           onConfirm: async () => {
-            await effect.payload.onConfirm();
+            const result = await effect.payload.onConfirm();
             if (effect.payload.title?.includes('삭제')) {
               dispatch({ type: 'DELETE_SUCCESS' });
             } else if (effect.payload.title?.includes('소모')) {
-              dispatch({
-                type: 'CONSUME_SUCCESS',
-                payload: { name: state.ingredient?.name || '' },
-              });
+              if (result && result.success && result.ingredientName) {
+                dispatch({
+                  type: 'CONSUME_SUCCESS',
+                  payload: { name: result.ingredientName },
+                });
+              }
             }
           },
           onCancel: undefined,
@@ -98,7 +105,7 @@ export function useIngredientDetailLogic() {
         router.back();
         break;
     }
-  }, [effect, alert, confirm, router, state.ingredient, dispatch]);
+  }, [effect, alert, confirm, router, dispatch]);
 
   // Android 시스템 백버튼 핸들링
   useEffect(() => {

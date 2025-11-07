@@ -5,7 +5,8 @@ import { BasicInfoSection } from '../../ingredient-detail/components/EditForm/Ba
 import { CategorySection } from '../../ingredient-detail/components/EditForm/CategorySection';
 import { QuantitySection } from '../../ingredient-detail/components/EditForm/QuantitySection';
 import { DateSection } from '../../ingredient-detail/components/EditForm/DateSection';
-import { StorageAndMemoSection } from '../../ingredient-detail/components/EditForm/StorageAndMemoSection';
+import { StorageSection } from '../../ingredient-detail/components/EditForm/StorageSection';
+import { MemoSection } from '@/screens/ingredient-detail/components/EditForm/MemoSection';
 
 interface AddFormProps {
   formData: AddFormData;
@@ -41,11 +42,7 @@ export function AddForm({
         onEmojiPress={onEmojiPress}
       />
 
-      <StorageAndMemoSection
-        storageLocation={formData.storage_location}
-        memo={formData.memo || ''}
-        onFieldChange={onFieldChange as any}
-      />
+      <StorageSection storageLocation={formData.storage_location || ''} onFieldChange={onFieldChange as any} />
 
       <DateSection
         purchaseDate={formData.purchase_date || ''}
@@ -62,6 +59,8 @@ export function AddForm({
         onFieldChange={onFieldChange as any}
         onUnitPress={onUnitPress}
       />
+
+      <MemoSection memo={formData.memo || ''} onFieldChange={onFieldChange as any} />
     </View>
   );
 }

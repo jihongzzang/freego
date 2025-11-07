@@ -20,7 +20,7 @@ const initialState: AddState = {
     unit: undefined,
     purchase_date: undefined,
     expiry_date: '',
-    storage_location: 'fridge',
+    storage_location: undefined,
     memo: '',
   },
   mode: 'select',

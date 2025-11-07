@@ -31,9 +31,11 @@ export function IngredientItem({ item, onPress, onEdit, onQuickDeduct, getDaysRe
           <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>
             {item.quantity
               ? item.unit
-                ? `${item.quantity}${findUnitById(item.unit)?.krLabel} · ${findStorageLocationById(item.storage_location)?.krLabel}`
-                : `${item.quantity} · ${findStorageLocationById(item.storage_location)?.krLabel}`
-              : findStorageLocationById(item.storage_location)?.krLabel}
+                ? `${item.quantity}${findUnitById(item.unit)?.krLabel}${item.storage_location ? ` · ${findStorageLocationById(item.storage_location)?.krLabel}` : ''}`
+                : `${item.quantity}${item.storage_location ? ` · ${findStorageLocationById(item.storage_location)?.krLabel}` : ''}`
+              : item.storage_location
+                ? findStorageLocationById(item.storage_location)?.krLabel
+                : ''}
           </Text>
 
           {item.expiry_date ? (

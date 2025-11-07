@@ -16,7 +16,7 @@ export interface Ingredient {
   registration_date: string;
   purchase_date?: string;
   expiry_date?: string;
-  storage_location: StorageLocationType;
+  storage_location?: StorageLocationType;
   memo: string;
   created_at: string;
 }
@@ -29,6 +29,7 @@ export interface ShoppingItem {
   name: string;
   category: CategoryType;
   is_purchased: boolean;
+  memo?: string;
   created_at: string;
 }
 

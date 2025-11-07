@@ -24,7 +24,7 @@ const initialState: IngredientDetailState = {
     quantity: '',
     unit: '',
     expiry_date: '',
-    storage_location: 'fridge',
+    storage_location: undefined,
     memo: '',
   },
   isEditing: false,

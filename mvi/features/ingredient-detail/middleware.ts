@@ -5,12 +5,7 @@
  */
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
-import {
-  IngredientDetailState,
-  IngredientDetailIntent,
-  IngredientDetailEffect,
-  Ingredient,
-} from './types';
+import { IngredientDetailState, IngredientDetailIntent, IngredientDetailEffect, Ingredient } from './types';
 import { storage } from '@/lib/storage';
 import { StatusType } from '@/constants/itemStatus';
 
@@ -38,10 +33,7 @@ export const ingredientDetailMiddleware: Middleware<
   IngredientDetailState,
   IngredientDetailIntent,
   IngredientDetailEffect
-> = async (
-  state,
-  intent,
-): Promise<MiddlewareResult<IngredientDetailState, IngredientDetailEffect>> => {
+> = async (state, intent): Promise<MiddlewareResult<IngredientDetailState, IngredientDetailEffect>> => {
   switch (intent.type) {
     case 'LOAD_INGREDIENT': {
       try {
@@ -100,7 +92,7 @@ export const ingredientDetailMiddleware: Middleware<
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '삭제 확인',
+              title: '',
               message: '이 식재료를 삭제할까요?',
               onConfirm: async () => {
                 try {
@@ -118,9 +110,7 @@ export const ingredientDetailMiddleware: Middleware<
 
     case 'DELETE_SUCCESS': {
       return {
-        effects: [
-          { type: 'NAVIGATE_BACK' },
-        ],
+        effects: [{ type: 'NAVIGATE_BACK' }],
       };
     }
 
@@ -128,13 +118,14 @@ export const ingredientDetailMiddleware: Middleware<
       if (!state.ingredient) return {};
 
       const ingredient = state.ingredient;
+      const ingredientName = ingredient.name;
 
       return {
         effects: [
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '소모 확인',
+              title: '',
               message: `${ingredient.name}을(를) 소모 처리할까요?\n장보기 목록에 자동으로 추가돼요.`,
               onConfirm: async () => {
                 try {
@@ -143,8 +134,10 @@ export const ingredientDetailMiddleware: Middleware<
                     category: ingredient.category,
                   });
                   await storage.deleteIngredient(ingredient.id);
+                  return { success: true, ingredientName };
                 } catch (error) {
                   console.error('Error consuming ingredient:', error);
+                  return { success: false };
                 }
               },
             },
@@ -159,7 +152,7 @@ export const ingredientDetailMiddleware: Middleware<
           {
             type: 'SHOW_ALERT',
             payload: {
-              title: '완료',
+              title: '',
               message: `${intent.payload.name}이(가) 장보기 목록에 추가됐어요.`,
               variant: 'success',
             },
@@ -187,9 +180,7 @@ export const ingredientDetailMiddleware: Middleware<
 
         // 업데이트 후 다시 로드
         const ingredients = await storage.getIngredients();
-        const data = ingredients.find(
-          (item) => item.id === state.ingredient!.id,
-        );
+        const data = ingredients.find((item) => item.id === state.ingredient!.id);
 
         if (data) {
           const status = calculateStatus(data.expiry_date);
@@ -216,7 +207,7 @@ export const ingredientDetailMiddleware: Middleware<
               {
                 type: 'SHOW_ALERT',
                 payload: {
-                  title: '완료',
+                  title: '',
                   message: '식재료 정보가 업데이트됐어요.',
                   variant: 'success',
                 },
@@ -233,7 +224,7 @@ export const ingredientDetailMiddleware: Middleware<
             {
               type: 'SHOW_ALERT',
               payload: {
-                title: '오류',
+                title: '',
                 message: '식재료 업데이트에 실패했어요.',
                 variant: 'error',
               },

@@ -26,7 +26,7 @@ export interface EditFormData {
   unit?: string;
   purchase_date?: string;
   expiry_date: string;
-  storage_location: StorageLocationType;
+  storage_location?: StorageLocationType;
   memo: string;
 }
 
@@ -75,7 +75,7 @@ export type IngredientDetailEffect =
       payload: {
         title?: string;
         message: string;
-        onConfirm: () => void;
+        onConfirm: () => void | Promise<void | { success: boolean; ingredientName?: string }>;
         isDanger?: boolean;
       };
     }

@@ -1,8 +1,8 @@
-import { Refrigerator, Snowflake, Home } from 'lucide-react-native';
+import { Refrigerator, Snowflake, Home, Package } from 'lucide-react-native';
 import { StorageLocationType } from '@/constants/storageLocations';
 import { getStorageLocationColors } from './getStorageLocationColors';
 
-export function getStorageLocationIcon(location: StorageLocationType, size: number = 20) {
+export function getStorageLocationIcon(location?: StorageLocationType, size: number = 20) {
   const iconColor = getStorageLocationColors(location);
 
   switch (location) {
@@ -13,6 +13,6 @@ export function getStorageLocationIcon(location: StorageLocationType, size: numb
     case 'room_temp':
       return <Home size={size} color={iconColor} />;
     default:
-      return <Refrigerator size={size} color={iconColor} />;
+      return <Package size={size} color={iconColor} />;
   }
 }

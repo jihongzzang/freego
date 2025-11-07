@@ -1,15 +1,17 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Trash2 } from 'lucide-react-native';
+import { Trash2, Package } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import Card from '@/components/ui/Card';
 import { ShoppingItem } from './ShoppingItem';
 import { useMemo } from 'react';
+import { CategoryType } from '@/constants/categories';
 
 export interface ShoppingListItem {
   id: string;
   name: string;
-  category: string;
+  category: CategoryType;
   is_purchased: boolean;
+  memo?: string;
 }
 
 interface ShoppingSectionProps {
@@ -17,8 +19,11 @@ interface ShoppingSectionProps {
   items: ShoppingListItem[];
   onToggleItem: (id: string, isPurchased: boolean) => void;
   onDeleteItem: (id: string, name: string) => void;
+  onMemoPress?: (id: string, currentMemo?: string) => void;
+  onAddToStorage?: (id: string, name: string, category: CategoryType) => void;
   onClearAll: () => void;
   clearButtonText: string;
+  isPurchasedSection?: boolean;
 }
 
 export function ShoppingSection({
@@ -26,10 +31,13 @@ export function ShoppingSection({
   items,
   onToggleItem,
   onDeleteItem,
+  onMemoPress,
+  onAddToStorage,
   onClearAll,
   clearButtonText,
+  isPurchasedSection = false,
 }: ShoppingSectionProps) {
-  const { colors, typography, spacing, borderRadius } = useTheme();
+  const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
 
@@ -40,12 +48,25 @@ export function ShoppingSection({
       <View style={styles.sectionHeader}>
         <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>{title}</Text>
         <TouchableOpacity
-          style={[styles.clearButton, { backgroundColor: colors.dangerLight }]}
+          style={[
+            styles.clearButton,
+            {
+              backgroundColor: isDark ? colors.surface : colors.textTertiary,
+              borderColor: isDark ? colors.surface : colors.textTertiary,
+              borderWidth: 1,
+            },
+          ]}
           onPress={onClearAll}
           activeOpacity={0.7}
         >
-          <Trash2 size={14} color={colors.danger} />
-          <Text style={[typography.styles.t7Bold, { color: colors.danger }]}>{clearButtonText}</Text>
+          {isPurchasedSection ? (
+            <Package size={14} color={isDark ? colors.grey400 : colors.white} />
+          ) : (
+            <Trash2 size={14} color={isDark ? colors.grey400 : colors.white} />
+          )}
+          <Text style={[typography.styles.t7Medium, { color: isDark ? colors.grey400 : colors.white }]}>
+            {clearButtonText}
+          </Text>
         </TouchableOpacity>
       </View>
       <Card variant="elevated" padding="none">
@@ -56,8 +77,11 @@ export function ShoppingSection({
             name={item.name}
             category={item.category}
             isPurchased={item.is_purchased}
+            memo={item.memo}
             onToggle={() => onToggleItem(item.id, item.is_purchased)}
             onDelete={() => onDeleteItem(item.id, item.name)}
+            onMemoPress={onMemoPress ? () => onMemoPress(item.id, item.memo) : undefined}
+            onAddToStorage={onAddToStorage ? () => onAddToStorage(item.id, item.name, item.category) : undefined}
             isLast={index === items.length - 1}
           />
         ))}

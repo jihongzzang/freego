@@ -9,8 +9,10 @@ interface AddShoppingListBottomSheetProps {
   onClose: () => void;
   name: string;
   category: string;
+  memo: string;
   onNameChange: (text: string) => void;
   onCategoryChange: (categoryId: string) => void;
+  onMemoChange: (text: string) => void;
   onSubmit: () => void;
 }
 
@@ -19,14 +21,16 @@ export default function AddShoppingListBottomSheet({
   onClose,
   name,
   category,
+  memo,
   onNameChange,
   onCategoryChange,
+  onMemoChange,
   onSubmit,
 }: AddShoppingListBottomSheetProps) {
   const { colors, typography, isDark } = useTheme();
 
   return (
-    <BottomSheet maxHeight={450} visible={visible} onClose={onClose} title="장보기 항목 추가">
+    <BottomSheet maxHeight={550} visible={visible} onClose={onClose} title="장보기 항목 추가">
       <View style={styles.container}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <View style={styles.content}>
@@ -94,6 +98,29 @@ export default function AddShoppingListBottomSheet({
                 ))}
               </ScrollView>
             </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>메모 (선택)</Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  styles.memoInput,
+                  typography.styles.t5,
+                  {
+                    backgroundColor: colors.surface,
+                    color: colors.text,
+                    borderColor: colors.border,
+                  },
+                ]}
+                value={memo}
+                onChangeText={onMemoChange}
+                placeholder="예: 1kg, 신선한 것으로"
+                placeholderTextColor={colors.textTertiary}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+              />
+            </View>
           </View>
         </ScrollView>
 
@@ -136,7 +163,7 @@ export default function AddShoppingListBottomSheet({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    maxHeight: 372,
+    maxHeight: 472,
   },
   content: {
     padding: 20,
@@ -151,6 +178,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderWidth: 1,
+  },
+  memoInput: {
+    minHeight: 80,
+    paddingTop: 14,
   },
   categoryScroll: {
     gap: 8,

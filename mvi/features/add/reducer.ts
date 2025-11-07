@@ -17,7 +17,7 @@ const initialFormData = {
   unit: undefined,
   purchase_date: undefined,
   expiry_date: '',
-  storage_location: 'fridge' as const,
+  storage_location: undefined,
   memo: '',
 };
 
@@ -30,6 +30,10 @@ export const addReducer: Reducer<AddState, AddIntent> = (
       return {
         ...state,
         mode: intent.payload,
+        // 직접 등록 모드로 전환할 때 storage_location을 'fridge'로 설정
+        form: intent.payload === 'manual'
+          ? { ...state.form, storage_location: 'fridge' }
+          : state.form,
       };
 
     case 'UPDATE_FIELD':

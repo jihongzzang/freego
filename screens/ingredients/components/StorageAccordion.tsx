@@ -7,9 +7,10 @@ import { findStorageLocationById, StorageLocationType } from '@/constants/storag
 import { IngredientItem } from './IngredientItem';
 import { useTheme } from '@/lib/theme';
 import { Text } from 'react-native';
+import { HelpCircle } from 'lucide-react-native';
 
 interface StorageAccordionProps {
-  storageId: StorageLocationType;
+  storageId: StorageLocationType | 'unset';
   items: Ingredient[];
   isExpanded: boolean;
   onToggle: () => void;
@@ -31,12 +32,14 @@ export function StorageAccordion({
 }: StorageAccordionProps) {
   const { colors, typography } = useTheme();
 
-  const storageItem = findStorageLocationById(storageId);
+  const storageItem = storageId === 'unset' ? null : findStorageLocationById(storageId);
+  const storageLabel = storageId === 'unset' ? '미설정' : storageItem?.krLabel || '';
+  const storageIcon = storageId === 'unset' ? <HelpCircle size={20} color={colors.textSecondary} /> : getStorageLocationIcon(storageId, 20);
 
   return (
     <Accordion
-      title={storageItem?.krLabel || ''}
-      leftIcon={getStorageLocationIcon(storageId, 20)}
+      title={storageLabel}
+      leftIcon={storageIcon}
       badge={
         items.length > 0 ? (
           <Text style={[typography.styles.t7Bold, { color: colors.text }]}>{items.length}</Text>

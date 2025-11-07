@@ -18,7 +18,7 @@ export interface AddFormData {
   unit?: UnitType;
   purchase_date?: string;
   expiry_date: string;
-  storage_location: StorageLocationType;
+  storage_location?: StorageLocationType;
   memo: string;
 }
 

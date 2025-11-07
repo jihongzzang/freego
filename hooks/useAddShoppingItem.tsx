@@ -2,11 +2,16 @@ import { useState } from 'react';
 import { CategoryType } from '@/constants/categories';
 import { useDialog } from '@/contexts/DialogContext';
 
-export function useAddShoppingItem() {
+interface UseAddShoppingItemProps {
+  onSuccess?: () => void;
+}
+
+export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
   const { alert } = useDialog();
   const [isVisible, setIsVisible] = useState(false);
   const [name, setName] = useState('');
   const [category, setCategory] = useState<CategoryType>('vegetables');
+  const [memo, setMemo] = useState('');
 
   function open() {
     setIsVisible(true);
@@ -16,6 +21,7 @@ export function useAddShoppingItem() {
     setIsVisible(false);
     setName('');
     setCategory('vegetables');
+    setMemo('');
   }
 
   function handleNameChange(text: string) {
@@ -24,6 +30,10 @@ export function useAddShoppingItem() {
 
   function handleCategoryChange(categoryId: string) {
     setCategory(categoryId as CategoryType);
+  }
+
+  function handleMemoChange(text: string) {
+    setMemo(text);
   }
 
   async function handleSubmit() {
@@ -38,9 +48,15 @@ export function useAddShoppingItem() {
       await storage.addToShoppingList({
         name: name.trim(),
         category,
+        memo: memo.trim() || undefined,
       });
 
       close();
+
+      // 성공 콜백 호출 (목록 새로고침)
+      if (props?.onSuccess) {
+        props.onSuccess();
+      }
 
       alert({
         title: '추가 완료',
@@ -61,10 +77,12 @@ export function useAddShoppingItem() {
     isVisible,
     name,
     category,
+    memo,
     open,
     close,
     handleNameChange,
     handleCategoryChange,
+    handleMemoChange,
     handleSubmit,
   };
 }

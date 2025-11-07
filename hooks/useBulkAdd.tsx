@@ -56,7 +56,7 @@ export function useBulkAdd(onSuccess?: () => void) {
         name: template.krLabel,
         category: template.category as CategoryType,
         emoji: template.emoji,
-        storage_location: 'fridge' as StorageLocationType,
+        storage_location: undefined,
         quantity: undefined,
         unit: template.defaultUnit as UnitType,
         registration_date: new Date().toISOString().split('T')[0],

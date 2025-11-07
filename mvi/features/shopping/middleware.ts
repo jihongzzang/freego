@@ -77,7 +77,6 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              // title: '삭제 확인',
               message: `"${intent.payload.name}"을(를) 장보기 목록에서 삭제할까요?`,
               onConfirm: async () => {
                 try {
@@ -129,7 +128,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             {
               type: 'SHOW_ALERT',
               payload: {
-                title: '완료',
+                title: '',
                 message: '장보기 목록에 추가됐어요.',
                 variant: 'success',
               },
@@ -162,7 +161,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             {
               type: 'SHOW_ALERT',
               payload: {
-                title: '알림',
+                title: '',
                 message: '구매한 항목이 없어요.',
                 variant: 'info',
               },
@@ -176,7 +175,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '구매 완료 항목 삭제',
+              title: '',
               message: `${purchasedItems.length}개의 구매 완료 항목을 삭제할까요?`,
               onConfirm: async () => {
                 try {
@@ -206,7 +205,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             {
               type: 'SHOW_ALERT',
               payload: {
-                title: '알림',
+                title: '',
                 message: '구매 예정 항목이 없어요.',
                 variant: 'info',
               },
@@ -220,7 +219,6 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '구매 예정 항목 삭제',
               message: `${unpurchasedItems.length}개의 구매 예정 항목을 삭제할까요?`,
               onConfirm: async () => {
                 try {

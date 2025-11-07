@@ -12,24 +12,22 @@ function RootStack({ isOnboardingComplete }: { isOnboardingComplete: boolean }) 
   const { isDark, colors } = useTheme();
 
   return (
-    <DialogProvider>
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <Stack
-          // initialRouteName={isOnboardingComplete ? '(tabs)' : 'onboarding'}
-          initialRouteName={'onboarding'}
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: colors.background },
-            animation: 'default',
-          }}
-        >
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style={isDark ? 'light' : 'dark'} />
-      </View>
-    </DialogProvider>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <Stack
+        // initialRouteName={isOnboardingComplete ? '(tabs)' : 'onboarding'}
+        initialRouteName={'onboarding'}
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+          animation: 'default',
+        }}
+      >
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+    </View>
   );
 }
 

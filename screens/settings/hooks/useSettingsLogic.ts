@@ -103,7 +103,7 @@ export function useSettingsLogic() {
 
   function handleDeleteAllData() {
     confirm({
-      title: '모든 데이터 삭제',
+      title: '',
       message: '등록된 모든 냉장고 재료가 삭제돼요.\n이 작업은 되돌릴 수 없어요.\n\n정말 삭제하시겠어요?',
       confirmText: '삭제',
       cancelText: '취소',
@@ -112,7 +112,7 @@ export function useSettingsLogic() {
         try {
           await storage.clearAll();
           alert({
-            title: '완료',
+            title: '',
             message: '모든 데이터가 삭제되었어요.',
             type: 'success',
           });

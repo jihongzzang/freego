@@ -5,7 +5,8 @@ import { BasicInfoSection } from './BasicInfoSection';
 import { CategorySection } from './CategorySection';
 import { QuantitySection } from './QuantitySection';
 import { DateSection } from './DateSection';
-import { StorageAndMemoSection } from './StorageAndMemoSection';
+import { StorageSection } from './StorageSection';
+import { MemoSection } from './MemoSection';
 
 interface EditFormProps {
   formData: EditFormData;
@@ -55,11 +56,9 @@ export function EditForm({
         onQuickSelect={onQuickSelect}
       />
 
-      <StorageAndMemoSection
-        storageLocation={formData.storage_location}
-        memo={formData.memo || ''}
-        onFieldChange={onFieldChange}
-      />
+      <StorageSection storageLocation={formData.storage_location || ''} onFieldChange={onFieldChange} />
+
+      <MemoSection memo={formData.memo || ''} onFieldChange={onFieldChange} />
     </View>
   );
 }

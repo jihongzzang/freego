@@ -86,7 +86,7 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
             {
               type: 'SHOW_ALERT',
               payload: {
-                title: '알림',
+                title: '',
                 message: firstError || '입력 항목을 확인해주세요.',
                 variant: 'warning',
               },
@@ -128,7 +128,7 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
               unit: undefined,
               purchase_date: undefined,
               expiry_date: '',
-              storage_location: defaultStorageLocation?.id || 'fridge',
+              storage_location: undefined,
               memo: '',
             },
             mode: 'select',
@@ -138,7 +138,6 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
             {
               type: 'SHOW_ALERT',
               payload: {
-                // title: '성공',
                 title: '',
                 message: '식재료가 등록됐어요.',
                 variant: 'success',

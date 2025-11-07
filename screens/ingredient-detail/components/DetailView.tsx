@@ -53,7 +53,7 @@ export function DetailView({ ingredient }: DetailViewProps) {
         <View style={styles.infoItem}>
           <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>보관 위치</Text>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
-            {findStorageLocationById(ingredient.storage_location)?.krLabel}
+            {findStorageLocationById(ingredient.storage_location)?.krLabel || '-'}
           </Text>
         </View>
         <View style={styles.infoItem}>

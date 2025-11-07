@@ -50,7 +50,7 @@ export function ViewModeTabs({ viewMode, onChangeMode }: ViewModeTabsProps) {
             { color: viewMode === 'storage' ? (isDark ? colors.white : colors.text) : colors.textTertiary },
           ]}
         >
-          저장위치별
+          보관위치별
         </Text>
       </TouchableOpacity>
     </View>

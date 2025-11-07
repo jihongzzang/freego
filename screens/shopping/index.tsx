@@ -1,9 +1,11 @@
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { useMemo } from 'react';
-import { ShoppingCart } from 'lucide-react-native';
+import { ShoppingCart, Share2, Plus } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import Header from '@/components/Header';
 import AddShoppingListBottomSheet from '@/components/AddShoppingListBottomSheet';
+import EditMemoBottomSheet from '@/components/EditMemoBottomSheet';
+import SelectStorageBottomSheet from '@/components/SelectStorageBottomSheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FloatingButton from '@/components/FloatingButton';
 import EmptyStateUI from '@/components/ui/EmptyState';
@@ -21,6 +23,18 @@ export default function ShoppingListScreen() {
     handleDeleteItem,
     handleClearPurchased,
     handleClearUnpurchased,
+    handleAddAllToStorage,
+    handleAddToStorage,
+    handleStorageSelect,
+    selectingStorageForItem,
+    setSelectingStorageForItem,
+    handleShare,
+    handleMemoPress,
+    editingMemoId,
+    editingMemo,
+    handleMemoClose,
+    handleMemoChange,
+    handleMemoSubmit,
   } = useShoppingLogic();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
@@ -53,6 +67,7 @@ export default function ShoppingListScreen() {
               items={unpurchasedItems}
               onToggleItem={handleTogglePurchased}
               onDeleteItem={handleDeleteItem}
+              onMemoPress={handleMemoPress}
               onClearAll={handleClearUnpurchased}
               clearButtonText="전체삭제"
             />
@@ -61,21 +76,58 @@ export default function ShoppingListScreen() {
               items={purchasedItems}
               onToggleItem={handleTogglePurchased}
               onDeleteItem={handleDeleteItem}
-              onClearAll={handleClearPurchased}
-              clearButtonText="삭제"
+              onAddToStorage={handleAddToStorage}
+              onClearAll={handleAddAllToStorage}
+              clearButtonText="재고에 넣기"
+              isPurchasedSection
             />
           </>
         )}
       </ScrollView>
-      <FloatingButton onPress={addShoppingItem.open} />
+      <FloatingButton
+        menuItems={[
+          ...(unpurchasedItems.length > 0
+            ? [
+                {
+                  icon: <Share2 size={24} color="#FFFFFF" />,
+                  label: '구매 예정 공유',
+                  onPress: handleShare,
+                  labelColor: colors.white,
+                  backgroundColor: colors.blue500,
+                },
+              ]
+            : []),
+          {
+            icon: <Plus size={24} color="#FFFFFF" />,
+            label: '항목 추가',
+            onPress: addShoppingItem.open,
+            labelColor: colors.white,
+            backgroundColor: colors.primary,
+          },
+        ]}
+      />
       <AddShoppingListBottomSheet
         visible={addShoppingItem.isVisible}
         onClose={addShoppingItem.close}
         name={addShoppingItem.name}
         category={addShoppingItem.category}
+        memo={addShoppingItem.memo}
         onNameChange={addShoppingItem.handleNameChange}
         onCategoryChange={addShoppingItem.handleCategoryChange}
+        onMemoChange={addShoppingItem.handleMemoChange}
         onSubmit={addShoppingItem.handleSubmit}
+      />
+      <EditMemoBottomSheet
+        visible={editingMemoId !== null}
+        onClose={handleMemoClose}
+        memo={editingMemo}
+        onMemoChange={handleMemoChange}
+        onSubmit={handleMemoSubmit}
+      />
+      <SelectStorageBottomSheet
+        visible={selectingStorageForItem !== null}
+        onClose={() => setSelectingStorageForItem(null)}
+        onSelect={handleStorageSelect}
       />
     </View>
   );

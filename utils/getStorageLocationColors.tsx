@@ -1,7 +1,7 @@
 import { StorageLocationType } from '@/constants/storageLocations';
 import { Colors } from '@/lib/theme';
 
-export function getStorageLocationColors(location: StorageLocationType): string {
+export function getStorageLocationColors(location?: StorageLocationType): string {
   const colors = Colors.light; // 컬러 토큰은 light/dark 동일
 
   switch (location) {

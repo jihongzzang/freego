@@ -14,7 +14,7 @@ export interface PackageIngredient {
   quantity?: number;
   unit?: UnitType;
   emoji: string;
-  storage_location: StorageLocationType;
+  storage_location?: StorageLocationType;
 }
 
 export interface LifestylePackage {
@@ -55,7 +55,7 @@ function ingredient({
     quantity,
     emoji: template.emoji,
     unit: quantity ? template.defaultUnit : undefined,
-    storage_location: 'fridge', // 기본값
+    storage_location: undefined, // 기본값
     ...overrides, // 수동 오버라이드
   };
 }

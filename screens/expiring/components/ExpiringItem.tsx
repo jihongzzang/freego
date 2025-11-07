@@ -35,8 +35,12 @@ export function ExpiringItem({ item, onPress, onQuickDeduct, getDaysRemaining }:
                 <>
                   {item.quantity}
                   {item.unit && findUnitById(item.unit)?.krLabel}
-                  {' · '}
-                  {findStorageLocationById(item.storage_location)?.krLabel}
+                  {item.storage_location && (
+                    <>
+                      {' · '}
+                      {findStorageLocationById(item.storage_location)?.krLabel}
+                    </>
+                  )}
                 </>
               )}
 

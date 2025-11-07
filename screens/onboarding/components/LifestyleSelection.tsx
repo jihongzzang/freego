@@ -1,5 +1,4 @@
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ColorPalette, useTheme } from '@/lib/theme';
 import { LIFESTYLE_PACKAGES } from '@/constants/starterPackages';
