@@ -2,7 +2,47 @@ import { Tabs } from 'expo-router';
 import { Home, Package, Settings } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/lib/theme';
-import { Platform } from 'react-native';
+import { Platform, TouchableOpacity } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+
+function AnimatedTabBarButton({ children, onPress, ...props }: any) {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withTiming(0.85, { duration: 100 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withTiming(1, { duration: 150 });
+  };
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      activeOpacity={1}
+      {...props}
+    >
+      <Animated.View
+        style={[
+          {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          },
+          animatedStyle,
+        ]}
+      >
+        {children}
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
@@ -30,11 +70,9 @@ export default function TabLayout() {
           shadowRadius: 1,
           elevation: 1,
         },
-        // 애니메이션 비활성화 (커스텀 애니메이션 사용)
         animation: 'shift',
         lazy: false,
-
-        // iOS에서 부드러운 전환
+        tabBarButton: (props) => <AnimatedTabBarButton {...props} />, // ✅ 커스텀 버튼 적용
         ...(Platform.OS === 'ios' && {
           tabBarHideOnKeyboard: true,
         }),
