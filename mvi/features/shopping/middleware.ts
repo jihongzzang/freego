@@ -6,7 +6,7 @@
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { ShoppingState, ShoppingIntent, ShoppingEffect } from './types';
-import { storage } from '@/lib/storage';
+import { shoppingService } from '@/services/shopping.service';
 
 /**
  * Shopping Middleware
@@ -19,7 +19,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
   switch (intent.type) {
     case 'LOAD_SHOPPING_LIST': {
       try {
-        const items = await storage.getShoppingList();
+        const items = await shoppingService.getShoppingList();
         return {
           state: {
             ...state,
@@ -42,12 +42,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
     case 'TOGGLE_PURCHASED': {
       try {
-        await storage.updateShoppingItem(intent.payload.id, {
+        await shoppingService.updateShoppingItem(intent.payload.id, {
           is_purchased: !intent.payload.currentStatus,
         });
 
         // 다시 로드
-        const items = await storage.getShoppingList();
+        const items = await shoppingService.getShoppingList();
         return {
           state: {
             ...state,
@@ -80,7 +80,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
               message: `"${intent.payload.name}"을(를) 장보기 목록에서 삭제할까요?`,
               onConfirm: async () => {
                 try {
-                  await storage.deleteShoppingItem(intent.payload.id);
+                  await shoppingService.deleteShoppingItem(intent.payload.id);
                   // 삭제 후 목록 새로고침을 위한 LOAD_SHOPPING_LIST intent 발행은
                   // 컴포넌트에서 처리하도록 함
                 } catch (error) {
@@ -111,12 +111,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
       }
 
       try {
-        await storage.addToShoppingList({
+        await shoppingService.addToShoppingList({
           name: state.addForm.name.trim(),
           category: state.addForm.category,
         });
 
-        const items = await storage.getShoppingList();
+        const items = await shoppingService.getShoppingList();
         return {
           state: {
             ...state,
@@ -180,7 +180,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
               onConfirm: async () => {
                 try {
                   for (const item of purchasedItems) {
-                    await storage.deleteShoppingItem(item.id);
+                    await shoppingService.deleteShoppingItem(item.id);
                   }
                   // 삭제 후 목록 새로고침은 컴포넌트에서 처리
                 } catch (error) {
@@ -223,7 +223,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
               onConfirm: async () => {
                 try {
                   for (const item of unpurchasedItems) {
-                    await storage.deleteShoppingItem(item.id);
+                    await shoppingService.deleteShoppingItem(item.id);
                   }
                   // 삭제 후 목록 새로고침은 컴포넌트에서 처리
                 } catch (error) {

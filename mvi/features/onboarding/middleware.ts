@@ -7,7 +7,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { OnboardingState, OnboardingIntent, OnboardingEffect } from './types';
-import { storage } from '@/lib/storage';
+import { ingredientService } from '@/services/ingredient.service';
 import { findLifestylePackageById } from '@/constants/starterPackages';
 import { categoryDefaultEmojis } from '@/constants/ingredientTemplates';
 
@@ -55,7 +55,7 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
               memo: '',
             }));
 
-            await storage.addMultipleIngredients(ingredientsToAdd);
+            await ingredientService.addMultipleIngredients(ingredientsToAdd);
           } catch (error) {
             console.error('Error adding starter package:', error);
           }

@@ -83,19 +83,20 @@ export function useShoppingLogic() {
     }
 
     try {
-      const { storage } = await import('@/lib/storage');
+      const { ingredientService } = await import('@/services/ingredient.service');
+      const { shoppingService } = await import('@/services/shopping.service');
 
       // 모든 구매 완료 항목을 storage_location: undefined로 재고에 추가
       const today = new Date().toISOString().split('T')[0];
       for (const item of purchasedItems) {
-        await storage.addIngredient({
+        await ingredientService.addIngredient({
           name: item.name,
           category: item.category,
           storage_location: undefined,
           registration_date: today,
           memo: '',
         });
-        await storage.deleteShoppingItem(item.id);
+        await shoppingService.deleteShoppingItem(item.id);
       }
 
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
@@ -123,10 +124,11 @@ export function useShoppingLogic() {
     if (!selectingStorageForItem) return;
 
     try {
-      const { storage } = await import('@/lib/storage');
+      const { ingredientService } = await import('@/services/ingredient.service');
+      const { shoppingService } = await import('@/services/shopping.service');
       const today = new Date().toISOString().split('T')[0];
 
-      await storage.addIngredient({
+      await ingredientService.addIngredient({
         name: selectingStorageForItem.name,
         category: selectingStorageForItem.category as any,
         storage_location: storageLocation as any,
@@ -134,7 +136,7 @@ export function useShoppingLogic() {
         memo: '',
       });
 
-      await storage.deleteShoppingItem(selectingStorageForItem.id);
+      await shoppingService.deleteShoppingItem(selectingStorageForItem.id);
 
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
 
@@ -240,8 +242,8 @@ export function useShoppingLogic() {
     if (!editingMemoId) return;
 
     try {
-      const { storage } = await import('@/lib/storage');
-      await storage.updateShoppingItem(editingMemoId, {
+      const { shoppingService } = await import('@/services/shopping.service');
+      await shoppingService.updateShoppingItem(editingMemoId, {
         memo: editingMemo.trim() || undefined,
       });
 

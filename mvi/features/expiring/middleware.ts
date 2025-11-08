@@ -6,7 +6,7 @@
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { ExpiringState, ExpiringIntent, ExpiringEffect, Ingredient } from './types';
-import { storage } from '@/lib/storage';
+import { ingredientService } from '@/services/ingredient.service';
 import { calculateStatus } from '@/utils/calculateStatus';
 import { calculateDaysRemaining } from '@/utils/calculateDaysRemaining';
 
@@ -20,7 +20,7 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
   switch (intent.type) {
     case 'LOAD_INGREDIENTS': {
       try {
-        const data = await storage.getIngredients();
+        const data = await ingredientService.getIngredients();
         // 만료된 상태인 재료만 필터링
         const allIngredients: Ingredient[] = data.map((item) => ({
           ...item,
@@ -57,10 +57,10 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
 
     case 'DELETE_INGREDIENT': {
       try {
-        await storage.deleteIngredient(intent.payload);
+        await ingredientService.deleteIngredient(intent.payload);
 
         // 삭제 후 다시 로드
-        const data = await storage.getIngredients();
+        const data = await ingredientService.getIngredients();
         const allIngredients: Ingredient[] = data.map((item) => ({
           ...item,
           status: calculateStatus(item.expiry_date),

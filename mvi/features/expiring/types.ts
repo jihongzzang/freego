@@ -3,7 +3,7 @@
  */
 
 import { Intent, State, Effect } from '@/mvi/base';
-import { Ingredient as StoredIngredient } from '@/lib/storage';
+import { Ingredient as StoredIngredient } from '@/data/models/ingredient.model';
 import { StatusType } from '@/constants/itemStatus';
 
 /**

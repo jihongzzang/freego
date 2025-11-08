@@ -6,7 +6,7 @@
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { IngredientsState, IngredientsIntent, IngredientsEffect, Ingredient } from './types';
-import { storage } from '@/lib/storage';
+import { ingredientService } from '@/services/ingredient.service';
 import { calculateStatus } from '@/utils/calculateStatus';
 import { calculateDaysRemaining } from '@/utils/calculateDaysRemaining';
 
@@ -20,7 +20,7 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
   switch (intent.type) {
     case 'LOAD_INGREDIENTS': {
       try {
-        const data = await storage.getIngredients();
+        const data = await ingredientService.getIngredients();
         const ingredients: Ingredient[] = data.map((item) => ({
           ...item,
           status: calculateStatus(item.expiry_date),
@@ -54,10 +54,10 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
 
     case 'DELETE_INGREDIENT': {
       try {
-        await storage.deleteIngredient(intent.payload);
+        await ingredientService.deleteIngredient(intent.payload);
 
         // 삭제 후 다시 로드
-        const data = await storage.getIngredients();
+        const data = await ingredientService.getIngredients();
         const ingredients: Ingredient[] = data.map((item) => ({
           ...item,
           status: calculateStatus(item.expiry_date),

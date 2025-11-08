@@ -43,9 +43,9 @@ export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
     }
 
     try {
-      const { storage } = await import('@/lib/storage');
+      const { shoppingService } = await import('@/services/shopping.service');
 
-      await storage.addToShoppingList({
+      await shoppingService.addToShoppingList({
         name: name.trim(),
         category,
         memo: memo.trim() || undefined,

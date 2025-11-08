@@ -6,7 +6,8 @@
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { IngredientDetailState, IngredientDetailIntent, IngredientDetailEffect, Ingredient } from './types';
-import { storage } from '@/lib/storage';
+import { ingredientService } from '@/services/ingredient.service';
+import { shoppingService } from '@/services/shopping.service';
 import { StatusType } from '@/constants/itemStatus';
 
 /**
@@ -37,7 +38,7 @@ export const ingredientDetailMiddleware: Middleware<
   switch (intent.type) {
     case 'LOAD_INGREDIENT': {
       try {
-        const ingredients = await storage.getIngredients();
+        const ingredients = await ingredientService.getIngredients();
         const data = ingredients.find((item) => item.id === intent.payload);
 
         if (data) {
@@ -96,7 +97,7 @@ export const ingredientDetailMiddleware: Middleware<
               message: '이 식재료를 삭제할까요?',
               onConfirm: async () => {
                 try {
-                  await storage.deleteIngredient(state.ingredient!.id);
+                  await ingredientService.deleteIngredient(state.ingredient!.id);
                 } catch (error) {
                   console.error('Error deleting ingredient:', error);
                 }
@@ -129,11 +130,11 @@ export const ingredientDetailMiddleware: Middleware<
               message: `${ingredient.name}을(를) 소모 처리할까요?\n장보기 목록에 자동으로 추가돼요.`,
               onConfirm: async () => {
                 try {
-                  await storage.addToShoppingList({
+                  await shoppingService.addToShoppingList({
                     name: ingredient.name,
                     category: ingredient.category,
                   });
-                  await storage.deleteIngredient(ingredient.id);
+                  await ingredientService.deleteIngredient(ingredient.id);
                   return { success: true, ingredientName };
                 } catch (error) {
                   console.error('Error consuming ingredient:', error);
@@ -166,7 +167,7 @@ export const ingredientDetailMiddleware: Middleware<
       if (!state.ingredient) return {};
 
       try {
-        await storage.updateIngredient(state.ingredient.id, {
+        await ingredientService.updateIngredient(state.ingredient.id, {
           name: state.editForm.name,
           emoji: state.editForm.emoji,
           category: state.editForm.category,
@@ -179,7 +180,7 @@ export const ingredientDetailMiddleware: Middleware<
         });
 
         // 업데이트 후 다시 로드
-        const ingredients = await storage.getIngredients();
+        const ingredients = await ingredientService.getIngredients();
         const data = ingredients.find((item) => item.id === state.ingredient!.id);
 
         if (data) {

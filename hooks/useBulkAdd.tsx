@@ -51,7 +51,7 @@ export function useBulkAdd(onSuccess?: () => void) {
     }
 
     try {
-      const { storage } = await import('@/lib/storage');
+      const { ingredientService } = await import('@/services/ingredient.service');
       const ingredientsToAdd = selectedTemplates.map((template) => ({
         name: template.krLabel,
         category: template.category as CategoryType,
@@ -65,7 +65,7 @@ export function useBulkAdd(onSuccess?: () => void) {
         memo: '',
       }));
 
-      await storage.addMultipleIngredients(ingredientsToAdd);
+      await ingredientService.addMultipleIngredients(ingredientsToAdd);
 
       close();
 

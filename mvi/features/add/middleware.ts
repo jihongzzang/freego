@@ -6,7 +6,7 @@
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { AddState, AddIntent, AddEffect } from './types';
-import { storage } from '@/lib/storage';
+import { ingredientService } from '@/services/ingredient.service';
 import { categoryDefaultEmojis } from '@/constants/ingredientTemplates';
 import { CATEGORIES } from '@/constants/categories';
 import { STORAGE_LOCATIONS } from '@/constants/storageLocations';
@@ -99,7 +99,7 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
         const registrationDate = new Date().toISOString().split('T')[0];
 
         // 스토리지에 저장
-        await storage.addIngredient({
+        await ingredientService.addIngredient({
           name: state.form.name,
           category: state.form.category,
           emoji: state.form.emoji || categoryDefaultEmojis[state.form.category] || '🍴',

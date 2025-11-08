@@ -3,7 +3,7 @@
  */
 
 import { Intent, State, Effect } from '@/mvi/base';
-import { ShoppingItem } from '@/lib/storage';
+import { ShoppingItem } from '@/data/models/shopping.model';
 import { CategoryType } from '@/constants/categories';
 
 /**
