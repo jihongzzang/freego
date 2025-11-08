@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState } from 'react';
-import { Share, Platform } from 'react-native';
+import { Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
 import { useDialog } from '@/contexts/DialogContext';
@@ -198,19 +198,9 @@ export function useShoppingLogic() {
     // setTimeout을 사용해서 메뉴가 닫힌 후에 Share dialog 표시
     setTimeout(async () => {
       try {
-        const result = await Share.share({
+        await Share.share({
           message: shareText,
         });
-
-        // Share가 실패하거나 Expo Go에서 작동하지 않으면 clipboard로 복사
-        if (result.action === Share.dismissedAction || !result.action) {
-          await Clipboard.setStringAsync(shareText);
-          alert({
-            title: '',
-            message: '장보기 목록이 클립보드에 복사되었어요.',
-            type: 'success',
-          });
-        }
       } catch (error) {
         console.error('Error sharing shopping list:', error);
         // Share 실패 시 clipboard로 폴백
