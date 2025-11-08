@@ -59,16 +59,20 @@ export default function BulkAddBottomSheet({
                     backgroundColor:
                       selectedCategoryId === cat.id
                         ? isDark
-                          ? colors.grey600
-                          : colors.grey400
+                          ? // ? colors.grey600
+                            // : colors.grey400
+                            colors.primary
+                          : colors.primary
                         : isDark
                           ? colors.grey400
                           : colors.grey200,
                     borderColor:
                       selectedCategoryId === cat.id
                         ? isDark
-                          ? colors.grey600
-                          : colors.grey400
+                          ? //colors.grey600
+                            //: colors.grey400
+                            colors.primary
+                          : colors.primary
                         : isDark
                           ? colors.grey400
                           : colors.grey200,

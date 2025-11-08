@@ -27,8 +27,10 @@ export function CategorySection({ selectedCategory, onCategoryChange }: Category
                 borderRadius: borderRadius.lg,
               },
               selectedCategory === cat.id && {
-                backgroundColor: isDark ? colors.grey600 : colors.grey400,
-                borderColor: isDark ? colors.grey600 : colors.grey400,
+                // backgroundColor: isDark ? colors.grey600 : colors.grey400,
+                // borderColor: isDark ? colors.grey600 : colors.grey400,
+                backgroundColor: isDark ? colors.primary : colors.primary,
+                borderColor: isDark ? colors.primary : colors.primary,
               },
             ]}
             onPress={() => onCategoryChange('category', cat.id)}

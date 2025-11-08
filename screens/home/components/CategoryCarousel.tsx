@@ -34,7 +34,8 @@ export function CategoryCarousel({ selectedCategoryId, onCategorySelect, getCate
               onPress={() => onCategorySelect(categoryItem.id)}
               variant={'filled'}
               size="medium"
-              selectedColor={isDark ? colors.grey600 : colors.grey400}
+              // selectedColor={isDark ? colors.grey600 : colors.grey400}
+              selectedColor={isDark ? colors.primary : colors.primary}
               backgroundColor={isDark ? colors.grey400 : colors.grey200}
             />
           );

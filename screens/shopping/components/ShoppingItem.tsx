@@ -95,7 +95,11 @@ export function ShoppingItem({
       {!isPurchased ? (
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.actionButton} onPress={onMemoPress} activeOpacity={0.7}>
-            <MessageSquare size={20} color={memo ? colors.primary : colors.textTertiary} />
+            <MessageSquare
+              size={20}
+              fill={memo ? colors.textTertiary : colors.surface}
+              color={memo ? colors.textTertiary : colors.textTertiary}
+            />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={onDelete} activeOpacity={0.7}>
             <Trash2 size={20} color={colors.textTertiary} />

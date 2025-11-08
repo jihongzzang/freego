@@ -27,8 +27,10 @@ export function StorageSection({ storageLocation, onFieldChange }: StorageSectio
                 borderRadius: borderRadius.lg,
               },
               storageLocation === loc.id && {
-                backgroundColor: isDark ? colors.grey600 : colors.grey400,
-                borderColor: isDark ? colors.grey600 : colors.grey400,
+                // backgroundColor: isDark ? colors.grey600 : colors.grey400,
+                // borderColor: isDark ? colors.grey600 : colors.grey400,
+                backgroundColor: isDark ? colors.primary : colors.primary,
+                borderColor: isDark ? colors.primary : colors.primary,
               },
             ]}
             onPress={() => onFieldChange('storage_location', loc.id)}
