@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ingredient } from '@/data/models/ingredient.model';
 import { generateId } from './utils/generateId';
+import { checkExpiryAndNotify } from './notification.service';
 
 /**
  * AsyncStorage 키 상수
@@ -32,6 +33,9 @@ export const ingredientService = {
       };
       ingredients.push(newIngredient);
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+
+      // 유통기한 알림 체크 (트리거 2: 재료 등록)
+      await checkExpiryAndNotify();
     } catch (error) {
       console.error('Error adding ingredient:', error);
       throw error;
@@ -48,6 +52,9 @@ export const ingredientService = {
       }));
       ingredients.push(...newIngredients);
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+
+      // 유통기한 알림 체크 (트리거 2: 재료 등록)
+      await checkExpiryAndNotify();
     } catch (error) {
       console.error('Error adding multiple ingredients:', error);
       throw error;
@@ -65,6 +72,9 @@ export const ingredientService = {
           updated_at: new Date().toISOString(),
         };
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+
+        // 유통기한 알림 체크 (트리거 3: 재료 수정)
+        await checkExpiryAndNotify();
       }
     } catch (error) {
       console.error('Error updating ingredient:', error);
@@ -83,6 +93,9 @@ export const ingredientService = {
           deleted_at: new Date().toISOString(), // 삭제 시각 기록
         };
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+
+        // 유통기한 알림 체크 (트리거 4: 재료 삭제)
+        await checkExpiryAndNotify();
       }
     } catch (error) {
       console.error('Error marking ingredient as deleted:', error);

@@ -21,10 +21,11 @@ export function useSettingsLogic() {
   // Notification permission state
   const [hasNotificationPermission, setHasNotificationPermission] = useState(false);
 
-  // Check notification permission on mount
+  // Load notification days and check permission on mount
   useEffect(() => {
+    dispatch({ type: 'LOAD_NOTIFICATION_DAYS' });
     checkNotificationPermission();
-  }, []);
+  }, [dispatch]);
 
   // Handle effects
   useEffect(() => {
@@ -41,27 +42,40 @@ export function useSettingsLogic() {
   }, [effect, showToast]);
 
   async function checkNotificationPermission() {
-    const settings = await Notifications.getPermissionsAsync();
-    setHasNotificationPermission((settings as any).granted);
+    try {
+      const settings = await Notifications.getPermissionsAsync();
+      setHasNotificationPermission((settings as any).granted);
+    } catch (error) {
+      console.log('Failed to check notification permission (expected in Expo Go):', error);
+      setHasNotificationPermission(false);
+    }
   }
 
   async function requestNotificationPermission() {
-    const settings = await Notifications.requestPermissionsAsync();
-    setHasNotificationPermission((settings as any).granted);
+    try {
+      const settings = await Notifications.requestPermissionsAsync();
+      setHasNotificationPermission((settings as any).granted);
 
-    if (!(settings as any).granted) {
-      confirm({
-        title: '알림 권한 필요',
-        message: '설정에서 알림 권한을 허용해주세요.',
-        confirmText: '설정 열기',
-        cancelText: '취소',
-        onConfirm: () => {
-          if (Platform.OS === 'ios') {
-            Linking.openURL('app-settings:');
-          } else {
-            Linking.openSettings();
-          }
-        },
+      if (!(settings as any).granted) {
+        confirm({
+          title: '알림 권한 필요',
+          message: '설정에서 알림 권한을 허용해주세요.',
+          confirmText: '설정 열기',
+          cancelText: '취소',
+          onConfirm: () => {
+            if (Platform.OS === 'ios') {
+              Linking.openURL('app-settings:');
+            } else {
+              Linking.openSettings();
+            }
+          },
+        });
+      }
+    } catch (error) {
+      console.log('Failed to request notification permission (expected in Expo Go):', error);
+      showToast({
+        message: 'Expo Go에서는 알림 권한을 요청할 수 없어요. Development build를 사용해주세요.',
+        type: 'warning',
       });
     }
   }

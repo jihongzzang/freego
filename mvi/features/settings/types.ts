@@ -15,7 +15,9 @@ export interface SettingsState extends State {
 /**
  * Settings Intent
  */
-export type SettingsIntent = { type: 'SET_NOTIFICATION_DAYS'; payload: number };
+export type SettingsIntent =
+  | { type: 'LOAD_NOTIFICATION_DAYS' }
+  | { type: 'SET_NOTIFICATION_DAYS'; payload: number };
 
 /**
  * Settings Effect

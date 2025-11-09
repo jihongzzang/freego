@@ -26,7 +26,7 @@ export function OnboardingCarousel({
   onNext,
   onSkip,
 }: OnboardingCarouselProps) {
-  const { colors, typography, spacing, borderRadius, shadows, isDark } = useTheme();
+  const { colors, typography, spacing, borderRadius, shadows } = useTheme();
 
   const insets = useSafeAreaInsets();
 

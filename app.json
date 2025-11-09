@@ -12,12 +12,21 @@
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "softwareKeyboardLayoutMode": "resize"
+      "softwareKeyboardLayoutMode": "resize",
+      "locales": {
+        "ko": {
+          "label": "프리고"
+        }
+      }
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.frigo.app.dev",
-      "buildNumber": "4"
+      "buildNumber": "4",
+      "infoPlist": {
+        "CFBundleLocalizations": ["ko", "en", "ja"],
+        "CFBundleDisplayName": "프리고"
+      }
     },
     "web": {
       "bundler": "metro",

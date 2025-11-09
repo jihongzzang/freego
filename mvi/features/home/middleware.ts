@@ -9,6 +9,7 @@ import { HomeState, HomeIntent, HomeEffect, Ingredient } from './types';
 import { ingredientService } from '@/services/ingredient.service';
 import { getCalculateStatus } from '@/utils/status';
 import { getCalculateDaysRemaining } from '@/utils/time';
+import { checkExpiryAndNotify } from '@/services/notification.service';
 
 /**
  * Home Middleware
@@ -26,6 +27,9 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
           status: getCalculateStatus(item.expiry_date),
           daysRemaining: getCalculateDaysRemaining(item.expiry_date),
         }));
+
+        // 유통기한 알림 체크 (트리거 1: 앱 접속)
+        await checkExpiryAndNotify();
 
         return {
           state: {

@@ -22,10 +22,10 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
 ): Promise<MiddlewareResult<OnboardingState, OnboardingEffect>> => {
   switch (intent.type) {
     case 'SKIP_PACKAGE':
-      // 패키지 추가 건너뛰기 -> 홈으로 이동
+      // 패키지 추가 건너뛰기 -> 알림 권한 요청 후 홈으로 이동
       await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
       return {
-        effects: [{ type: 'NAVIGATE_TO_HOME' }],
+        effects: [{ type: 'REQUEST_NOTIFICATION_PERMISSION' }, { type: 'NAVIGATE_TO_HOME' }],
       };
 
     case 'ADD_STARTER_PACKAGE':
@@ -60,6 +60,7 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
                     variant: 'success',
                   },
                 },
+                { type: 'REQUEST_NOTIFICATION_PERMISSION' },
                 { type: 'NAVIGATE_TO_HOME' },
               ],
             };
@@ -75,6 +76,7 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
                     variant: 'error',
                   },
                 },
+                { type: 'REQUEST_NOTIFICATION_PERMISSION' },
                 { type: 'NAVIGATE_TO_HOME' },
               ],
             };
@@ -84,21 +86,21 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
 
       await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
       return {
-        effects: [{ type: 'NAVIGATE_TO_HOME' }],
+        effects: [{ type: 'REQUEST_NOTIFICATION_PERMISSION' }, { type: 'NAVIGATE_TO_HOME' }],
       };
 
     case 'COMPLETE_ONBOARDING':
-      // 온보딩 완료 -> AsyncStorage에 저장하고 홈으로 이동
+      // 온보딩 완료 -> 알림 권한 요청 후 홈으로 이동
       await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
       return {
-        effects: [{ type: 'NAVIGATE_TO_HOME' }],
+        effects: [{ type: 'REQUEST_NOTIFICATION_PERMISSION' }, { type: 'NAVIGATE_TO_HOME' }],
       };
 
     case 'NEXT_STEP':
       if (state.currentStep >= state.totalSteps - 1) {
         await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
         return {
-          effects: [{ type: 'NAVIGATE_TO_HOME' }],
+          effects: [{ type: 'REQUEST_NOTIFICATION_PERMISSION' }, { type: 'NAVIGATE_TO_HOME' }],
         };
       }
       return {};

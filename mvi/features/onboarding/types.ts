@@ -41,6 +41,7 @@ export type OnboardingIntent =
  */
 export type OnboardingEffect =
   | { type: 'NAVIGATE_TO_HOME' }
+  | { type: 'REQUEST_NOTIFICATION_PERMISSION' }
   | { type: 'ADD_PACKAGE'; payload: string }
   | {
       type: 'SHOW_TOAST';

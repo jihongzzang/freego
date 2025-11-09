@@ -3,6 +3,7 @@ import { BackHandler } from 'react-native';
 import { useSharedValue, withSpring } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 import { Gesture } from 'react-native-gesture-handler';
+import * as Notifications from 'expo-notifications';
 import { useMVIStore } from '@/mvi/base';
 import { createOnboardingStore } from '@/mvi/features/onboarding';
 import { useRouter } from '@/hooks/useRouter';
@@ -20,6 +21,16 @@ export function useOnboardingLogic(width: number, stepsLength: number) {
     if (!effect) return;
 
     switch (effect.type) {
+      case 'REQUEST_NOTIFICATION_PERMISSION':
+        // 알림 권한 요청 (Expo Go에서는 에러 발생 가능)
+        (async () => {
+          try {
+            await Notifications.requestPermissionsAsync();
+          } catch (error) {
+            console.log('Notification permission request failed (expected in Expo Go):', error);
+          }
+        })();
+        break;
       case 'NAVIGATE_TO_HOME':
         router.replace('/(tabs)');
         break;
