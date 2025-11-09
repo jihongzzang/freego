@@ -49,27 +49,21 @@ export function PackageConfirmation({
         <Card
           variant="elevated"
           padding="large"
-          style={{ ...styles.ingredientsCard, ...{ backgroundColor: isDark ? colors.white : colors.grey100 } }}
+          style={{ ...styles.ingredientsCard, ...{ backgroundColor: isDark ? colors.grey100 : colors.grey100 } }}
         >
           <View style={styles.ingredientsCardHeader}>
             <Text style={[typography.styles.t5Semibold, styles.ingredientsCardTitle]}>포함된 재료</Text>
           </View>
           <View style={styles.ingredientsGrid}>
             {selectedPackage?.ingredients.map((item, index) => {
-              if (isDark) {
-                return (
-                  <Chip
-                    key={index}
-                    label={item.emoji + ' ' + item.name}
-                    variant="secondary"
-                    color="green"
-                    size="large"
-                  />
-                );
-              }
-
               return (
-                <Chip key={index} label={item.emoji + ' ' + item.name} variant="secondary" color="green" size="large" />
+                <Chip
+                  key={index}
+                  label={item.emoji + ' ' + item.name}
+                  variant="secondary"
+                  color="green"
+                  size="medium"
+                />
               );
             })}
           </View>
@@ -93,7 +87,7 @@ export function PackageConfirmation({
             size="large"
             fullWidth
             style={styles.secondaryButton}
-            textStyle={{ color: colors.grey400 }}
+            textStyle={{ color: colors.textTertiary }}
           >
             아니요, 직접 등록할게요
           </Button>

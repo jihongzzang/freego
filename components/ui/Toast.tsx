@@ -36,14 +36,14 @@ export function Toast({
       Animated.parallel([
         Animated.spring(translateY, {
           toValue: 0,
-          useNativeDriver: Platform.OS == 'ios' ? true : false,
+          useNativeDriver: true,
           tension: 65,
           friction: 8,
         }),
         Animated.timing(opacity, {
           toValue: 1,
           duration: 200,
-          useNativeDriver: Platform.OS == 'ios' ? true : false,
+          useNativeDriver: true,
         }),
       ]).start();
 

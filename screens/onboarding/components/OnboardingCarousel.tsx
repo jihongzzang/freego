@@ -72,7 +72,7 @@ export function OnboardingCarousel({
               key={dotIndex}
               style={[
                 styles.paginationDot,
-                { backgroundColor: isDark ? colors.text : colors.grey500 },
+                { backgroundColor: colors.textTertiary },
                 dotIndex === currentStep && styles.paginationDotActive,
               ]}
             />
@@ -117,7 +117,7 @@ const createStyles = ({
     },
 
     skipText: {
-      color: colors.grey400,
+      color: colors.textTertiary,
       opacity: 0.9,
     },
 

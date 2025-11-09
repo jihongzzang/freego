@@ -39,7 +39,7 @@ export function LifestyleSelection({ onSelectLifestyle, onSkip }: LifestyleSelec
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.lifestyleList}>
-            {LIFESTYLE_PACKAGES.map((lifestyle, index) => (
+            {LIFESTYLE_PACKAGES.map((lifestyle) => (
               <Card
                 key={lifestyle.id}
                 variant="elevated"
@@ -47,7 +47,7 @@ export function LifestyleSelection({ onSelectLifestyle, onSkip }: LifestyleSelec
                 onPress={() => onSelectLifestyle(lifestyle.id)}
                 style={{
                   ...styles.lifestyleCard,
-                  ...{ backgroundColor: isDark ? colors.white : colors.surfaceSecondary },
+                  ...{ backgroundColor: isDark ? colors.grey200 : colors.grey100 },
                 }}
               >
                 <View style={styles.lifestyleCardLeft}>
@@ -182,7 +182,7 @@ const createStyles = ({
     },
 
     skipPackageText: {
-      color: colors.grey400,
+      color: colors.textTertiary,
       opacity: 0.9,
     },
   });
