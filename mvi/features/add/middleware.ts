@@ -72,9 +72,8 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
           },
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '',
                 message: firstError || '입력 항목을 확인해주세요.',
                 variant: 'warning',
               },
@@ -117,9 +116,8 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
           },
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '',
                 message: '식재료가 등록됐어요.',
                 variant: 'success',
               },
@@ -135,9 +133,8 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
           },
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '오류',
                 message: '식재료 등록에 실패했어요.',
                 variant: 'error',
               },

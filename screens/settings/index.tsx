@@ -45,25 +45,17 @@ export default function SettingsScreen() {
           onRequestPermission={requestNotificationPermission}
           onUpdateDays={updateNotificationDays}
         />
-
         <ThemeSettings
           isDark={isDark}
           themePreference={themePreference}
           onToggleTheme={toggleTheme}
           onResetToSystem={resetThemeToSystem}
         />
-
         <DataManagement onDeleteAllData={handleDeleteAllData} />
-
         <FeedbackSection onSendFeedback={sendFeedback} />
-
         <AppInfo />
-
         <View style={styles.footer}>
           <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>프리고 앱</Text>
-          <Text style={[typography.styles.t7, { color: colors.textTertiary, marginTop: spacing.xs }]}>
-            음식물 쓰레기를 줄이고 현명한 소비를
-          </Text>
         </View>
       </ScrollView>
     </View>

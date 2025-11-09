@@ -32,8 +32,8 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
     switch (buttonStyle) {
       case 'cancel':
         return {
-          backgroundColor: colors.surfaceSecondary,
-          textColor: colors.textSecondary,
+          backgroundColor: isDark ? '#3f3f4b' : colors.greyOpactiy100,
+          textColor: isDark ? '#c3c3c6' : colors.grey700,
         };
       case 'destructive':
         return {
@@ -43,7 +43,7 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
       default:
         return {
           backgroundColor: colors.primary,
-          textColor: colors.white,
+          textColor: colors.whiteOpactiy900,
         };
     }
   }
@@ -74,7 +74,7 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
       onRequestClose={Platform.OS === 'ios' ? undefined : handleRequestClose}
       // statusBarTranslucent
     >
-      <BlurView intensity={isDark ? 40 : 60} style={styles.overlay}>
+      <View style={styles.overlay}>
         <TouchableOpacity
           style={[styles.backdrop, { backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.3)' }]}
           activeOpacity={1}
@@ -83,12 +83,14 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
         <View style={[styles.dialog, { backgroundColor: isDark ? '#2C2C35' : colors.white }]}>
           {title && (
             <View style={styles.titleContainer}>
-              <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>{title}</Text>
+              <Text style={[typography.styles.t4Semibold, { color: isDark ? '#E4E4E5' : colors.grey800 }]}>
+                {title}
+              </Text>
             </View>
           )}
 
           <View style={styles.messageContainer}>
-            <Text style={[typography.styles.t5, { color: colors.textSecondary }]}>{message}</Text>
+            <Text style={[typography.styles.t6, { color: isDark ? '#9E9EA4' : colors.grey600 }]}>{message}</Text>
           </View>
 
           <View style={styles.buttonsContainer}>
@@ -111,7 +113,7 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
             })}
           </View>
         </View>
-      </BlurView>
+      </View>
     </Modal>
   );
 }
@@ -130,6 +132,7 @@ const createStyles = ({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.3)',
     },
     backdrop: {
       position: 'absolute',
@@ -142,8 +145,9 @@ const createStyles = ({
       width: width - 54,
       maxWidth: 400,
       borderRadius: borderRadius.xxl,
-      padding: spacing.xxl,
+      paddingTop: 22,
       paddingBottom: 16,
+      paddingHorizontal: 16,
       ...shadows.lg,
       shadowOpacity: 0.25,
       shadowRadius: 20,
@@ -158,11 +162,12 @@ const createStyles = ({
     messageContainer: {
       textAlign: 'left',
       justifyContent: 'flex-start',
+      paddingTop: 8,
+      paddingBottom: 14,
     },
     buttonsContainer: {
       flexDirection: 'row',
-      gap: spacing.md,
-      marginTop: spacing.xxl,
+      gap: 8,
     },
     button: {
       flex: 1,

@@ -59,9 +59,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '오류',
                 message: '상태 변경에 실패했어요.',
                 variant: 'error',
               },
@@ -77,6 +76,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
+              title: '장보기 목록 삭제',
               message: `"${intent.payload.name}"을(를) 장보기 목록에서 삭제할까요?`,
               onConfirm: async () => {
                 try {
@@ -99,9 +99,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '입력 오류',
                 message: '재료 이름을 입력해주세요.',
                 variant: 'warning',
               },
@@ -126,9 +125,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           },
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '',
                 message: '장보기 목록에 추가됐어요.',
                 variant: 'success',
               },
@@ -140,9 +138,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '오류',
                 message: '항목 추가에 실패했어요.',
                 variant: 'error',
               },
@@ -159,9 +156,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '',
                 message: '구매한 항목이 없어요.',
                 variant: 'info',
               },
@@ -175,7 +171,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '',
+              title: '구매 완료 항목 삭제',
               message: `${purchasedItems.length}개의 구매 완료 항목을 삭제할까요?`,
               onConfirm: async () => {
                 try {
@@ -203,9 +199,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '',
                 message: '구매 예정 항목이 없어요.',
                 variant: 'info',
               },
@@ -219,6 +214,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
+              title: '구매 예정 항목 삭제',
               message: `${unpurchasedItems.length}개의 구매 예정 항목을 삭제할까요?`,
               onConfirm: async () => {
                 try {

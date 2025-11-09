@@ -9,5 +9,6 @@ export function getStatusColor(status: StatusType): string {
 
   // 만료 / 유효
   if (status === 'expired') return colors.danger; // expired
+
   return colors.success; // valid
 }

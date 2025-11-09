@@ -45,7 +45,7 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료 데이터를 불러오는데 실패했어요.',
+              payload: { message: '식재료 데이터를 불러오는데 실패했어요.', variant: 'error' },
             },
           ],
         };
@@ -72,7 +72,7 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료가 삭제됐어요.',
+              payload: { message: '식재료가 삭제됐어요', variant: 'error' },
             },
           ],
         };
@@ -81,7 +81,7 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료 삭제에 실패했어요.',
+              payload: { message: '식재료 삭제에 실패했어요.', variant: 'error' },
             },
           ],
         };

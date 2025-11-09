@@ -1,4 +1,5 @@
 import { Category } from '@/data/enums/category';
+
 import { Colors } from '@/lib/theme';
 
 export function getCategoryColor(category: Category): string {

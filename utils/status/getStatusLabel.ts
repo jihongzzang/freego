@@ -15,6 +15,8 @@ export function getStatusLabel({
 
   const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
-  if (diffDays < 0) return lang === 'kr' ? '만료' : 'Expired';
-  return lang === 'kr' ? '유효' : 'Valid';
+  if (diffDays < 0)
+    return lang === 'kr' ? `소비기한 지남 (D+${Math.abs(diffDays)})` : `${Math.abs(diffDays)} day(s) past expiry`;
+
+  return lang === 'kr' ? `D-${diffDays} 남음` : `D-${diffDays}`;
 }

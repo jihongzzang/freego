@@ -6,19 +6,35 @@ import { getStatusColor } from '@/utils/status/getStatusColor';
 import { getStorageLocationLabel } from '@/utils/storageLocation';
 import { getUnitLabel } from '@/utils/unit';
 import { useMemo } from 'react';
+import { getDaysRemaining } from '@/utils/time';
 
 interface IngredientItemProps {
   item: Ingredient;
   onPress: () => void;
   onEdit: () => void;
   onQuickDeduct: () => void;
-  getDaysRemaining: (daysRemaining: number | null) => string;
 }
 
-export function IngredientItem({ item, onPress, onEdit, onQuickDeduct, getDaysRemaining }: IngredientItemProps) {
+export function IngredientItem({ item, onPress, onEdit, onQuickDeduct }: IngredientItemProps) {
   const { colors, typography, spacing, borderRadius } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
+
+  const getIngredientDetails = useMemo(() => {
+    const parts: string[] = [];
+
+    // 수량과 단위 (둘 다 있어야 표시)
+    if (item.quantity && item.unit) {
+      parts.push(`${item.quantity}${getUnitLabel({ unit: item.unit, lang: 'kr' })}`);
+    }
+
+    // 보관 위치
+    if (item.storage_location) {
+      parts.push(getStorageLocationLabel({ storageLocation: item.storage_location, lang: 'kr' }));
+    }
+
+    return parts.length > 0 ? parts.join(' · ') : null;
+  }, [item.quantity, item.unit, item.storage_location]);
 
   return (
     <View style={styles.ingredientItem}>
@@ -28,16 +44,9 @@ export function IngredientItem({ item, onPress, onEdit, onQuickDeduct, getDaysRe
             <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{item.name}</Text>
             <View style={[styles.statusDot, { backgroundColor: getStatusColor(item.status) }]} />
           </View>
-          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>
-            {item.quantity
-              ? item.unit
-                ? `${item.quantity}${getUnitLabel({ unit: item.unit, lang: 'kr' })}${item.storage_location ? ` · ${getStorageLocationLabel({ storageLocation: item.storage_location, lang: 'kr' })}` : ''}`
-                : `${item.quantity}${item.storage_location ? ` · ${getStorageLocationLabel({ storageLocation: item.storage_location, lang: 'kr' })}` : ''}`
-              : item.storage_location
-                ? getStorageLocationLabel({ storageLocation: item.storage_location, lang: 'kr' })
-                : ''}
-          </Text>
-
+          {getIngredientDetails && (
+            <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>{getIngredientDetails}</Text>
+          )}
           {item.expiry_date ? (
             <Text
               style={[

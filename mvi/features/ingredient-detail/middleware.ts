@@ -81,13 +81,15 @@ export const ingredientDetailMiddleware: Middleware<
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '',
+              title: '식재료 삭제',
               message: '이 식재료를 삭제할까요?',
               onConfirm: async () => {
                 try {
                   await ingredientService.deleteIngredient(state.ingredient!.id);
+                  return { success: true };
                 } catch (error) {
                   console.error('Error deleting ingredient:', error);
+                  return { success: false };
                 }
               },
               isDanger: true,
@@ -114,7 +116,7 @@ export const ingredientDetailMiddleware: Middleware<
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '',
+              title: '식재료 소모',
               message: `${ingredient.name}을(를) 소모 처리할까요?\n장보기 목록에 자동으로 추가돼요.`,
               onConfirm: async () => {
                 try {
@@ -139,9 +141,8 @@ export const ingredientDetailMiddleware: Middleware<
       return {
         effects: [
           {
-            type: 'SHOW_ALERT',
+            type: 'SHOW_TOAST',
             payload: {
-              title: '',
               message: `${intent.payload.name}이(가) 장보기 목록에 추가됐어요.`,
               variant: 'success',
             },
@@ -158,9 +159,8 @@ export const ingredientDetailMiddleware: Middleware<
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '',
                 message: '수량이 0개인 식재료는 등록할 수 없어요.',
                 variant: 'warning',
               },
@@ -208,9 +208,8 @@ export const ingredientDetailMiddleware: Middleware<
             },
             effects: [
               {
-                type: 'SHOW_ALERT',
+                type: 'SHOW_TOAST',
                 payload: {
-                  title: '',
                   message: '식재료 정보가 업데이트됐어요.',
                   variant: 'success',
                 },
@@ -225,9 +224,8 @@ export const ingredientDetailMiddleware: Middleware<
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '',
                 message: '식재료 업데이트에 실패했어요.',
                 variant: 'error',
               },

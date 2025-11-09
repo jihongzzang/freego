@@ -17,7 +17,6 @@ interface StorageAccordionProps {
   onItemPress: (id: string) => void;
   onItemEdit: (id: string) => void;
   onQuickDeduct: (id: string) => void;
-  getDaysRemaining: (daysRemaining: number | null) => string;
 }
 
 export function StorageAccordion({
@@ -28,11 +27,11 @@ export function StorageAccordion({
   onItemPress,
   onItemEdit,
   onQuickDeduct,
-  getDaysRemaining,
 }: StorageAccordionProps) {
   const { colors, typography } = useTheme();
 
-  const storageLabel = storageId === 'unset' ? '미설정' : getStorageLocationLabel({ storageLocation: storageId, lang: 'kr' });
+  const storageLabel =
+    storageId === 'unset' ? '미설정' : getStorageLocationLabel({ storageLocation: storageId, lang: 'kr' });
   const storageIcon =
     storageId === 'unset' ? (
       <HelpCircle size={20} color={colors.textSecondary} />
@@ -46,7 +45,7 @@ export function StorageAccordion({
       leftIcon={storageIcon}
       badge={
         items.length > 0 ? (
-          <Text style={[typography.styles.t7Bold, { color: colors.text }]}>{items.length}</Text>
+          <Text style={[typography.styles.t7Bold, { color: colors.textSecondary }]}>{items.length}</Text>
         ) : undefined
       }
       defaultExpanded={isExpanded}
@@ -61,7 +60,6 @@ export function StorageAccordion({
               onPress={() => onItemPress(String(item.id))}
               onEdit={() => onItemEdit(String(item.id))}
               onQuickDeduct={() => onQuickDeduct(String(item.id))}
-              getDaysRemaining={getDaysRemaining}
             />
           ))}
         </Card>

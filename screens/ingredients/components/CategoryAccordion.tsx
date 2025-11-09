@@ -16,7 +16,6 @@ interface CategoryAccordionProps {
   onItemPress: (id: string) => void;
   onItemEdit: (id: string) => void;
   onQuickDeduct: (id: string) => void;
-  getDaysRemaining: (daysRemaining: number | null) => string;
 }
 
 export function CategoryAccordion({
@@ -27,7 +26,6 @@ export function CategoryAccordion({
   onItemPress,
   onItemEdit,
   onQuickDeduct,
-  getDaysRemaining,
 }: CategoryAccordionProps) {
   const { colors, typography } = useTheme();
 
@@ -37,7 +35,7 @@ export function CategoryAccordion({
       leftIcon={getCategoryIcon(categoryId, 20)}
       badge={
         items.length > 0 ? (
-          <Text style={[typography.styles.t7Bold, { color: colors.grey500 }]}>{items.length}</Text>
+          <Text style={[typography.styles.t7Bold, { color: colors.textSecondary }]}>{items.length}</Text>
         ) : undefined
       }
       defaultExpanded={isExpanded}
@@ -52,7 +50,6 @@ export function CategoryAccordion({
               onPress={() => onItemPress(String(item.id))}
               onEdit={() => onItemEdit(String(item.id))}
               onQuickDeduct={() => onQuickDeduct(String(item.id))}
-              getDaysRemaining={getDaysRemaining}
             />
           ))}
         </Card>

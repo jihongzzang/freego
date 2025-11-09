@@ -3,6 +3,7 @@ import { BackHandler } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
 import { useDialog } from '@/contexts/DialogContext';
+import { useToast } from '@/components/ui';
 import { useMVIStore } from '@/mvi/base';
 import { createIngredientDetailStore, EditFormData } from '@/mvi/features/ingredient-detail';
 import { useUnitPicker } from '@/hooks/useUnitPicker';
@@ -12,7 +13,8 @@ import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 export function useIngredientDetailLogic() {
   const router = useRouter();
   const { id, mode } = useLocalSearchParams();
-  const { alert, confirm } = useDialog();
+  const { confirm } = useDialog();
+  const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createIngredientDetailStore);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<IngredientTemplate | null>(null);
@@ -69,9 +71,8 @@ export function useIngredientDetailLogic() {
     processedEffectRef.current = effect;
 
     switch (effect.type) {
-      case 'SHOW_ALERT':
-        alert({
-          title: effect.payload.title,
+      case 'SHOW_TOAST':
+        showToast({
           message: effect.payload.message,
           type: effect.payload.variant,
         });
@@ -83,15 +84,17 @@ export function useIngredientDetailLogic() {
           message: effect.payload.message,
           onConfirm: async () => {
             const result = await effect.payload.onConfirm();
-            if (effect.payload.title?.includes('삭제')) {
+
+            // 삭제 성공
+            if (effect.payload.isDanger && result && result.success) {
               dispatch({ type: 'DELETE_SUCCESS' });
-            } else if (effect.payload.title?.includes('소모')) {
-              if (result && result.success && result.ingredientName) {
-                dispatch({
-                  type: 'CONSUME_SUCCESS',
-                  payload: { name: result.ingredientName },
-                });
-              }
+            }
+            // 소모 성공
+            else if (!effect.payload.isDanger && result && result.success && result.ingredientName) {
+              dispatch({
+                type: 'CONSUME_SUCCESS',
+                payload: { name: result.ingredientName },
+              });
             }
           },
           onCancel: undefined,
@@ -105,7 +108,7 @@ export function useIngredientDetailLogic() {
         router.back();
         break;
     }
-  }, [effect, alert, confirm, router, dispatch]);
+  }, [effect, confirm, showToast, router, dispatch]);
 
   // Android 시스템 백버튼 핸들링
   useEffect(() => {

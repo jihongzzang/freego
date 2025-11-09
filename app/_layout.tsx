@@ -5,6 +5,7 @@ import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useFonts } from '@/hooks/useFonts';
 import { ThemeProvider, useTheme } from '@/lib/theme';
 import { DialogProvider } from '@/contexts/DialogContext';
+import { ToastProvider } from '@/components/ui';
 
 export const unstable_settings = {
   initialRouteName: 'index',
@@ -42,9 +43,11 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <DialogProvider>
-        <RootStack />
-      </DialogProvider>
+      <ToastProvider>
+        <DialogProvider>
+          <RootStack />
+        </DialogProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

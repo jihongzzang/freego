@@ -55,7 +55,7 @@ export default function EditMemoBottomSheet({
             },
           ]}
         >
-          <Button size="large" variant="primary" disabled={!memo} onPress={onSubmit}>
+          <Button size="large" variant="primary" onPress={onSubmit}>
             저장
           </Button>
         </View>

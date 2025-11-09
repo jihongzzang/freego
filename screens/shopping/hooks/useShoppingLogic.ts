@@ -3,6 +3,7 @@ import { Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
 import { useDialog } from '@/contexts/DialogContext';
+import { useToast } from '@/components/ui';
 import { useMVIStore } from '@/mvi/base';
 import { createShoppingStore } from '@/mvi/features/shopping';
 import { useAddShoppingItem } from '@/hooks/useAddShoppingItem';
@@ -12,6 +13,7 @@ import { getCategoryLabel } from '@/utils/category/getCategoryLabel';
 
 export function useShoppingLogic() {
   const { alert, confirm } = useDialog();
+  const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createShoppingStore);
   const addShoppingItem = useAddShoppingItem({
     onSuccess: () => {
@@ -38,9 +40,8 @@ export function useShoppingLogic() {
     if (!effect) return;
 
     switch (effect.type) {
-      case 'SHOW_ALERT':
-        alert({
-          title: effect.payload.title,
+      case 'SHOW_TOAST':
+        showToast({
           message: effect.payload.message,
           type: effect.payload.variant,
         });
@@ -60,7 +61,7 @@ export function useShoppingLogic() {
         });
         break;
     }
-  }, [effect, alert, confirm, dispatch]);
+  }, [effect, showToast, confirm, dispatch]);
 
   function handleTogglePurchased(id: string, currentStatus: boolean) {
     dispatch({ type: 'TOGGLE_PURCHASED', payload: { id, currentStatus } });
@@ -104,15 +105,13 @@ export function useShoppingLogic() {
 
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
 
-      alert({
-        title: '',
+      showToast({
         message: `${purchasedItems.length}개 품목이 재고에 추가되었어요.`,
         type: 'success',
       });
     } catch (error) {
       console.error('Error adding to storage:', error);
-      alert({
-        title: '오류',
+      showToast({
         message: '재고 추가 중 오류가 발생했어요.',
         type: 'error',
       });
@@ -143,8 +142,7 @@ export function useShoppingLogic() {
 
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
 
-      alert({
-        title: '',
+      showToast({
         message: `${selectingStorageForItem.name}이(가) 재고에 추가되었어요.`,
         type: 'success',
       });
@@ -152,8 +150,7 @@ export function useShoppingLogic() {
       setSelectingStorageForItem(null);
     } catch (error) {
       console.error('Error adding to storage:', error);
-      alert({
-        title: '오류',
+      showToast({
         message: '재고 추가 중 오류가 발생했어요.',
         type: 'error',
       });
@@ -164,8 +161,7 @@ export function useShoppingLogic() {
     const unpurchasedItems = state.shoppingList.filter((item) => !item.is_purchased);
 
     if (unpurchasedItems.length === 0) {
-      alert({
-        title: '',
+      showToast({
         message: '공유할 구매 예정 항목이 없어요.',
         type: 'info',
       });
@@ -206,18 +202,14 @@ export function useShoppingLogic() {
           message: shareText,
         });
       } catch (error) {
-        console.error('Error sharing shopping list:', error);
-        // Share 실패 시 clipboard로 폴백
         try {
           await Clipboard.setStringAsync(shareText);
-          alert({
-            title: '',
+          showToast({
             message: '장보기 목록이 클립보드에 복사되었어요.',
             type: 'success',
           });
         } catch (clipboardError) {
-          alert({
-            title: '오류',
+          showToast({
             message: '공유 중 오류가 발생했어요.',
             type: 'error',
           });
@@ -252,15 +244,13 @@ export function useShoppingLogic() {
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
       handleMemoClose();
 
-      alert({
-        title: '',
+      showToast({
         message: '메모가 저장됐어요.',
         type: 'success',
       });
     } catch (error) {
       console.error('Error updating memo:', error);
-      alert({
-        title: '오류',
+      showToast({
         message: '메모 저장 중 오류가 발생했어요.',
         type: 'error',
       });

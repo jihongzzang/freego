@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Category } from '@/data/enums/category';
-import { useDialog } from '@/contexts/DialogContext';
+
+import { useToast } from '@/components/ui';
 
 interface UseAddShoppingItemProps {
   onSuccess?: () => void;
 }
 
 export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
-  const { alert } = useDialog();
+  const { showToast } = useToast();
   const [isVisible, setIsVisible] = useState(false);
   const [name, setName] = useState('');
   const [category, setCategory] = useState<Category>(Category.VEGETABLE);
@@ -58,15 +59,13 @@ export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
         props.onSuccess();
       }
 
-      alert({
-        title: '추가 완료',
+      showToast({
         message: `'${name.trim()}'을(를) 장보기 목록에 추가했어요.`,
         type: 'success',
       });
     } catch (error) {
       console.error('Error adding shopping item:', error);
-      alert({
-        title: '오류',
+      showToast({
         message: '장보기 목록 추가 중 오류가 발생했어요.',
         type: 'error',
       });

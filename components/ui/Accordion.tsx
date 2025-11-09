@@ -24,7 +24,7 @@ export default function Accordion({
   onToggle,
   style,
 }: AccordionProps) {
-  const { colors, typography } = useTheme();
+  const { colors, typography, isDark } = useTheme();
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const rotation = useSharedValue(defaultExpanded ? 180 : 0);
 
@@ -43,13 +43,13 @@ export default function Accordion({
       <TouchableOpacity style={styles.header} onPress={handleToggle} activeOpacity={0.7}>
         <View style={styles.headerLeft}>
           {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
-          <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{title}</Text>
+          <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>{title}</Text>
         </View>
 
         <View style={styles.headerRight}>
           {badge && <View style={styles.badge}>{badge}</View>}
           <Animated.View style={animatedRotationStyle}>
-            <ChevronDown size={20} color={colors.textTertiary} />
+            <ChevronDown size={20} color={colors.textSecondary} />
           </Animated.View>
         </View>
       </TouchableOpacity>

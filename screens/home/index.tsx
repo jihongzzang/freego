@@ -102,7 +102,6 @@ export default function HomeScreen() {
         />
       </Animated.View>
 
-      {/* Scrollable Content */}
       <Animated.ScrollView
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
           useNativeDriver: Platform.OS == 'android' ? false : true,
@@ -115,20 +114,6 @@ export default function HomeScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* {expiringItems.length > 0 && (
-          <ExpiringSection
-            items={
-              selectedCategoryId === ALL_CATEGORY.id
-                ? expiringItems
-                : expiringItems.filter((item) => item.category == selectedCategoryId)
-            }
-            onSeeMore={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
-            onCardPress={(item) => router.push(`/ingredient/${item.id}`)}
-            onCalendarPress={openDatePicker}
-            getExpiryDisplay={getExpiryDisplay}
-          />
-        )} */}
-
         {state.loading ? (
           <View style={{ paddingTop: 24 }}>
             <EmptyStateUI title="로딩 중이에요..." />
@@ -152,7 +137,6 @@ export default function HomeScreen() {
         )}
       </Animated.ScrollView>
 
-      {/* Floating Action Button */}
       <FloatingButton
         menuItems={[
           {
@@ -160,26 +144,25 @@ export default function HomeScreen() {
             label: floatingMenuItems[0].label,
             onPress: floatingMenuItems[0].onPress,
             labelColor: colors.white,
-            backgroundColor: colors.blue500,
+            backgroundColor: colors.blue600,
           },
           {
             icon: <Edit3 size={24} color="#FFFFFF" />,
             label: floatingMenuItems[1].label,
             onPress: floatingMenuItems[1].onPress,
             labelColor: colors.white,
-            backgroundColor: colors.primary,
+            backgroundColor: colors.green600,
           },
           {
             icon: <Grid3x3 size={24} color="#FFFFFF" />,
             label: floatingMenuItems[2].label,
             onPress: floatingMenuItems[2].onPress,
             labelColor: colors.white,
-            backgroundColor: colors.orange500,
+            backgroundColor: colors.orange600,
           },
         ]}
       />
 
-      {/* Modals */}
       <SelectDateBottomSheet
         visible={expiryDatePicker.visible}
         onClose={expiryDatePicker.close}

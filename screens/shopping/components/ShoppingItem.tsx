@@ -5,6 +5,7 @@ import { getCategoryColor } from '@/utils/category/getCategoryColor';
 import { getCategoryLabel } from '@/utils/category/getCategoryLabel';
 import { Category } from '@/data/enums/category';
 import { useMemo } from 'react';
+import { Chip } from '@/components/ui';
 
 interface ShoppingItemProps {
   id: string;

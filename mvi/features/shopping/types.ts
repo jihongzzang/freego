@@ -44,19 +44,18 @@ export type ShoppingIntent =
  */
 export type ShoppingEffect =
   | {
-      type: 'SHOW_ALERT';
-      payload: {
-        title: string;
-        message: string;
-        variant: 'success' | 'info' | 'warning' | 'error';
-      };
-    }
-  | {
       type: 'SHOW_CONFIRM';
       payload: {
         title?: string;
         message: string;
         onConfirm: () => void;
         isDanger?: boolean;
+      };
+    }
+  | {
+      type: 'SHOW_TOAST';
+      payload: {
+        message: string;
+        variant: 'success' | 'info' | 'warning' | 'error';
       };
     };

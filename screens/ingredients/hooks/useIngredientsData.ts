@@ -32,10 +32,7 @@ export function useIngredientsData(ingredients: Ingredient[]) {
 
   // 보관위치별로 재료 그룹화
   const groupedByStorage = useMemo(() => {
-    const grouped: Record<StorageLocationOrUnset, Ingredient[]> = {} as Record<
-      StorageLocationOrUnset,
-      Ingredient[]
-    >;
+    const grouped: Record<StorageLocationOrUnset, Ingredient[]> = {} as Record<StorageLocationOrUnset, Ingredient[]>;
 
     ingredients.forEach((item) => {
       const location: StorageLocationOrUnset = item.storage_location || 'unset';
@@ -74,15 +71,6 @@ export function useIngredientsData(ingredients: Ingredient[]) {
     });
   }
 
-  function getDaysRemaining(daysRemaining: number | null): string {
-    if (daysRemaining === null) return '';
-
-    if (daysRemaining < 0) return '만료됨';
-    if (daysRemaining === 0) return '오늘';
-    if (daysRemaining === 1) return '내일';
-    return `${daysRemaining}일 남음`;
-  }
-
   return {
     categoryOrder,
     storageOrder,
@@ -92,6 +80,5 @@ export function useIngredientsData(ingredients: Ingredient[]) {
     collapsedStorages,
     toggleCategory,
     toggleStorage,
-    getDaysRemaining,
   };
 }

@@ -4,10 +4,9 @@ import { useTheme } from '@/lib/theme';
 import { getCategoryIcon } from '@/utils/category';
 import { getStatusColor, getCalculateStatus } from '@/utils/status';
 import Badge from '@/components/ui/Badge';
-import { Ingredient } from '@/data/models/ingredient.model';
-import { getUnitLabel } from '@/utils/unit';
-import { getStorageLocationLabel } from '@/utils/storageLocation';
 import { useMemo } from 'react';
+import { Ingredient } from '@/mvi/features/expiring/types';
+import { getDaysRemaining } from '@/utils/time';
 
 interface ExpiringItemProps {
   item: Ingredient;
@@ -16,36 +15,51 @@ interface ExpiringItemProps {
 }
 
 export function ExpiringItem({ item, onPress, onQuickDeduct }: ExpiringItemProps) {
-  const { colors, typography, spacing, isDark, borderRadius } = useTheme();
+  const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
-
 
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.left}>
-        <View style={[styles.categoryIconWrapper, { backgroundColor: colors.surfaceSecondary }]}>
+        <View style={[styles.categoryIconWrapper, { backgroundColor: isDark ? colors.grey800 : colors.grey200 }]}>
           {item.emoji ? <Text style={typography.styles.t7}>{item.emoji}</Text> : getCategoryIcon(item.category, 20)}
         </View>
         <View style={styles.info}>
           <View style={styles.nameRow}>
             <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{item.name}</Text>
-            <Badge dot variant="primary" style={{ backgroundColor: getStatusColor(getCalculateStatus(item.expiry_date)) }} />
+            <Badge
+              dot
+              variant="primary"
+              style={{ backgroundColor: getStatusColor(getCalculateStatus(item.expiry_date)) }}
+            />
           </View>
-          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>
-            {item.quantity && item.unit && (
-              <>
-                {item.quantity}
-                {item.unit && getUnitLabel({ unit: item.unit })}
-              </>
-            )}
-            {item.storage_location && (
-              <>
-                {item.quantity && item.unit && ' · '}
-                {getStorageLocationLabel({ storageLocation: item.storage_location })}
-              </>
-            )}
-          </Text>
+          {item.expiry_date ? (
+            <Text
+              style={[
+                typography.styles.t7,
+                {
+                  color: getStatusColor(item.status),
+                  marginTop: spacing.xs,
+                },
+              ]}
+            >
+              유통기한: {item.expiry_date}
+              {item.daysRemaining !== null && ` (${getDaysRemaining(item.daysRemaining)})`}
+            </Text>
+          ) : (
+            <Text
+              style={[
+                typography.styles.t7,
+                {
+                  color: colors.textTertiary,
+                  marginTop: spacing.xs,
+                },
+              ]}
+            >
+              유통기한 입력 필요
+            </Text>
+          )}
         </View>
       </View>
       <TouchableOpacity
@@ -61,39 +75,40 @@ export function ExpiringItem({ item, onPress, onQuickDeduct }: ExpiringItemProps
   );
 }
 
-const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) => StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: spacing.lg,
-  },
-  left: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  categoryIconWrapper: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  info: {
-    flex: 1,
-  },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.xs,
-  },
-  quickButton: {
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: spacing.lg,
+    },
+    left: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+    },
+    categoryIconWrapper: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    info: {
+      flex: 1,
+    },
+    nameRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      marginBottom: spacing.xs,
+    },
+    quickButton: {
+      width: 32,
+      height: 32,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  });

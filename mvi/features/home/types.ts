@@ -40,4 +40,12 @@ export type HomeIntent =
 /**
  * Home Effect (부수 효과)
  */
-export type HomeEffect = { type: 'NAVIGATE'; payload: string } | { type: 'SHOW_TOAST'; payload: string };
+export type HomeEffect =
+  | { type: 'NAVIGATE'; payload: string }
+  | {
+      type: 'SHOW_TOAST';
+      payload: {
+        message: string;
+        variant: 'success' | 'error' | 'info' | 'warning';
+      };
+    };

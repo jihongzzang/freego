@@ -56,18 +56,10 @@ export type IngredientDetailIntent =
  */
 export type IngredientDetailEffect =
   | {
-      type: 'SHOW_ALERT';
-      payload: {
-        title: string;
-        message: string;
-        variant: 'success' | 'warning' | 'error';
-      };
-    }
-  | {
       type: 'SHOW_TOAST';
       payload: {
         message: string;
-        variant: 'success' | 'warning' | 'error';
+        variant: 'success' | 'error' | 'info' | 'warning';
       };
     }
   | {

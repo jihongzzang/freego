@@ -41,4 +41,10 @@ export type IngredientsIntent =
  */
 export type IngredientsEffect =
   | { type: 'NAVIGATE'; payload: string }
-  | { type: 'SHOW_TOAST'; payload: string };
+  | {
+      type: 'SHOW_TOAST';
+      payload: {
+        message: string;
+        variant: 'success' | 'error' | 'info' | 'warning';
+      };
+    };

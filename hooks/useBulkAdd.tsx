@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Category } from '@/data/enums/category';
 import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 import { Unit } from '@/data/enums/unit';
-import { useDialog } from '@/contexts/DialogContext';
+import { useDialog } from './useDialog';
+import { useToast } from '@/components/ui';
 
 export function useBulkAdd(onSuccess?: () => void) {
   const { alert } = useDialog();
+  const { showToast } = useToast();
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<Category | 0>(0);
   const [selectedTemplates, setSelectedTemplates] = useState<IngredientTemplate[]>([]);
@@ -68,8 +70,7 @@ export function useBulkAdd(onSuccess?: () => void) {
 
       close();
 
-      alert({
-        title: '추가 완료',
+      showToast({
         message: `${selectedTemplates.length}개의 재료가 추가됐어요.`,
         type: 'success',
       });
@@ -78,8 +79,7 @@ export function useBulkAdd(onSuccess?: () => void) {
       onSuccess?.();
     } catch (error) {
       console.error('Error adding templates:', error);
-      alert({
-        title: '오류',
+      showToast({
         message: '재료 추가 중 오류가 발생했어요.',
         type: 'error',
       });

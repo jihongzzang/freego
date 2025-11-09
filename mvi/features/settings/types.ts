@@ -21,6 +21,9 @@ export type SettingsIntent = { type: 'SET_NOTIFICATION_DAYS'; payload: number };
  * Settings Effect
  */
 export type SettingsEffect = {
-  type: 'SHOW_ALERT';
-  payload: { title: string; message: string; type: 'success' | 'error' };
+  type: 'SHOW_TOAST';
+  payload: {
+    message: string;
+    variant: 'success' | 'error' | 'info' | 'warning';
+  };
 };

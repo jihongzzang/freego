@@ -60,18 +60,10 @@ export type AddIntent =
  */
 export type AddEffect =
   | {
-      type: 'SHOW_ALERT';
-      payload: {
-        title: string;
-        message: string;
-        variant: 'success' | 'warning' | 'error';
-      };
-    }
-  | {
       type: 'SHOW_TOAST';
       payload: {
         message: string;
-        variant: 'success' | 'warning' | 'error';
+        variant: 'success' | 'error' | 'info' | 'warning';
       };
     }
   | { type: 'NAVIGATE_HOME' }
