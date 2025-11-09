@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useFonts } from '@/hooks/useFonts';
 import { ThemeProvider, useTheme } from '@/lib/theme';
@@ -42,12 +43,14 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider>
-      <ToastProvider>
-        <DialogProvider>
-          <RootStack />
-        </DialogProvider>
-      </ToastProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <ToastProvider>
+          <DialogProvider>
+            <RootStack />
+          </DialogProvider>
+        </ToastProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

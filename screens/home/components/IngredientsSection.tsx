@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { ColorPalette, useTheme } from '@/lib/theme';
 import { Ingredient } from '@/mvi/features/home';
-import { IngredientCard } from './IngredientCard';
+import { SwipeableIngredientListItem } from './SwipeableIngredientListItem';
 import { StatusType } from '@/data/enums/status';
 import { useMemo } from 'react';
 
@@ -11,6 +11,7 @@ interface IngredientsSectionProps {
   items: Ingredient[];
   onCardPress: (item: Ingredient) => void;
   onCalendarPress: (item: Ingredient) => void;
+  onDelete?: (item: Ingredient) => void;
   getExpiryDisplay: (status: StatusType, daysRemaining: number | null) => string;
 }
 
@@ -20,11 +21,12 @@ export function IngredientsSection({
   items,
   onCardPress,
   onCalendarPress,
+  onDelete,
   getExpiryDisplay,
 }: IngredientsSectionProps) {
   const { colors, typography, spacing } = useTheme();
 
-  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
+  const styles = useMemo(() => createStyles({ spacing, colors }), [spacing, colors]);
 
   return (
     <View style={styles.section}>
@@ -32,13 +34,14 @@ export function IngredientsSection({
         <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>{title}</Text>
         <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>{count}개</Text>
       </View>
-      <View style={styles.cardList}>
+      <View style={styles.listContainer}>
         {items.map((item) => (
-          <IngredientCard
+          <SwipeableIngredientListItem
             key={item.id}
             item={item}
             onPress={() => onCardPress(item)}
             onCalendarPress={() => onCalendarPress(item)}
+            onDelete={onDelete ? () => onDelete(item) : undefined}
             getExpiryDisplay={getExpiryDisplay}
           />
         ))}
@@ -47,7 +50,7 @@ export function IngredientsSection({
   );
 }
 
-const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
+const createStyles = ({ spacing, colors }: { spacing: typeof import('@/lib/theme').spacing; colors: any }) =>
   StyleSheet.create({
     section: {
       paddingTop: spacing.xxl,
@@ -57,10 +60,11 @@ const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spaci
       alignItems: 'center',
       justifyContent: 'space-between',
       marginBottom: spacing.md,
+      paddingHorizontal: spacing.lg,
     },
-    cardList: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: spacing.md,
+    listContainer: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      overflow: 'hidden',
     },
   });

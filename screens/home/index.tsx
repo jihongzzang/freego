@@ -1,5 +1,5 @@
 import { View, Animated, TouchableOpacity, Platform } from 'react-native';
-import { Bell, QrCode, Edit3, Grid3x3, Dot } from 'lucide-react-native';
+import { Bell, QrCode, Edit3, Grid3x3 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { useRouter } from '@/hooks/useRouter';
 import Header from '@/components/ui/Header';
@@ -132,6 +132,7 @@ export default function HomeScreen() {
             items={filteredIngredients}
             onCardPress={(item) => router.push(`/ingredient/${item.id}`)}
             onCalendarPress={openDatePicker}
+            onDelete={(item) => dispatch({ type: 'DELETE_INGREDIENT', payload: item.id })}
             getExpiryDisplay={getExpiryDisplay}
           />
         )}
