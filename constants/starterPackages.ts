@@ -2,19 +2,19 @@
  * 라이프스타일별 스타터 패키지
  */
 
-import { CategoryType } from './categories';
-import { StorageLocationType } from './storageLocations';
-import { UnitType } from './units';
+import { Category } from '@/data/enums/category';
 import { ingredientTemplates, IngredientTemplate } from './ingredientTemplates';
+import { Unit } from '@/data/enums/unit';
+import { StorageLocation } from '@/data/enums/storage_location';
 
 export interface PackageIngredient {
   id: string;
   name: string;
-  category: CategoryType;
+  category: Category;
   quantity?: number;
-  unit?: UnitType;
+  unit: Unit;
   emoji: string;
-  storage_location?: StorageLocationType;
+  storage_location?: StorageLocation;
 }
 
 export interface LifestylePackage {
@@ -54,9 +54,9 @@ function ingredient({
     category: template.category,
     quantity,
     emoji: template.emoji,
-    unit: quantity ? template.defaultUnit : undefined,
+    unit: template.defaultUnit,
     storage_location: undefined, // 기본값
-    ...overrides, // 수동 오버라이드
+    ...overrides,
   };
 }
 
@@ -70,15 +70,15 @@ export const LIFESTYLE_PACKAGES: LifestylePackage[] = [
     ingredients: [
       ingredient({ id: 'egg' }),
       ingredient({ id: 'milk' }),
-      ingredient({ id: 'white_bread', overrides: { storage_location: 'room_temp' } }),
-      ingredient({ id: 'onion', quantity: 2, overrides: { storage_location: 'room_temp' } }),
-      ingredient({ id: 'garlic', quantity: 1, overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'white_bread', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
+      ingredient({ id: 'onion', quantity: 2, overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
+      ingredient({ id: 'garlic', quantity: 1, overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
       ingredient({ id: 'green_onion', quantity: 1 }),
       ingredient({ id: 'carrot', quantity: 3 }),
-      ingredient({ id: 'potato', quantity: 5, overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'potato', quantity: 5, overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
       ingredient({ id: 'kimchi', quantity: 1 }),
-      ingredient({ id: 'sesame_oil', quantity: 1, overrides: { storage_location: 'room_temp' } }),
-      ingredient({ id: 'soy_sauce', quantity: 1, overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'sesame_oil', quantity: 1, overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
+      ingredient({ id: 'soy_sauce', quantity: 1, overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
       ingredient({ id: 'gochujang', quantity: 1 }),
     ],
   },
@@ -89,7 +89,7 @@ export const LIFESTYLE_PACKAGES: LifestylePackage[] = [
     description: '간편하게 식사를 해결하는 직장인을 위한 패키지',
     icon: '💼',
     ingredients: [
-      ingredient({ id: 'instant_cooked_rice', overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'instant_cooked_rice', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
       ingredient({ id: 'egg' }),
       ingredient({ id: 'ham' }),
       ingredient({ id: 'cheese' }),
@@ -98,7 +98,7 @@ export const LIFESTYLE_PACKAGES: LifestylePackage[] = [
       ingredient({ id: 'yogurt' }),
       ingredient({ id: 'cherry_tomatoes' }),
       ingredient({ id: 'salad' }),
-      ingredient({ id: 'frozen_dumplings', overrides: { storage_location: 'freezer' } }),
+      ingredient({ id: 'frozen_dumplings', overrides: { storage_location: StorageLocation.FREEZER } }),
     ],
   },
   {
@@ -108,14 +108,14 @@ export const LIFESTYLE_PACKAGES: LifestylePackage[] = [
     description: '건강하고 깨끗한 식단을 선호하는 분들을 위한 패키지',
     icon: '🥗',
     ingredients: [
-      ingredient({ id: 'chicken_breast', overrides: { storage_location: 'freezer' } }),
+      ingredient({ id: 'chicken_breast', overrides: { storage_location: StorageLocation.FREEZER } }),
       ingredient({ id: 'broccoli' }),
       ingredient({ id: 'spinach' }),
       ingredient({ id: 'tomato' }),
       ingredient({ id: 'avocado' }),
       ingredient({ id: 'greek_yogurt' }),
-      ingredient({ id: 'salmon', overrides: { storage_location: 'freezer' } }),
-      ingredient({ id: 'sweet_potato', overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'salmon', overrides: { storage_location: StorageLocation.FREEZER } }),
+      ingredient({ id: 'sweet_potato', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
       ingredient({ id: 'blueberry' }),
     ],
   },
@@ -126,18 +126,18 @@ export const LIFESTYLE_PACKAGES: LifestylePackage[] = [
     description: '온 가족이 함께 식사하는 가정을 위한 패키지',
     icon: '👨‍👩‍👧‍👦',
     ingredients: [
-      ingredient({ id: 'rice', overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'rice', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
       ingredient({ id: 'egg' }),
       ingredient({ id: 'milk' }),
-      ingredient({ id: 'onion', overrides: { storage_location: 'room_temp' } }),
-      ingredient({ id: 'potato', overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'onion', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
+      ingredient({ id: 'potato', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
       ingredient({ id: 'carrot' }),
-      ingredient({ id: 'pork', overrides: { storage_location: 'freezer' } }),
-      ingredient({ id: 'chicken', overrides: { storage_location: 'freezer' } }),
+      ingredient({ id: 'pork', overrides: { storage_location: StorageLocation.FREEZER } }),
+      ingredient({ id: 'chicken', overrides: { storage_location: StorageLocation.FREEZER } }),
       ingredient({ id: 'tofu' }),
       ingredient({ id: 'kimchi' }),
       ingredient({ id: 'green_onion' }),
-      ingredient({ id: 'garlic', overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'garlic', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
     ],
   },
   {
@@ -147,16 +147,16 @@ export const LIFESTYLE_PACKAGES: LifestylePackage[] = [
     description: '처음 자취를 시작하는 분들을 위한 기본 패키지',
     icon: '🔰',
     ingredients: [
-      ingredient({ id: 'ramen', overrides: { storage_location: 'room_temp' } }),
-      ingredient({ id: 'instant_cooked_rice', overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'ramen', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
+      ingredient({ id: 'instant_cooked_rice', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
       ingredient({ id: 'egg' }),
-      ingredient({ id: 'onion', overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'onion', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
       ingredient({ id: 'green_onion' }),
       ingredient({ id: 'kimchi' }),
       ingredient({ id: 'milk' }),
-      ingredient({ id: 'white_bread', overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'white_bread', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
       ingredient({ id: 'butter' }),
-      ingredient({ id: 'tuna_can', overrides: { storage_location: 'room_temp' } }),
+      ingredient({ id: 'tuna_can', overrides: { storage_location: StorageLocation.ROOM_TEMPERATURE } }),
     ],
   },
 ];

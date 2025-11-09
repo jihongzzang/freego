@@ -6,7 +6,7 @@
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { ShoppingState, ShoppingIntent, ShoppingEffect } from './types';
-import { storage } from '@/lib/storage';
+import { shoppingService } from '@/services/shopping.service';
 
 /**
  * Shopping Middleware
@@ -19,7 +19,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
   switch (intent.type) {
     case 'LOAD_SHOPPING_LIST': {
       try {
-        const items = await storage.getShoppingList();
+        const items = await shoppingService.getShoppingList();
         return {
           state: {
             ...state,
@@ -42,12 +42,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
     case 'TOGGLE_PURCHASED': {
       try {
-        await storage.updateShoppingItem(intent.payload.id, {
+        await shoppingService.updateShoppingItem(Number(intent.payload.id), {
           is_purchased: !intent.payload.currentStatus,
         });
 
         // 다시 로드
-        const items = await storage.getShoppingList();
+        const items = await shoppingService.getShoppingList();
         return {
           state: {
             ...state,
@@ -59,9 +59,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '오류',
                 message: '상태 변경에 실패했어요.',
                 variant: 'error',
               },
@@ -77,10 +76,11 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
+              title: '장보기 목록 삭제',
               message: `"${intent.payload.name}"을(를) 장보기 목록에서 삭제할까요?`,
               onConfirm: async () => {
                 try {
-                  await storage.deleteShoppingItem(intent.payload.id);
+                  await shoppingService.deleteShoppingItem(Number(intent.payload.id));
                   // 삭제 후 목록 새로고침을 위한 LOAD_SHOPPING_LIST intent 발행은
                   // 컴포넌트에서 처리하도록 함
                 } catch (error) {
@@ -99,9 +99,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '입력 오류',
                 message: '재료 이름을 입력해주세요.',
                 variant: 'warning',
               },
@@ -111,24 +110,23 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
       }
 
       try {
-        await storage.addToShoppingList({
+        await shoppingService.addToShoppingList({
           name: state.addForm.name.trim(),
           category: state.addForm.category,
         });
 
-        const items = await storage.getShoppingList();
+        const items = await shoppingService.getShoppingList();
         return {
           state: {
             ...state,
             shoppingList: items,
             isAddingItem: false,
-            addForm: { name: '', category: 'vegetables' },
+            addForm: { name: '', category: 1 },
           },
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '',
                 message: '장보기 목록에 추가됐어요.',
                 variant: 'success',
               },
@@ -140,9 +138,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '오류',
                 message: '항목 추가에 실패했어요.',
                 variant: 'error',
               },
@@ -159,9 +156,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '',
                 message: '구매한 항목이 없어요.',
                 variant: 'info',
               },
@@ -175,12 +171,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '',
+              title: '구매 완료 항목 삭제',
               message: `${purchasedItems.length}개의 구매 완료 항목을 삭제할까요?`,
               onConfirm: async () => {
                 try {
                   for (const item of purchasedItems) {
-                    await storage.deleteShoppingItem(item.id);
+                    await shoppingService.deleteShoppingItem(item.id);
                   }
                   // 삭제 후 목록 새로고침은 컴포넌트에서 처리
                 } catch (error) {
@@ -203,9 +199,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '',
                 message: '구매 예정 항목이 없어요.',
                 variant: 'info',
               },
@@ -219,11 +214,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
+              title: '구매 예정 항목 삭제',
               message: `${unpurchasedItems.length}개의 구매 예정 항목을 삭제할까요?`,
               onConfirm: async () => {
                 try {
                   for (const item of unpurchasedItems) {
-                    await storage.deleteShoppingItem(item.id);
+                    await shoppingService.deleteShoppingItem(item.id);
                   }
                   // 삭제 후 목록 새로고침은 컴포넌트에서 처리
                 } catch (error) {

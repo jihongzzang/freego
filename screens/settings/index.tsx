@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useMemo } from 'react';
 import { useTheme } from '@/lib/theme';
-import Header from '@/components/Header';
+import Header from '@/components/ui/Header';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSettingsLogic } from './hooks/useSettingsLogic';
 import { NotificationSettings } from './components/NotificationSettings';
@@ -45,25 +45,17 @@ export default function SettingsScreen() {
           onRequestPermission={requestNotificationPermission}
           onUpdateDays={updateNotificationDays}
         />
-
         <ThemeSettings
           isDark={isDark}
           themePreference={themePreference}
           onToggleTheme={toggleTheme}
           onResetToSystem={resetThemeToSystem}
         />
-
         <DataManagement onDeleteAllData={handleDeleteAllData} />
-
         <FeedbackSection onSendFeedback={sendFeedback} />
-
         <AppInfo />
-
         <View style={styles.footer}>
           <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>프리고 앱</Text>
-          <Text style={[typography.styles.t7, { color: colors.textTertiary, marginTop: spacing.xs }]}>
-            음식물 쓰레기를 줄이고 현명한 소비를
-          </Text>
         </View>
       </ScrollView>
     </View>

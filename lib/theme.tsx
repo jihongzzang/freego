@@ -30,11 +30,9 @@ export type ColorPalette = {
 
   primary: string;
   primaryLight: string;
-  primaryDark: string;
 
   secondary: string;
   secondaryLight: string;
-  secondaryDark: string;
 
   danger: string;
   dangerLight: string;
@@ -51,8 +49,6 @@ export type ColorPalette = {
   textDisabled: string;
 
   border: string;
-  borderLight: string;
-  borderStrong: string;
   borderFocus: string;
   borderError: string;
   borderSuccess: string;
@@ -164,41 +160,37 @@ export const Colors: Record<'light' | 'dark', ColorPalette> = {
     white: '#FFFFFF',
     black: '#000000',
 
-    background: '#F9FAFB',
+    background: '#F2F4F6',
 
     surface: '#FFFFFF',
-    surfaceSecondary: '#F2F4F6', // grey100
+    surfaceSecondary: '#F2F4F6',
 
-    primary: '#15C67F', // green400
-    primaryLight: '#3FD599', // green300
-    primaryDark: '#02A262', // green600
+    primary: '#02A262',
+    primaryLight: '#77E4B8',
 
-    secondary: '#ff9900', // orange500
-    secondaryLight: '#fff3e0', // orange50
-    secondaryDark: '#f57600', // orange700
+    secondary: '#ffa929',
+    secondaryLight: '#fff3e0',
 
-    danger: '#f04251', // red500
-    dangerLight: '#fff0f0', // red50
+    danger: '#f66571',
+    dangerLight: '#fff0f0',
 
-    success: '#15C67F', // green400
-    successLight: '#F0FAF6', // green50
+    success: '#15C67F',
+    successLight: '#F0FAF6',
 
-    warning: '#ffc342', // yellow500
-    warningLight: '#fff9e5', // yellow50
+    warning: '#ffc342',
+    warningLight: '#fff9e5',
 
-    text: '#191F28', // grey900 기반
-    textSecondary: '#4E5968', // grey700 기반
-    textTertiary: '#9CA3AF', // grey400 기반
-    textDisabled: '#AFB7C0', // grey400
+    text: '#191F28',
+    textSecondary: '#4E5968',
+    textTertiary: '#9CA3AF',
+    textDisabled: '#AFB7C0',
 
-    border: '#E5E7EB', // grey200
-    borderLight: '#F2F4F6', // grey100
-    borderStrong: '#d1d6db', // grey300
-    borderFocus: '#66C08A', // primary
-    borderError: '#F04452', // danger
-    borderSuccess: '#10B981', // success
+    border: '#F2F4F6',
+    borderFocus: '#02A262',
+    borderError: '#f66571',
+    borderSuccess: '#15C67F',
 
-    overlay: 'rgba(0, 0, 0, 0.5)',
+    overlay: 'rgba(0, 0, 0, 0.2)',
 
     blue50: '#e5f2ff',
     blue100: '#c7e1ff',
@@ -273,9 +265,9 @@ export const Colors: Record<'light' | 'dark', ColorPalette> = {
     grey400: '#afb7c0',
     grey500: '#8c95a1',
     grey600: '#6c7684',
-    grey700: '#4f5a69',
-    grey800: '#333d48',
-    grey900: '#1a2029',
+    grey700: '#4e5968',
+    grey800: '#333d4b',
+    grey900: '#191f28',
 
     greyOpactiy50: 'rgba(0, 23, 51, 0.02)',
     greyOpactiy100: 'rgba(2, 32, 71, 0.05)',
@@ -303,39 +295,35 @@ export const Colors: Record<'light' | 'dark', ColorPalette> = {
     white: '#FFFFFF',
     black: '#000000',
 
-    background: '#1a2029', // grey900
+    background: '#101013',
 
-    surface: '#333d48', // grey800
-    surfaceSecondary: '#4f5a69', // grey700
+    surface: '#17171c',
+    surfaceSecondary: '#4f5a69',
 
-    primary: '#3FD599', // green300
-    primaryLight: '#77E4B8', // green200
-    primaryDark: '#15C67F', // green400
+    primary: '#02A262',
+    primaryLight: '#77E4B8',
 
-    secondary: '#ffa929', // orange400
-    secondaryLight: '#fff3e0', // orange50
-    secondaryDark: '#eb6600', // orange800
+    secondary: '#ffa929',
+    secondaryLight: '#fff3e0',
 
-    danger: '#f66571', // red400
-    dangerLight: '#fff0f0', // red50
+    danger: '#f04251',
+    dangerLight: '#fff0f0',
 
-    success: '#15C67F', // green400
-    successLight: '#F0FAF6', // green50
+    success: '#15C67F',
+    successLight: '#F0FAF6',
 
-    warning: '#ffc342', // yellow500
-    warningLight: '#fff9e5', // yellow50
+    warning: '#ffc342',
+    warningLight: '#fff9e5',
 
-    text: '#F9FAFB', // grey50
-    textSecondary: '#d1d6db', // grey300
-    textTertiary: '#8c95a1', // grey500
-    textDisabled: '#4f5a69', // grey700
+    text: '#F9FAFB',
+    textSecondary: '#d1d6db',
+    textTertiary: '#8c95a1',
+    textDisabled: '#4f5a69',
 
-    border: '#6c7684', // grey600
-    borderLight: '#4f5a69', // grey700
-    borderStrong: '#8c95a1', // grey500
-    borderFocus: '#3FD599', // primary (green300)
-    borderError: '#f66571', // danger (red400)
-    borderSuccess: '#15C67F', // success (green400)
+    border: '#33333C',
+    borderFocus: '#02A262',
+    borderError: '#f04251',
+    borderSuccess: '#15C67F',
 
     overlay: 'rgba(2, 9, 19, 0.91)', // greyOpacity900
 
@@ -758,6 +746,30 @@ export const typography = {
       fontSize: scaleFontSize(13),
       fontWeight: '700' as const,
       lineHeight: scaleFontSize(13 * 1.5),
+    },
+
+    /** t8 - (11) */
+    t8Medium: {
+      fontFamily: 'Pretendard-Medium',
+      fontSize: scaleFontSize(11),
+      fontWeight: '500' as const,
+      lineHeight: scaleFontSize(11 * 1.5),
+    },
+
+    /** t11 - (14) */
+    t11Bold: {
+      fontFamily: 'Pretendard-Medium',
+      fontSize: scaleFontSize(14),
+      fontWeight: '700' as const,
+      lineHeight: scaleFontSize(14 * 1.5),
+    },
+
+    /** t12 - (12) */
+    t12Bold: {
+      fontFamily: 'Pretendard-Medium',
+      fontSize: scaleFontSize(12),
+      fontWeight: '700' as const,
+      lineHeight: scaleFontSize(12 * 1.5),
     },
   } satisfies Record<string, TextStyle>,
 };

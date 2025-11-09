@@ -17,7 +17,7 @@ export function NotificationSettings({
   onRequestPermission,
   onUpdateDays,
 }: NotificationSettingsProps) {
-  const { colors, typography, spacing, borderRadius } = useTheme();
+  const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
 
@@ -81,12 +81,12 @@ export function NotificationSettings({
               style={[
                 styles.notificationOption,
                 {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.borderLight,
+                  backgroundColor: isDark ? colors.grey800 : colors.grey100,
+                  borderColor: isDark ? colors.grey800 : colors.grey100,
                 },
                 notificationDays === days && {
-                  backgroundColor: colors.surfaceSecondary,
-                  borderColor: colors.border,
+                  backgroundColor: colors.primary,
+                  borderColor: colors.primary,
                 },
               ]}
               onPress={() => onUpdateDays(days)}
@@ -97,7 +97,7 @@ export function NotificationSettings({
                   typography.styles.t6Medium,
                   { color: colors.textSecondary },
                   notificationDays === days && {
-                    color: colors.text,
+                    color: colors.white,
                   },
                 ]}
               >

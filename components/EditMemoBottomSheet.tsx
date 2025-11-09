@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '@/lib/theme';
-import BottomSheet from '@/components/BottomSheet';
+import BottomSheet from '@/components/ui/BottomSheet';
+import { Button } from './ui';
 
 interface EditMemoBottomSheetProps {
   visible: boolean;
@@ -17,10 +18,10 @@ export default function EditMemoBottomSheet({
   onMemoChange,
   onSubmit,
 }: EditMemoBottomSheetProps) {
-  const { colors, typography } = useTheme();
+  const { colors, typography, isDark, spacing } = useTheme();
 
   return (
-    <BottomSheet maxHeight={350} visible={visible} onClose={onClose} title={memo ? '메모 수정' : '메모 추가'}>
+    <BottomSheet maxHeight={360} visible={visible} onClose={onClose} title={memo ? '메모 수정' : '메모 추가'}>
       <View style={styles.container}>
         <View style={styles.content}>
           <TextInput
@@ -48,31 +49,15 @@ export default function EditMemoBottomSheet({
           style={[
             styles.confirmButtonContainer,
             {
-              backgroundColor: colors.background,
-              borderTopColor: colors.border,
+              backgroundColor: isDark ? '#202027' : colors.white,
+              paddingVertical: spacing.xl,
+              paddingHorizontal: spacing.xl,
             },
           ]}
         >
-          <TouchableOpacity
-            style={[
-              styles.confirmButton,
-              {
-                backgroundColor: colors.primary,
-              },
-            ]}
-            onPress={onSubmit}
-          >
-            <Text
-              style={[
-                typography.styles.st8Semibold,
-                {
-                  color: '#FFFFFF',
-                },
-              ]}
-            >
-              저장
-            </Text>
-          </TouchableOpacity>
+          <Button size="large" variant="primary" onPress={onSubmit}>
+            저장
+          </Button>
         </View>
       </View>
     </BottomSheet>
@@ -82,28 +67,20 @@ export default function EditMemoBottomSheet({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    maxHeight: 272,
+    paddingTop: 12,
   },
   content: {
-    padding: 20,
-    paddingBottom: 20,
+    paddingHorizontal: 20,
   },
   input: {
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderWidth: 1,
-    minHeight: 120,
+    minHeight: 170,
   },
   confirmButtonContainer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderTopWidth: 1,
-  },
-  confirmButton: {
-    paddingVertical: 20,
-    borderRadius: 20,
-    alignItems: 'center',
-    width: '100%',
   },
 });

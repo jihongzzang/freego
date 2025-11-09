@@ -19,7 +19,7 @@ export function ViewModeTabs({ viewMode, onChangeMode }: ViewModeTabsProps) {
         style={[
           styles.tab,
           {
-            borderBottomColor: viewMode === 'category' ? (isDark ? colors.grey600 : colors.text) : 'transparent',
+            borderBottomColor: viewMode === 'category' ? (isDark ? colors.grey600 : colors.grey800) : 'transparent',
           },
         ]}
         onPress={() => onChangeMode('category')}
@@ -28,7 +28,7 @@ export function ViewModeTabs({ viewMode, onChangeMode }: ViewModeTabsProps) {
         <Text
           style={[
             typography.styles.t5Semibold,
-            { color: viewMode === 'category' ? (isDark ? colors.white : colors.text) : colors.textTertiary },
+            { color: viewMode === 'category' ? (isDark ? colors.white : colors.grey900) : colors.textTertiary },
           ]}
         >
           카테고리별
@@ -38,7 +38,7 @@ export function ViewModeTabs({ viewMode, onChangeMode }: ViewModeTabsProps) {
         style={[
           styles.tab,
           {
-            borderBottomColor: viewMode === 'storage' ? (isDark ? colors.grey600 : colors.text) : 'transparent',
+            borderBottomColor: viewMode === 'storage' ? (isDark ? colors.grey600 : colors.grey800) : 'transparent',
           },
         ]}
         onPress={() => onChangeMode('storage')}
@@ -47,7 +47,7 @@ export function ViewModeTabs({ viewMode, onChangeMode }: ViewModeTabsProps) {
         <Text
           style={[
             typography.styles.t5Semibold,
-            { color: viewMode === 'storage' ? (isDark ? colors.white : colors.text) : colors.textTertiary },
+            { color: viewMode === 'storage' ? (isDark ? colors.white : colors.grey900) : colors.textTertiary },
           ]}
         >
           보관위치별

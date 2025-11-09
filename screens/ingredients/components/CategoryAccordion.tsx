@@ -2,21 +2,20 @@ import Accordion from '@/components/ui/Accordion';
 import Card from '@/components/ui/Card';
 import EmptyStateUI from '@/components/ui/EmptyState';
 import { Ingredient } from '@/mvi/features/ingredients';
-import { getCategoryIcon } from '@/utils/getCategoryIcons';
-import { findCategoryById, CategoryType } from '@/constants/categories';
+import { Category } from '@/data/enums/category';
+import { getCategoryIcon, getCategoryLabel } from '@/utils/category';
 import { IngredientItem } from './IngredientItem';
 import { useTheme } from '@/lib/theme';
 import { Text } from 'react-native';
 
 interface CategoryAccordionProps {
-  categoryId: CategoryType;
+  categoryId: Category;
   items: Ingredient[];
   isExpanded: boolean;
   onToggle: () => void;
   onItemPress: (id: string) => void;
   onItemEdit: (id: string) => void;
   onQuickDeduct: (id: string) => void;
-  getDaysRemaining: (daysRemaining: number | null) => string;
 }
 
 export function CategoryAccordion({
@@ -27,19 +26,16 @@ export function CategoryAccordion({
   onItemPress,
   onItemEdit,
   onQuickDeduct,
-  getDaysRemaining,
 }: CategoryAccordionProps) {
-  const categoryItem = findCategoryById(categoryId);
-
   const { colors, typography } = useTheme();
 
   return (
     <Accordion
-      title={categoryItem?.krLabel || ''}
+      title={getCategoryLabel({ category: categoryId, lang: 'kr' })}
       leftIcon={getCategoryIcon(categoryId, 20)}
       badge={
         items.length > 0 ? (
-          <Text style={[typography.styles.t7Bold, { color: colors.grey500 }]}>{items.length}</Text>
+          <Text style={[typography.styles.t7Bold, { color: colors.textSecondary }]}>{items.length}</Text>
         ) : undefined
       }
       defaultExpanded={isExpanded}
@@ -51,10 +47,9 @@ export function CategoryAccordion({
             <IngredientItem
               key={item.id}
               item={item}
-              onPress={() => onItemPress(item.id)}
-              onEdit={() => onItemEdit(item.id)}
-              onQuickDeduct={() => onQuickDeduct(item.id)}
-              getDaysRemaining={getDaysRemaining}
+              onPress={() => onItemPress(String(item.id))}
+              onEdit={() => onItemEdit(String(item.id))}
+              onQuickDeduct={() => onQuickDeduct(String(item.id))}
             />
           ))}
         </Card>

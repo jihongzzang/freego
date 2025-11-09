@@ -14,11 +14,10 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
       return {
         effects: [
           {
-            type: 'SHOW_ALERT',
+            type: 'SHOW_TOAST',
             payload: {
-              title: '',
               message: `알림 주기가 ${intent.payload}일로 변경됐어요.`,
-              type: 'success',
+              variant: 'success',
             },
           },
         ],

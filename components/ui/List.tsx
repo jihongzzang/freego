@@ -30,24 +30,20 @@ export function ListItem({
   const content = (
     <View style={[styles.item, style]}>
       {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
-
       <View style={styles.content}>
-        <Text style={[typography.styles.t5, { color: colors.text }]}>{title}</Text>
+        <Text style={[typography.styles.t6, { color: colors.text }]}>{title}</Text>
         {description && (
-          <Text style={[typography.styles.t7, { color: colors.textSecondary, marginTop: spacing.xs }]}>
+          <Text style={[typography.styles.t6, { color: colors.textSecondary, marginTop: spacing.xs }]}>
             {description}
           </Text>
         )}
       </View>
-
       {rightText && (
         <Text style={[typography.styles.t6, { color: colors.textSecondary, marginRight: spacing.sm }]}>
           {rightText}
         </Text>
       )}
-
       {rightIcon && <View style={styles.rightIcon}>{rightIcon}</View>}
-
       {showChevron && <ChevronRight size={20} color={colors.textTertiary} />}
     </View>
   );
@@ -77,7 +73,7 @@ export function List({ children, showDividers = true, style }: ListProps) {
       {childArray.map((child, index) => (
         <React.Fragment key={index}>
           {child}
-          {showDividers && index < childArray.length - 1 && <Divider style={styles.divider} />}
+          {showDividers && index < childArray.length - 1 && <Divider />}
         </React.Fragment>
       ))}
     </View>
@@ -99,9 +95,5 @@ const styles = StyleSheet.create({
   },
   rightIcon: {
     marginLeft: 8,
-  },
-  divider: {
-    marginLeft: 16,
-    marginRight: 16,
   },
 });

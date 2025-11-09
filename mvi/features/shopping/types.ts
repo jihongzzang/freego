@@ -3,8 +3,8 @@
  */
 
 import { Intent, State, Effect } from '@/mvi/base';
-import { ShoppingItem } from '@/lib/storage';
-import { CategoryType } from '@/constants/categories';
+import { ShoppingItem } from '@/data/models/shopping.model';
+import { Category } from '@/data/enums/category';
 
 /**
  * Shopping State
@@ -16,7 +16,7 @@ export interface ShoppingState extends State {
   isAddingItem: boolean;
   addForm: {
     name: string;
-    category: CategoryType;
+    category: Category;
   };
 }
 
@@ -44,19 +44,18 @@ export type ShoppingIntent =
  */
 export type ShoppingEffect =
   | {
-      type: 'SHOW_ALERT';
-      payload: {
-        title: string;
-        message: string;
-        variant: 'success' | 'info' | 'warning' | 'error';
-      };
-    }
-  | {
       type: 'SHOW_CONFIRM';
       payload: {
         title?: string;
         message: string;
         onConfirm: () => void;
         isDanger?: boolean;
+      };
+    }
+  | {
+      type: 'SHOW_TOAST';
+      payload: {
+        message: string;
+        variant: 'success' | 'info' | 'warning' | 'error';
       };
     };

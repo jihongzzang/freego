@@ -23,7 +23,7 @@ export function DataManagement({ onDeleteAllData }: DataManagementProps) {
       <Card variant="elevated" padding="large">
         <TouchableOpacity style={styles.deleteButton} onPress={onDeleteAllData} activeOpacity={0.7}>
           <View style={styles.deleteButtonText}>
-            <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>냉장고 데이터 삭제</Text>
+            <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>냉장고 데이터 삭제</Text>
             <Text style={[typography.styles.t7, { color: colors.textSecondary, marginTop: spacing.xs }]}>
               등록된 모든 재료가 삭제돼요
             </Text>

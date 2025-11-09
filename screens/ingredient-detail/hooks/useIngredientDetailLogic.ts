@@ -3,6 +3,7 @@ import { BackHandler } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
 import { useDialog } from '@/contexts/DialogContext';
+import { useToast } from '@/components/ui';
 import { useMVIStore } from '@/mvi/base';
 import { createIngredientDetailStore, EditFormData } from '@/mvi/features/ingredient-detail';
 import { useUnitPicker } from '@/hooks/useUnitPicker';
@@ -12,13 +13,14 @@ import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 export function useIngredientDetailLogic() {
   const router = useRouter();
   const { id, mode } = useLocalSearchParams();
-  const { alert, confirm } = useDialog();
+  const { confirm } = useDialog();
+  const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createIngredientDetailStore);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<IngredientTemplate | null>(null);
   const processedEffectRef = useRef<typeof effect>(null);
 
-  const handleFieldChange = (field: keyof EditFormData, value: string) => {
+  const handleFieldChange = (field: keyof EditFormData, value: any) => {
     dispatch({ type: 'UPDATE_FORM_FIELD', payload: { field, value } });
   };
 
@@ -27,17 +29,17 @@ export function useIngredientDetailLogic() {
   });
 
   const expiryDatePicker = useExpiryDatePicker({
-    onDateConfirm: (formattedDate) => handleFieldChange('expiry_date', formattedDate),
+    onDateConfirm: (date) => handleFieldChange('expiry_date', date),
   });
 
   const purchaseDatePicker = useExpiryDatePicker({
-    onDateConfirm: (formattedDate) => handleFieldChange('purchase_date', formattedDate),
+    onDateConfirm: (date) => handleFieldChange('purchased_date', date),
   });
 
   // 식재료 데이터 로드
   useEffect(() => {
-    if (id) {
-      dispatch({ type: 'LOAD_INGREDIENT', payload: id as string });
+    if (id && !isNaN(Number(id))) {
+      dispatch({ type: 'LOAD_INGREDIENT', payload: Number(id) });
     }
   }, [id, dispatch]);
 
@@ -69,9 +71,8 @@ export function useIngredientDetailLogic() {
     processedEffectRef.current = effect;
 
     switch (effect.type) {
-      case 'SHOW_ALERT':
-        alert({
-          title: effect.payload.title,
+      case 'SHOW_TOAST':
+        showToast({
           message: effect.payload.message,
           type: effect.payload.variant,
         });
@@ -83,15 +84,17 @@ export function useIngredientDetailLogic() {
           message: effect.payload.message,
           onConfirm: async () => {
             const result = await effect.payload.onConfirm();
-            if (effect.payload.title?.includes('삭제')) {
+
+            // 삭제 성공
+            if (effect.payload.isDanger && result && result.success) {
               dispatch({ type: 'DELETE_SUCCESS' });
-            } else if (effect.payload.title?.includes('소모')) {
-              if (result && result.success && result.ingredientName) {
-                dispatch({
-                  type: 'CONSUME_SUCCESS',
-                  payload: { name: result.ingredientName },
-                });
-              }
+            }
+            // 소모 성공
+            else if (!effect.payload.isDanger && result && result.success && result.ingredientName) {
+              dispatch({
+                type: 'CONSUME_SUCCESS',
+                payload: { name: result.ingredientName },
+              });
             }
           },
           onCancel: undefined,
@@ -105,7 +108,7 @@ export function useIngredientDetailLogic() {
         router.back();
         break;
     }
-  }, [effect, alert, confirm, router, dispatch]);
+  }, [effect, confirm, showToast, router, dispatch]);
 
   // Android 시스템 백버튼 핸들링
   useEffect(() => {
@@ -135,10 +138,7 @@ export function useIngredientDetailLogic() {
   const handleQuickSelect = (days: number) => {
     const date = new Date();
     date.setDate(date.getDate() + days);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
+    const formattedDate = date.toISOString();
     handleFieldChange('expiry_date', formattedDate);
   };
 

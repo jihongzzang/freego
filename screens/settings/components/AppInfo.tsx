@@ -21,7 +21,7 @@ export function AppInfo() {
         <List>
           <ListItem title="버전" rightText="1.0.0" />
           <ListItem title="개발자" rightText="주민준, laonzenamoon" />
-          <ListItem title="문의" rightText="jujihong2@gmail.com, laonzenamoon@gmail.com" />
+          <ListItem title="문의" rightText="jujihong2@gmail.com" />
         </List>
       </Card>
     </View>

@@ -3,10 +3,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/lib/theme';
 import { EditFormData } from '@/mvi/features/ingredient-detail';
 import { QUICK_SELECT_OPTIONS } from '@/constants/quickSelectOptions';
+import { useMemo } from 'react';
+import { toLocalDate } from '@/utils/time';
 
 interface DateSectionProps {
-  purchaseDate: string;
-  expiryDate: string;
+  isEdit: boolean;
+  purchaseDate?: string;
+  expiryDate?: string;
   onFieldChange: (field: keyof EditFormData, value: string) => void;
   onPurchaseDatePress: () => void;
   onExpiryDatePress: () => void;
@@ -14,6 +17,7 @@ interface DateSectionProps {
 }
 
 export function DateSection({
+  isEdit,
   purchaseDate,
   expiryDate,
   onFieldChange,
@@ -22,7 +26,10 @@ export function DateSection({
   onQuickSelect,
 }: DateSectionProps) {
   const { colors, typography, spacing, borderRadius } = useTheme();
-  const today = new Date().toISOString().split('T')[0];
+
+  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
+
+  const today = new Date().toISOString();
 
   return (
     <>
@@ -30,30 +37,17 @@ export function DateSection({
       <View style={styles.container}>
         <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>구매일</Text>
-          <TouchableOpacity
-            style={styles.checkboxRow}
-            onPress={() => {
-              if (purchaseDate) {
-                onFieldChange('purchase_date', '');
-              } else {
-                onFieldChange('purchase_date', today);
-              }
-            }}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                {
-                  borderColor: purchaseDate === today ? colors.primary : colors.border,
-                  backgroundColor: purchaseDate === today ? colors.primary : 'transparent',
-                },
-              ]}
+          {!isEdit && (
+            <TouchableOpacity
+              style={[styles.sameCreatedButton, { backgroundColor: colors.surface, borderColor: colors.surface }]}
+              onPress={() => {
+                onFieldChange('purchased_date', today);
+              }}
+              activeOpacity={0.7}
             >
-              {purchaseDate === today && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
-            </View>
-            <Text style={[typography.styles.t7, { color: colors.textTertiary }]}>등록일과 동일</Text>
-          </TouchableOpacity>
+              <Text style={[typography.styles.t7, { color: colors.textTertiary }]}>등록일과 동일</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <TouchableOpacity
@@ -76,7 +70,7 @@ export function DateSection({
               },
             ]}
           >
-            {purchaseDate || '날짜 선택'}
+            {purchaseDate ? toLocalDate(purchaseDate) : '날짜 선택'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -93,13 +87,13 @@ export function DateSection({
                 styles.quickSelectBtn,
                 {
                   backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  borderRadius: borderRadius.md,
+                  borderColor: colors.surface,
+                  borderRadius: 6,
                 },
               ]}
               onPress={() => onQuickSelect(option.days)}
             >
-              <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>{option.krLabel}</Text>
+              <Text style={[typography.styles.t7, { color: colors.textTertiary }]}>{option.krLabel}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -132,45 +126,52 @@ export function DateSection({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    gap: 8,
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderWidth: 1,
-  },
-  quickSelectContainer: {
-    flexDirection: 'row',
-    gap: 4,
-    flexWrap: 'wrap',
-  },
-  quickSelectBtn: {
-    flex: 1,
-    minWidth: '22%',
-    paddingHorizontal: 8,
-    paddingVertical: 10,
-    borderWidth: 1,
-    alignItems: 'center',
-  },
-});
+const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
+  StyleSheet.create({
+    container: {
+      gap: spacing.sm,
+    },
+    row: {
+      flexDirection: 'row',
+    },
+    checkboxRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    checkbox: {
+      width: 20,
+      height: 20,
+      borderRadius: 4,
+      borderWidth: 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    dateButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 14,
+      borderWidth: 1,
+    },
+    quickSelectContainer: {
+      flexDirection: 'row',
+      gap: 4,
+      flexWrap: 'wrap',
+    },
+    quickSelectBtn: {
+      flex: 1,
+      minWidth: '22%',
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderWidth: 1,
+      alignItems: 'center',
+    },
+    sameCreatedButton: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      borderRadius: 6,
+      borderWidth: 1,
+    },
+  });

@@ -1,7 +1,7 @@
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useMemo } from 'react';
 import { useTheme } from '@/lib/theme';
-import Header from '@/components/Header';
+import Header from '@/components/ui/Header';
 import SelectUnitBottomSheet from '@/components/SelectUnitBottomSheet';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
 import AddEmojiBottomSheet from '@/components/AddEmojiBottomSheet';
@@ -54,7 +54,7 @@ export default function AddIngredientScreen() {
               onFieldChange={handleFieldChange}
               onEmojiPress={() => setIsEmojiPickerVisible(true)}
               onUnitPress={unitPicker.open}
-              onPurchaseDatePress={() => purchaseDatePicker.open(state.form.purchase_date || new Date())}
+              onPurchaseDatePress={() => purchaseDatePicker.open(state.form.purchased_date || new Date())}
               onExpiryDatePress={() => expiryDatePicker.open(state.form.expiry_date || new Date())}
               onQuickSelect={handleQuickSelect}
             />

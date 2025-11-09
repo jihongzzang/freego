@@ -1,14 +1,16 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Check, Trash2, MessageSquare, Refrigerator } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
-import { getCategoryColor } from '@/utils/getCategoryColors';
-import { findCategoryById, CategoryType } from '@/constants/categories';
+import { getCategoryColor } from '@/utils/category/getCategoryColor';
+import { getCategoryLabel } from '@/utils/category/getCategoryLabel';
+import { Category } from '@/data/enums/category';
 import { useMemo } from 'react';
+import { Chip } from '@/components/ui';
 
 interface ShoppingItemProps {
   id: string;
   name: string;
-  category: CategoryType;
+  category: Category;
   isPurchased: boolean;
   memo?: string;
   onToggle: () => void;
@@ -72,7 +74,7 @@ export function ShoppingItem({
               ]}
             >
               <Text style={[typography.styles.t7Bold, { color: getCategoryColor(category) }]}>
-                {findCategoryById(category)?.krLabel}
+                {getCategoryLabel({ category, lang: 'kr' })}
               </Text>
             </View>
           </View>

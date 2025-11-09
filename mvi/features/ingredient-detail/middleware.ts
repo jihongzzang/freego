@@ -5,26 +5,10 @@
  */
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
-import { IngredientDetailState, IngredientDetailIntent, IngredientDetailEffect, Ingredient } from './types';
-import { storage } from '@/lib/storage';
-import { StatusType } from '@/constants/itemStatus';
-
-/**
- * 유통기한 상태 계산
- */
-function calculateStatus(expiryDate: string | null | undefined): StatusType {
-  if (!expiryDate) return 'not_set';
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const expiry = new Date(expiryDate);
-  expiry.setHours(0, 0, 0, 0);
-  const diffTime = expiry.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) return 'expired';
-  return 'valid';
-}
+import { IngredientDetailState, IngredientDetailIntent, IngredientDetailEffect } from './types';
+import { ingredientService } from '@/services/ingredient.service';
+import { shoppingService } from '@/services/shopping.service';
+import { Ingredient } from '@/data/models/ingredient.model';
 
 /**
  * Ingredient Detail Middleware
@@ -37,12 +21,17 @@ export const ingredientDetailMiddleware: Middleware<
   switch (intent.type) {
     case 'LOAD_INGREDIENT': {
       try {
-        const ingredients = await storage.getIngredients();
+        const ingredients = await ingredientService.getIngredients();
         const data = ingredients.find((item) => item.id === intent.payload);
 
+        if (!data) {
+          return {
+            state: { ...state, loading: false, error: '식재료를 찾을 수 없어요.' },
+          };
+        }
+
         if (data) {
-          const status = calculateStatus(data.expiry_date);
-          const ingredient: Ingredient = { ...data, status };
+          const ingredient: Ingredient = data;
 
           return {
             state: {
@@ -53,11 +42,11 @@ export const ingredientDetailMiddleware: Middleware<
                 emoji: data.emoji,
                 category: data.category,
                 quantity: data.quantity?.toString() || '',
-                unit: data.unit || '',
-                purchase_date: data.purchase_date || '',
-                expiry_date: data.expiry_date || '',
+                unit: data.unit,
+                purchased_date: data.purchased_date,
+                expiry_date: data.expiry_date,
                 storage_location: data.storage_location,
-                memo: data.memo || '',
+                memo: data.memo,
               },
               loading: false,
               error: null,
@@ -92,13 +81,15 @@ export const ingredientDetailMiddleware: Middleware<
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '',
+              title: '식재료 삭제',
               message: '이 식재료를 삭제할까요?',
               onConfirm: async () => {
                 try {
-                  await storage.deleteIngredient(state.ingredient!.id);
+                  await ingredientService.deleteIngredient(state.ingredient!.id);
+                  return { success: true };
                 } catch (error) {
                   console.error('Error deleting ingredient:', error);
+                  return { success: false };
                 }
               },
               isDanger: true,
@@ -125,15 +116,15 @@ export const ingredientDetailMiddleware: Middleware<
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '',
+              title: '식재료 소모',
               message: `${ingredient.name}을(를) 소모 처리할까요?\n장보기 목록에 자동으로 추가돼요.`,
               onConfirm: async () => {
                 try {
-                  await storage.addToShoppingList({
+                  await shoppingService.addToShoppingList({
                     name: ingredient.name,
                     category: ingredient.category,
                   });
-                  await storage.deleteIngredient(ingredient.id);
+                  await ingredientService.deleteIngredient(ingredient.id);
                   return { success: true, ingredientName };
                 } catch (error) {
                   console.error('Error consuming ingredient:', error);
@@ -150,9 +141,8 @@ export const ingredientDetailMiddleware: Middleware<
       return {
         effects: [
           {
-            type: 'SHOW_ALERT',
+            type: 'SHOW_TOAST',
             payload: {
-              title: '',
               message: `${intent.payload.name}이(가) 장보기 목록에 추가됐어요.`,
               variant: 'success',
             },
@@ -165,26 +155,39 @@ export const ingredientDetailMiddleware: Middleware<
     case 'UPDATE_INGREDIENT': {
       if (!state.ingredient) return {};
 
+      if (state.editForm.quantity?.trim() === '0') {
+        return {
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: {
+                message: '수량이 0개인 식재료는 등록할 수 없어요.',
+                variant: 'warning',
+              },
+            },
+          ],
+        };
+      }
+
       try {
-        await storage.updateIngredient(state.ingredient.id, {
+        await ingredientService.updateIngredient(state.ingredient.id, {
           name: state.editForm.name,
           emoji: state.editForm.emoji,
           category: state.editForm.category,
           quantity: state.editForm.quantity ? parseInt(state.editForm.quantity) || undefined : undefined,
           unit: state.editForm.unit as any,
-          purchase_date: state.editForm.purchase_date || undefined,
-          expiry_date: state.editForm.expiry_date || undefined,
+          purchased_date: state.editForm.purchased_date,
+          expiry_date: state.editForm.expiry_date,
           storage_location: state.editForm.storage_location,
           memo: state.editForm.memo,
         });
 
         // 업데이트 후 다시 로드
-        const ingredients = await storage.getIngredients();
+        const ingredients = await ingredientService.getIngredients();
         const data = ingredients.find((item) => item.id === state.ingredient!.id);
 
         if (data) {
-          const status = calculateStatus(data.expiry_date);
-          const ingredient: Ingredient = { ...data, status };
+          const ingredient: Ingredient = data;
 
           return {
             state: {
@@ -194,20 +197,19 @@ export const ingredientDetailMiddleware: Middleware<
                 name: data.name,
                 emoji: data.emoji,
                 category: data.category,
-                quantity: data.quantity?.toString() || '',
-                unit: data.unit || '',
-                purchase_date: data.purchase_date || '',
-                expiry_date: data.expiry_date || '',
+                quantity: data.quantity?.toString(),
+                unit: data.unit,
+                purchased_date: data.purchased_date,
+                expiry_date: data.expiry_date,
                 storage_location: data.storage_location,
-                memo: data.memo || '',
+                memo: data.memo,
               },
               isEditing: false,
             },
             effects: [
               {
-                type: 'SHOW_ALERT',
+                type: 'SHOW_TOAST',
                 payload: {
-                  title: '',
                   message: '식재료 정보가 업데이트됐어요.',
                   variant: 'success',
                 },
@@ -222,9 +224,8 @@ export const ingredientDetailMiddleware: Middleware<
         return {
           effects: [
             {
-              type: 'SHOW_ALERT',
+              type: 'SHOW_TOAST',
               payload: {
-                title: '',
                 message: '식재료 업데이트에 실패했어요.',
                 variant: 'error',
               },

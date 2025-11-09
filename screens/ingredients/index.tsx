@@ -2,9 +2,9 @@ import { View, StyleSheet, Animated } from 'react-native';
 import { useMemo } from 'react';
 import { QrCode, Edit3, Grid3x3 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
-import Header from '@/components/Header';
+import Header from '@/components/ui/Header';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import FloatingButton from '@/components/FloatingButton';
+import FloatingButton from '@/components/ui/FloatingButton';
 import BulkAddBottomSheet from '@/components/BulkAddBottomSheet';
 import EmptyStateUI from '@/components/ui/EmptyState';
 import { useIngredientsLogic } from './hooks/useIngredientsLogic';
@@ -41,7 +41,6 @@ export default function IngredientsScreen() {
     collapsedStorages,
     toggleCategory,
     toggleStorage,
-    getDaysRemaining,
   } = useIngredientsData(ingredients);
 
   const { headerTranslateY, contentOpacity, useNativeDriver } = useIngredientsAnimation(scrollY);
@@ -101,7 +100,6 @@ export default function IngredientsScreen() {
                   onItemPress={navigateToDetail}
                   onItemEdit={navigateToEdit}
                   onQuickDeduct={quickDeduct}
-                  getDaysRemaining={getDaysRemaining}
                 />
               );
             })}
@@ -122,7 +120,6 @@ export default function IngredientsScreen() {
                   onItemPress={navigateToDetail}
                   onItemEdit={navigateToEdit}
                   onQuickDeduct={quickDeduct}
-                  getDaysRemaining={getDaysRemaining}
                 />
               );
             })}
@@ -137,21 +134,21 @@ export default function IngredientsScreen() {
             label: '영수증으로 재료 등록',
             onPress: bulkAdd.handleRegisterReceipt,
             labelColor: colors.white,
-            backgroundColor: colors.blue500,
+            backgroundColor: colors.blue600,
           },
           {
             icon: <Edit3 size={24} color="#FFFFFF" />,
             label: '직접 재료 등록',
             onPress: handleAddDirect,
             labelColor: colors.white,
-            backgroundColor: colors.primary,
+            backgroundColor: colors.green600,
           },
           {
             icon: <Grid3x3 size={24} color="#FFFFFF" />,
             label: '한꺼번에 재료 등록',
             onPress: bulkAdd.open,
             labelColor: colors.white,
-            backgroundColor: colors.orange500,
+            backgroundColor: colors.orange600,
           },
         ]}
       />

@@ -6,14 +6,14 @@ import { createHomeStore, Ingredient } from '@/mvi/features/home';
 import { useRouter } from '@/hooks/useRouter';
 import { useExpiryDatePicker } from '@/hooks/useExpiryDatePicker';
 import { useBulkAdd } from '@/hooks/useBulkAdd';
-import { ALL_CATEGORY, AllCategoryType } from '@/constants/categories';
+import { Category } from '@/data/enums/category';
 
 export function useHomeLogic() {
   const router = useRouter();
   const scrollY = useRef(new Animated.Value(0)).current;
 
   // 선택된 카테고리 상태
-  const [selectedCategoryId, setSelectedCategoryId] = useState<AllCategoryType>(ALL_CATEGORY.id);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<Category | 0>(0);
 
   // 유통기한 수정 모달 상태
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
@@ -26,7 +26,7 @@ export function useHomeLogic() {
     if (!selectedIngredient) return;
     dispatch({
       type: 'UPDATE_EXPIRY_DATE',
-      payload: { id: selectedIngredient.id, expiryDate },
+      payload: { id: Number(selectedIngredient.id), expiryDate },
     });
   };
 
@@ -79,7 +79,7 @@ export function useHomeLogic() {
       onPress: () => {
         dispatch({
           type: 'NAVIGATE_TO_ADD',
-          payload: selectedCategoryId === ALL_CATEGORY.id ? undefined : selectedCategoryId,
+          payload: selectedCategoryId === 0 ? undefined : (selectedCategoryId as number),
         });
       },
     },

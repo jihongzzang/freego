@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Keyboard } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
-import { useDialog } from '@/contexts/DialogContext';
+import { useToast } from '@/components/ui';
 import { useMVIStore } from '@/mvi/base';
 import { createAddStore } from '@/mvi/features/add';
 import type { AddFormData } from '@/mvi/features/add';
@@ -10,18 +10,17 @@ import { useUnitPicker } from '@/hooks/useUnitPicker';
 import { useExpiryDatePicker } from '@/hooks/useExpiryDatePicker';
 import { usePurchaseDatePicker } from '@/hooks/usePurchateDatePicker';
 import { type IngredientTemplate } from '@/constants/ingredientTemplates';
-import { ALL_CATEGORY } from '@/constants/categories';
 
 export function useAddLogic() {
   const router = useRouter();
   const { category } = useLocalSearchParams<{ category?: string }>();
-  const { alert } = useDialog();
+  const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createAddStore);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<IngredientTemplate | null>(null);
 
-  const handleFieldChange = (field: keyof AddFormData, value: string) => {
+  const handleFieldChange = (field: keyof AddFormData, value: any) => {
     dispatch({ type: 'UPDATE_FIELD', payload: { field, value } });
   };
 
@@ -34,7 +33,7 @@ export function useAddLogic() {
   });
 
   const purchaseDatePicker = usePurchaseDatePicker({
-    onDateConfirm: (formattedDate) => handleFieldChange('purchase_date', formattedDate),
+    onDateConfirm: (formattedDate) => handleFieldChange('purchased_date', formattedDate),
   });
 
   // 키보드 이벤트 리스너
@@ -57,9 +56,8 @@ export function useAddLogic() {
     if (!effect) return;
 
     switch (effect.type) {
-      case 'SHOW_ALERT':
-        alert({
-          title: effect.payload.title,
+      case 'SHOW_TOAST':
+        showToast({
           message: effect.payload.message,
           type: effect.payload.variant,
         });
@@ -73,18 +71,11 @@ export function useAddLogic() {
         router.back();
         break;
     }
-  }, [effect, alert, router]);
-
-  // 초기 모드 설정
-  useEffect(() => {
-    if (state.mode === 'select') {
-      dispatch({ type: 'SET_MODE', payload: 'manual' });
-    }
-  }, [state.mode, dispatch]);
+  }, [effect, showToast, router]);
 
   // URL 파라미터로 전달된 카테고리를 초기값으로 설정
   useEffect(() => {
-    if (category && category !== ALL_CATEGORY.id) {
+    if (category) {
       handleFieldChange('category', category);
     }
   }, [category]);

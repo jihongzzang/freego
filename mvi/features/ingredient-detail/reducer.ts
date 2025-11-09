@@ -9,7 +9,7 @@ import { IngredientDetailState, IngredientDetailIntent } from './types';
 
 export const ingredientDetailReducer: Reducer<IngredientDetailState, IngredientDetailIntent> = (
   state,
-  intent
+  intent,
 ): IngredientDetailState => {
   switch (intent.type) {
     case 'LOAD_INGREDIENT':
@@ -30,9 +30,9 @@ export const ingredientDetailReducer: Reducer<IngredientDetailState, IngredientD
             emoji: state.ingredient.emoji,
             category: state.ingredient.category,
             quantity: state.ingredient.quantity?.toString() || '',
-            unit: state.ingredient.unit || '',
-            purchase_date: state.ingredient.purchase_date || '',
-            expiry_date: state.ingredient.expiry_date || '',
+            unit: state.ingredient.unit,
+            purchased_date: state.ingredient.purchased_date,
+            expiry_date: state.ingredient.expiry_date,
             storage_location: state.ingredient.storage_location,
             memo: state.ingredient.memo || '',
           },

@@ -28,9 +28,6 @@ export function ThemeSettings({ isDark, themePreference, onToggleTheme, onResetT
         <View style={styles.settingRow}>
           <View style={styles.settingInfo}>
             <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>다크 모드</Text>
-            <Text style={[typography.styles.t7, { color: colors.textSecondary, marginTop: spacing.xs }]}>
-              {themePreference === 'system' ? '시스템 설정 따름' : '어두운 테마 사용'}
-            </Text>
           </View>
           <Switch value={isDark} onValueChange={onToggleTheme} />
         </View>

@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { CategoryType } from '@/constants/categories';
-import { useDialog } from '@/contexts/DialogContext';
+import { Category } from '@/data/enums/category';
+
+import { useToast } from '@/components/ui';
 
 interface UseAddShoppingItemProps {
   onSuccess?: () => void;
 }
 
 export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
-  const { alert } = useDialog();
+  const { showToast } = useToast();
   const [isVisible, setIsVisible] = useState(false);
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<CategoryType>('vegetables');
+  const [category, setCategory] = useState<Category>(Category.VEGETABLE);
   const [memo, setMemo] = useState('');
 
   function open() {
@@ -20,7 +21,7 @@ export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
   function close() {
     setIsVisible(false);
     setName('');
-    setCategory('vegetables');
+    setCategory(Category.VEGETABLE);
     setMemo('');
   }
 
@@ -28,8 +29,8 @@ export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
     setName(text);
   }
 
-  function handleCategoryChange(categoryId: string) {
-    setCategory(categoryId as CategoryType);
+  function handleCategoryChange(categoryId: number) {
+    setCategory(categoryId as Category);
   }
 
   function handleMemoChange(text: string) {
@@ -43,9 +44,9 @@ export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
     }
 
     try {
-      const { storage } = await import('@/lib/storage');
+      const { shoppingService } = await import('@/services/shopping.service');
 
-      await storage.addToShoppingList({
+      await shoppingService.addToShoppingList({
         name: name.trim(),
         category,
         memo: memo.trim() || undefined,
@@ -58,15 +59,13 @@ export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
         props.onSuccess();
       }
 
-      alert({
-        title: '추가 완료',
+      showToast({
         message: `'${name.trim()}'을(를) 장보기 목록에 추가했어요.`,
         type: 'success',
       });
     } catch (error) {
       console.error('Error adding shopping item:', error);
-      alert({
-        title: '오류',
+      showToast({
         message: '장보기 목록 추가 중 오류가 발생했어요.',
         type: 'error',
       });

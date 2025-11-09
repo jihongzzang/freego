@@ -2,12 +2,12 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { useMemo } from 'react';
 import { ShoppingCart, Share2, Plus } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
-import Header from '@/components/Header';
+import Header from '@/components/ui/Header';
 import AddShoppingListBottomSheet from '@/components/AddShoppingListBottomSheet';
 import EditMemoBottomSheet from '@/components/EditMemoBottomSheet';
 import SelectStorageBottomSheet from '@/components/SelectStorageBottomSheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import FloatingButton from '@/components/FloatingButton';
+import FloatingButton from '@/components/ui/FloatingButton';
 import EmptyStateUI from '@/components/ui/EmptyState';
 import { useShoppingLogic } from './hooks/useShoppingLogic';
 import { ShoppingSection } from './components/ShoppingSection';
@@ -21,7 +21,6 @@ export default function ShoppingListScreen() {
     addShoppingItem,
     handleTogglePurchased,
     handleDeleteItem,
-    handleClearPurchased,
     handleClearUnpurchased,
     handleAddAllToStorage,
     handleAddToStorage,
@@ -78,7 +77,7 @@ export default function ShoppingListScreen() {
               onDeleteItem={handleDeleteItem}
               onAddToStorage={handleAddToStorage}
               onClearAll={handleAddAllToStorage}
-              clearButtonText="재고에 넣기"
+              clearButtonText="한번에 재고에 넣기"
               isPurchasedSection
             />
           </>

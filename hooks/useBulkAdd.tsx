@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { ALL_CATEGORY, AllCategoryType, CategoryType } from '@/constants/categories';
+import { Category } from '@/data/enums/category';
 import { type IngredientTemplate } from '@/constants/ingredientTemplates';
-import { StorageLocationType } from '@/constants/storageLocations';
-import { UnitType } from '@/constants/units';
-import { useDialog } from '@/contexts/DialogContext';
+import { Unit } from '@/data/enums/unit';
+import { useDialog } from './useDialog';
+import { useToast } from '@/components/ui';
 
 export function useBulkAdd(onSuccess?: () => void) {
   const { alert } = useDialog();
+  const { showToast } = useToast();
   const [isVisible, setIsVisible] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<AllCategoryType>(ALL_CATEGORY.id);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<Category | 0>(0);
   const [selectedTemplates, setSelectedTemplates] = useState<IngredientTemplate[]>([]);
 
   function open() {
@@ -18,10 +19,10 @@ export function useBulkAdd(onSuccess?: () => void) {
   function close() {
     setIsVisible(false);
     setSelectedTemplates([]);
-    setSelectedCategoryId(ALL_CATEGORY.id);
+    setSelectedCategoryId(0);
   }
 
-  function handleCategoryChange(categoryId: AllCategoryType) {
+  function handleCategoryChange(categoryId: Category | 0) {
     setSelectedCategoryId(categoryId);
   }
 
@@ -51,26 +52,25 @@ export function useBulkAdd(onSuccess?: () => void) {
     }
 
     try {
-      const { storage } = await import('@/lib/storage');
+      const { ingredientService } = await import('@/services/ingredient.service');
       const ingredientsToAdd = selectedTemplates.map((template) => ({
         name: template.krLabel,
-        category: template.category as CategoryType,
+        category: template.category as Category,
         emoji: template.emoji,
         storage_location: undefined,
         quantity: undefined,
-        unit: template.defaultUnit as UnitType,
+        unit: template.defaultUnit as Unit,
         registration_date: new Date().toISOString().split('T')[0],
         purchase_date: undefined,
         expiry_date: undefined,
         memo: '',
       }));
 
-      await storage.addMultipleIngredients(ingredientsToAdd);
+      await ingredientService.addMultipleIngredients(ingredientsToAdd);
 
       close();
 
-      alert({
-        title: '추가 완료',
+      showToast({
         message: `${selectedTemplates.length}개의 재료가 추가됐어요.`,
         type: 'success',
       });
@@ -79,8 +79,7 @@ export function useBulkAdd(onSuccess?: () => void) {
       onSuccess?.();
     } catch (error) {
       console.error('Error adding templates:', error);
-      alert({
-        title: '오류',
+      showToast({
         message: '재료 추가 중 오류가 발생했어요.',
         type: 'error',
       });

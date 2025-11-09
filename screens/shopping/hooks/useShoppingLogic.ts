@@ -3,12 +3,17 @@ import { Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useFocusEffect } from 'expo-router';
 import { useDialog } from '@/contexts/DialogContext';
+import { useToast } from '@/components/ui';
 import { useMVIStore } from '@/mvi/base';
 import { createShoppingStore } from '@/mvi/features/shopping';
 import { useAddShoppingItem } from '@/hooks/useAddShoppingItem';
+import { StorageLocation } from '@/data/enums/storage_location';
+import { Category } from '@/data/enums/category';
+import { getCategoryLabel } from '@/utils/category/getCategoryLabel';
 
 export function useShoppingLogic() {
   const { alert, confirm } = useDialog();
+  const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createShoppingStore);
   const addShoppingItem = useAddShoppingItem({
     onSuccess: () => {
@@ -20,7 +25,7 @@ export function useShoppingLogic() {
   const [selectingStorageForItem, setSelectingStorageForItem] = useState<{
     id: string;
     name: string;
-    category: string;
+    category: number;
   } | null>(null);
 
   // 화면 포커스 시 데이터 로드
@@ -35,9 +40,8 @@ export function useShoppingLogic() {
     if (!effect) return;
 
     switch (effect.type) {
-      case 'SHOW_ALERT':
-        alert({
-          title: effect.payload.title,
+      case 'SHOW_TOAST':
+        showToast({
           message: effect.payload.message,
           type: effect.payload.variant,
         });
@@ -57,7 +61,7 @@ export function useShoppingLogic() {
         });
         break;
     }
-  }, [effect, alert, confirm, dispatch]);
+  }, [effect, showToast, confirm, dispatch]);
 
   function handleTogglePurchased(id: string, currentStatus: boolean) {
     dispatch({ type: 'TOGGLE_PURCHASED', payload: { id, currentStatus } });
@@ -83,63 +87,62 @@ export function useShoppingLogic() {
     }
 
     try {
-      const { storage } = await import('@/lib/storage');
+      const { ingredientService } = await import('@/services/ingredient.service');
+      const { shoppingService } = await import('@/services/shopping.service');
 
       // 모든 구매 완료 항목을 storage_location: undefined로 재고에 추가
       const today = new Date().toISOString().split('T')[0];
       for (const item of purchasedItems) {
-        await storage.addIngredient({
+        await ingredientService.addIngredient({
           name: item.name,
           category: item.category,
           storage_location: undefined,
-          registration_date: today,
+          purchased_date: today,
           memo: '',
         });
-        await storage.deleteShoppingItem(item.id);
+        await shoppingService.deleteShoppingItem(Number(item.id));
       }
 
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
 
-      alert({
-        title: '',
+      showToast({
         message: `${purchasedItems.length}개 품목이 재고에 추가되었어요.`,
         type: 'success',
       });
     } catch (error) {
       console.error('Error adding to storage:', error);
-      alert({
-        title: '오류',
+      showToast({
         message: '재고 추가 중 오류가 발생했어요.',
         type: 'error',
       });
     }
   }
 
-  function handleAddToStorage(id: string, name: string, category: string) {
+  function handleAddToStorage(id: string, name: string, category: number) {
     setSelectingStorageForItem({ id, name, category });
   }
 
-  async function handleStorageSelect(storageLocation: string) {
+  async function handleStorageSelect(storageLocation: StorageLocation) {
     if (!selectingStorageForItem) return;
 
     try {
-      const { storage } = await import('@/lib/storage');
+      const { ingredientService } = await import('@/services/ingredient.service');
+      const { shoppingService } = await import('@/services/shopping.service');
       const today = new Date().toISOString().split('T')[0];
 
-      await storage.addIngredient({
+      await ingredientService.addIngredient({
         name: selectingStorageForItem.name,
         category: selectingStorageForItem.category as any,
         storage_location: storageLocation as any,
-        registration_date: today,
+        purchased_date: today,
         memo: '',
       });
 
-      await storage.deleteShoppingItem(selectingStorageForItem.id);
+      await shoppingService.deleteShoppingItem(Number(selectingStorageForItem.id));
 
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
 
-      alert({
-        title: '',
+      showToast({
         message: `${selectingStorageForItem.name}이(가) 재고에 추가되었어요.`,
         type: 'success',
       });
@@ -147,8 +150,7 @@ export function useShoppingLogic() {
       setSelectingStorageForItem(null);
     } catch (error) {
       console.error('Error adding to storage:', error);
-      alert({
-        title: '오류',
+      showToast({
         message: '재고 추가 중 오류가 발생했어요.',
         type: 'error',
       });
@@ -159,8 +161,7 @@ export function useShoppingLogic() {
     const unpurchasedItems = state.shoppingList.filter((item) => !item.is_purchased);
 
     if (unpurchasedItems.length === 0) {
-      alert({
-        title: '',
+      showToast({
         message: '공유할 구매 예정 항목이 없어요.',
         type: 'info',
       });
@@ -180,11 +181,10 @@ export function useShoppingLogic() {
     let shareText = '📝 장보기 목록\n\n';
 
     Object.keys(groupedItems).forEach((categoryId) => {
-      const { findCategoryById } = require('@/constants/categories');
-      const category = findCategoryById(categoryId);
       const items = groupedItems[categoryId];
+      const categoryLabel = getCategoryLabel({ category: Number(categoryId) as Category, lang: 'kr' });
 
-      shareText += `${category?.krLabel || '기타'}\n`;
+      shareText += `${categoryLabel}\n`;
       items.forEach((item) => {
         shareText += `• ${item.name}`;
         if (item.memo) {
@@ -202,18 +202,14 @@ export function useShoppingLogic() {
           message: shareText,
         });
       } catch (error) {
-        console.error('Error sharing shopping list:', error);
-        // Share 실패 시 clipboard로 폴백
         try {
           await Clipboard.setStringAsync(shareText);
-          alert({
-            title: '',
+          showToast({
             message: '장보기 목록이 클립보드에 복사되었어요.',
             type: 'success',
           });
         } catch (clipboardError) {
-          alert({
-            title: '오류',
+          showToast({
             message: '공유 중 오류가 발생했어요.',
             type: 'error',
           });
@@ -240,23 +236,21 @@ export function useShoppingLogic() {
     if (!editingMemoId) return;
 
     try {
-      const { storage } = await import('@/lib/storage');
-      await storage.updateShoppingItem(editingMemoId, {
+      const { shoppingService } = await import('@/services/shopping.service');
+      await shoppingService.updateShoppingItem(Number(editingMemoId), {
         memo: editingMemo.trim() || undefined,
       });
 
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
       handleMemoClose();
 
-      alert({
-        title: '',
+      showToast({
         message: '메모가 저장됐어요.',
         type: 'success',
       });
     } catch (error) {
       console.error('Error updating memo:', error);
-      alert({
-        title: '오류',
+      showToast({
         message: '메모 저장 중 오류가 발생했어요.',
         type: 'error',
       });
@@ -268,7 +262,6 @@ export function useShoppingLogic() {
     addShoppingItem,
     handleTogglePurchased,
     handleDeleteItem,
-    handleClearPurchased,
     handleClearUnpurchased,
     handleAddAllToStorage,
     handleAddToStorage,

@@ -1,19 +1,18 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import Badge from '@/components/ui/Badge';
-import { Ingredient } from '@/mvi/features/ingredient-detail';
-import { getStatusColor } from '@/utils/getStatusColors';
-import { findCategoryById } from '@/constants/categories';
-import { findStorageLocationById } from '@/constants/storageLocations';
-import { findStatusById } from '@/constants/itemStatus';
-import { getCategoryIcon } from '@/utils/getCategoryIcons';
+import { getStatusColor, getStatusLabel, getCalculateStatus } from '@/utils/status';
+import { getCategoryIcon, getCategoryLabel } from '@/utils/category';
+import { Ingredient } from '@/data/models/ingredient.model';
+import { getStorageLocationLabel } from '@/utils/storageLocation';
+import { toLocalDate } from '@/utils/time';
 
 interface DetailViewProps {
   ingredient: Ingredient;
 }
 
 export function DetailView({ ingredient }: DetailViewProps) {
-  const { colors, typography, spacing } = useTheme();
+  const { colors, typography, isDark, spacing } = useTheme();
 
   return (
     <View style={styles.container}>
@@ -24,13 +23,13 @@ export function DetailView({ ingredient }: DetailViewProps) {
         <Badge
           variant="primary"
           style={{
-            backgroundColor: getStatusColor(ingredient.status),
+            backgroundColor: getStatusColor(getCalculateStatus(ingredient.expiry_date)),
             paddingHorizontal: 12,
             paddingVertical: 6,
           }}
         >
           <Text style={[typography.styles.t7Semibold, { color: '#ffffff' }]}>
-            {findStatusById(ingredient.status)?.krLabel}
+            {getStatusLabel({ expiryDate: ingredient.expiry_date })}
           </Text>
         </Badge>
       </View>
@@ -42,7 +41,7 @@ export function DetailView({ ingredient }: DetailViewProps) {
           <View style={styles.categoryContentRow}>
             {getCategoryIcon(ingredient.category)}
             <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
-              {findCategoryById(ingredient.category)?.krLabel}
+              {getCategoryLabel({ category: ingredient.category })}
             </Text>
           </View>
         </View>
@@ -53,22 +52,28 @@ export function DetailView({ ingredient }: DetailViewProps) {
         <View style={styles.infoItem}>
           <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>보관 위치</Text>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
-            {findStorageLocationById(ingredient.storage_location)?.krLabel || '-'}
+            {ingredient.storage_location
+              ? getStorageLocationLabel({ storageLocation: ingredient.storage_location })
+              : '-'}
           </Text>
         </View>
         <View style={styles.infoItem}>
           <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>등록일</Text>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
-            {ingredient.registration_date || '-'}
+            {toLocalDate(ingredient.created_at) || '-'}
           </Text>
         </View>
         <View style={styles.infoItem}>
           <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>구매일</Text>
-          <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{ingredient.purchase_date || '-'}</Text>
+          <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
+            {ingredient.purchased_date ? toLocalDate(ingredient.purchased_date) : '-'}
+          </Text>
         </View>
         <View style={styles.infoItem}>
           <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>유통기한</Text>
-          <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{ingredient.expiry_date || '-'}</Text>
+          <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
+            {ingredient.expiry_date ? toLocalDate(ingredient.expiry_date) : '-'}
+          </Text>
         </View>
       </View>
 

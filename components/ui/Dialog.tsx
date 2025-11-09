@@ -28,28 +28,12 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
 
   useEffect(() => {}, [visible]);
 
-  // function getIcon() {
-  //   const iconSize = 24;
-  //   switch (type) {
-  //     case 'success':
-  //       return <CheckCircle size={iconSize} color={colors.primary} />;
-  //     case 'warning':
-  //       return <AlertCircle size={iconSize} color="#f59e0b" />;
-  //     case 'error':
-  //       return <XCircle size={iconSize} color="#ef4444" />;
-  //     case 'info':
-  //       return <Info size={iconSize} color="#3b82f6" />;
-  //     default:
-  //       return null;
-  //   }
-  // }
-
   function getButtonStyle(buttonStyle: string) {
     switch (buttonStyle) {
       case 'cancel':
         return {
-          backgroundColor: colors.surfaceSecondary,
-          textColor: colors.textSecondary,
+          backgroundColor: isDark ? '#3f3f4b' : colors.greyOpactiy100,
+          textColor: isDark ? '#c3c3c6' : colors.grey700,
         };
       case 'destructive':
         return {
@@ -59,7 +43,7 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
       default:
         return {
           backgroundColor: colors.primary,
-          textColor: colors.white,
+          textColor: colors.whiteOpactiy900,
         };
     }
   }
@@ -88,23 +72,25 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
       transparent
       animationType="fade"
       onRequestClose={Platform.OS === 'ios' ? undefined : handleRequestClose}
-      statusBarTranslucent
+      // statusBarTranslucent
     >
-      <BlurView intensity={isDark ? 40 : 60} style={styles.overlay}>
+      <View style={styles.overlay}>
         <TouchableOpacity
-          style={[styles.backdrop, { backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)' }]}
+          style={[styles.backdrop, { backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.3)' }]}
           activeOpacity={1}
           onPress={onClose}
         />
-        <View style={[styles.dialog, { backgroundColor: colors.surface }]}>
+        <View style={[styles.dialog, { backgroundColor: isDark ? '#2C2C35' : colors.white }]}>
           {title && (
             <View style={styles.titleContainer}>
-              <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>{title}</Text>
+              <Text style={[typography.styles.t4Semibold, { color: isDark ? '#E4E4E5' : colors.grey800 }]}>
+                {title}
+              </Text>
             </View>
           )}
 
           <View style={styles.messageContainer}>
-            <Text style={[typography.styles.t5, { color: colors.textSecondary }]}>{message}</Text>
+            <Text style={[typography.styles.t6, { color: isDark ? '#9E9EA4' : colors.grey600 }]}>{message}</Text>
           </View>
 
           <View style={styles.buttonsContainer}>
@@ -127,7 +113,7 @@ export function Dialog({ visible, title, message, type = 'default', buttons, onC
             })}
           </View>
         </View>
-      </BlurView>
+      </View>
     </Modal>
   );
 }
@@ -146,6 +132,7 @@ const createStyles = ({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.3)',
     },
     backdrop: {
       position: 'absolute',
@@ -155,10 +142,12 @@ const createStyles = ({
       bottom: 0,
     },
     dialog: {
-      width: width - 64,
+      width: width - 54,
       maxWidth: 400,
       borderRadius: borderRadius.xxl,
-      padding: spacing.xxl,
+      paddingTop: 22,
+      paddingBottom: 16,
+      paddingHorizontal: 16,
       ...shadows.lg,
       shadowOpacity: 0.25,
       shadowRadius: 20,
@@ -173,17 +162,18 @@ const createStyles = ({
     messageContainer: {
       textAlign: 'left',
       justifyContent: 'flex-start',
+      paddingTop: 8,
+      paddingBottom: 14,
     },
     buttonsContainer: {
       flexDirection: 'row',
-      gap: spacing.md,
-      marginTop: spacing.xxl,
+      gap: 8,
     },
     button: {
       flex: 1,
-      paddingVertical: 20,
+      paddingVertical: 11,
       paddingHorizontal: spacing.xl,
-      borderRadius: borderRadius.xl,
+      borderRadius: 14,
       alignItems: 'center',
       justifyContent: 'center',
     },

@@ -1,14 +1,15 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/lib/theme';
-import BottomSheet from '@/components/BottomSheet';
-import { UNITS, UnitType } from '@/constants/units';
+import BottomSheet from '@/components/ui/BottomSheet';
+import { Unit } from '@/data/enums/unit';
+import { makeUnitList } from '@/utils/unit/makeUnitList';
 
 interface SelectUnitBottomSheetProps {
   visible: boolean;
   onClose: () => void;
-  selectedUnit?: UnitType;
-  onUnitSelect: (unitId: string) => void;
+  selectedUnit?: Unit;
+  onUnitSelect: (unitId: Unit) => void;
 }
 
 export default function SelectUnitBottomSheet({
@@ -19,46 +20,45 @@ export default function SelectUnitBottomSheet({
 }: SelectUnitBottomSheetProps) {
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
-  const handleUnitSelect = (unitId: string) => {
+  const handleUnitSelect = (unitId: Unit) => {
     onUnitSelect(unitId);
     onClose();
   };
 
+  const units = makeUnitList({ lang: 'kr' });
+
   return (
-    <BottomSheet maxHeight={400} visible={visible} onClose={onClose} title="단위 선택">
+    <BottomSheet maxHeight={450} visible={visible} onClose={onClose} title="단위 선택">
       <View style={styles.container}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[styles.content, { padding: spacing.md, gap: spacing.xs }]}
-        >
-          {UNITS.map((unit) => (
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+          {units.map((unit) => (
             <TouchableOpacity
               key={unit.id}
               style={[
                 styles.unitItem,
                 {
-                  backgroundColor: selectedUnit === unit.id ? (isDark ? colors.white : colors.grey400) : colors.surface,
-                  borderColor: selectedUnit === unit.id ? (isDark ? colors.white : colors.grey400) : colors.border,
-                  paddingHorizontal: spacing.lg,
-                  paddingVertical: spacing.md,
+                  backgroundColor: isDark ? 'rgba(78, 89, 104 ,0.16)' : 'rgba(78, 89, 104 ,0.16)',
+                  borderColor: selectedUnit === unit.id ? colors.primary : 'transparent',
+                  borderWidth: 1,
                   borderRadius: borderRadius.md,
+                  paddingTop: spacing.md,
+                  paddingBottom: spacing.lg,
+                  paddingHorizontal: spacing.lg,
                 },
               ]}
-              onPress={() => handleUnitSelect(unit.id)}
+              onPress={() => handleUnitSelect(unit.id as Unit)}
             >
               <Text
                 style={[
-                  typography.styles.t5Medium,
+                  typography.styles.t5,
                   {
-                    color: selectedUnit === unit.id ? (isDark ? colors.black : colors.white) : colors.text,
+                    color: selectedUnit === unit.id ? colors.text : isDark ? colors.grey500 : colors.grey700,
+                    fontWeight: selectedUnit === unit.id ? '600' : '400',
                   },
                 ]}
               >
-                {unit.krLabel}
+                {unit.label}
               </Text>
-              {selectedUnit === unit.id && (
-                <Ionicons name="checkmark" size={24} color={isDark ? colors.black : colors.white} />
-              )}
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -70,15 +70,16 @@ export default function SelectUnitBottomSheet({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    maxHeight: 400,
   },
   content: {
-    // padding� gap@ x|x ��|\ �
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 12,
+    gap: 12,
   },
   unitItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderWidth: 1,
   },
 });

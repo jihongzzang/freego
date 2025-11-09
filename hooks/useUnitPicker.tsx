@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { Unit } from '@/data/enums/unit';
 
 interface UseUnitPickerProps {
-  onUnitChange: (unitId: string) => void;
+  onUnitChange: (unitId: Unit) => void;
 }
 
 export function useUnitPicker({ onUnitChange }: UseUnitPickerProps) {
@@ -10,7 +11,7 @@ export function useUnitPicker({ onUnitChange }: UseUnitPickerProps) {
   const open = () => setVisible(true);
   const close = () => setVisible(false);
 
-  const handleUnitSelect = (unitId: string) => {
+  const handleUnitSelect = (unitId: Unit) => {
     onUnitChange(unitId);
     close();
   };

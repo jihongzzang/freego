@@ -36,11 +36,11 @@ export function useExpiringLogic() {
     dispatch({ type: 'NAVIGATE_BACK' });
   };
 
-  const handleNavigateToDetail = (id: string) => {
-    dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: id });
+  const handleNavigateToDetail = (id: number) => {
+    dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: id.toString() });
   };
 
-  const handleQuickDeduct = (id: string) => {
+  const handleQuickDeduct = (id: number) => {
     dispatch({ type: 'DELETE_INGREDIENT', payload: id });
   };
 

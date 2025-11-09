@@ -4,15 +4,8 @@ import { useTheme } from '@/lib/theme';
 import Card from '@/components/ui/Card';
 import { ShoppingItem } from './ShoppingItem';
 import { useMemo } from 'react';
-import { CategoryType } from '@/constants/categories';
-
-export interface ShoppingListItem {
-  id: string;
-  name: string;
-  category: CategoryType;
-  is_purchased: boolean;
-  memo?: string;
-}
+import { ShoppingItem as ShoppingListItem } from '@/data/models/shopping.model';
+import { Category } from '@/data/enums/category';
 
 interface ShoppingSectionProps {
   title: string;
@@ -20,7 +13,7 @@ interface ShoppingSectionProps {
   onToggleItem: (id: string, isPurchased: boolean) => void;
   onDeleteItem: (id: string, name: string) => void;
   onMemoPress?: (id: string, currentMemo?: string) => void;
-  onAddToStorage?: (id: string, name: string, category: CategoryType) => void;
+  onAddToStorage?: (id: string, name: string, category: Category) => void;
   onClearAll: () => void;
   clearButtonText: string;
   isPurchasedSection?: boolean;
@@ -73,15 +66,15 @@ export function ShoppingSection({
         {items.map((item, index) => (
           <ShoppingItem
             key={item.id}
-            id={item.id}
+            id={String(item.id)}
             name={item.name}
             category={item.category}
             isPurchased={item.is_purchased}
             memo={item.memo}
-            onToggle={() => onToggleItem(item.id, item.is_purchased)}
-            onDelete={() => onDeleteItem(item.id, item.name)}
-            onMemoPress={onMemoPress ? () => onMemoPress(item.id, item.memo) : undefined}
-            onAddToStorage={onAddToStorage ? () => onAddToStorage(item.id, item.name, item.category) : undefined}
+            onToggle={() => onToggleItem(String(item.id), item.is_purchased)}
+            onDelete={() => onDeleteItem(String(item.id), item.name)}
+            onMemoPress={onMemoPress ? () => onMemoPress(String(item.id), item.memo) : undefined}
+            onAddToStorage={onAddToStorage ? () => onAddToStorage(String(item.id), item.name, item.category) : undefined}
             isLast={index === items.length - 1}
           />
         ))}

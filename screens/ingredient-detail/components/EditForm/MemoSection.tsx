@@ -1,8 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '@/lib/theme';
-import { STORAGE_LOCATIONS } from '@/constants/storageLocations';
 import { EditFormData } from '@/mvi/features/ingredient-detail';
-import { getStorageLocationIcon } from '@/utils/getStorageLocationIcons';
+import { useMemo } from 'react';
 
 interface MemoSectionProps {
   memo: string;
@@ -10,7 +9,9 @@ interface MemoSectionProps {
 }
 
 export function MemoSection({ memo, onFieldChange }: MemoSectionProps) {
-  const { colors, typography, isDark, borderRadius } = useTheme();
+  const { colors, typography, spacing, borderRadius } = useTheme();
+
+  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
   return (
     <View style={styles.container}>
@@ -38,17 +39,18 @@ export function MemoSection({ memo, onFieldChange }: MemoSectionProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    gap: 8,
-  },
-  input: {
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderWidth: 1,
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-});
+const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
+  StyleSheet.create({
+    container: {
+      gap: spacing.sm,
+    },
+    input: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 14,
+      borderWidth: 1,
+    },
+    textArea: {
+      height: 100,
+      textAlignVertical: 'top',
+    },
+  });

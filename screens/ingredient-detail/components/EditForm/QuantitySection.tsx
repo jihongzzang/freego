@@ -2,17 +2,21 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/lib/theme';
 import { EditFormData } from '@/mvi/features/ingredient-detail';
-import { findUnitById } from '@/constants/units';
+import { Unit } from '@/data/enums/unit';
+import { getUnitLabel } from '@/utils/unit';
+import { useMemo } from 'react';
 
 interface QuantitySectionProps {
   quantity?: string;
-  unit?: string;
+  unit?: Unit;
   onFieldChange: (field: keyof EditFormData, value: string) => void;
   onUnitPress: () => void;
 }
 
 export function QuantitySection({ quantity, unit, onFieldChange, onUnitPress }: QuantitySectionProps) {
   const { colors, typography, spacing, borderRadius } = useTheme();
+
+  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
   return (
     <View style={styles.row}>
@@ -60,7 +64,7 @@ export function QuantitySection({ quantity, unit, onFieldChange, onUnitPress }: 
               },
             ]}
           >
-            {unit ? findUnitById(unit as any)?.krLabel || unit : '선택'}
+            {unit ? getUnitLabel({ unit }) : '선택'}
           </Text>
           <Ionicons name="chevron-down" size={20} color={colors.textTertiary} />
         </TouchableOpacity>
@@ -69,16 +73,17 @@ export function QuantitySection({ quantity, unit, onFieldChange, onUnitPress }: 
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-  },
-  inputGroup: {
-    gap: 8,
-  },
-  input: {
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderWidth: 1,
-  },
-});
+const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+    },
+    inputGroup: {
+      gap: spacing.sm,
+    },
+    input: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 14,
+      borderWidth: 1,
+    },
+  });

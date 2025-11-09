@@ -5,11 +5,14 @@ import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/contexts/DialogContext';
 import { useMVIStore } from '@/mvi/base';
 import { createSettingsStore } from '@/mvi/features/settings';
-import { storage } from '@/lib/storage';
+import { ingredientService } from '@/services/ingredient.service';
+import { shoppingService } from '@/services/shopping.service';
+import { useToast } from '@/components/ui';
 
 export function useSettingsLogic() {
   const { isDark, themePreference, setTheme } = useTheme();
   const { alert, confirm } = useDialog();
+  const { showToast } = useToast();
 
   // MVI Store
   const [state, dispatch, effect] = useMVIStore(createSettingsStore);
@@ -27,16 +30,15 @@ export function useSettingsLogic() {
   useEffect(() => {
     if (effect) {
       switch (effect.type) {
-        case 'SHOW_ALERT':
-          alert({
-            title: effect.payload.title,
+        case 'SHOW_TOAST':
+          showToast({
             message: effect.payload.message,
-            type: effect.payload.type,
+            type: effect.payload.variant,
           });
           break;
       }
     }
-  }, [effect, alert]);
+  }, [effect, showToast]);
 
   async function checkNotificationPermission() {
     const settings = await Notifications.getPermissionsAsync();
@@ -73,13 +75,8 @@ export function useSettingsLogic() {
     setTheme(newMode);
   }
 
-  async function resetThemeToSystem() {
-    await setTheme('system');
-    alert({
-      title: '',
-      message: '시스템 설정을 따라요.',
-      type: 'success',
-    });
+  function resetThemeToSystem() {
+    setTheme('system');
   }
 
   async function sendFeedback() {
@@ -93,8 +90,7 @@ export function useSettingsLogic() {
     if (canOpen) {
       await Linking.openURL(url);
     } else {
-      alert({
-        title: '오류',
+      showToast({
         message: '이메일 앱을 열 수 없어요.',
         type: 'error',
       });
@@ -103,22 +99,21 @@ export function useSettingsLogic() {
 
   function handleDeleteAllData() {
     confirm({
-      title: '',
+      title: '데이터 삭제',
       message: '등록된 모든 냉장고 재료가 삭제돼요.\n이 작업은 되돌릴 수 없어요.\n\n정말 삭제하시겠어요?',
       confirmText: '삭제',
       cancelText: '취소',
       isDestructive: true,
       onConfirm: async () => {
         try {
-          await storage.clearAll();
-          alert({
-            title: '',
+          await ingredientService.clearAll();
+          await shoppingService.clearAll();
+          showToast({
             message: '모든 데이터가 삭제되었어요.',
             type: 'success',
           });
         } catch (error) {
-          alert({
-            title: '오류',
+          showToast({
             message: '데이터 삭제 중 문제가 발생했어요.',
             type: 'error',
           });

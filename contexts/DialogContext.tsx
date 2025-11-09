@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { Dialog } from '@/components/Dialog';
+import { Dialog } from '@/components/ui/Dialog';
 
 interface DialogButton {
   text: string;

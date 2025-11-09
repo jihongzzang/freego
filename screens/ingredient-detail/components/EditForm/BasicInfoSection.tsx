@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { useTheme } from '@/lib/theme';
 import { EditFormData } from '@/mvi/features/ingredient-detail';
 import { type IngredientTemplate } from '@/constants/ingredientTemplates';
+import { useMemo } from 'react';
 
 interface BasicInfoSectionProps {
   formData: EditFormData;
@@ -13,12 +14,14 @@ interface BasicInfoSectionProps {
 export function BasicInfoSection({ formData, selectedEmoji, onFieldChange, onEmojiPress }: BasicInfoSectionProps) {
   const { colors, typography, spacing, borderRadius } = useTheme();
 
+  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
+
   return (
     <View style={styles.container}>
       <View style={styles.inputHeader}>
         <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>이름</Text>
         <TouchableOpacity
-          style={[styles.emojiButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          style={[styles.emojiButton, { backgroundColor: colors.surface, borderColor: colors.surface }]}
           onPress={onEmojiPress}
         >
           {selectedEmoji ? (
@@ -51,31 +54,32 @@ export function BasicInfoSection({ formData, selectedEmoji, onFieldChange, onEmo
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    gap: 8,
-  },
-  inputHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  input: {
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderWidth: 1,
-  },
-  emojiButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    borderWidth: 1,
-  },
-  emojiButtonContent: {
-    width: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-  },
-});
+const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
+  StyleSheet.create({
+    container: {
+      gap: spacing.sm,
+    },
+    inputHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    input: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 14,
+      borderWidth: 1,
+    },
+    emojiButton: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      borderRadius: 6,
+      borderWidth: 1,
+    },
+    emojiButtonContent: {
+      width: 40,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.xs,
+    },
+  });

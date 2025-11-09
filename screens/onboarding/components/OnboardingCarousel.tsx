@@ -30,8 +30,6 @@ export function OnboardingCarousel({
 
   const insets = useSafeAreaInsets();
 
-  const currentStepData = steps[currentStep];
-
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
   }));
@@ -40,8 +38,6 @@ export function OnboardingCarousel({
     () => createStyles({ colors, spacing, borderRadius, shadows }),
     [spacing, borderRadius, shadows],
   );
-
-  //currentStepData.color
 
   return (
     <View style={[styles.content, { backgroundColor: colors.surface }]}>

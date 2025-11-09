@@ -2,13 +2,12 @@ import { View, Animated, TouchableOpacity, Platform } from 'react-native';
 import { Bell, QrCode, Edit3, Grid3x3, Dot } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { useRouter } from '@/hooks/useRouter';
-import Header from '@/components/Header';
-import FloatingButton from '@/components/FloatingButton';
+import Header from '@/components/ui/Header';
+import FloatingButton from '@/components/ui/FloatingButton';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
 import BulkAddBottomSheet from '@/components/BulkAddBottomSheet';
 import EmptyStateUI from '@/components/ui/EmptyState';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ALL_CATEGORY } from '@/constants/categories';
 import { useHomeLogic } from './hooks/useHomeLogic';
 import { useHomeData } from './hooks/useHomeData';
 import { useHomeAnimation } from './hooks/useHomeAnimation';
@@ -103,7 +102,6 @@ export default function HomeScreen() {
         />
       </Animated.View>
 
-      {/* Scrollable Content */}
       <Animated.ScrollView
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
           useNativeDriver: Platform.OS == 'android' ? false : true,
@@ -116,20 +114,6 @@ export default function HomeScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* {expiringItems.length > 0 && (
-          <ExpiringSection
-            items={
-              selectedCategoryId === ALL_CATEGORY.id
-                ? expiringItems
-                : expiringItems.filter((item) => item.category == selectedCategoryId)
-            }
-            onSeeMore={() => dispatch({ type: 'NAVIGATE_TO_EXPIRING' })}
-            onCardPress={(item) => router.push(`/ingredient/${item.id}`)}
-            onCalendarPress={openDatePicker}
-            getExpiryDisplay={getExpiryDisplay}
-          />
-        )} */}
-
         {state.loading ? (
           <View style={{ paddingTop: 24 }}>
             <EmptyStateUI title="로딩 중이에요..." />
@@ -137,17 +121,13 @@ export default function HomeScreen() {
         ) : filteredIngredients.length === 0 ? (
           <View style={{ paddingTop: 24 }}>
             <EmptyStateUI
-              title={
-                selectedCategoryId === ALL_CATEGORY.id
-                  ? '관리할 재료가 없어요'
-                  : `${selectedCategoryItem?.krLabel} 재료가 없어요`
-              }
+              title={selectedCategoryId === 0 ? '관리할 재료가 없어요' : `${selectedCategoryItem?.label} 재료가 없어요`}
               description="기억하고 싶은 재료만 추가해보세요"
             />
           </View>
         ) : (
           <IngredientsSection
-            title={selectedCategoryId === ALL_CATEGORY.id ? '전체 재료' : selectedCategoryItem?.krLabel || ''}
+            title={selectedCategoryId === 0 ? '전체 재료' : selectedCategoryItem?.label || ''}
             count={filteredIngredients.length}
             items={filteredIngredients}
             onCardPress={(item) => router.push(`/ingredient/${item.id}`)}
@@ -157,7 +137,6 @@ export default function HomeScreen() {
         )}
       </Animated.ScrollView>
 
-      {/* Floating Action Button */}
       <FloatingButton
         menuItems={[
           {
@@ -165,26 +144,25 @@ export default function HomeScreen() {
             label: floatingMenuItems[0].label,
             onPress: floatingMenuItems[0].onPress,
             labelColor: colors.white,
-            backgroundColor: colors.blue500,
+            backgroundColor: colors.blue600,
           },
           {
             icon: <Edit3 size={24} color="#FFFFFF" />,
             label: floatingMenuItems[1].label,
             onPress: floatingMenuItems[1].onPress,
             labelColor: colors.white,
-            backgroundColor: colors.primary,
+            backgroundColor: colors.green600,
           },
           {
             icon: <Grid3x3 size={24} color="#FFFFFF" />,
             label: floatingMenuItems[2].label,
             onPress: floatingMenuItems[2].onPress,
             labelColor: colors.white,
-            backgroundColor: colors.orange500,
+            backgroundColor: colors.orange600,
           },
         ]}
       />
 
-      {/* Modals */}
       <SelectDateBottomSheet
         visible={expiryDatePicker.visible}
         onClose={expiryDatePicker.close}
