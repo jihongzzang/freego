@@ -1,1 +1,1 @@
-export type StatusType = 'expired' | 'valid' | 'not_set';
+export type StatusType = 'expired' | 'warning' | 'valid' | 'not_set';

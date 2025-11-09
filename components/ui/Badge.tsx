@@ -28,11 +28,11 @@ export default function Badge({ children, variant = 'primary', size = 'medium', 
         };
       case 'success':
         return {
-          backgroundColor: '#10b981',
+          backgroundColor: colors.success,
         };
       case 'warning':
         return {
-          backgroundColor: '#f59e0b',
+          backgroundColor: colors.warning,
         };
       case 'danger':
         return {
@@ -40,7 +40,7 @@ export default function Badge({ children, variant = 'primary', size = 'medium', 
         };
       case 'info':
         return {
-          backgroundColor: '#3b82f6',
+          backgroundColor: colors.textTertiary,
         };
       default:
         return {};

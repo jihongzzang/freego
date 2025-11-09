@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Minus, Edit3, Trash2 } from 'lucide-react-native';
+import { Minus, Edit3, Trash2, ShoppingCart } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { Ingredient } from '@/mvi/features/ingredients';
 import { getStatusColor } from '@/utils/status/getStatusColor';
@@ -13,9 +13,10 @@ interface IngredientItemProps {
   onPress: () => void;
   onEdit: () => void;
   onQuickDeduct: () => void;
+  onQuickDelete: () => void;
 }
 
-export function IngredientItem({ item, onPress, onEdit, onQuickDeduct }: IngredientItemProps) {
+export function IngredientItem({ item, onPress, onEdit, onQuickDeduct, onQuickDelete }: IngredientItemProps) {
   const { colors, typography, spacing, borderRadius } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
@@ -42,7 +43,10 @@ export function IngredientItem({ item, onPress, onEdit, onQuickDeduct }: Ingredi
         <View style={styles.ingredientInfo}>
           <View style={styles.ingredientNameRow}>
             <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{item.name}</Text>
-            <View style={[styles.statusDot, { backgroundColor: getStatusColor(item.status) }]} />
+
+            {(item.status === 'warning' || item.status === 'expired') && (
+              <View style={[styles.statusDot, { backgroundColor: getStatusColor(item.status) }]} />
+            )}
           </View>
           {getIngredientDetails && (
             <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>{getIngredientDetails}</Text>
@@ -75,27 +79,36 @@ export function IngredientItem({ item, onPress, onEdit, onQuickDeduct }: Ingredi
           )}
         </View>
       </TouchableOpacity>
-
       <View style={styles.actionButtons}>
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: colors.surfaceSecondary }]}
+          style={[styles.actionButton]}
           onPress={(e) => {
             e.stopPropagation();
             onEdit();
           }}
           activeOpacity={0.7}
         >
-          <Edit3 size={16} color={colors.textSecondary} />
+          <Edit3 size={20} color={colors.blue500} />
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: colors.surfaceSecondary }]}
+          style={[styles.actionButton]}
           onPress={(e) => {
             e.stopPropagation();
             onQuickDeduct();
           }}
           activeOpacity={0.7}
         >
-          <Trash2 size={16} color={colors.textSecondary} />
+          <ShoppingCart size={20} color={colors.teal500} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.actionButton]}
+          onPress={(e) => {
+            e.stopPropagation();
+            onQuickDelete();
+          }}
+          activeOpacity={0.7}
+        >
+          <Trash2 size={20} color={colors.red500} />
         </TouchableOpacity>
       </View>
     </View>

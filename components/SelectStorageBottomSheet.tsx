@@ -22,10 +22,10 @@ export default function SelectStorageBottomSheet({ visible, onClose, onSelect }:
   const storageLocations = makeStorageList({ lang: 'kr' });
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} title="재고에 넣기" maxHeight={260}>
+    <BottomSheet visible={visible} onClose={onClose} title="냉장고에 넣기" maxHeight={260}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary, marginBottom: 12 }]}>
-          재고에 넣기전 보관위치를 설정해 주세요.
+          냉장고에 넣기전 보관위치를 설정해 주세요.
         </Text>
         <View style={styles.grid}>
           {storageLocations.map((location) => (

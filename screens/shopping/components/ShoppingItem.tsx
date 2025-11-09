@@ -99,18 +99,18 @@ export function ShoppingItem({
           <TouchableOpacity style={styles.actionButton} onPress={onMemoPress} activeOpacity={0.7}>
             <MessageSquare
               size={20}
-              fill={memo ? colors.textTertiary : colors.surface}
-              color={memo ? colors.textTertiary : colors.textTertiary}
+              fill={memo ? colors.green500 : colors.surface}
+              color={memo ? colors.green500 : colors.green500}
             />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={onDelete} activeOpacity={0.7}>
-            <Trash2 size={20} color={colors.textTertiary} />
+            <Trash2 size={20} color={colors.red500} />
           </TouchableOpacity>
         </View>
       ) : (
         onAddToStorage && (
           <TouchableOpacity style={styles.actionButton} onPress={onAddToStorage} activeOpacity={0.7}>
-            <Refrigerator size={22} color={colors.textTertiary} />
+            <Refrigerator size={22} color={colors.blue500} />
           </TouchableOpacity>
         )
       )}

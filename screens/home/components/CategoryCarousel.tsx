@@ -4,6 +4,7 @@ import { Category } from '@/data/enums/category';
 import { makeCategoryList } from '@/utils/category/makeCategoryList';
 import Chip from '@/components/ui/Chip';
 import { useMemo } from 'react';
+import { getCategoryIcon } from '@/utils/category';
 
 interface CategoryCarouselProps {
   selectedCategoryId: Category | 0;

@@ -30,6 +30,7 @@ export const ingredientsReducer: Reducer<IngredientsState, IngredientsIntent> = 
 
     // 네비게이션 및 삭제 액션들은 미들웨어에서 처리
     case 'DELETE_INGREDIENT':
+    case 'DEDUCT_INGREDIENT':
     case 'NAVIGATE_TO_ADD':
     case 'NAVIGATE_TO_DETAIL':
     case 'NAVIGATE_TO_DETAIL_EDIT':

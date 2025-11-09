@@ -23,6 +23,7 @@ export function IngredientCard({ item, onPress, onCalendarPress, getExpiryDispla
           <View style={styles.emojiContainer}>
             <Text style={typography.styles.t5}>{item.emoji || '🍽️'}</Text>
             {item.status === 'expired' && <Badge variant="danger" dot size="small" style={styles.statusBadge} />}
+            {item.status === 'warning' && <Badge variant="warning" dot size="small" style={styles.statusBadge} />}
           </View>
           <TouchableOpacity
             style={styles.calendarButton}
@@ -43,7 +44,12 @@ export function IngredientCard({ item, onPress, onCalendarPress, getExpiryDispla
             typography.styles.t7,
             {
               marginTop: 2,
-              color: item.status === 'expired' ? colors.danger : colors.textTertiary,
+              color:
+                item.status === 'expired'
+                  ? colors.danger
+                  : item.status === 'warning'
+                    ? colors.warning
+                    : colors.textTertiary,
             },
           ]}
           numberOfLines={1}

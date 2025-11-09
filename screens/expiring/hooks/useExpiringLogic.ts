@@ -47,6 +47,10 @@ export function useExpiringLogic() {
   };
 
   const handleQuickDeduct = (id: number) => {
+    dispatch({ type: 'DEDUCT_INGREDIENT', payload: id });
+  };
+
+  const handleQuickDelete = (id: number) => {
     dispatch({ type: 'DELETE_INGREDIENT', payload: id });
   };
 
@@ -56,5 +60,6 @@ export function useExpiringLogic() {
     handleNavigateBack,
     handleNavigateToDetail,
     handleQuickDeduct,
+    handleQuickDelete,
   };
 }

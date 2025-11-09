@@ -11,6 +11,11 @@ export function getCalculateStatus(expiryDate?: string | null): StatusType {
 
   const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
+  console.log(`hello ${diffDays}`);
+
   if (diffDays < 0) return 'expired';
+
+  if (diffDays < 4) return 'warning';
+
   return 'valid';
 }

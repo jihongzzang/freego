@@ -26,10 +26,11 @@ export default function IngredientsScreen() {
     scrollY,
     scrollViewRef,
     bulkAdd,
-    navigateToDetail,
-    navigateToEdit,
-    quickDeduct,
-    navigateToAdd,
+    handleNavigateToDetail,
+    handleNavigateToEdit,
+    handleNavigateToAdd,
+    handleQuickDelete,
+    handleQuickDeduct,
   } = useIngredientsLogic();
 
   const {
@@ -97,9 +98,10 @@ export default function IngredientsScreen() {
                   items={categoryItems}
                   isExpanded={isExpanded}
                   onToggle={() => toggleCategory(catId)}
-                  onItemPress={navigateToDetail}
-                  onItemEdit={navigateToEdit}
-                  onQuickDeduct={quickDeduct}
+                  onItemPress={handleNavigateToDetail}
+                  onItemEdit={handleNavigateToEdit}
+                  onQuickDeduct={handleQuickDeduct}
+                  onQuickDelete={handleQuickDelete}
                 />
               );
             })}
@@ -117,9 +119,10 @@ export default function IngredientsScreen() {
                   items={storageItems}
                   isExpanded={isExpanded}
                   onToggle={() => toggleStorage(storageId)}
-                  onItemPress={navigateToDetail}
-                  onItemEdit={navigateToEdit}
-                  onQuickDeduct={quickDeduct}
+                  onItemPress={handleNavigateToDetail}
+                  onItemEdit={handleNavigateToEdit}
+                  onQuickDeduct={handleQuickDeduct}
+                  onQuickDelete={handleQuickDelete}
                 />
               );
             })}
@@ -132,7 +135,7 @@ export default function IngredientsScreen() {
           {
             icon: <Edit3 size={24} color="#FFFFFF" />,
             label: '직접 재료 등록',
-            onPress: navigateToAdd,
+            onPress: handleNavigateToAdd,
             labelColor: colors.white,
             backgroundColor: colors.green600,
           },

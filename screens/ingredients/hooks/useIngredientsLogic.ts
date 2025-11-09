@@ -55,20 +55,24 @@ export function useIngredientsLogic() {
     }, [dispatch]),
   );
 
-  function navigateToDetail(id: string) {
+  function handleNavigateToDetail(id: string) {
     dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: Number(id) });
   }
 
-  function navigateToEdit(id: string) {
+  function handleNavigateToEdit(id: string) {
     dispatch({ type: 'NAVIGATE_TO_DETAIL_EDIT', payload: Number(id) });
   }
 
-  function navigateToAdd() {
+  function handleNavigateToAdd() {
     dispatch({ type: 'NAVIGATE_TO_ADD' });
   }
 
-  function quickDeduct(id: string) {
+  function handleQuickDelete(id: string) {
     dispatch({ type: 'DELETE_INGREDIENT', payload: Number(id) });
+  }
+
+  function handleQuickDeduct(id: string) {
+    dispatch({ type: 'DEDUCT_INGREDIENT', payload: Number(id) });
   }
 
   return {
@@ -79,9 +83,10 @@ export function useIngredientsLogic() {
     scrollY,
     scrollViewRef,
     bulkAdd,
-    navigateToDetail,
-    navigateToEdit,
-    navigateToAdd,
-    quickDeduct,
+    handleNavigateToDetail,
+    handleNavigateToEdit,
+    handleNavigateToAdd,
+    handleQuickDelete,
+    handleQuickDeduct,
   };
 }

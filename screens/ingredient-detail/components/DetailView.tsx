@@ -12,7 +12,7 @@ interface DetailViewProps {
 }
 
 export function DetailView({ ingredient }: DetailViewProps) {
-  const { colors, typography, isDark, spacing } = useTheme();
+  const { colors, typography } = useTheme();
 
   return (
     <View style={styles.container}>

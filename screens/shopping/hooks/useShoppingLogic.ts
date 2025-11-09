@@ -115,7 +115,7 @@ export function useShoppingLogic() {
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
 
       showToast({
-        message: `${purchasedItems.length}개 품목이 재고에 추가되었어요.`,
+        message: `${purchasedItems.length}개 품목이 냉장고에 추가되었어요.`,
         type: 'success',
       });
     } catch (error) {
@@ -152,7 +152,7 @@ export function useShoppingLogic() {
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
 
       showToast({
-        message: `${selectingStorageForItem.name}이(가) 재고에 추가되었어요.`,
+        message: `${selectingStorageForItem.name}이(가) 냉장고에 추가되었어요.`,
         type: 'success',
       });
 

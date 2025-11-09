@@ -7,8 +7,11 @@ export function getStatusColor(status: StatusType): string {
   // 미설정
   if (status === 'not_set') return colors.grey500;
 
+  // 미설정
+  if (status === 'warning') return colors.warning;
+
   // 만료 / 유효
   if (status === 'expired') return colors.danger; // expired
 
-  return colors.success; // valid
+  return colors.grey500; // valid
 }

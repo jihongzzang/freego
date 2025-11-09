@@ -177,7 +177,8 @@ export const Colors: Record<'light' | 'dark', ColorPalette> = {
     success: '#15C67F',
     successLight: '#F0FAF6',
 
-    warning: '#ffc342',
+    // warning: '#ffc342',
+    warning: '#ff9900',
     warningLight: '#fff9e5',
 
     text: '#191F28',
@@ -312,7 +313,8 @@ export const Colors: Record<'light' | 'dark', ColorPalette> = {
     success: '#15C67F',
     successLight: '#F0FAF6',
 
-    warning: '#ffc342',
+    // warning: '#ffc342',
+    warning: '#ff9900',
     warningLight: '#fff9e5',
 
     text: '#F9FAFB',

@@ -77,7 +77,7 @@ export default function ShoppingListScreen() {
               onDeleteItem={handleDeleteItem}
               onAddToStorage={handleAddToStorage}
               onClearAll={handleAddAllToStorage}
-              clearButtonText="한번에 재고에 넣기"
+              clearButtonText="한번에 냉장고에 넣기"
               isPurchasedSection
             />
           </>

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Minus } from 'lucide-react-native';
+import { ShoppingCart, Trash2 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { getCategoryIcon } from '@/utils/category';
 import { getStatusColor, getCalculateStatus } from '@/utils/status';
@@ -12,9 +12,10 @@ interface ExpiringItemProps {
   item: Ingredient;
   onPress: () => void;
   onQuickDeduct: () => void;
+  onQuickDelete: () => void;
 }
 
-export function ExpiringItem({ item, onPress, onQuickDeduct }: ExpiringItemProps) {
+export function ExpiringItem({ item, onPress, onQuickDeduct, onQuickDelete }: ExpiringItemProps) {
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
@@ -63,13 +64,23 @@ export function ExpiringItem({ item, onPress, onQuickDeduct }: ExpiringItemProps
         </View>
       </View>
       <TouchableOpacity
-        style={[styles.quickButton, { backgroundColor: colors.surfaceSecondary, borderRadius: borderRadius.lg }]}
+        style={[styles.quickButton, { borderRadius: borderRadius.lg }]}
         onPress={(e) => {
           e.stopPropagation();
           onQuickDeduct();
         }}
       >
-        <Minus size={16} color={colors.text} />
+        <ShoppingCart size={20} color={colors.teal500} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.quickButton, { borderRadius: borderRadius.lg, marginLeft: 8 }]}
+        onPress={(e) => {
+          e.stopPropagation();
+          onQuickDelete();
+        }}
+        activeOpacity={0.7}
+      >
+        <Trash2 size={20} color={colors.red500} />
       </TouchableOpacity>
     </TouchableOpacity>
   );

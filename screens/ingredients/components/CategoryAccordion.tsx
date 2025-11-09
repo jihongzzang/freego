@@ -16,6 +16,7 @@ interface CategoryAccordionProps {
   onItemPress: (id: string) => void;
   onItemEdit: (id: string) => void;
   onQuickDeduct: (id: string) => void;
+  onQuickDelete: (id: string) => void;
 }
 
 export function CategoryAccordion({
@@ -26,6 +27,7 @@ export function CategoryAccordion({
   onItemPress,
   onItemEdit,
   onQuickDeduct,
+  onQuickDelete,
 }: CategoryAccordionProps) {
   const { colors, typography } = useTheme();
 
@@ -50,6 +52,7 @@ export function CategoryAccordion({
               onPress={() => onItemPress(String(item.id))}
               onEdit={() => onItemEdit(String(item.id))}
               onQuickDeduct={() => onQuickDeduct(String(item.id))}
+              onQuickDelete={() => onQuickDelete(String(item.id))}
             />
           ))}
         </Card>
