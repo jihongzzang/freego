@@ -2,15 +2,15 @@ import Accordion from '@/components/ui/Accordion';
 import Card from '@/components/ui/Card';
 import EmptyStateUI from '@/components/ui/EmptyState';
 import { Ingredient } from '@/mvi/features/ingredients';
-import { getStorageLocationIcon } from '@/utils/getStorageLocationIcons';
-import { findStorageLocationById, StorageLocationType } from '@/constants/storageLocations';
+import { StorageLocation } from '@/data/enums/storage_location';
+import { getStorageLocationIcon, getStorageLocationLabel } from '@/utils/storageLocation';
 import { IngredientItem } from './IngredientItem';
 import { useTheme } from '@/lib/theme';
 import { Text } from 'react-native';
 import { HelpCircle } from 'lucide-react-native';
 
 interface StorageAccordionProps {
-  storageId: StorageLocationType | 'unset';
+  storageId: StorageLocation | 'unset';
   items: Ingredient[];
   isExpanded: boolean;
   onToggle: () => void;
@@ -32,9 +32,13 @@ export function StorageAccordion({
 }: StorageAccordionProps) {
   const { colors, typography } = useTheme();
 
-  const storageItem = storageId === 'unset' ? null : findStorageLocationById(storageId);
-  const storageLabel = storageId === 'unset' ? '미설정' : storageItem?.krLabel || '';
-  const storageIcon = storageId === 'unset' ? <HelpCircle size={20} color={colors.textSecondary} /> : getStorageLocationIcon(storageId, 20);
+  const storageLabel = storageId === 'unset' ? '미설정' : getStorageLocationLabel({ storageLocation: storageId, lang: 'kr' });
+  const storageIcon =
+    storageId === 'unset' ? (
+      <HelpCircle size={20} color={colors.textSecondary} />
+    ) : (
+      getStorageLocationIcon(storageId, 20)
+    );
 
   return (
     <Accordion
@@ -54,9 +58,9 @@ export function StorageAccordion({
             <IngredientItem
               key={item.id}
               item={item}
-              onPress={() => onItemPress(item.id)}
-              onEdit={() => onItemEdit(item.id)}
-              onQuickDeduct={() => onQuickDeduct(item.id)}
+              onPress={() => onItemPress(String(item.id))}
+              onEdit={() => onItemEdit(String(item.id))}
+              onQuickDeduct={() => onQuickDeduct(String(item.id))}
               getDaysRemaining={getDaysRemaining}
             />
           ))}

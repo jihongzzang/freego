@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import { Ingredient } from '@/mvi/features/home';
 import { IngredientCard } from './IngredientCard';
-import { StatusType } from '@/constants/itemStatus';
+import { StatusType } from '@/data/enums/status';
 import { useMemo } from 'react';
 
 interface ExpiringSectionProps {

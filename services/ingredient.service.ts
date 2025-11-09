@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ingredient } from '@/data/models/ingredient.model';
+import { generateId } from './utils/generateId';
 
 /**
  * AsyncStorage 키 상수
@@ -13,7 +14,8 @@ export const ingredientService = {
   async getIngredients(): Promise<Ingredient[]> {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
+      const ingredients = data ? JSON.parse(data) : [];
+      return ingredients.filter((item: Ingredient) => !item.deleted_at);
     } catch (error) {
       console.error('Error reading ingredients:', error);
       return [];
@@ -25,7 +27,7 @@ export const ingredientService = {
       const ingredients = await this.getIngredients();
       const newIngredient: Ingredient = {
         ...ingredient,
-        id: Date.now().toString(),
+        id: generateId(),
         created_at: new Date().toISOString(),
       };
       ingredients.push(newIngredient);
@@ -39,10 +41,9 @@ export const ingredientService = {
   async addMultipleIngredients(ingredientList: Omit<Ingredient, 'id' | 'created_at'>[]): Promise<void> {
     try {
       const ingredients = await this.getIngredients();
-      const now = Date.now();
-      const newIngredients: Ingredient[] = ingredientList.map((ingredient, index) => ({
+      const newIngredients: Ingredient[] = ingredientList.map((ingredient) => ({
         ...ingredient,
-        id: (now + index).toString(),
+        id: generateId(),
         created_at: new Date().toISOString(),
       }));
       ingredients.push(...newIngredients);
@@ -53,12 +54,16 @@ export const ingredientService = {
     }
   },
 
-  async updateIngredient(id: string, updates: Partial<Ingredient>): Promise<void> {
+  async updateIngredient(id: number, updates: Partial<Ingredient>): Promise<void> {
     try {
       const ingredients = await this.getIngredients();
       const index = ingredients.findIndex((item) => item.id === id);
       if (index !== -1) {
-        ingredients[index] = { ...ingredients[index], ...updates };
+        ingredients[index] = {
+          ...ingredients[index],
+          ...updates,
+          updated_at: new Date().toISOString(),
+        };
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
       }
     } catch (error) {
@@ -67,13 +72,20 @@ export const ingredientService = {
     }
   },
 
-  async deleteIngredient(id: string): Promise<void> {
+  async deleteIngredient(id: number): Promise<void> {
     try {
       const ingredients = await this.getIngredients();
-      const filtered = ingredients.filter((item) => item.id !== id);
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+      const index = ingredients.findIndex((item) => item.id === id);
+
+      if (index !== -1) {
+        ingredients[index] = {
+          ...ingredients[index],
+          deleted_at: new Date().toISOString(), // 삭제 시각 기록
+        };
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+      }
     } catch (error) {
-      console.error('Error deleting ingredient:', error);
+      console.error('Error marking ingredient as deleted:', error);
       throw error;
     }
   },

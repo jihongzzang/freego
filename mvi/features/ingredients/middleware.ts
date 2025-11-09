@@ -7,8 +7,8 @@
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { IngredientsState, IngredientsIntent, IngredientsEffect, Ingredient } from './types';
 import { ingredientService } from '@/services/ingredient.service';
-import { calculateStatus } from '@/utils/calculateStatus';
-import { calculateDaysRemaining } from '@/utils/calculateDaysRemaining';
+import { getCalculateStatus } from '@/utils/status';
+import { getCalculateDaysRemaining } from '@/utils/time';
 
 /**
  * Ingredients Middleware
@@ -23,8 +23,8 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
         const data = await ingredientService.getIngredients();
         const ingredients: Ingredient[] = data.map((item) => ({
           ...item,
-          status: calculateStatus(item.expiry_date),
-          daysRemaining: calculateDaysRemaining(item.expiry_date),
+          status: getCalculateStatus(item.expiry_date),
+          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
         }));
 
         return {
@@ -60,8 +60,8 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
         const data = await ingredientService.getIngredients();
         const ingredients: Ingredient[] = data.map((item) => ({
           ...item,
-          status: calculateStatus(item.expiry_date),
-          daysRemaining: calculateDaysRemaining(item.expiry_date),
+          status: getCalculateStatus(item.expiry_date),
+          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
         }));
 
         return {

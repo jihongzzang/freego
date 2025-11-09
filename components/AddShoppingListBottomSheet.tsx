@@ -1,17 +1,19 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { useTheme } from '@/lib/theme';
-import BottomSheet from '@/components/BottomSheet';
-import { getCategoryIcon } from '@/utils/getCategoryIcons';
-import { CATEGORIES } from '@/constants/categories';
+import BottomSheet from '@/components/ui/BottomSheet';
+import { makeCategoryList } from '@/utils/category/makeCategoryList';
+import { getCategoryIcon } from '@/utils/category';
+import { useMemo } from 'react';
+import { Button, Chip } from './ui';
 
 interface AddShoppingListBottomSheetProps {
   visible: boolean;
   onClose: () => void;
   name: string;
-  category: string;
+  category: number;
   memo: string;
   onNameChange: (text: string) => void;
-  onCategoryChange: (categoryId: string) => void;
+  onCategoryChange: (categoryId: number) => void;
   onMemoChange: (text: string) => void;
   onSubmit: () => void;
 }
@@ -27,7 +29,8 @@ export default function AddShoppingListBottomSheet({
   onMemoChange,
   onSubmit,
 }: AddShoppingListBottomSheetProps) {
-  const { colors, typography, isDark } = useTheme();
+  const { colors, typography, isDark, spacing } = useTheme();
+  const categories = useMemo(() => makeCategoryList({ lang: 'kr' }), []);
 
   return (
     <BottomSheet maxHeight={550} visible={visible} onClose={onClose} title="장보기 항목 추가">
@@ -35,7 +38,7 @@ export default function AddShoppingListBottomSheet({
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <View style={styles.content}>
             <View style={styles.inputGroup}>
-              <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>재료 이름</Text>
+              <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>재료 이름</Text>
               <TextInput
                 style={[
                   styles.input,
@@ -54,53 +57,28 @@ export default function AddShoppingListBottomSheet({
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>카테고리</Text>
+              <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>카테고리</Text>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.categoryScroll}
               >
-                {CATEGORIES.map((cat) => (
-                  <TouchableOpacity
+                {categories.map((cat) => (
+                  <Chip
                     key={cat.id}
-                    style={[
-                      styles.categoryChip,
-                      {
-                        // backgroundColor: colors.surface,
-                        // borderColor: colors.border,
-                        backgroundColor: isDark ? colors.grey400 : colors.grey200,
-                        borderColor: isDark ? colors.grey400 : colors.grey200,
-                      },
-                      category === cat.id && {
-                        // backgroundColor: colors.primaryLight,
-                        // borderColor: colors.primary,
-                        backgroundColor: isDark ? colors.grey600 : colors.grey400,
-                        borderColor: isDark ? colors.grey600 : colors.grey400,
-                      },
-                    ]}
+                    label={cat.label}
                     onPress={() => onCategoryChange(cat.id)}
-                  >
-                    <View style={styles.categoryChipContent}>
-                      {getCategoryIcon(cat.id, 16)}
-                      <Text
-                        style={[
-                          typography.styles.t6,
-                          { color: colors.grey700 },
-                          category === cat.id && {
-                            color: isDark ? colors.text : colors.white,
-                          },
-                        ]}
-                      >
-                        {cat.krLabel}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
+                    variant={category === cat.id ? 'primary' : 'secondary'}
+                    color={category === cat.id ? 'green' : 'grey'}
+                    size="xlarge"
+                    leftIcon={cat.id !== 0 && getCategoryIcon(cat.id, 16)}
+                  />
                 ))}
               </ScrollView>
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>메모 (선택)</Text>
+              <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>메모 (선택)</Text>
               <TextInput
                 style={[
                   styles.input,
@@ -125,35 +103,15 @@ export default function AddShoppingListBottomSheet({
         </ScrollView>
 
         <View
-          style={[
-            styles.confirmButtonContainer,
-            {
-              backgroundColor: colors.background,
-              borderTopColor: colors.border,
-            },
-          ]}
+          style={{
+            backgroundColor: isDark ? '#202027' : colors.white,
+            paddingVertical: spacing.xl,
+            paddingHorizontal: spacing.xl,
+          }}
         >
-          <TouchableOpacity
-            style={[
-              styles.confirmButton,
-              {
-                backgroundColor: name.trim() ? colors.primary : colors.border,
-              },
-            ]}
-            onPress={onSubmit}
-            disabled={!name.trim()}
-          >
-            <Text
-              style={[
-                typography.styles.st8Semibold,
-                {
-                  color: name.trim() ? '#FFFFFF' : colors.textTertiary,
-                },
-              ]}
-            >
-              추가
-            </Text>
-          </TouchableOpacity>
+          <Button size="large" variant="primary" onPress={onSubmit} disabled={!name.trim()}>
+            추가
+          </Button>
         </View>
       </View>
     </BottomSheet>
@@ -163,11 +121,12 @@ export default function AddShoppingListBottomSheet({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    maxHeight: 472,
+    maxHeight: 550,
   },
   content: {
     padding: 20,
     gap: 20,
+    paddingTop: 12,
     paddingBottom: 20,
   },
   inputGroup: {

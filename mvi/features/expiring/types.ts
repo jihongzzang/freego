@@ -3,16 +3,7 @@
  */
 
 import { Intent, State, Effect } from '@/mvi/base';
-import { Ingredient as StoredIngredient } from '@/data/models/ingredient.model';
-import { StatusType } from '@/constants/itemStatus';
-
-/**
- * Ingredient with status
- */
-export interface Ingredient extends StoredIngredient {
-  status: StatusType;
-  daysRemaining: number | null;
-}
+import { Ingredient } from '@/data/models/ingredient.model';
 
 /**
  * Expiring State
@@ -30,13 +21,11 @@ export type ExpiringIntent =
   | { type: 'LOAD_INGREDIENTS' }
   | { type: 'LOAD_INGREDIENTS_SUCCESS'; payload: Ingredient[] }
   | { type: 'LOAD_INGREDIENTS_ERROR'; payload: string }
-  | { type: 'DELETE_INGREDIENT'; payload: string }
+  | { type: 'DELETE_INGREDIENT'; payload: number }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: string }
   | { type: 'NAVIGATE_BACK' };
 
 /**
  * Expiring Effect (부수 효과)
  */
-export type ExpiringEffect =
-  | { type: 'NAVIGATE'; payload: string }
-  | { type: 'SHOW_TOAST'; payload: string };
+export type ExpiringEffect = { type: 'NAVIGATE'; payload: string } | { type: 'SHOW_TOAST'; message: string };

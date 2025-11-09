@@ -7,8 +7,8 @@
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { HomeState, HomeIntent, HomeEffect, Ingredient } from './types';
 import { ingredientService } from '@/services/ingredient.service';
-import { calculateStatus } from '@/utils/calculateStatus';
-import { calculateDaysRemaining } from '@/utils/calculateDaysRemaining';
+import { getCalculateStatus } from '@/utils/status';
+import { getCalculateDaysRemaining } from '@/utils/time';
 
 /**
  * Home Middleware
@@ -23,8 +23,8 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
         const data = await ingredientService.getIngredients();
         const ingredients: Ingredient[] = data.map((item) => ({
           ...item,
-          status: calculateStatus(item.expiry_date),
-          daysRemaining: calculateDaysRemaining(item.expiry_date),
+          status: getCalculateStatus(item.expiry_date),
+          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
         }));
 
         return {
@@ -60,8 +60,8 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
         const data = await ingredientService.getIngredients();
         const ingredients: Ingredient[] = data.map((item) => ({
           ...item,
-          status: calculateStatus(item.expiry_date),
-          daysRemaining: calculateDaysRemaining(item.expiry_date),
+          status: getCalculateStatus(item.expiry_date),
+          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
         }));
 
         return {
@@ -99,8 +99,8 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
 
         const ingredients: Ingredient[] = data.map((item) => ({
           ...item,
-          status: calculateStatus(item.expiry_date),
-          daysRemaining: calculateDaysRemaining(item.expiry_date),
+          status: getCalculateStatus(item.expiry_date),
+          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
         }));
 
         return {

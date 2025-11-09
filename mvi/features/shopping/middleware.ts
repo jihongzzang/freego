@@ -42,7 +42,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
     case 'TOGGLE_PURCHASED': {
       try {
-        await shoppingService.updateShoppingItem(intent.payload.id, {
+        await shoppingService.updateShoppingItem(Number(intent.payload.id), {
           is_purchased: !intent.payload.currentStatus,
         });
 
@@ -80,7 +80,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
               message: `"${intent.payload.name}"을(를) 장보기 목록에서 삭제할까요?`,
               onConfirm: async () => {
                 try {
-                  await shoppingService.deleteShoppingItem(intent.payload.id);
+                  await shoppingService.deleteShoppingItem(Number(intent.payload.id));
                   // 삭제 후 목록 새로고침을 위한 LOAD_SHOPPING_LIST intent 발행은
                   // 컴포넌트에서 처리하도록 함
                 } catch (error) {
@@ -122,7 +122,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             ...state,
             shoppingList: items,
             isAddingItem: false,
-            addForm: { name: '', category: 'vegetables' },
+            addForm: { name: '', category: 1 },
           },
           effects: [
             {

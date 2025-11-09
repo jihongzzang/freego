@@ -16,7 +16,7 @@ export const shoppingReducer: Reducer<ShoppingState, ShoppingIntent> = (
       return {
         ...state,
         isAddingItem: intent.payload,
-        addForm: intent.payload ? state.addForm : { name: '', category: 'vegetables' },
+        addForm: intent.payload ? state.addForm : { name: '', category: 1 },
       };
 
     case 'UPDATE_ADD_FORM':

@@ -18,7 +18,7 @@ export function useIngredientDetailLogic() {
   const [selectedEmoji, setSelectedEmoji] = useState<IngredientTemplate | null>(null);
   const processedEffectRef = useRef<typeof effect>(null);
 
-  const handleFieldChange = (field: keyof EditFormData, value: string) => {
+  const handleFieldChange = (field: keyof EditFormData, value: any) => {
     dispatch({ type: 'UPDATE_FORM_FIELD', payload: { field, value } });
   };
 
@@ -27,17 +27,17 @@ export function useIngredientDetailLogic() {
   });
 
   const expiryDatePicker = useExpiryDatePicker({
-    onDateConfirm: (formattedDate) => handleFieldChange('expiry_date', formattedDate),
+    onDateConfirm: (date) => handleFieldChange('expiry_date', date),
   });
 
   const purchaseDatePicker = useExpiryDatePicker({
-    onDateConfirm: (formattedDate) => handleFieldChange('purchase_date', formattedDate),
+    onDateConfirm: (date) => handleFieldChange('purchased_date', date),
   });
 
   // 식재료 데이터 로드
   useEffect(() => {
-    if (id) {
-      dispatch({ type: 'LOAD_INGREDIENT', payload: id as string });
+    if (id && !isNaN(Number(id))) {
+      dispatch({ type: 'LOAD_INGREDIENT', payload: Number(id) });
     }
   }, [id, dispatch]);
 
@@ -135,10 +135,7 @@ export function useIngredientDetailLogic() {
   const handleQuickSelect = (days: number) => {
     const date = new Date();
     date.setDate(date.getDate() + days);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
+    const formattedDate = date.toISOString();
     handleFieldChange('expiry_date', formattedDate);
   };
 

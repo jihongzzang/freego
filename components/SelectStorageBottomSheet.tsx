@@ -1,44 +1,55 @@
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useTheme } from '@/lib/theme';
-import BottomSheet from './BottomSheet';
-import { STORAGE_LOCATIONS, StorageLocationType } from '@/constants/storageLocations';
-import { getStorageLocationIcon } from '@/utils/getStorageLocationIcons';
+import BottomSheet from './ui/BottomSheet';
+import { StorageLocation } from '@/data/enums/storage_location';
+import { makeStorageList } from '@/utils/category/makeStorageList';
+import { getStorageLocationIcon } from '@/utils/storageLocation/getStorageLocationIcon';
 
 interface SelectStorageBottomSheetProps {
   visible: boolean;
   onClose: () => void;
-  onSelect: (storageLocation: StorageLocationType) => void;
+  onSelect: (storageLocation: StorageLocation) => void;
 }
 
 export default function SelectStorageBottomSheet({ visible, onClose, onSelect }: SelectStorageBottomSheetProps) {
-  const { colors, typography, spacing, borderRadius } = useTheme();
+  const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
-  const handleSelect = (storageLocation: StorageLocationType) => {
+  const handleSelect = (storageLocation: StorageLocation) => {
     onSelect(storageLocation);
     onClose();
   };
 
+  const storageLocations = makeStorageList({ lang: 'kr' });
+
   return (
-    <BottomSheet visible={visible} onClose={onClose} title="보관위치 선택" maxHeight={250}>
+    <BottomSheet visible={visible} onClose={onClose} title="재고에 넣기" maxHeight={260}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary, marginBottom: 12 }]}>
+          재고에 넣기전 보관위치를 설정해 주세요.
+        </Text>
         <View style={styles.grid}>
-          {STORAGE_LOCATIONS.map((location) => (
+          {storageLocations.map((location) => (
             <TouchableOpacity
               key={location.id}
               style={[
                 styles.locationCard,
                 {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  borderRadius: borderRadius.lg,
+                  backgroundColor: 'rgba(78, 89, 104 ,0.16)',
+                  borderColor: 'transparent',
+                  borderRadius: borderRadius.md,
                 },
               ]}
               onPress={() => handleSelect(location.id)}
               activeOpacity={0.7}
             >
               <View style={[styles.iconContainer]}>{getStorageLocationIcon(location.id, 28)}</View>
-              <Text style={[typography.styles.t6Semibold, { color: colors.text, marginTop: spacing.sm }]}>
-                {location.krLabel}
+              <Text
+                style={[
+                  typography.styles.t6Semibold,
+                  { color: isDark ? colors.grey500 : colors.grey700, marginTop: spacing.sm },
+                ]}
+              >
+                {location.label}
               </Text>
             </TouchableOpacity>
           ))}
@@ -50,9 +61,8 @@ export default function SelectStorageBottomSheet({ visible, onClose, onSelect }:
 
 const styles = StyleSheet.create({
   container: {
-    maxHeight: 250,
-    paddingHorizontal: 12,
-    paddingTop: 16,
+    paddingHorizontal: 20,
+    paddingTop: 12,
   },
   grid: {
     flexDirection: 'row',

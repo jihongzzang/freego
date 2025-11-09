@@ -57,18 +57,19 @@ export function PackageConfirmation({
           <View style={styles.ingredientsGrid}>
             {selectedPackage?.ingredients.map((item, index) => {
               if (isDark) {
-                return <Chip key={index} label={item.emoji + ' ' + item.name} variant="filled" size="small" />;
+                return (
+                  <Chip
+                    key={index}
+                    label={item.emoji + ' ' + item.name}
+                    variant="secondary"
+                    color="green"
+                    size="large"
+                  />
+                );
               }
 
               return (
-                <Chip
-                  key={index}
-                  label={item.emoji + ' ' + item.name}
-                  variant="filled"
-                  size="small"
-                  // selectedColor={colors.grey400}
-                  backgroundColor={colors.grey300}
-                />
+                <Chip key={index} label={item.emoji + ' ' + item.name} variant="secondary" color="green" size="large" />
               );
             })}
           </View>

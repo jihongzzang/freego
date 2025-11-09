@@ -8,8 +8,7 @@ import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { AddState, AddIntent, AddEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
 import { categoryDefaultEmojis } from '@/constants/ingredientTemplates';
-import { CATEGORIES } from '@/constants/categories';
-import { STORAGE_LOCATIONS } from '@/constants/storageLocations';
+import { Category } from '@/data/enums/category';
 
 /**
  * 폼 유효성 검사
@@ -26,19 +25,8 @@ function validateForm(form: AddState['form']): {
   }
 
   // 수량 검증 (선택적)
-  if (form.quantity && form.quantity.trim()) {
-    const quantity = parseInt(form.quantity);
-    if (isNaN(quantity) || quantity <= 0) {
-      errors.name = '올바른 수량을 입력해주세요.';
-    }
-  }
-
-  // 유통기한 검증 (선택적)
-  if (form.expiry_date.trim()) {
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateRegex.test(form.expiry_date)) {
-      errors.expiry_date = '날짜 형식이 올바르지 않아요. (YYYY-MM-DD)';
-    }
+  if (form.quantity?.trim() === '0') {
+    errors.name = '수량이 0개인 식재료는 등록할 수 없어요.';
   }
 
   return {
@@ -104,18 +92,12 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
           category: state.form.category,
           emoji: state.form.emoji || categoryDefaultEmojis[state.form.category] || '🍴',
           quantity: state.form.quantity && state.form.quantity.trim() ? parseInt(state.form.quantity) : undefined,
-          unit: state.form.unit && state.form.unit.trim() ? (state.form.unit as any) : undefined,
-          registration_date: registrationDate,
-          purchase_date:
-            state.form.purchase_date && state.form.purchase_date.trim() ? state.form.purchase_date : undefined,
-          expiry_date: state.form.expiry_date.trim() || undefined,
-          storage_location: state.form.storage_location,
+          unit: state.form.unit || undefined,
+          purchased_date: state.form.purchased_date || undefined,
+          expiry_date: state.form.expiry_date || undefined,
+          storage_location: state.form.storage_location || undefined,
           memo: state.form.memo,
         });
-
-        // 기본 카테고리와 보관 위치 찾기
-        const defaultCategory = CATEGORIES.find((cat) => cat.id === 'vegetables');
-        const defaultStorageLocation = STORAGE_LOCATIONS.find((loc) => loc.id === 'fridge');
 
         return {
           state: {
@@ -123,15 +105,14 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
             isSubmitting: false,
             form: {
               name: '',
-              category: defaultCategory?.id || 'vegetables',
+              category: Category.VEGETABLE,
               quantity: undefined,
               unit: undefined,
-              purchase_date: undefined,
-              expiry_date: '',
+              purchased_date: undefined,
+              expiry_date: undefined,
               storage_location: undefined,
-              memo: '',
+              memo: undefined,
             },
-            mode: 'select',
             errors: {},
           },
           effects: [

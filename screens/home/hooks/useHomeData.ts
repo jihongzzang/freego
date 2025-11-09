@@ -1,31 +1,33 @@
 import { useMemo } from 'react';
 import { Ingredient } from '@/mvi/features/home';
-import { ALL_CATEGORIES, ALL_CATEGORY, AllCategoryType } from '@/constants/categories';
-import { StatusType } from '@/constants/itemStatus';
+import { Category } from '@/data/enums/category';
+import { StatusType } from '@/data/enums/status';
+import { makeCategoryList } from '@/utils/category/makeCategoryList';
 
-export function useHomeData(ingredients: Ingredient[], selectedCategoryId: AllCategoryType) {
+export function useHomeData(ingredients: Ingredient[], selectedCategoryId: Category | 0) {
   // 만료된 재료 필터링
   const expiringItems = useMemo(() => {
     return ingredients.filter((item) => item.status === 'expired');
   }, [ingredients]);
 
   // 선택된 카테고리 정보
+  const categories = useMemo(() => makeCategoryList({ includeAllCategory: true, lang: 'kr' }), []);
   const selectedCategoryItem = useMemo(
-    () => ALL_CATEGORIES.find((cat) => cat.id === selectedCategoryId),
-    [selectedCategoryId],
+    () => categories.find((cat) => cat.id === selectedCategoryId),
+    [selectedCategoryId, categories],
   );
 
   // 선택된 카테고리에 따른 재료 필터링
   const filteredIngredients = useMemo(() => {
-    if (selectedCategoryId === ALL_CATEGORY.id) {
+    if (selectedCategoryId === 0) {
       return ingredients;
     }
     return ingredients.filter((item) => item.category === selectedCategoryId);
   }, [ingredients, selectedCategoryId]);
 
   // 카테고리별 개수 계산
-  const getCategoryCount = (categoryId: AllCategoryType) => {
-    if (categoryId === ALL_CATEGORY.id) {
+  const getCategoryCount = (categoryId: Category | 0) => {
+    if (categoryId === 0) {
       return ingredients.length;
     }
     return ingredients.filter((item) => item.category === categoryId).length;

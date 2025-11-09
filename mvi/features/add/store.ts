@@ -8,6 +8,7 @@ import { Store } from '@/mvi/base';
 import { AddState, AddIntent, AddEffect } from './types';
 import { addReducer } from './reducer';
 import { addMiddleware } from './middleware';
+import { Category } from '@/data/enums/category';
 
 /**
  * 초기 상태
@@ -15,15 +16,14 @@ import { addMiddleware } from './middleware';
 const initialState: AddState = {
   form: {
     name: '',
-    category: 'vegetables',
+    category: Category.VEGETABLE,
     quantity: undefined,
     unit: undefined,
-    purchase_date: undefined,
-    expiry_date: '',
+    purchased_date: undefined,
+    expiry_date: undefined,
     storage_location: undefined,
-    memo: '',
+    memo: undefined,
   },
-  mode: 'select',
   isSubmitting: false,
   errors: {},
 };

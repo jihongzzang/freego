@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Calendar } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { Ingredient } from '@/mvi/features/home';
-import { StatusType } from '@/constants/itemStatus';
+import { StatusType } from '@/data/enums/status';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 

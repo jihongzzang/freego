@@ -7,6 +7,8 @@ import { QuantitySection } from '../../ingredient-detail/components/EditForm/Qua
 import { DateSection } from '../../ingredient-detail/components/EditForm/DateSection';
 import { StorageSection } from '../../ingredient-detail/components/EditForm/StorageSection';
 import { MemoSection } from '@/screens/ingredient-detail/components/EditForm/MemoSection';
+import { useTheme } from '@/lib/theme';
+import { useMemo } from 'react';
 
 interface AddFormProps {
   formData: AddFormData;
@@ -22,7 +24,6 @@ interface AddFormProps {
 
 export function AddForm({
   formData,
-  errors,
   selectedEmoji,
   onFieldChange,
   onEmojiPress,
@@ -31,6 +32,10 @@ export function AddForm({
   onExpiryDatePress,
   onQuickSelect,
 }: AddFormProps) {
+  const { spacing } = useTheme();
+
+  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
+
   return (
     <View style={styles.container}>
       <CategorySection selectedCategory={formData.category} onCategoryChange={onFieldChange as any} />
@@ -42,10 +47,11 @@ export function AddForm({
         onEmojiPress={onEmojiPress}
       />
 
-      <StorageSection storageLocation={formData.storage_location || ''} onFieldChange={onFieldChange as any} />
+      <StorageSection storageLocation={formData.storage_location} onFieldChange={onFieldChange as any} />
 
       <DateSection
-        purchaseDate={formData.purchase_date || ''}
+        isEdit={false}
+        purchaseDate={formData.purchased_date}
         expiryDate={formData.expiry_date || ''}
         onFieldChange={onFieldChange as any}
         onPurchaseDatePress={onPurchaseDatePress}
@@ -65,8 +71,9 @@ export function AddForm({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    gap: 24,
-  },
-});
+const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
+  StyleSheet.create({
+    container: {
+      gap: spacing.xxl,
+    },
+  });

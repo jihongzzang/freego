@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import { Home, Package, Settings } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/lib/theme';
-import { Platform, TouchableOpacity } from 'react-native';
+import { Platform, Text, TouchableOpacity } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 function AnimatedTabBarButton({ children, onPress, ...props }: any) {
@@ -46,27 +46,26 @@ function AnimatedTabBarButton({ children, onPress, ...props }: any) {
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
-  const { colors } = useTheme();
+
+  const { colors, isDark, typography } = useTheme();
 
   return (
     <Tabs
       detachInactiveScreens={false}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.text,
-        tabBarInactiveTintColor: colors.textTertiary,
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopWidth: 0,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
           paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           paddingTop: 8,
           height: insets.bottom > 0 ? 48 + insets.bottom : 48,
           position: 'absolute',
-          shadowColor: '#000',
+          shadowColor: isDark ? '#3C3C47' : colors.grey200,
           shadowOffset: { width: 0, height: -1 },
-          shadowOpacity: 0.1,
+          shadowOpacity: 1,
           shadowRadius: 1,
           elevation: 1,
         },
@@ -83,7 +82,30 @@ export default function TabLayout() {
         options={{
           title: '내 냉장고',
           sceneStyle: { backgroundColor: colors.background },
-          tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
+          tabBarLabel: ({ focused }) => (
+            <Text
+              style={[
+                typography.styles.t8Medium,
+                {
+                  color: isDark
+                    ? focused
+                      ? colors.grey200
+                      : colors.grey600
+                    : focused
+                      ? colors.grey900
+                      : colors.grey600,
+                },
+              ]}
+            >
+              내 냉장고
+            </Text>
+          ),
+          tabBarIcon: ({ focused }) => (
+            <Home
+              size={24}
+              color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
+            />
+          ),
         }}
       />
       <Tabs.Screen
@@ -91,7 +113,30 @@ export default function TabLayout() {
         options={{
           title: '재료 관리',
           sceneStyle: { backgroundColor: colors.background },
-          tabBarIcon: ({ size, color }) => <Package size={size} color={color} />,
+          tabBarLabel: ({ focused }) => (
+            <Text
+              style={[
+                typography.styles.t8Medium,
+                {
+                  color: isDark
+                    ? focused
+                      ? colors.grey200
+                      : colors.grey600
+                    : focused
+                      ? colors.grey900
+                      : colors.grey600,
+                },
+              ]}
+            >
+              재료 관리
+            </Text>
+          ),
+          tabBarIcon: ({ focused }) => (
+            <Package
+              size={24}
+              color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
+            />
+          ),
         }}
       />
       <Tabs.Screen
@@ -99,7 +144,30 @@ export default function TabLayout() {
         options={{
           title: '장보기',
           sceneStyle: { backgroundColor: colors.background },
-          tabBarIcon: ({ size, color }) => <Package size={size} color={color} />,
+          tabBarLabel: ({ focused }) => (
+            <Text
+              style={[
+                typography.styles.t8Medium,
+                {
+                  color: isDark
+                    ? focused
+                      ? colors.grey200
+                      : colors.grey600
+                    : focused
+                      ? colors.grey900
+                      : colors.grey600,
+                },
+              ]}
+            >
+              장보기
+            </Text>
+          ),
+          tabBarIcon: ({ focused }) => (
+            <Package
+              size={24}
+              color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
+            />
+          ),
         }}
       />
       <Tabs.Screen
@@ -107,7 +175,30 @@ export default function TabLayout() {
         options={{
           title: '설정',
           sceneStyle: { backgroundColor: colors.background },
-          tabBarIcon: ({ size, color }) => <Settings size={size} color={color} />,
+          tabBarLabel: ({ focused }) => (
+            <Text
+              style={[
+                typography.styles.t8Medium,
+                {
+                  color: isDark
+                    ? focused
+                      ? colors.grey200
+                      : colors.grey600
+                    : focused
+                      ? colors.grey900
+                      : colors.grey600,
+                },
+              ]}
+            >
+              설정
+            </Text>
+          ),
+          tabBarIcon: ({ focused }) => (
+            <Settings
+              size={24}
+              color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
+            />
+          ),
         }}
       />
     </Tabs>

@@ -2,18 +2,16 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { useMemo } from 'react';
 import { Clock } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
-import Header from '@/components/Header';
+import Header from '@/components/ui/Header';
 import Card from '@/components/ui/Card';
 import EmptyStateUI from '@/components/ui/EmptyState';
 import { useExpiringLogic } from './hooks/useExpiringLogic';
-import { useExpiringData } from './hooks/useExpiringData';
 import { ExpiringItem } from './components/ExpiringItem';
 
 export default function ExpiringScreen() {
   const { colors, spacing } = useTheme();
 
   const { ingredients, loading, handleNavigateBack, handleNavigateToDetail, handleQuickDeduct } = useExpiringLogic();
-  const { getDaysRemaining } = useExpiringData();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
@@ -38,7 +36,6 @@ export default function ExpiringScreen() {
                 item={item}
                 onPress={() => handleNavigateToDetail(item.id)}
                 onQuickDeduct={() => handleQuickDeduct(item.id)}
-                getDaysRemaining={getDaysRemaining}
               />
             ))}
           </Card>

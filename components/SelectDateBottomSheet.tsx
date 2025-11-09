@@ -1,7 +1,9 @@
-import { Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, View } from 'react-native';
 import { useTheme } from '@/lib/theme';
-import BottomSheet from '@/components/BottomSheet';
-import DatePicker from '@/components/DatePicker';
+import BottomSheet from '@/components/ui/BottomSheet';
+import DatePicker from '@/components/ui/DatePicker';
+import { useMemo } from 'react';
+import { Button } from './ui';
 
 interface SelectDateBottomSheetProps {
   visible: boolean;
@@ -18,33 +20,44 @@ export default function SelectDateBottomSheet({
   visible,
   onClose,
   title = '날짜 선택',
-  maxHeight = 600,
+  maxHeight = 610,
   selectedDate,
   onDateChange,
   onConfirm,
 }: SelectDateBottomSheetProps) {
-  const { colors, typography } = useTheme();
+  const { colors, spacing, isDark } = useTheme();
+
+  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
   return (
     <BottomSheet maxHeight={maxHeight} visible={visible} onClose={onClose} title={title}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <DatePicker value={selectedDate} onDateSelect={onDateChange} />
-        <TouchableOpacity style={[styles.confirmButton, { backgroundColor: colors.primary }]} onPress={onConfirm}>
-          <Text style={[typography.styles.st8Semibold, { color: '#FFFFFF' }]}>확인</Text>
-        </TouchableOpacity>
+        <View
+          style={[
+            styles.confirmButtonContainer,
+            {
+              backgroundColor: isDark ? '#202027' : colors.white,
+            },
+          ]}
+        >
+          <Button variant="primary" size="large" onPress={onConfirm}>
+            확인
+          </Button>
+        </View>
       </ScrollView>
     </BottomSheet>
   );
 }
 
-const styles = StyleSheet.create({
-  content: {
-    padding: 20,
-    gap: 20,
-  },
-  confirmButton: {
-    paddingVertical: 20,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-});
+const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
+  StyleSheet.create({
+    content: {
+      gap: spacing.xl,
+      paddingHorizontal: 20,
+      paddingTop: 12,
+    },
+    confirmButtonContainer: {
+      paddingVertical: spacing.xl,
+    },
+  });

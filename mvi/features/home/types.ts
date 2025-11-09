@@ -4,7 +4,7 @@
 
 import { Intent, State, Effect } from '@/mvi/base';
 import { Ingredient as StoredIngredient } from '@/data/models/ingredient.model';
-import { StatusType } from '@/constants/itemStatus';
+import { StatusType } from '@/data/enums/status';
 
 /**
  * Ingredient with status
@@ -30,12 +30,12 @@ export type HomeIntent =
   | { type: 'LOAD_INGREDIENTS' }
   | { type: 'LOAD_INGREDIENTS_SUCCESS'; payload: Ingredient[] }
   | { type: 'LOAD_INGREDIENTS_ERROR'; payload: string }
-  | { type: 'DELETE_INGREDIENT'; payload: string }
-  | { type: 'UPDATE_EXPIRY_DATE'; payload: { id: string; expiryDate: string } }
-  | { type: 'NAVIGATE_TO_ADD'; payload?: string }
-  | { type: 'NAVIGATE_TO_INGREDIENTS'; payload?: string }
+  | { type: 'DELETE_INGREDIENT'; payload: number }
+  | { type: 'UPDATE_EXPIRY_DATE'; payload: { id: number; expiryDate: string } }
+  | { type: 'NAVIGATE_TO_ADD'; payload?: number }
+  | { type: 'NAVIGATE_TO_INGREDIENTS'; payload?: number }
   | { type: 'NAVIGATE_TO_EXPIRING' }
-  | { type: 'NAVIGATE_TO_DETAIL'; payload: string };
+  | { type: 'NAVIGATE_TO_DETAIL'; payload: number };
 
 /**
  * Home Effect (부수 효과)

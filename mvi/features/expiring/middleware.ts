@@ -5,10 +5,11 @@
  */
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
-import { ExpiringState, ExpiringIntent, ExpiringEffect, Ingredient } from './types';
+import { ExpiringState, ExpiringIntent, ExpiringEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
-import { calculateStatus } from '@/utils/calculateStatus';
-import { calculateDaysRemaining } from '@/utils/calculateDaysRemaining';
+import { getCalculateDaysRemaining } from '@/utils/time';
+import { Ingredient } from '@/data/models/ingredient.model';
+import { getStatusLabel } from '@/utils/status';
 
 /**
  * Expiring Middleware
@@ -21,14 +22,10 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
     case 'LOAD_INGREDIENTS': {
       try {
         const data = await ingredientService.getIngredients();
-        // 만료된 상태인 재료만 필터링
-        const allIngredients: Ingredient[] = data.map((item) => ({
-          ...item,
-          status: calculateStatus(item.expiry_date),
-          daysRemaining: calculateDaysRemaining(item.expiry_date),
-        }));
-
-        const ingredients = allIngredients.filter((item) => item.status === 'expired');
+        const ingredients = data.filter((item) => {
+          const days = getCalculateDaysRemaining(item.expiry_date);
+          return days !== null && days < 0;
+        });
 
         return {
           state: {
@@ -48,7 +45,7 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료 데이터를 불러오는데 실패했어요.',
+              message: '식재료 데이터를 불러오는데 실패했어요.',
             },
           ],
         };
@@ -61,13 +58,10 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
 
         // 삭제 후 다시 로드
         const data = await ingredientService.getIngredients();
-        const allIngredients: Ingredient[] = data.map((item) => ({
-          ...item,
-          status: calculateStatus(item.expiry_date),
-          daysRemaining: calculateDaysRemaining(item.expiry_date),
-        }));
-
-        const ingredients = allIngredients.filter((item) => item.status === 'expired');
+        const ingredients = data.filter((item) => {
+          const days = getCalculateDaysRemaining(item.expiry_date);
+          return days !== null && days < 0;
+        });
 
         return {
           state: {
@@ -77,7 +71,7 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료가 삭제됐어요.',
+              message: '식재료가 삭제됐어요.',
             },
           ],
         };
@@ -86,7 +80,7 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
           effects: [
             {
               type: 'SHOW_TOAST',
-              payload: '식재료 삭제에 실패했어요.',
+              message: '식재료 삭제에 실패했어요.',
             },
           ],
         };

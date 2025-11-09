@@ -2,10 +2,10 @@
  * Add Ingredient Screen MVI Types
  */
 
-import { Intent, State, Effect } from '@/mvi/base';
-import { CategoryType } from '@/constants/categories';
-import { StorageLocationType } from '@/constants/storageLocations';
-import { UnitType } from '@/constants/units';
+import { State } from '@/mvi/base';
+import { Category } from '@/data/enums/category';
+import { StorageLocation } from '@/data/enums/storage_location';
+import { Unit } from '@/data/enums/unit';
 
 /**
  * Add Form State
@@ -13,13 +13,13 @@ import { UnitType } from '@/constants/units';
 export interface AddFormData {
   name: string;
   emoji?: string;
-  category: CategoryType;
+  category: Category;
   quantity?: string;
-  unit?: UnitType;
-  purchase_date?: string;
-  expiry_date: string;
-  storage_location?: StorageLocationType;
-  memo: string;
+  unit?: Unit;
+  purchased_date?: string;
+  expiry_date?: string;
+  storage_location?: StorageLocation;
+  memo?: string;
 }
 
 /**
@@ -35,7 +35,6 @@ export interface ValidationErrors {
  */
 export interface AddState extends State {
   form: AddFormData;
-  mode: 'select' | 'manual';
   isSubmitting: boolean;
   errors: ValidationErrors;
 }
@@ -44,7 +43,6 @@ export interface AddState extends State {
  * Add Intent (사용자 액션)
  */
 export type AddIntent =
-  | { type: 'SET_MODE'; payload: 'select' | 'manual' }
   | {
       type: 'UPDATE_FIELD';
       payload: { field: keyof AddFormData; value: string };
@@ -65,6 +63,13 @@ export type AddEffect =
       type: 'SHOW_ALERT';
       payload: {
         title: string;
+        message: string;
+        variant: 'success' | 'warning' | 'error';
+      };
+    }
+  | {
+      type: 'SHOW_TOAST';
+      payload: {
         message: string;
         variant: 'success' | 'warning' | 'error';
       };

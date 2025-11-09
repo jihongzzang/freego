@@ -124,7 +124,7 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
               style={[
                 typography.styles.t7,
                 {
-                  color: index === 0 ? colors.danger : index === 6 ? colors.blue500 : colors.textSecondary,
+                  color: index === 0 ? colors.red700 : index === 6 ? colors.blue700 : colors.textTertiary,
                 },
               ]}
             >
@@ -147,14 +147,15 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
 
           // 텍스트 색상 결정
           let textColor = colors.text;
+
           if (selected) {
             textColor = '#FFFFFF';
           } else if (disabled) {
-            textColor = colors.textTertiary;
+            textColor = colors.textDisabled;
           } else if (dayOfWeek === 0) {
-            textColor = colors.danger;
+            textColor = colors.red700;
           } else if (dayOfWeek === 6) {
-            textColor = colors.blue500;
+            textColor = colors.blue700;
           }
 
           return (
@@ -168,12 +169,12 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
                 style={[
                   styles.dayCellInner,
                   selected && {
-                    backgroundColor: colors.grey400,
+                    backgroundColor: colors.primary,
                   },
                   today &&
                     !selected && {
                       borderWidth: 2,
-                      borderColor: colors.grey400,
+                      borderColor: colors.primary,
                     },
                 ]}
               >

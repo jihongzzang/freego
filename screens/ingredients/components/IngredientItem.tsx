@@ -2,9 +2,9 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Minus, Edit3 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { Ingredient } from '@/mvi/features/ingredients';
-import { getStatusColor } from '@/utils/getStatusColors';
-import { findStorageLocationById } from '@/constants/storageLocations';
-import { findUnitById } from '@/constants/units';
+import { getStatusColor } from '@/utils/status/getStatusColor';
+import { getStorageLocationLabel } from '@/utils/storageLocation';
+import { getUnitLabel } from '@/utils/unit';
 import { useMemo } from 'react';
 
 interface IngredientItemProps {
@@ -31,10 +31,10 @@ export function IngredientItem({ item, onPress, onEdit, onQuickDeduct, getDaysRe
           <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>
             {item.quantity
               ? item.unit
-                ? `${item.quantity}${findUnitById(item.unit)?.krLabel}${item.storage_location ? ` · ${findStorageLocationById(item.storage_location)?.krLabel}` : ''}`
-                : `${item.quantity}${item.storage_location ? ` · ${findStorageLocationById(item.storage_location)?.krLabel}` : ''}`
+                ? `${item.quantity}${getUnitLabel({ unit: item.unit, lang: 'kr' })}${item.storage_location ? ` · ${getStorageLocationLabel({ storageLocation: item.storage_location, lang: 'kr' })}` : ''}`
+                : `${item.quantity}${item.storage_location ? ` · ${getStorageLocationLabel({ storageLocation: item.storage_location, lang: 'kr' })}` : ''}`
               : item.storage_location
-                ? findStorageLocationById(item.storage_location)?.krLabel
+                ? getStorageLocationLabel({ storageLocation: item.storage_location, lang: 'kr' })
                 : ''}
           </Text>
 

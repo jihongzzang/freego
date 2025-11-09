@@ -5,13 +5,10 @@
  */
 
 import { Store } from '@/mvi/base';
-import {
-  IngredientDetailState,
-  IngredientDetailIntent,
-  IngredientDetailEffect,
-} from './types';
+import { IngredientDetailState, IngredientDetailIntent, IngredientDetailEffect } from './types';
 import { ingredientDetailReducer } from './reducer';
 import { ingredientDetailMiddleware } from './middleware';
+import { Category } from '@/data/enums/category';
 
 /**
  * 초기 상태
@@ -20,12 +17,12 @@ const initialState: IngredientDetailState = {
   ingredient: null,
   editForm: {
     name: '',
-    category: 'vegetables',
-    quantity: '',
-    unit: '',
-    expiry_date: '',
+    category: Category.VEGETABLE,
+    quantity: undefined,
+    unit: undefined,
+    expiry_date: undefined,
     storage_location: undefined,
-    memo: '',
+    memo: undefined,
   },
   isEditing: false,
   loading: true,

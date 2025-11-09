@@ -1,26 +1,26 @@
 import { Carrot, Apple, Beef, Milk, Package, Fish, Cookie, Soup } from 'lucide-react-native';
-import { CategoryType } from '@/constants/categories';
-import { getCategoryColor } from './getCategoryColors';
+import { getCategoryColor } from './getCategoryColor';
+import { Category } from '@/data/enums/category';
 
-export function getCategoryIcon(category: CategoryType, size: number = 16, customColor?: string) {
+export function getCategoryIcon(category: Category, size: number = 16, customColor?: string) {
   const color = customColor || getCategoryColor(category);
 
   switch (category) {
-    case 'vegetables':
+    case Category.VEGETABLE:
       return <Carrot size={size} color={color} />;
-    case 'fruits':
+    case Category.FRUIT:
       return <Apple size={size} color={color} />;
-    case 'meat':
+    case Category.MEAT:
       return <Beef size={size} color={color} />;
-    case 'seafood':
+    case Category.SEAFOOD:
       return <Fish size={size} color={color} />;
-    case 'dairy':
+    case Category.DAIRY:
       return <Milk size={size} color={color} />;
-    case 'processed':
+    case Category.PROCESSED:
       return <Cookie size={size} color={color} />;
-    case 'seasoning':
+    case Category.SEASONING:
       return <Soup size={size} color={color} />;
-    case 'etc':
+    case Category.OTHER:
       return <Package size={size} color={color} />;
     default:
       return <Package size={size} color={color} />;

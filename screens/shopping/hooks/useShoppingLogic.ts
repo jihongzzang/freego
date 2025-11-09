@@ -6,6 +6,9 @@ import { useDialog } from '@/contexts/DialogContext';
 import { useMVIStore } from '@/mvi/base';
 import { createShoppingStore } from '@/mvi/features/shopping';
 import { useAddShoppingItem } from '@/hooks/useAddShoppingItem';
+import { StorageLocation } from '@/data/enums/storage_location';
+import { Category } from '@/data/enums/category';
+import { getCategoryLabel } from '@/utils/category/getCategoryLabel';
 
 export function useShoppingLogic() {
   const { alert, confirm } = useDialog();
@@ -20,7 +23,7 @@ export function useShoppingLogic() {
   const [selectingStorageForItem, setSelectingStorageForItem] = useState<{
     id: string;
     name: string;
-    category: string;
+    category: number;
   } | null>(null);
 
   // 화면 포커스 시 데이터 로드
@@ -93,10 +96,10 @@ export function useShoppingLogic() {
           name: item.name,
           category: item.category,
           storage_location: undefined,
-          registration_date: today,
+          purchased_date: today,
           memo: '',
         });
-        await shoppingService.deleteShoppingItem(item.id);
+        await shoppingService.deleteShoppingItem(Number(item.id));
       }
 
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
@@ -116,11 +119,11 @@ export function useShoppingLogic() {
     }
   }
 
-  function handleAddToStorage(id: string, name: string, category: string) {
+  function handleAddToStorage(id: string, name: string, category: number) {
     setSelectingStorageForItem({ id, name, category });
   }
 
-  async function handleStorageSelect(storageLocation: string) {
+  async function handleStorageSelect(storageLocation: StorageLocation) {
     if (!selectingStorageForItem) return;
 
     try {
@@ -132,11 +135,11 @@ export function useShoppingLogic() {
         name: selectingStorageForItem.name,
         category: selectingStorageForItem.category as any,
         storage_location: storageLocation as any,
-        registration_date: today,
+        purchased_date: today,
         memo: '',
       });
 
-      await shoppingService.deleteShoppingItem(selectingStorageForItem.id);
+      await shoppingService.deleteShoppingItem(Number(selectingStorageForItem.id));
 
       dispatch({ type: 'LOAD_SHOPPING_LIST' });
 
@@ -182,11 +185,10 @@ export function useShoppingLogic() {
     let shareText = '📝 장보기 목록\n\n';
 
     Object.keys(groupedItems).forEach((categoryId) => {
-      const { findCategoryById } = require('@/constants/categories');
-      const category = findCategoryById(categoryId);
       const items = groupedItems[categoryId];
+      const categoryLabel = getCategoryLabel({ category: Number(categoryId) as Category, lang: 'kr' });
 
-      shareText += `${category?.krLabel || '기타'}\n`;
+      shareText += `${categoryLabel}\n`;
       items.forEach((item) => {
         shareText += `• ${item.name}`;
         if (item.memo) {
@@ -243,7 +245,7 @@ export function useShoppingLogic() {
 
     try {
       const { shoppingService } = await import('@/services/shopping.service');
-      await shoppingService.updateShoppingItem(editingMemoId, {
+      await shoppingService.updateShoppingItem(Number(editingMemoId), {
         memo: editingMemo.trim() || undefined,
       });
 
@@ -270,7 +272,6 @@ export function useShoppingLogic() {
     addShoppingItem,
     handleTogglePurchased,
     handleDeleteItem,
-    handleClearPurchased,
     handleClearUnpurchased,
     handleAddAllToStorage,
     handleAddToStorage,

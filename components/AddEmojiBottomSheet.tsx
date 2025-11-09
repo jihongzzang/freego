@@ -1,14 +1,14 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { useTheme } from '@/lib/theme';
-import BottomSheet from '@/components/BottomSheet';
-import { CategoryType } from '@/constants/categories';
+import BottomSheet from '@/components/ui/BottomSheet';
+import { Category } from '@/data/enums/category';
 import { getTemplatesByCategory, type IngredientTemplate } from '@/constants/ingredientTemplates';
 import { useMemo } from 'react';
 
 interface AddEmojiBottomSheetProps {
   visible: boolean;
   onClose: () => void;
-  selectedCategoryId: CategoryType;
+  selectedCategoryId: Category;
   selectedTemplates: IngredientTemplate[];
   onTemplateToggle: (template: IngredientTemplate) => void;
 }
@@ -24,9 +24,9 @@ export default function AddEmojiBottomSheet({
 
   // ✅ 화면 너비 기반으로 균등 3열 계산
   const screenWidth = Dimensions.get('window').width;
-  const H_PADDING = spacing.md * 2; // ScrollView padding 좌우 합
+  const H_PADDING = spacing.xl * 2; // ScrollView padding 좌우 합
   const GAP = spacing.sm; // 아이템 간 동일 간격
-  const ITEM_WIDTH = (screenWidth - H_PADDING - GAP * 2 - 24) / 3; // 3열 균등 분할
+  const ITEM_WIDTH = (screenWidth - H_PADDING - GAP * 2 - 20) / 3; // 3열 균등 분할
 
   const filteredTemplates = useMemo(() => {
     return getTemplatesByCategory(selectedCategoryId);
@@ -43,7 +43,7 @@ export default function AddEmojiBottomSheet({
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           style={{ flex: 1 }}
-          contentContainerStyle={{ padding: spacing.md }}
+          contentContainerStyle={{ padding: spacing.xl, paddingTop: 12 }}
         >
           <View style={styles.templatesGrid}>
             {filteredTemplates.map((template) => {
@@ -56,9 +56,9 @@ export default function AddEmojiBottomSheet({
                     {
                       width: ITEM_WIDTH,
                       marginBottom: GAP,
-                      backgroundColor: colors.surface,
-                      borderColor: isSelected ? (isDark ? colors.grey300 : colors.grey700) : colors.border,
-                      borderWidth: isSelected ? 1 : 1,
+                      backgroundColor: isDark ? 'rgba(78, 89, 104 ,0.16)' : 'rgba(78, 89, 104 ,0.16)',
+                      borderColor: isSelected ? colors.primary : 'transparent',
+                      borderWidth: 1,
                       borderRadius: borderRadius.md,
                       paddingVertical: spacing.sm,
                       paddingHorizontal: spacing.sm,
@@ -71,13 +71,7 @@ export default function AddEmojiBottomSheet({
                     style={[
                       typography.styles.t7,
                       {
-                        color: isSelected
-                          ? isDark
-                            ? colors.white
-                            : colors.text
-                          : isDark
-                            ? colors.grey300
-                            : colors.grey600,
+                        color: isSelected ? colors.text : isDark ? colors.grey500 : colors.grey700,
                         fontWeight: isSelected ? '600' : '400',
                       },
                     ]}
@@ -99,7 +93,6 @@ export default function AddEmojiBottomSheet({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    maxHeight: 600,
   },
   templatesGrid: {
     flexDirection: 'row',
@@ -112,12 +105,5 @@ const styles = StyleSheet.create({
   templateEmoji: {
     fontSize: 18,
     marginBottom: 4,
-  },
-  confirmButtonContainer: {
-    borderTopWidth: 1,
-  },
-  confirmButton: {
-    alignItems: 'center',
-    width: '100%',
   },
 });

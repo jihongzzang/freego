@@ -1,22 +1,24 @@
 import { useMemo, useState } from 'react';
 import { Ingredient } from '@/mvi/features/ingredients';
-import { CATEGORIES, CategoryType } from '@/constants/categories';
-import { STORAGE_LOCATIONS, StorageLocationType } from '@/constants/storageLocations';
+import { Category } from '@/data/enums/category';
+import { StorageLocation } from '@/data/enums/storage_location';
+import { makeCategoryList } from '@/utils/category/makeCategoryList';
+import { makeStorageList } from '@/utils/category/makeStorageList';
 
 // 미설정을 포함한 보관위치 타입
-type StorageLocationTypeOrUnset = StorageLocationType | 'unset';
+type StorageLocationOrUnset = StorageLocation | 'unset';
 
 export function useIngredientsData(ingredients: Ingredient[]) {
-  const categoryOrder: CategoryType[] = CATEGORIES.map((cat) => cat.id);
-  const storageOrder: StorageLocationTypeOrUnset[] = [...STORAGE_LOCATIONS.map((loc) => loc.id), 'unset'];
+  const categoryOrder: Category[] = makeCategoryList({ includeAllCategory: false }).map((cat) => cat.id);
+  const storageOrder: StorageLocationOrUnset[] = [...makeStorageList({ lang: 'kr' }).map((loc) => loc.id), 'unset'];
 
   // 아코디언 상태 관리
-  const [collapsedCategories, setCollapsedCategories] = useState<Set<CategoryType>>(new Set(categoryOrder));
-  const [collapsedStorages, setCollapsedStorages] = useState<Set<StorageLocationTypeOrUnset>>(new Set(storageOrder));
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<Category>>(new Set(categoryOrder));
+  const [collapsedStorages, setCollapsedStorages] = useState<Set<StorageLocationOrUnset>>(new Set(storageOrder));
 
   // 카테고리별로 재료 그룹화
   const groupedByCategory = useMemo(() => {
-    const grouped: Record<CategoryType, Ingredient[]> = {} as Record<CategoryType, Ingredient[]>;
+    const grouped: Record<Category, Ingredient[]> = {} as Record<Category, Ingredient[]>;
 
     ingredients.forEach((item) => {
       if (!grouped[item.category]) {
@@ -30,10 +32,13 @@ export function useIngredientsData(ingredients: Ingredient[]) {
 
   // 보관위치별로 재료 그룹화
   const groupedByStorage = useMemo(() => {
-    const grouped: Record<StorageLocationTypeOrUnset, Ingredient[]> = {} as Record<StorageLocationTypeOrUnset, Ingredient[]>;
+    const grouped: Record<StorageLocationOrUnset, Ingredient[]> = {} as Record<
+      StorageLocationOrUnset,
+      Ingredient[]
+    >;
 
     ingredients.forEach((item) => {
-      const location: StorageLocationTypeOrUnset = item.storage_location || 'unset';
+      const location: StorageLocationOrUnset = item.storage_location || 'unset';
       if (!grouped[location]) {
         grouped[location] = [];
       }
@@ -44,7 +49,7 @@ export function useIngredientsData(ingredients: Ingredient[]) {
   }, [ingredients]);
 
   // 카테고리 접기/펼치기 토글
-  function toggleCategory(category: CategoryType) {
+  function toggleCategory(category: Category) {
     setCollapsedCategories((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(category)) {
@@ -57,7 +62,7 @@ export function useIngredientsData(ingredients: Ingredient[]) {
   }
 
   // 보관위치 접기/펼치기 토글
-  function toggleStorage(storage: StorageLocationTypeOrUnset) {
+  function toggleStorage(storage: StorageLocationOrUnset) {
     setCollapsedStorages((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(storage)) {

@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { ALL_CATEGORY, AllCategoryType, CategoryType } from '@/constants/categories';
+import { Category } from '@/data/enums/category';
 import { type IngredientTemplate } from '@/constants/ingredientTemplates';
-import { StorageLocationType } from '@/constants/storageLocations';
-import { UnitType } from '@/constants/units';
+import { Unit } from '@/data/enums/unit';
 import { useDialog } from '@/contexts/DialogContext';
 
 export function useBulkAdd(onSuccess?: () => void) {
   const { alert } = useDialog();
   const [isVisible, setIsVisible] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<AllCategoryType>(ALL_CATEGORY.id);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<Category | 0>(0);
   const [selectedTemplates, setSelectedTemplates] = useState<IngredientTemplate[]>([]);
 
   function open() {
@@ -18,10 +17,10 @@ export function useBulkAdd(onSuccess?: () => void) {
   function close() {
     setIsVisible(false);
     setSelectedTemplates([]);
-    setSelectedCategoryId(ALL_CATEGORY.id);
+    setSelectedCategoryId(0);
   }
 
-  function handleCategoryChange(categoryId: AllCategoryType) {
+  function handleCategoryChange(categoryId: Category | 0) {
     setSelectedCategoryId(categoryId);
   }
 
@@ -54,11 +53,11 @@ export function useBulkAdd(onSuccess?: () => void) {
       const { ingredientService } = await import('@/services/ingredient.service');
       const ingredientsToAdd = selectedTemplates.map((template) => ({
         name: template.krLabel,
-        category: template.category as CategoryType,
+        category: template.category as Category,
         emoji: template.emoji,
         storage_location: undefined,
         quantity: undefined,
-        unit: template.defaultUnit as UnitType,
+        unit: template.defaultUnit as Unit,
         registration_date: new Date().toISOString().split('T')[0],
         purchase_date: undefined,
         expiry_date: undefined,

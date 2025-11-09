@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CategoryType } from '@/constants/categories';
+import { Category } from '@/data/enums/category';
 import { useDialog } from '@/contexts/DialogContext';
 
 interface UseAddShoppingItemProps {
@@ -10,7 +10,7 @@ export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
   const { alert } = useDialog();
   const [isVisible, setIsVisible] = useState(false);
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<CategoryType>('vegetables');
+  const [category, setCategory] = useState<Category>(Category.VEGETABLE);
   const [memo, setMemo] = useState('');
 
   function open() {
@@ -20,7 +20,7 @@ export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
   function close() {
     setIsVisible(false);
     setName('');
-    setCategory('vegetables');
+    setCategory(Category.VEGETABLE);
     setMemo('');
   }
 
@@ -28,8 +28,8 @@ export function useAddShoppingItem(props?: UseAddShoppingItemProps) {
     setName(text);
   }
 
-  function handleCategoryChange(categoryId: string) {
-    setCategory(categoryId as CategoryType);
+  function handleCategoryChange(categoryId: number) {
+    setCategory(categoryId as Category);
   }
 
   function handleMemoChange(text: string) {

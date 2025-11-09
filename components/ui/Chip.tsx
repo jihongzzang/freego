@@ -1,177 +1,192 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, View, ViewStyle } from 'react-native';
-import { ColorPalette, useTheme } from '@/lib/theme';
+import { useTheme } from '@/lib/theme';
 
-export type ChipVariant = 'filled' | 'outlined' | 'selected';
-export type ChipSize = 'small' | 'medium' | 'large';
+export type ChipVariant = 'primary' | 'secondary';
+export type Color = 'blue' | 'grey' | 'yellow' | 'red' | 'green' | 'teal';
+export type ChipSize = 'small' | 'medium' | 'large' | 'xlarge';
 
 interface ChipProps {
   label: string;
   onPress?: () => void;
   variant?: ChipVariant;
+  color?: Color;
   size?: ChipSize;
-  selected?: boolean;
+  isOutline?: Boolean;
   disabled?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  badge?: number;
-  badgeWidth?: number;
-  outlineType?: boolean; // true일 때 selected 상태에서 outline만 변경
   style?: ViewStyle;
-  selectedColor?: string;
-  borderColor?: string;
-  backgroundColor?: string;
 }
 
 export default function Chip({
   label,
   onPress,
-  variant = 'filled',
+  variant = 'primary',
+  color = 'green',
   size = 'medium',
-  selected = false,
   disabled = false,
+  isOutline = false,
   leftIcon,
   rightIcon,
-  badge,
-  badgeWidth,
-  outlineType = false,
+
   style,
-  selectedColor,
-  borderColor,
-  backgroundColor,
 }: ChipProps) {
-  const { colors, typography, borderRadius, spacing } = useTheme();
+  const { colors, typography } = useTheme();
 
   const getVariantStyles = (): ViewStyle => {
-    // outlineType이 true일 때: selected 상태에서 outline만 변경
-    if (outlineType && selected) {
-      return {
-        backgroundColor: colors.surface,
-        borderColor: colors.primary,
-        borderWidth: 2,
-      };
-    }
+    const key = `${variant}-${color}` as const;
 
-    // 기본 동작: selected 상태에서 배경색 변경
-    if (selected) {
-      return {
-        backgroundColor: selectedColor || colors.primary,
-        borderColor: selectedColor || colors.primary,
-        borderWidth: 1,
-      };
-    }
+    const styles: Record<string, ViewStyle> = {
+      // Primary variants - filled background with white text
+      'primary-blue': {
+        backgroundColor: colors.blue500,
+        borderColor: colors.blue500,
+        borderWidth: isOutline ? 1 : 0,
+      },
+      'primary-grey': {
+        backgroundColor: colors.grey700,
+        borderColor: colors.grey700,
+        borderWidth: isOutline ? 1 : 0,
+      },
+      'primary-yellow': {
+        backgroundColor: colors.yellow500,
+        borderColor: colors.yellow500,
+        borderWidth: isOutline ? 1 : 0,
+      },
+      'primary-red': {
+        backgroundColor: colors.red500,
+        borderColor: colors.red500,
+        borderWidth: isOutline ? 1 : 0,
+      },
+      'primary-green': {
+        backgroundColor: colors.green600,
+        borderColor: colors.green600,
+        borderWidth: isOutline ? 1 : 0,
+      },
+      'primary-teal': {
+        backgroundColor: colors.teal600,
+        borderColor: colors.teal600,
+        borderWidth: isOutline ? 1 : 0,
+      },
 
-    switch (variant) {
-      case 'filled':
-        return {
-          backgroundColor: backgroundColor || colors.surfaceSecondary,
-          borderColor: backgroundColor || colors.surfaceSecondary,
-          borderWidth: 1,
-        };
+      // Secondary variants - outlined with colored border and text
+      'secondary-blue': {
+        backgroundColor: 'rgba(49, 139, 246 ,0.16)',
+        borderColor: 'rgba(49, 139, 246 ,0.16)',
+        borderWidth: isOutline ? 1 : 0,
+      },
+      'secondary-grey': {
+        backgroundColor: 'rgba(78, 89, 104 ,0.16)',
+        borderColor: 'rgba(78, 89, 104 ,0.16)',
+        borderWidth: isOutline ? 1 : 0,
+      },
+      'secondary-yellow': {
+        backgroundColor: 'rgba(255, 179, 49, 0.16)',
+        borderColor: 'rgba(255, 179, 49, 0.16)',
+        borderWidth: isOutline ? 1 : 0,
+      },
+      'secondary-red': {
+        backgroundColor: 'rgba(240, 68, 82, 0.16)',
+        borderColor: 'rgba(240, 68, 82, 0.16)',
+        borderWidth: isOutline ? 1 : 0,
+      },
+      'secondary-green': {
+        backgroundColor: 'rgba(2, 162, 98, 0.16)',
+        borderColor: 'rgba(2, 162, 98, 0.16)',
+        borderWidth: isOutline ? 1 : 0,
+      },
+      'secondary-teal': {
+        backgroundColor: 'rgba(16, 149, 149, 0.16)',
+        borderColor: 'rgba(16, 149, 149, 0.16)',
+        borderWidth: isOutline ? 1 : 0,
+      },
+    };
 
-      case 'outlined':
-        return {
-          backgroundColor: backgroundColor || colors.surface,
-          borderColor: borderColor || colors.border,
-          borderWidth: 1,
-        };
-
-      case 'selected':
-        return {
-          backgroundColor: backgroundColor || colors.primaryLight,
-          borderColor: borderColor || colors.primary,
-          borderWidth: 1,
-        };
-
-      default:
-        return {};
-    }
+    return styles[key] || {};
   };
 
   const getTextColor = (): string => {
-    // outlineType일 때는 selected 상태에서도 primary 색상 사용
-    if (outlineType && selected) {
-      return colors.text;
-    }
+    const key = `${variant}-${color}` as const;
 
-    // 기본 동작
-    if (selected) {
-      return colors.white;
-    }
-    return colors.text;
+    const textColors: Record<string, string> = {
+      // Primary variants use white text
+      'primary-blue': colors.white,
+      'primary-grey': colors.white,
+      'primary-yellow': colors.grey800,
+      'primary-red': colors.white,
+      'primary-green': colors.white,
+      'primary-teal': colors.white,
+
+      // Secondary variants use colored text
+      'secondary-blue': colors.blue700,
+      'secondary-grey': colors.grey700,
+      'secondary-yellow': colors.yellow900,
+      'secondary-red': colors.red700,
+      'secondary-green': colors.green700,
+      'secondary-teal': colors.teal700,
+    };
+
+    return textColors[key] || colors.text;
   };
 
   const getSizeStyles = (): ViewStyle => {
     switch (size) {
       case 'small':
         return {
-          paddingVertical: spacing.xs,
-          paddingHorizontal: spacing.sm,
-          borderRadius: borderRadius.sm,
+          paddingVertical: 3,
+          paddingHorizontal: 7,
+          borderRadius: 11,
         };
       case 'medium':
         return {
-          paddingVertical: spacing.xs + 2,
-          paddingHorizontal: spacing.md,
-          borderRadius: borderRadius.md,
+          paddingVertical: 3,
+          paddingHorizontal: 7,
+          borderRadius: 12,
         };
       case 'large':
         return {
-          paddingVertical: spacing.sm,
-          paddingHorizontal: spacing.lg,
-          borderRadius: borderRadius.lg,
+          paddingVertical: 4,
+          paddingHorizontal: 8,
+          borderRadius: 13,
+        };
+      case 'xlarge':
+        return {
+          paddingVertical: 6,
+          paddingHorizontal: 12,
+          borderRadius: 13,
         };
       default:
         return {};
     }
   };
 
-  const getBadgeStyles = () => {
-    if (outlineType && selected) {
-      return {
-        backgroundColor: colors.surfaceSecondary,
-        textColor: colors.textSecondary,
-      };
+  const getTextStyle = () => {
+    switch (size) {
+      case 'small':
+        return typography.styles.t12Bold;
+      case 'medium':
+        return typography.styles.t7Bold;
+      case 'large':
+        return typography.styles.t11Bold;
+      case 'xlarge':
+        return typography.styles.t11Bold;
+      default:
+        return typography.styles.t12Bold;
     }
-
-    if (selected) {
-      return {
-        backgroundColor: 'rgba(255, 255, 255, 0.3)',
-        textColor: colors.white,
-      };
-    }
-
-    return {
-      backgroundColor: colors.surfaceSecondary,
-      textColor: colors.textSecondary,
-    };
   };
 
-  const badgeStyles = getBadgeStyles();
-
   const content = (
-    <View style={[styles.chip, getVariantStyles(), getSizeStyles(), disabled && styles.disabled, style]}>
+    <View style={[styles.chip, getVariantStyles(), getSizeStyles(), style]}>
       {leftIcon && <View style={styles.icon}>{leftIcon}</View>}
-      <Text style={[typography.styles.t6Medium, { color: getTextColor() }]}>{label}</Text>
-
-      {badge !== undefined && badge > 0 && (
-        <View
-          style={[
-            styles.badge,
-            { backgroundColor: badgeStyles.backgroundColor },
-            badgeWidth ? { minWidth: badgeWidth, minHeight: badgeWidth } : {},
-          ]}
-        >
-          <Text style={[typography.styles.t7Bold, { color: badgeStyles.textColor }]}>{badge}</Text>
-        </View>
-      )}
+      <Text style={[getTextStyle(), { color: getTextColor() }]}>{label}</Text>
       {rightIcon && <View style={styles.icon}>{rightIcon}</View>}
     </View>
   );
 
-  if (onPress && !disabled) {
+  if (onPress) {
     return (
-      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+      <TouchableOpacity disabled={disabled} onPress={onPress} activeOpacity={0.7}>
         {content}
       </TouchableOpacity>
     );
@@ -185,9 +200,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  disabled: {
-    opacity: 0.5,
   },
   icon: {
     marginHorizontal: 4,

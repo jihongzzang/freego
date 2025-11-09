@@ -50,15 +50,15 @@ export function useIngredientsLogic() {
   );
 
   function navigateToDetail(id: string) {
-    dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: id });
+    dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: Number(id) });
   }
 
   function navigateToEdit(id: string) {
-    dispatch({ type: 'NAVIGATE_TO_DETAIL_EDIT', payload: id });
+    dispatch({ type: 'NAVIGATE_TO_DETAIL_EDIT', payload: Number(id) });
   }
 
   function quickDeduct(id: string) {
-    dispatch({ type: 'DELETE_INGREDIENT', payload: id });
+    dispatch({ type: 'DELETE_INGREDIENT', payload: Number(id) });
   }
 
   function handleAddDirect() {

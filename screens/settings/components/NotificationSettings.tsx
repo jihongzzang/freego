@@ -82,7 +82,7 @@ export function NotificationSettings({
                 styles.notificationOption,
                 {
                   backgroundColor: colors.surface,
-                  borderColor: colors.borderLight,
+                  borderColor: colors.border,
                 },
                 notificationDays === days && {
                   backgroundColor: colors.surfaceSecondary,

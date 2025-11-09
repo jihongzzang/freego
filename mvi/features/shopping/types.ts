@@ -4,7 +4,7 @@
 
 import { Intent, State, Effect } from '@/mvi/base';
 import { ShoppingItem } from '@/data/models/shopping.model';
-import { CategoryType } from '@/constants/categories';
+import { Category } from '@/data/enums/category';
 
 /**
  * Shopping State
@@ -16,7 +16,7 @@ export interface ShoppingState extends State {
   isAddingItem: boolean;
   addForm: {
     name: string;
-    category: CategoryType;
+    category: Category;
   };
 }
 

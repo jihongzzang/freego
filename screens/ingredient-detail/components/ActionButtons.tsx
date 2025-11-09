@@ -1,6 +1,5 @@
 import { View, StyleSheet } from 'react-native';
 import { Trash2, Minus } from 'lucide-react-native';
-import { useTheme } from '@/lib/theme';
 import Button from '@/components/ui/Button';
 
 interface ActionButtonsProps {
@@ -9,8 +8,6 @@ interface ActionButtonsProps {
 }
 
 export function ActionButtons({ onConsume, onDelete }: ActionButtonsProps) {
-  const { colors, spacing } = useTheme();
-
   return (
     <View style={styles.container}>
       <View style={{ flex: 1 }}>

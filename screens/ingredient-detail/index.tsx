@@ -2,8 +2,8 @@ import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } fr
 import { useMemo } from 'react';
 import { Edit3, Check } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
-import Header from '@/components/Header';
-import FloatingButton from '@/components/FloatingButton';
+import Header from '@/components/ui/Header';
+import FloatingButton from '@/components/ui/FloatingButton';
 import SelectUnitBottomSheet from '@/components/SelectUnitBottomSheet';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
 import AddEmojiBottomSheet from '@/components/AddEmojiBottomSheet';
@@ -64,7 +64,7 @@ export default function IngredientDetailScreen() {
                 onFieldChange={handleFieldChange}
                 onEmojiPress={() => setIsEmojiPickerVisible(true)}
                 onUnitPress={unitPicker.open}
-                onPurchaseDatePress={() => purchaseDatePicker.open(state.editForm.purchase_date || new Date())}
+                onPurchaseDatePress={() => purchaseDatePicker.open(state.editForm.purchased_date || new Date())}
                 onExpiryDatePress={() => expiryDatePicker.open(state.editForm.expiry_date || new Date())}
                 onQuickSelect={handleQuickSelect}
               />
@@ -78,12 +78,7 @@ export default function IngredientDetailScreen() {
         </KeyboardAvoidingView>
 
         {state.isEditing ? (
-          <FloatingButton
-            onPress={handleUpdate}
-            icon={<Check size={24} color="#FFFFFF" />}
-            label="저장하기"
-            hasTabBar={false}
-          />
+          <FloatingButton onPress={handleUpdate} label="저장하기" hasTabBar={false} />
         ) : (
           <FloatingButton
             onPress={handleToggleEdit}

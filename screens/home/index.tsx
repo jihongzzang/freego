@@ -2,13 +2,12 @@ import { View, Animated, TouchableOpacity, Platform } from 'react-native';
 import { Bell, QrCode, Edit3, Grid3x3, Dot } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { useRouter } from '@/hooks/useRouter';
-import Header from '@/components/Header';
-import FloatingButton from '@/components/FloatingButton';
+import Header from '@/components/ui/Header';
+import FloatingButton from '@/components/ui/FloatingButton';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
 import BulkAddBottomSheet from '@/components/BulkAddBottomSheet';
 import EmptyStateUI from '@/components/ui/EmptyState';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ALL_CATEGORY } from '@/constants/categories';
 import { useHomeLogic } from './hooks/useHomeLogic';
 import { useHomeData } from './hooks/useHomeData';
 import { useHomeAnimation } from './hooks/useHomeAnimation';
@@ -137,17 +136,13 @@ export default function HomeScreen() {
         ) : filteredIngredients.length === 0 ? (
           <View style={{ paddingTop: 24 }}>
             <EmptyStateUI
-              title={
-                selectedCategoryId === ALL_CATEGORY.id
-                  ? '관리할 재료가 없어요'
-                  : `${selectedCategoryItem?.krLabel} 재료가 없어요`
-              }
+              title={selectedCategoryId === 0 ? '관리할 재료가 없어요' : `${selectedCategoryItem?.label} 재료가 없어요`}
               description="기억하고 싶은 재료만 추가해보세요"
             />
           </View>
         ) : (
           <IngredientsSection
-            title={selectedCategoryId === ALL_CATEGORY.id ? '전체 재료' : selectedCategoryItem?.krLabel || ''}
+            title={selectedCategoryId === 0 ? '전체 재료' : selectedCategoryItem?.label || ''}
             count={filteredIngredients.length}
             items={filteredIngredients}
             onCardPress={(item) => router.push(`/ingredient/${item.id}`)}

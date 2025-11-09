@@ -6,6 +6,7 @@ import { useDialog } from '@/contexts/DialogContext';
 import { useMVIStore } from '@/mvi/base';
 import { createSettingsStore } from '@/mvi/features/settings';
 import { ingredientService } from '@/services/ingredient.service';
+import { shoppingService } from '@/services/shopping.service';
 
 export function useSettingsLogic() {
   const { isDark, themePreference, setTheme } = useTheme();
@@ -111,6 +112,7 @@ export function useSettingsLogic() {
       onConfirm: async () => {
         try {
           await ingredientService.clearAll();
+          await shoppingService.clearAll();
           alert({
             title: '',
             message: '모든 데이터가 삭제되었어요.',

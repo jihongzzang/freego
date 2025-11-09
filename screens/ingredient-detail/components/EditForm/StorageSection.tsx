@@ -1,12 +1,14 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '@/lib/theme';
-import { STORAGE_LOCATIONS } from '@/constants/storageLocations';
 import { EditFormData } from '@/mvi/features/ingredient-detail';
-import { getStorageLocationIcon } from '@/utils/getStorageLocationIcons';
+import { getStorageLocationIcon } from '@/utils/storageLocation';
+import { makeStorageList } from '@/utils/category/makeStorageList';
+import { StorageLocation } from '@/data/enums/storage_location';
+import { Chip } from '@/components/ui';
 
 interface StorageSectionProps {
-  storageLocation: string;
-  onFieldChange: (field: keyof EditFormData, value: string) => void;
+  storageLocation?: StorageLocation;
+  onFieldChange: (field: keyof EditFormData, value: StorageLocation) => void;
 }
 
 export function StorageSection({ storageLocation, onFieldChange }: StorageSectionProps) {
@@ -16,40 +18,16 @@ export function StorageSection({ storageLocation, onFieldChange }: StorageSectio
     <View style={styles.container}>
       <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>보관 위치</Text>
       <View style={styles.categoryButtons}>
-        {STORAGE_LOCATIONS.map((loc) => (
-          <TouchableOpacity
+        {makeStorageList({}).map((loc) => (
+          <Chip
             key={loc.id}
-            style={[
-              styles.categoryBtn,
-              {
-                backgroundColor: isDark ? colors.grey400 : colors.grey200,
-                borderColor: isDark ? colors.grey400 : colors.grey200,
-                borderRadius: borderRadius.lg,
-              },
-              storageLocation === loc.id && {
-                // backgroundColor: isDark ? colors.grey600 : colors.grey400,
-                // borderColor: isDark ? colors.grey600 : colors.grey400,
-                backgroundColor: isDark ? colors.primary : colors.primary,
-                borderColor: isDark ? colors.primary : colors.primary,
-              },
-            ]}
+            label={loc.label}
             onPress={() => onFieldChange('storage_location', loc.id)}
-          >
-            <View style={styles.storageBtnContent}>
-              {getStorageLocationIcon(loc.id, 18)}
-              <Text
-                style={[
-                  typography.styles.t6,
-                  { color: colors.grey700 },
-                  storageLocation === loc.id && {
-                    color: isDark ? colors.text : colors.white,
-                  },
-                ]}
-              >
-                {loc.krLabel}
-              </Text>
-            </View>
-          </TouchableOpacity>
+            variant={storageLocation === loc.id ? 'primary' : 'secondary'}
+            color={storageLocation === loc.id ? 'blue' : 'grey'}
+            size="xlarge"
+            leftIcon={getStorageLocationIcon(loc.id, 18)}
+          />
         ))}
       </View>
     </View>

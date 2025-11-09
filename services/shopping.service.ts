@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ShoppingItem } from '@/data/models/shopping.model';
+import { generateId } from './utils/generateId';
 
 /**
  * AsyncStorage 키 상수
@@ -13,7 +14,8 @@ export const shoppingService = {
   async getShoppingList(): Promise<ShoppingItem[]> {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
+      const list = data ? JSON.parse(data) : [];
+      return list.filter((item: ShoppingItem) => !item.deleted_at);
     } catch (error) {
       console.error('Error reading shopping list:', error);
       return [];
@@ -28,7 +30,7 @@ export const shoppingService = {
       if (!existing) {
         const newItem: ShoppingItem = {
           ...item,
-          id: Date.now().toString(),
+          id: generateId(),
           is_purchased: false,
           created_at: new Date().toISOString(),
         };
@@ -41,12 +43,17 @@ export const shoppingService = {
     }
   },
 
-  async updateShoppingItem(id: string, updates: Partial<ShoppingItem>): Promise<void> {
+  async updateShoppingItem(id: number, updates: Partial<ShoppingItem>): Promise<void> {
     try {
       const shoppingList = await this.getShoppingList();
       const index = shoppingList.findIndex((item) => item.id === id);
+
       if (index !== -1) {
-        shoppingList[index] = { ...shoppingList[index], ...updates };
+        shoppingList[index] = {
+          ...shoppingList[index],
+          ...updates,
+          updated_at: new Date().toISOString(),
+        };
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shoppingList));
       }
     } catch (error) {
@@ -55,13 +62,28 @@ export const shoppingService = {
     }
   },
 
-  async deleteShoppingItem(id: string): Promise<void> {
+  async deleteShoppingItem(id: number): Promise<void> {
     try {
       const shoppingList = await this.getShoppingList();
-      const filtered = shoppingList.filter((item) => item.id !== id);
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+      const index = shoppingList.findIndex((item) => item.id === id);
+      if (index !== -1) {
+        shoppingList[index] = {
+          ...shoppingList[index],
+          deleted_at: new Date().toISOString(), // 삭제 시각 기록
+        };
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shoppingList));
+      }
     } catch (error) {
       console.error('Error deleting shopping item:', error);
+      throw error;
+    }
+  },
+
+  async clearAll(): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+      console.error('Error clearing storage:', error);
       throw error;
     }
   },

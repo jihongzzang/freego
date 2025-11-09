@@ -6,36 +6,24 @@
 
 import { Reducer } from '@/mvi/base';
 import { AddState, AddIntent } from './types';
+import { Category } from '@/data/enums/category';
 
 /**
  * 초기 폼 데이터
  */
 const initialFormData = {
   name: '',
-  category: 'vegetables' as const,
+  category: Category.VEGETABLE,
   quantity: undefined,
   unit: undefined,
   purchase_date: undefined,
-  expiry_date: '',
+  expiry_date: undefined,
   storage_location: undefined,
-  memo: '',
+  memo: undefined,
 };
 
-export const addReducer: Reducer<AddState, AddIntent> = (
-  state,
-  intent,
-): AddState => {
+export const addReducer: Reducer<AddState, AddIntent> = (state, intent): AddState => {
   switch (intent.type) {
-    case 'SET_MODE':
-      return {
-        ...state,
-        mode: intent.payload,
-        // 직접 등록 모드로 전환할 때 storage_location을 'fridge'로 설정
-        form: intent.payload === 'manual'
-          ? { ...state.form, storage_location: 'fridge' }
-          : state.form,
-      };
-
     case 'UPDATE_FIELD':
       return {
         ...state,
@@ -68,7 +56,6 @@ export const addReducer: Reducer<AddState, AddIntent> = (
         ...state,
         isSubmitting: false,
         form: initialFormData,
-        mode: 'select',
         errors: {},
       };
 
@@ -82,7 +69,6 @@ export const addReducer: Reducer<AddState, AddIntent> = (
       return {
         ...state,
         form: initialFormData,
-        mode: 'select',
         errors: {},
       };
 

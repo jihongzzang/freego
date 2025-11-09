@@ -27,7 +27,7 @@ interface BottomSheetProps {
 }
 
 export default function BottomSheet({ maxHeight, visible, onClose, title, children }: BottomSheetProps) {
-  const { colors, typography } = useTheme();
+  const { colors, typography, isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const translateY = useRef(new Animated.Value(0)).current;
   const keyboardTranslateY = useRef(new Animated.Value(0)).current;
@@ -159,25 +159,27 @@ export default function BottomSheet({ maxHeight, visible, onClose, title, childr
                   styles.bottomSheet,
                   {
                     borderRadius: Platform.OS === 'ios' ? 28 : 28,
-                    backgroundColor: colors.background,
+                    backgroundColor: isDark ? '#202027' : colors.white,
                     height: maxHeight,
                   },
                 ]}
               >
                 <View {...panResponder.panHandlers}>
                   <View style={styles.handleContainer}>
-                    <View style={[styles.handle, { backgroundColor: colors.border }]} />
+                    <View style={[styles.handle, { backgroundColor: isDark ? '#3c3c47' : colors.grey100 }]} />
                   </View>
 
                   <View
                     style={[
                       styles.header,
                       {
-                        borderBottomColor: colors.border,
+                        // borderBottomColor: colors.border,
                       },
                     ]}
                   >
-                    <Text style={[typography.styles.t4Semibold, { color: colors.text, flex: 1 }]}>{title}</Text>
+                    <Text style={[typography.styles.t4Bold, { color: isDark ? colors.text : colors.grey800, flex: 1 }]}>
+                      {title}
+                    </Text>
                   </View>
                 </View>
                 <View style={{ flex: 1 }}>{children}</View>
@@ -193,7 +195,7 @@ export default function BottomSheet({ maxHeight, visible, onClose, title, childr
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'flex-end',
   },
   bottomSheetContainer: {
@@ -204,7 +206,7 @@ const styles = StyleSheet.create({
   },
   handleContainer: {
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingTop: 12,
   },
   handle: {
     width: 48,
@@ -215,9 +217,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 4,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
+    paddingTop: 24,
+    paddingBottom: 8,
   },
   content: {
     flex: 1,

@@ -3,17 +3,10 @@
  */
 
 import { Intent, State, Effect } from '@/mvi/base';
-import { Ingredient as StoredIngredient } from '@/data/models/ingredient.model';
-import { StatusType } from '@/constants/itemStatus';
-import { CategoryType } from '@/constants/categories';
-import { StorageLocationType } from '@/constants/storageLocations';
-
-/**
- * Ingredient with status
- */
-export interface Ingredient extends StoredIngredient {
-  status: StatusType;
-}
+import { Category } from '@/data/enums/category';
+import { StorageLocation } from '@/data/enums/storage_location';
+import { Ingredient } from '@/data/models/ingredient.model';
+import { Unit } from '@/data/enums/unit';
 
 /**
  * Edit Form Data
@@ -21,13 +14,13 @@ export interface Ingredient extends StoredIngredient {
 export interface EditFormData {
   name: string;
   emoji?: string;
-  category: CategoryType;
+  category: Category;
   quantity?: string;
-  unit?: string;
-  purchase_date?: string;
-  expiry_date: string;
-  storage_location?: StorageLocationType;
-  memo: string;
+  unit?: Unit;
+  purchased_date?: string;
+  expiry_date?: string;
+  storage_location?: StorageLocation;
+  memo?: string;
 }
 
 /**
@@ -45,11 +38,11 @@ export interface IngredientDetailState extends State {
  * Ingredient Detail Intent (사용자 액션)
  */
 export type IngredientDetailIntent =
-  | { type: 'LOAD_INGREDIENT'; payload: string }
+  | { type: 'LOAD_INGREDIENT'; payload: number }
   | { type: 'SET_EDITING'; payload: boolean }
   | {
       type: 'UPDATE_FORM_FIELD';
-      payload: { field: keyof EditFormData; value: string };
+      payload: { field: keyof EditFormData; value: any };
     }
   | { type: 'DELETE_INGREDIENT' }
   | { type: 'CONSUME_INGREDIENT' }
@@ -66,6 +59,13 @@ export type IngredientDetailEffect =
       type: 'SHOW_ALERT';
       payload: {
         title: string;
+        message: string;
+        variant: 'success' | 'warning' | 'error';
+      };
+    }
+  | {
+      type: 'SHOW_TOAST';
+      payload: {
         message: string;
         variant: 'success' | 'warning' | 'error';
       };

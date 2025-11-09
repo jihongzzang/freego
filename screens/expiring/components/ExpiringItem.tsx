@@ -1,22 +1,25 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Minus } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
-import { Ingredient } from '@/mvi/features/expiring';
-import { getCategoryIcon } from '@/utils/getCategoryIcons';
-import { getStatusColor } from '@/utils/getStatusColors';
-import { findStorageLocationById } from '@/constants/storageLocations';
-import { findUnitById } from '@/constants/units';
+import { getCategoryIcon } from '@/utils/category';
+import { getStatusColor, getCalculateStatus } from '@/utils/status';
 import Badge from '@/components/ui/Badge';
+import { Ingredient } from '@/data/models/ingredient.model';
+import { getUnitLabel } from '@/utils/unit';
+import { getStorageLocationLabel } from '@/utils/storageLocation';
+import { useMemo } from 'react';
 
 interface ExpiringItemProps {
   item: Ingredient;
   onPress: () => void;
   onQuickDeduct: () => void;
-  getDaysRemaining: (daysRemaining: number | null) => string;
 }
 
-export function ExpiringItem({ item, onPress, onQuickDeduct, getDaysRemaining }: ExpiringItemProps) {
-  const { colors, typography, spacing, borderRadius } = useTheme();
+export function ExpiringItem({ item, onPress, onQuickDeduct }: ExpiringItemProps) {
+  const { colors, typography, spacing, isDark, borderRadius } = useTheme();
+
+  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
+
 
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
@@ -27,30 +30,21 @@ export function ExpiringItem({ item, onPress, onQuickDeduct, getDaysRemaining }:
         <View style={styles.info}>
           <View style={styles.nameRow}>
             <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{item.name}</Text>
-            <Badge dot variant="primary" style={{ backgroundColor: getStatusColor(item.status) }} />
+            <Badge dot variant="primary" style={{ backgroundColor: getStatusColor(getCalculateStatus(item.expiry_date)) }} />
           </View>
           <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>
-            <>
-              {item.quantity && item.unit && (
-                <>
-                  {item.quantity}
-                  {item.unit && findUnitById(item.unit)?.krLabel}
-                  {item.storage_location && (
-                    <>
-                      {' · '}
-                      {findStorageLocationById(item.storage_location)?.krLabel}
-                    </>
-                  )}
-                </>
-              )}
-
-              {item.daysRemaining !== null && (
-                <>
-                  {item.quantity && item.unit && ' · '}
-                  {getDaysRemaining(item.daysRemaining)}
-                </>
-              )}
-            </>
+            {item.quantity && item.unit && (
+              <>
+                {item.quantity}
+                {item.unit && getUnitLabel({ unit: item.unit })}
+              </>
+            )}
+            {item.storage_location && (
+              <>
+                {item.quantity && item.unit && ' · '}
+                {getStorageLocationLabel({ storageLocation: item.storage_location })}
+              </>
+            )}
           </Text>
         </View>
       </View>
@@ -67,18 +61,18 @@ export function ExpiringItem({ item, onPress, onQuickDeduct, getDaysRemaining }:
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: spacing.lg,
   },
   left: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.md,
   },
   categoryIconWrapper: {
     width: 36,
@@ -93,8 +87,8 @@ const styles = StyleSheet.create({
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 4,
+    gap: spacing.sm,
+    marginBottom: spacing.xs,
   },
   quickButton: {
     width: 32,

@@ -5,27 +5,10 @@
  */
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
-import { IngredientDetailState, IngredientDetailIntent, IngredientDetailEffect, Ingredient } from './types';
+import { IngredientDetailState, IngredientDetailIntent, IngredientDetailEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
 import { shoppingService } from '@/services/shopping.service';
-import { StatusType } from '@/constants/itemStatus';
-
-/**
- * 유통기한 상태 계산
- */
-function calculateStatus(expiryDate: string | null | undefined): StatusType {
-  if (!expiryDate) return 'not_set';
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const expiry = new Date(expiryDate);
-  expiry.setHours(0, 0, 0, 0);
-  const diffTime = expiry.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) return 'expired';
-  return 'valid';
-}
+import { Ingredient } from '@/data/models/ingredient.model';
 
 /**
  * Ingredient Detail Middleware
@@ -41,9 +24,14 @@ export const ingredientDetailMiddleware: Middleware<
         const ingredients = await ingredientService.getIngredients();
         const data = ingredients.find((item) => item.id === intent.payload);
 
+        if (!data) {
+          return {
+            state: { ...state, loading: false, error: '식재료를 찾을 수 없어요.' },
+          };
+        }
+
         if (data) {
-          const status = calculateStatus(data.expiry_date);
-          const ingredient: Ingredient = { ...data, status };
+          const ingredient: Ingredient = data;
 
           return {
             state: {
@@ -54,11 +42,11 @@ export const ingredientDetailMiddleware: Middleware<
                 emoji: data.emoji,
                 category: data.category,
                 quantity: data.quantity?.toString() || '',
-                unit: data.unit || '',
-                purchase_date: data.purchase_date || '',
-                expiry_date: data.expiry_date || '',
+                unit: data.unit,
+                purchased_date: data.purchased_date,
+                expiry_date: data.expiry_date,
                 storage_location: data.storage_location,
-                memo: data.memo || '',
+                memo: data.memo,
               },
               loading: false,
               error: null,
@@ -166,6 +154,21 @@ export const ingredientDetailMiddleware: Middleware<
     case 'UPDATE_INGREDIENT': {
       if (!state.ingredient) return {};
 
+      if (state.editForm.quantity?.trim() === '0') {
+        return {
+          effects: [
+            {
+              type: 'SHOW_ALERT',
+              payload: {
+                title: '',
+                message: '수량이 0개인 식재료는 등록할 수 없어요.',
+                variant: 'warning',
+              },
+            },
+          ],
+        };
+      }
+
       try {
         await ingredientService.updateIngredient(state.ingredient.id, {
           name: state.editForm.name,
@@ -173,8 +176,8 @@ export const ingredientDetailMiddleware: Middleware<
           category: state.editForm.category,
           quantity: state.editForm.quantity ? parseInt(state.editForm.quantity) || undefined : undefined,
           unit: state.editForm.unit as any,
-          purchase_date: state.editForm.purchase_date || undefined,
-          expiry_date: state.editForm.expiry_date || undefined,
+          purchased_date: state.editForm.purchased_date,
+          expiry_date: state.editForm.expiry_date,
           storage_location: state.editForm.storage_location,
           memo: state.editForm.memo,
         });
@@ -184,8 +187,7 @@ export const ingredientDetailMiddleware: Middleware<
         const data = ingredients.find((item) => item.id === state.ingredient!.id);
 
         if (data) {
-          const status = calculateStatus(data.expiry_date);
-          const ingredient: Ingredient = { ...data, status };
+          const ingredient: Ingredient = data;
 
           return {
             state: {
@@ -195,12 +197,12 @@ export const ingredientDetailMiddleware: Middleware<
                 name: data.name,
                 emoji: data.emoji,
                 category: data.category,
-                quantity: data.quantity?.toString() || '',
-                unit: data.unit || '',
-                purchase_date: data.purchase_date || '',
-                expiry_date: data.expiry_date || '',
+                quantity: data.quantity?.toString(),
+                unit: data.unit,
+                purchased_date: data.purchased_date,
+                expiry_date: data.expiry_date,
                 storage_location: data.storage_location,
-                memo: data.memo || '',
+                memo: data.memo,
               },
               isEditing: false,
             },

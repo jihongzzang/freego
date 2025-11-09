@@ -1,17 +1,20 @@
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { ColorPalette, useTheme } from '@/lib/theme';
-import { ALL_CATEGORIES, AllCategoryType } from '@/constants/categories';
+import { Category } from '@/data/enums/category';
+import { makeCategoryList } from '@/utils/category/makeCategoryList';
 import Chip from '@/components/ui/Chip';
 import { useMemo } from 'react';
 
 interface CategoryCarouselProps {
-  selectedCategoryId: AllCategoryType;
-  onCategorySelect: (categoryId: AllCategoryType) => void;
-  getCategoryCount: (categoryId: AllCategoryType) => number;
+  selectedCategoryId: Category | 0;
+  onCategorySelect: (categoryId: Category | 0) => void;
+  getCategoryCount: (categoryId: Category | 0) => number;
 }
 
-export function CategoryCarousel({ selectedCategoryId, onCategorySelect, getCategoryCount }: CategoryCarouselProps) {
-  const { colors, spacing, isDark } = useTheme();
+export function CategoryCarousel({ selectedCategoryId, onCategorySelect }: CategoryCarouselProps) {
+  const { colors, spacing } = useTheme();
+
+  const categories = useMemo(() => makeCategoryList({ includeAllCategory: true, lang: 'kr' }), []);
 
   const styles = useMemo(() => createStyles({ colors, spacing }), [colors, spacing]);
 
@@ -23,20 +26,17 @@ export function CategoryCarousel({ selectedCategoryId, onCategorySelect, getCate
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
-        {ALL_CATEGORIES.map((categoryItem) => {
+        {categories.map((categoryItem) => {
           const isSelected = categoryItem.id === selectedCategoryId;
 
           return (
             <Chip
               key={categoryItem.id}
-              label={categoryItem.krLabel}
-              selected={isSelected}
+              label={categoryItem.label}
               onPress={() => onCategorySelect(categoryItem.id)}
-              variant={'filled'}
-              size="medium"
-              // selectedColor={isDark ? colors.grey600 : colors.grey400}
-              selectedColor={isDark ? colors.primary : colors.primary}
-              backgroundColor={isDark ? colors.grey400 : colors.grey200}
+              variant={isSelected ? 'primary' : 'secondary'}
+              color={isSelected ? 'green' : 'grey'}
+              size="xlarge"
             />
           );
         })}
@@ -52,7 +52,7 @@ const createStyles = ({ colors, spacing }: { colors: ColorPalette; spacing: type
       paddingVertical: spacing.md,
       borderBottomWidth: 1,
       backgroundColor: colors.surface,
-      borderBottomColor: colors.borderLight,
+      borderBottomColor: colors.border,
     },
     scrollView: {
       flexGrow: 0,
