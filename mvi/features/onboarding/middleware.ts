@@ -21,13 +21,6 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
   intent,
 ): Promise<MiddlewareResult<OnboardingState, OnboardingEffect>> => {
   switch (intent.type) {
-    case 'SKIP_ONBOARDING':
-      // 온보딩 건너뛰기 -> AsyncStorage에 저장하고 홈으로 이동
-      await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
-      return {
-        effects: [{ type: 'NAVIGATE_TO_HOME' }],
-      };
-
     case 'SKIP_PACKAGE':
       // 패키지 추가 건너뛰기 -> 홈으로 이동
       await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
@@ -56,8 +49,35 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
             }));
 
             await ingredientService.addMultipleIngredients(ingredientsToAdd);
+
+            await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
+            return {
+              effects: [
+                {
+                  type: 'SHOW_TOAST',
+                  payload: {
+                    message: `${ingredientsToAdd.length}개의 식재료가 추가됐어요.`,
+                    variant: 'success',
+                  },
+                },
+                { type: 'NAVIGATE_TO_HOME' },
+              ],
+            };
           } catch (error) {
             console.error('Error adding starter package:', error);
+            await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
+            return {
+              effects: [
+                {
+                  type: 'SHOW_TOAST',
+                  payload: {
+                    message: '스타터 패키지 추가 중 오류가 발생했어요.',
+                    variant: 'error',
+                  },
+                },
+                { type: 'NAVIGATE_TO_HOME' },
+              ],
+            };
           }
         }
       }

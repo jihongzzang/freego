@@ -2,6 +2,7 @@ import { useEffect, useCallback, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
+import { useToast } from '@/components/ui';
 import { useMVIStore } from '@/mvi/base';
 import { createIngredientsStore } from '@/mvi/features/ingredients';
 import { useBulkAdd } from '@/hooks/useBulkAdd';
@@ -10,6 +11,7 @@ export type ViewMode = 'category' | 'storage';
 
 export function useIngredientsLogic() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createIngredientsStore);
   const { ingredients, loading } = state;
 
@@ -37,10 +39,14 @@ export function useIngredientsLogic() {
           }
           break;
         case 'SHOW_TOAST':
+          showToast({
+            message: effect.payload.message,
+            type: effect.payload.variant,
+          });
           break;
       }
     }
-  }, [effect, router]);
+  }, [effect, router, showToast]);
 
   // 화면 포커스 시 데이터 로드
   useFocusEffect(
@@ -57,12 +63,12 @@ export function useIngredientsLogic() {
     dispatch({ type: 'NAVIGATE_TO_DETAIL_EDIT', payload: Number(id) });
   }
 
-  function quickDeduct(id: string) {
-    dispatch({ type: 'DELETE_INGREDIENT', payload: Number(id) });
+  function navigateToAdd() {
+    dispatch({ type: 'NAVIGATE_TO_ADD' });
   }
 
-  function handleAddDirect() {
-    router.push('/add');
+  function quickDeduct(id: string) {
+    dispatch({ type: 'DELETE_INGREDIENT', payload: Number(id) });
   }
 
   return {
@@ -75,7 +81,7 @@ export function useIngredientsLogic() {
     bulkAdd,
     navigateToDetail,
     navigateToEdit,
+    navigateToAdd,
     quickDeduct,
-    handleAddDirect,
   };
 }

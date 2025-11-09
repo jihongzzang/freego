@@ -1,6 +1,6 @@
 import { View, StyleSheet, Animated } from 'react-native';
 import { useMemo } from 'react';
-import { QrCode, Edit3, Grid3x3 } from 'lucide-react-native';
+import { Edit3, Grid3x3 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import Header from '@/components/ui/Header';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -29,7 +29,7 @@ export default function IngredientsScreen() {
     navigateToDetail,
     navigateToEdit,
     quickDeduct,
-    handleAddDirect,
+    navigateToAdd,
   } = useIngredientsLogic();
 
   const {
@@ -130,16 +130,9 @@ export default function IngredientsScreen() {
       <FloatingButton
         menuItems={[
           {
-            icon: <QrCode size={24} color="#FFFFFF" />,
-            label: '영수증으로 재료 등록',
-            onPress: bulkAdd.handleRegisterReceipt,
-            labelColor: colors.white,
-            backgroundColor: colors.blue600,
-          },
-          {
             icon: <Edit3 size={24} color="#FFFFFF" />,
             label: '직접 재료 등록',
-            onPress: handleAddDirect,
+            onPress: navigateToAdd,
             labelColor: colors.white,
             backgroundColor: colors.green600,
           },

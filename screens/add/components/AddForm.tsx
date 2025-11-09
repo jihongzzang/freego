@@ -39,16 +39,13 @@ export function AddForm({
   return (
     <View style={styles.container}>
       <CategorySection selectedCategory={formData.category} onCategoryChange={onFieldChange as any} />
-
       <BasicInfoSection
         formData={formData as any}
         selectedEmoji={selectedEmoji}
         onFieldChange={onFieldChange as any}
         onEmojiPress={onEmojiPress}
       />
-
       <StorageSection storageLocation={formData.storage_location} onFieldChange={onFieldChange as any} />
-
       <DateSection
         isEdit={false}
         purchaseDate={formData.purchased_date}
@@ -65,7 +62,6 @@ export function AddForm({
         onFieldChange={onFieldChange as any}
         onUnitPress={onUnitPress}
       />
-
       <MemoSection memo={formData.memo || ''} onFieldChange={onFieldChange as any} />
     </View>
   );

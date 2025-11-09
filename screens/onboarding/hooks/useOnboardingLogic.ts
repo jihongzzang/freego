@@ -6,9 +6,11 @@ import { Gesture } from 'react-native-gesture-handler';
 import { useMVIStore } from '@/mvi/base';
 import { createOnboardingStore } from '@/mvi/features/onboarding';
 import { useRouter } from '@/hooks/useRouter';
+import { useToast } from '@/components/ui';
 
 export function useOnboardingLogic(width: number, stepsLength: number) {
   const [state, dispatch, effect] = useMVIStore(createOnboardingStore);
+  const { showToast } = useToast();
 
   const translateX = useSharedValue(0);
 
@@ -17,10 +19,18 @@ export function useOnboardingLogic(width: number, stepsLength: number) {
   useEffect(() => {
     if (!effect) return;
 
-    if (effect.type === 'NAVIGATE_TO_HOME') {
-      router.replace('/(tabs)');
+    switch (effect.type) {
+      case 'NAVIGATE_TO_HOME':
+        router.replace('/(tabs)');
+        break;
+      case 'SHOW_TOAST':
+        showToast({
+          message: effect.payload.message,
+          type: effect.payload.variant,
+        });
+        break;
     }
-  }, [effect]);
+  }, [effect, router, showToast]);
 
   useEffect(() => {
     translateX.value = withSpring(-state.currentStep * width);

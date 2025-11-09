@@ -51,7 +51,6 @@ export default function FloatingButton({
   }, [menuItems]);
 
   useEffect(() => {
-    console.log('[FloatingButton] isExpanded changed to:', isExpanded);
     Animated.parallel([
       Animated.spring(animatedValue, {
         toValue: isExpanded ? 1 : 0,
@@ -79,12 +78,9 @@ export default function FloatingButton({
   }, [isExpanded]);
 
   const handleMainPress = () => {
-    console.log('[FloatingButton] Main button pressed');
     if (menuItems && menuItems.length > 0) {
-      console.log('[FloatingButton] Toggling expanded state:', !isExpanded);
       setIsExpanded(!isExpanded);
     } else if (onPress) {
-      console.log('[FloatingButton] Executing onPress');
       onPress();
     }
   };
@@ -107,7 +103,6 @@ export default function FloatingButton({
           style={styles.overlay}
           activeOpacity={1}
           onPress={() => {
-            console.log('[FloatingButton] Overlay pressed, closing menu');
             setIsExpanded(false);
           }}
         />

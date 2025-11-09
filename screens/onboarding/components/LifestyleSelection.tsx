@@ -47,24 +47,26 @@ export function LifestyleSelection({ onSelectLifestyle, onSkip }: LifestyleSelec
                 onPress={() => onSelectLifestyle(lifestyle.id)}
                 style={{
                   ...styles.lifestyleCard,
-                  ...{ backgroundColor: isDark ? colors.grey200 : colors.grey100 },
+                  ...{ backgroundColor: isDark ? colors.grey800 : colors.grey100 },
                 }}
               >
                 <View style={styles.lifestyleCardLeft}>
                   <View
-                    style={[styles.lifestyleIconBadge, { backgroundColor: isDark ? colors.grey100 : colors.grey300 }]}
+                    style={[styles.lifestyleIconBadge, { backgroundColor: isDark ? colors.grey700 : colors.grey300 }]}
                   >
                     <Text style={typography.styles.st5Semibold}>{lifestyle.icon}</Text>
                   </View>
                   <View style={styles.lifestyleInfo}>
-                    <Text style={[typography.styles.t5Semibold, styles.lifestyleLabel]}>{lifestyle.krLabel}</Text>
-                    <Text style={[typography.styles.t6, styles.lifestyleDesc]} numberOfLines={2}>
+                    <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>
+                      {lifestyle.krLabel}
+                    </Text>
+                    <Text style={[typography.styles.t6, { color: colors.textTertiary }]} numberOfLines={2}>
                       {lifestyle.description}
                     </Text>
                   </View>
                 </View>
                 <View style={styles.arrowIcon}>
-                  <ChevronRight size={20} color={colors.grey400} />
+                  <ChevronRight size={20} color={colors.textTertiary} />
                 </View>
               </Card>
             ))}
@@ -160,13 +162,13 @@ const createStyles = ({
       gap: spacing.xs,
     },
 
-    lifestyleLabel: {
-      color: colors.grey800,
-    },
+    // lifestyleLabel: {
+    //   color: colors.grey800,
+    // },
 
-    lifestyleDesc: {
-      color: colors.grey600,
-    },
+    // lifestyleDesc: {
+    //   color: colors.grey600,
+    // },
 
     arrowIcon: {
       width: 24,

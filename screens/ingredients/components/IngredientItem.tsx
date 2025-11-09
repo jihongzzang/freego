@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Minus, Edit3 } from 'lucide-react-native';
+import { Minus, Edit3, Trash2 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { Ingredient } from '@/mvi/features/ingredients';
 import { getStatusColor } from '@/utils/status/getStatusColor';
@@ -95,7 +95,7 @@ export function IngredientItem({ item, onPress, onEdit, onQuickDeduct }: Ingredi
           }}
           activeOpacity={0.7}
         >
-          <Minus size={16} color={colors.textSecondary} />
+          <Trash2 size={16} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
     </View>

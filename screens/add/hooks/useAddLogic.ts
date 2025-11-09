@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Keyboard } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
 import { useToast } from '@/components/ui';
@@ -16,7 +15,6 @@ export function useAddLogic() {
   const { category } = useLocalSearchParams<{ category?: string }>();
   const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createAddStore);
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState<IngredientTemplate | null>(null);
 
@@ -35,21 +33,6 @@ export function useAddLogic() {
   const purchaseDatePicker = usePurchaseDatePicker({
     onDateConfirm: (formattedDate) => handleFieldChange('purchased_date', formattedDate),
   });
-
-  // 키보드 이벤트 리스너
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setIsKeyboardVisible(true);
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setIsKeyboardVisible(false);
-    });
-
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
 
   // Effect 처리
   useEffect(() => {
@@ -71,12 +54,13 @@ export function useAddLogic() {
         router.back();
         break;
     }
-  }, [effect, showToast, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effect]);
 
   // URL 파라미터로 전달된 카테고리를 초기값으로 설정
   useEffect(() => {
     if (category) {
-      handleFieldChange('category', category);
+      handleFieldChange('category', Number(category));
     }
   }, [category]);
 
@@ -106,7 +90,6 @@ export function useAddLogic() {
 
   return {
     state,
-    isKeyboardVisible,
     isEmojiPickerVisible,
     setIsEmojiPickerVisible,
     selectedEmoji,

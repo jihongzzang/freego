@@ -1,11 +1,13 @@
 import { useEffect, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
+import { useToast } from '@/components/ui';
 import { useMVIStore } from '@/mvi/base';
 import { createExpiringStore } from '@/mvi/features/expiring';
 
 export function useExpiringLogic() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createExpiringStore);
 
   // Effect 처리
@@ -20,10 +22,14 @@ export function useExpiringLogic() {
           }
           break;
         case 'SHOW_TOAST':
+          showToast({
+            message: effect.payload.message,
+            type: effect.payload.variant,
+          });
           break;
       }
     }
-  }, [effect, router]);
+  }, [effect, router, showToast]);
 
   // 화면 포커스 시 데이터 로드
   useFocusEffect(

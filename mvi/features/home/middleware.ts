@@ -52,42 +52,6 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
       }
     }
 
-    case 'DELETE_INGREDIENT': {
-      try {
-        await ingredientService.deleteIngredient(intent.payload);
-
-        // 삭제 후 다시 로드
-        const data = await ingredientService.getIngredients();
-        const ingredients: Ingredient[] = data.map((item) => ({
-          ...item,
-          status: getCalculateStatus(item.expiry_date),
-          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
-        }));
-
-        return {
-          state: {
-            ...state,
-            ingredients,
-          },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '식재료가 삭제됐어요.', variant: 'error' },
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '식재료 삭제에 실패했어요.', variant: 'error' },
-            },
-          ],
-        };
-      }
-    }
-
     case 'UPDATE_EXPIRY_DATE': {
       try {
         const { id, expiryDate } = intent.payload;
@@ -138,18 +102,6 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
         ],
       };
     }
-
-    case 'NAVIGATE_TO_INGREDIENTS':
-      return {
-        effects: [
-          {
-            type: 'NAVIGATE',
-            payload: intent.payload
-              ? `/(tabs)/ingredients?category=${encodeURIComponent(intent.payload)}`
-              : '/(tabs)/ingredients',
-          },
-        ],
-      };
 
     case 'NAVIGATE_TO_EXPIRING':
       return {

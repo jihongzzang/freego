@@ -69,6 +69,15 @@ export const ingredientDetailMiddleware: Middleware<
             loading: false,
             error: error instanceof Error ? error.message : '데이터 로드 실패',
           },
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: {
+                message: '식재료를 불러오는데 실패했어요.',
+                variant: 'error',
+              },
+            },
+          ],
         };
       }
     }
@@ -101,7 +110,16 @@ export const ingredientDetailMiddleware: Middleware<
 
     case 'DELETE_SUCCESS': {
       return {
-        effects: [{ type: 'NAVIGATE_BACK' }],
+        effects: [
+          {
+            type: 'SHOW_TOAST',
+            payload: {
+              message: '식재료가 삭제됐어요.',
+              variant: 'success',
+            },
+          },
+          { type: 'NAVIGATE_BACK' },
+        ],
       };
     }
 

@@ -12,7 +12,7 @@ import { Category } from '@/data/enums/category';
 import { getCategoryLabel } from '@/utils/category/getCategoryLabel';
 
 export function useShoppingLogic() {
-  const { alert, confirm } = useDialog();
+  const { confirm } = useDialog();
   const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createShoppingStore);
   const addShoppingItem = useAddShoppingItem({
@@ -51,8 +51,21 @@ export function useShoppingLogic() {
           title: effect.payload.title,
           message: effect.payload.message,
           onConfirm: async () => {
-            await effect.payload.onConfirm();
+            const result = await effect.payload.onConfirm();
             dispatch({ type: 'LOAD_SHOPPING_LIST' });
+
+            // 삭제 결과에 따라 토스트 표시
+            if (result && result.success) {
+              showToast({
+                message: '장보기 항목이 삭제됐어요.',
+                type: 'success',
+              });
+            } else if (result && result.success === false) {
+              showToast({
+                message: '삭제에 실패했어요.',
+                type: 'error',
+              });
+            }
           },
           onCancel: undefined,
           confirmText: '삭제',
@@ -69,10 +82,6 @@ export function useShoppingLogic() {
 
   function handleDeleteItem(id: string, name: string) {
     dispatch({ type: 'DELETE_ITEM', payload: { id, name } });
-  }
-
-  function handleClearPurchased() {
-    dispatch({ type: 'CLEAR_PURCHASED' });
   }
 
   function handleClearUnpurchased() {

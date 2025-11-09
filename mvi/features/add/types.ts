@@ -47,11 +47,7 @@ export type AddIntent =
       type: 'UPDATE_FIELD';
       payload: { field: keyof AddFormData; value: string };
     }
-  | { type: 'UPDATE_FORM'; payload: Partial<AddFormData> }
   | { type: 'SUBMIT_FORM' }
-  | { type: 'SUBMIT_SUCCESS' }
-  | { type: 'SUBMIT_ERROR'; payload: string }
-  | { type: 'RESET_FORM' }
   | { type: 'VALIDATE_FORM' }
   | { type: 'NAVIGATE_BACK' };
 

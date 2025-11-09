@@ -83,8 +83,6 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
       }
 
       try {
-        const registrationDate = new Date().toISOString().split('T')[0];
-
         // 스토리지에 저장
         await ingredientService.addIngredient({
           name: state.form.name,
@@ -125,7 +123,6 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
           ],
         };
       } catch (error) {
-        console.error('Error adding ingredient:', error);
         return {
           state: {
             ...state,

@@ -103,11 +103,6 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
         effects: [{ type: 'NAVIGATE', payload: `/ingredient/${intent.payload}?mode=edit` }],
       };
 
-    case 'NAVIGATE_BACK':
-      return {
-        effects: [{ type: 'NAVIGATE', payload: 'back' }],
-      };
-
     default:
       return {};
   }

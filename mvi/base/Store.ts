@@ -36,8 +36,6 @@ export class Store<S extends State, I extends Intent, E extends Effect> {
    * Intent 전송
    */
   async dispatch(intent: I): Promise<void> {
-    console.log('Store.dispatch called with intent:', intent);
-    console.log('Number of middlewares:', this.middlewares.length);
     // 1. Middleware 실행 (비동기 작업)
     for (const middleware of this.middlewares) {
       try {

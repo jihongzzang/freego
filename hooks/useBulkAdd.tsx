@@ -2,11 +2,9 @@ import { useState } from 'react';
 import { Category } from '@/data/enums/category';
 import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 import { Unit } from '@/data/enums/unit';
-import { useDialog } from './useDialog';
 import { useToast } from '@/components/ui';
 
 export function useBulkAdd(onSuccess?: () => void) {
-  const { alert } = useDialog();
   const { showToast } = useToast();
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<Category | 0>(0);
@@ -34,14 +32,6 @@ export function useBulkAdd(onSuccess?: () => void) {
       } else {
         return [...prev, template];
       }
-    });
-  }
-
-  function handleRegisterReceipt() {
-    alert({
-      title: '준비중이에요',
-      message: '빠른 시일내에 업데이트 할게요.',
-      type: 'info',
     });
   }
 
@@ -95,6 +85,5 @@ export function useBulkAdd(onSuccess?: () => void) {
     handleCategoryChange,
     handleTemplateToggle,
     handleConfirm,
-    handleRegisterReceipt,
   };
 }

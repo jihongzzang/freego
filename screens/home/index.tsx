@@ -1,7 +1,6 @@
 import { View, Animated, TouchableOpacity, Platform } from 'react-native';
-import { Bell, QrCode, Edit3, Grid3x3, Dot } from 'lucide-react-native';
+import { Bell, Edit3, Grid3x3 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
-import { useRouter } from '@/hooks/useRouter';
 import Header from '@/components/ui/Header';
 import FloatingButton from '@/components/ui/FloatingButton';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
@@ -12,11 +11,9 @@ import { useHomeLogic } from './hooks/useHomeLogic';
 import { useHomeData } from './hooks/useHomeData';
 import { useHomeAnimation } from './hooks/useHomeAnimation';
 import { CategoryCarousel } from './components/CategoryCarousel';
-// import { ExpiringSection } from './components/ExpiringSection';
 import { IngredientsSection } from './components/IngredientsSection';
 
 export default function HomeScreen() {
-  const router = useRouter();
   const { colors, spacing } = useTheme();
   const inset = useSafeAreaInsets();
 
@@ -32,6 +29,7 @@ export default function HomeScreen() {
     getFloatingMenuItems,
     expiryDatePicker,
     bulkAdd,
+    navigateIngredientDetail,
   } = useHomeLogic();
 
   // Data hooks
@@ -130,7 +128,7 @@ export default function HomeScreen() {
             title={selectedCategoryId === 0 ? '전체 재료' : selectedCategoryItem?.label || ''}
             count={filteredIngredients.length}
             items={filteredIngredients}
-            onCardPress={(item) => router.push(`/ingredient/${item.id}`)}
+            onCardPress={(item) => navigateIngredientDetail(item.id)}
             onCalendarPress={openDatePicker}
             getExpiryDisplay={getExpiryDisplay}
           />
@@ -140,23 +138,16 @@ export default function HomeScreen() {
       <FloatingButton
         menuItems={[
           {
-            icon: <QrCode size={24} color="#FFFFFF" />,
+            icon: <Edit3 size={24} color="#FFFFFF" />,
             label: floatingMenuItems[0].label,
             onPress: floatingMenuItems[0].onPress,
-            labelColor: colors.white,
-            backgroundColor: colors.blue600,
-          },
-          {
-            icon: <Edit3 size={24} color="#FFFFFF" />,
-            label: floatingMenuItems[1].label,
-            onPress: floatingMenuItems[1].onPress,
             labelColor: colors.white,
             backgroundColor: colors.green600,
           },
           {
             icon: <Grid3x3 size={24} color="#FFFFFF" />,
-            label: floatingMenuItems[2].label,
-            onPress: floatingMenuItems[2].onPress,
+            label: floatingMenuItems[1].label,
+            onPress: floatingMenuItems[1].onPress,
             labelColor: colors.white,
             backgroundColor: colors.orange600,
           },

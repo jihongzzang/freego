@@ -1,5 +1,6 @@
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { useMemo } from 'react';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useTheme } from '@/lib/theme';
 import Header from '@/components/ui/Header';
 import SelectUnitBottomSheet from '@/components/SelectUnitBottomSheet';
@@ -14,7 +15,6 @@ export default function AddIngredientScreen() {
 
   const {
     state,
-    isKeyboardVisible,
     isEmojiPickerVisible,
     setIsEmojiPickerVisible,
     selectedEmoji,
@@ -34,34 +34,30 @@ export default function AddIngredientScreen() {
     <View style={{ flex: 1 }}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header title="" onBackPress={handleBackPress} />
-
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        <KeyboardAwareScrollView
+          style={styles.content}
+          contentContainerStyle={{ paddingBottom: spacing.xxxl }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          enableOnAndroid={true}
+          enableAutomaticScroll
+          extraScrollHeight={Platform.OS === 'ios' ? 0 : 80}
+          extraHeight={150}
+          enableResetScrollToCoords={false}
         >
-          <ScrollView
-            style={styles.content}
-            contentContainerStyle={{ paddingBottom: spacing.xxxl }}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="interactive"
-          >
-            <AddForm
-              formData={state.form}
-              errors={state.errors}
-              selectedEmoji={selectedEmoji}
-              onFieldChange={handleFieldChange}
-              onEmojiPress={() => setIsEmojiPickerVisible(true)}
-              onUnitPress={unitPicker.open}
-              onPurchaseDatePress={() => purchaseDatePicker.open(state.form.purchased_date || new Date())}
-              onExpiryDatePress={() => expiryDatePicker.open(state.form.expiry_date || new Date())}
-              onQuickSelect={handleQuickSelect}
-            />
-          </ScrollView>
-        </KeyboardAvoidingView>
-
-        {!isKeyboardVisible && <SubmitButton onSubmit={handleSubmit} />}
+          <AddForm
+            formData={state.form}
+            errors={state.errors}
+            selectedEmoji={selectedEmoji}
+            onFieldChange={handleFieldChange}
+            onEmojiPress={() => setIsEmojiPickerVisible(true)}
+            onUnitPress={unitPicker.open}
+            onPurchaseDatePress={() => purchaseDatePicker.open(state.form.purchased_date || new Date())}
+            onExpiryDatePress={() => expiryDatePicker.open(state.form.expiry_date || new Date())}
+            onQuickSelect={handleQuickSelect}
+          />
+        </KeyboardAwareScrollView>
+        <SubmitButton onSubmit={handleSubmit} />
       </View>
 
       <SelectDateBottomSheet

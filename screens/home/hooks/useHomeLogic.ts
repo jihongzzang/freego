@@ -7,10 +7,12 @@ import { useRouter } from '@/hooks/useRouter';
 import { useExpiryDatePicker } from '@/hooks/useExpiryDatePicker';
 import { useBulkAdd } from '@/hooks/useBulkAdd';
 import { Category } from '@/data/enums/category';
+import { useToast } from '@/components/ui';
 
 export function useHomeLogic() {
   const router = useRouter();
   const scrollY = useRef(new Animated.Value(0)).current;
+  const { showToast } = useToast();
 
   // 선택된 카테고리 상태
   const [selectedCategoryId, setSelectedCategoryId] = useState<Category | 0>(0);
@@ -48,6 +50,10 @@ export function useHomeLogic() {
           router.push(effect.payload as any);
           break;
         case 'SHOW_TOAST':
+          showToast({
+            message: effect.payload.message,
+            type: effect.payload.variant,
+          });
           break;
       }
     }
@@ -66,17 +72,17 @@ export function useHomeLogic() {
     expiryDatePicker.open(item.expiry_date || new Date());
   }
 
+  function navigateIngredientDetail(ingredientId: number) {
+    dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: ingredientId });
+  }
+
   // 플로팅 버튼 메뉴 아이템
   const getFloatingMenuItems = () => [
-    {
-      icon: 'QrCode',
-      label: '영수증으로 재료 등록',
-      onPress: bulkAdd.handleRegisterReceipt,
-    },
     {
       icon: 'Edit3',
       label: '직접 재료 등록',
       onPress: () => {
+        console.log(selectedCategoryId);
         dispatch({
           type: 'NAVIGATE_TO_ADD',
           payload: selectedCategoryId === 0 ? undefined : (selectedCategoryId as number),
@@ -101,5 +107,6 @@ export function useHomeLogic() {
     getFloatingMenuItems,
     expiryDatePicker,
     bulkAdd,
+    navigateIngredientDetail,
   };
 }

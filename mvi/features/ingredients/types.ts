@@ -33,8 +33,7 @@ export type IngredientsIntent =
   | { type: 'DELETE_INGREDIENT'; payload: number }
   | { type: 'NAVIGATE_TO_ADD' }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: number }
-  | { type: 'NAVIGATE_TO_DETAIL_EDIT'; payload: number }
-  | { type: 'NAVIGATE_BACK' };
+  | { type: 'NAVIGATE_TO_DETAIL_EDIT'; payload: number };
 
 /**
  * Ingredients Effect (부수 효과)

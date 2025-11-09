@@ -15,7 +15,6 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
   state,
   intent,
 ): Promise<MiddlewareResult<ShoppingState, ShoppingEffect>> => {
-  console.log('shoppingMiddleware called with intent:', intent.type);
   switch (intent.type) {
     case 'LOAD_SHOPPING_LIST': {
       try {
@@ -36,6 +35,15 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             loading: false,
             error: error instanceof Error ? error.message : '데이터 로드 실패',
           },
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: {
+                message: '장보기 목록을 불러오는데 실패했어요.',
+                variant: 'error',
+              },
+            },
+          ],
         };
       }
     }
@@ -71,20 +79,21 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
     }
 
     case 'DELETE_ITEM': {
+      const itemName = intent.payload.name;
       return {
         effects: [
           {
             type: 'SHOW_CONFIRM',
             payload: {
               title: '장보기 목록 삭제',
-              message: `"${intent.payload.name}"을(를) 장보기 목록에서 삭제할까요?`,
+              message: `"${itemName}"을(를) 장보기 목록에서 삭제할까요?`,
               onConfirm: async () => {
                 try {
                   await shoppingService.deleteShoppingItem(Number(intent.payload.id));
-                  // 삭제 후 목록 새로고침을 위한 LOAD_SHOPPING_LIST intent 발행은
-                  // 컴포넌트에서 처리하도록 함
+                  return { success: true };
                 } catch (error) {
                   console.error('Error deleting shopping item:', error);
+                  return { success: false };
                 }
               },
               isDanger: true,
@@ -149,51 +158,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
       }
     }
 
-    case 'CLEAR_PURCHASED': {
-      const purchasedItems = state.shoppingList.filter((item) => item.is_purchased);
-
-      if (purchasedItems.length === 0) {
-        return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '구매한 항목이 없어요.',
-                variant: 'info',
-              },
-            },
-          ],
-        };
-      }
-
-      return {
-        effects: [
-          {
-            type: 'SHOW_CONFIRM',
-            payload: {
-              title: '구매 완료 항목 삭제',
-              message: `${purchasedItems.length}개의 구매 완료 항목을 삭제할까요?`,
-              onConfirm: async () => {
-                try {
-                  for (const item of purchasedItems) {
-                    await shoppingService.deleteShoppingItem(item.id);
-                  }
-                  // 삭제 후 목록 새로고침은 컴포넌트에서 처리
-                } catch (error) {
-                  console.error('Error clearing purchased items:', error);
-                }
-              },
-              isDanger: true,
-            },
-          },
-        ],
-      };
-    }
-
     case 'CLEAR_UNPURCHASED': {
-      console.log('CLEAR_UNPURCHASED middleware called');
       const unpurchasedItems = state.shoppingList.filter((item) => !item.is_purchased);
-      console.log('unpurchasedItems:', unpurchasedItems.length);
 
       if (unpurchasedItems.length === 0) {
         return {
@@ -209,21 +175,23 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         };
       }
 
+      const itemCount = unpurchasedItems.length;
       return {
         effects: [
           {
             type: 'SHOW_CONFIRM',
             payload: {
               title: '구매 예정 항목 삭제',
-              message: `${unpurchasedItems.length}개의 구매 예정 항목을 삭제할까요?`,
+              message: `${itemCount}개의 구매 예정 항목을 삭제할까요?`,
               onConfirm: async () => {
                 try {
                   for (const item of unpurchasedItems) {
                     await shoppingService.deleteShoppingItem(item.id);
                   }
-                  // 삭제 후 목록 새로고침은 컴포넌트에서 처리
+                  return { success: true, count: itemCount };
                 } catch (error) {
                   console.error('Error clearing unpurchased items:', error);
+                  return { success: false };
                 }
               },
               isDanger: true,

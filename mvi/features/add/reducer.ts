@@ -38,39 +38,9 @@ export const addReducer: Reducer<AddState, AddIntent> = (state, intent): AddStat
         },
       };
 
-    case 'UPDATE_FORM':
-      return {
-        ...state,
-        form: {
-          ...state.form,
-          ...intent.payload,
-        },
-      };
-
     case 'SUBMIT_FORM':
       // SUBMIT_FORM은 미들웨어에서 처리하므로 리듀서에서는 상태 변경 없음
       return state;
-
-    case 'SUBMIT_SUCCESS':
-      return {
-        ...state,
-        isSubmitting: false,
-        form: initialFormData,
-        errors: {},
-      };
-
-    case 'SUBMIT_ERROR':
-      return {
-        ...state,
-        isSubmitting: false,
-      };
-
-    case 'RESET_FORM':
-      return {
-        ...state,
-        form: initialFormData,
-        errors: {},
-      };
 
     default:
       return state;

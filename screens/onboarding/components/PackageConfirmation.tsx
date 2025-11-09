@@ -49,10 +49,19 @@ export function PackageConfirmation({
         <Card
           variant="elevated"
           padding="large"
-          style={{ ...styles.ingredientsCard, ...{ backgroundColor: isDark ? colors.grey100 : colors.grey100 } }}
+          style={{ ...styles.ingredientsCard, ...{ backgroundColor: isDark ? colors.grey800 : colors.grey100 } }}
         >
           <View style={styles.ingredientsCardHeader}>
-            <Text style={[typography.styles.t5Semibold, styles.ingredientsCardTitle]}>포함된 재료</Text>
+            <Text
+              style={[
+                typography.styles.t5Semibold,
+                {
+                  color: colors.textSecondary,
+                },
+              ]}
+            >
+              포함된 재료
+            </Text>
           </View>
           <View style={styles.ingredientsGrid}>
             {selectedPackage?.ingredients.map((item, index) => {
@@ -155,9 +164,7 @@ const createStyles = ({
     ingredientsCardHeader: {
       marginBottom: spacing.lg,
     },
-    ingredientsCardTitle: {
-      color: colors.grey800,
-    },
+
     ingredientsGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',

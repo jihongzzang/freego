@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { useMemo } from 'react';
-import { Edit3, Check } from 'lucide-react-native';
+import { Edit3 } from 'lucide-react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useTheme } from '@/lib/theme';
 import Header from '@/components/ui/Header';
 import FloatingButton from '@/components/ui/FloatingButton';
@@ -47,36 +48,34 @@ export default function IngredientDetailScreen() {
     <>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header title="" onBackPress={handleBackPress} />
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        <KeyboardAwareScrollView
+          style={styles.content}
+          contentContainerStyle={{ paddingBottom: state.isEditing ? 200 : 24 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          enableOnAndroid
+          enableAutomaticScroll
+          extraScrollHeight={Platform.OS === 'ios' ? 0 : 80}
+          extraHeight={150}
         >
-          <ScrollView
-            style={styles.content}
-            contentContainerStyle={{ paddingBottom: state.isEditing ? 200 : 24 }}
-            showsVerticalScrollIndicator={false}
-          >
-            {state.isEditing ? (
-              <EditForm
-                formData={state.editForm}
-                selectedEmoji={selectedEmoji}
-                onFieldChange={handleFieldChange}
-                onEmojiPress={() => setIsEmojiPickerVisible(true)}
-                onUnitPress={unitPicker.open}
-                onPurchaseDatePress={() => purchaseDatePicker.open(state.editForm.purchased_date || new Date())}
-                onExpiryDatePress={() => expiryDatePicker.open(state.editForm.expiry_date || new Date())}
-                onQuickSelect={handleQuickSelect}
-              />
-            ) : (
-              <>
-                <DetailView ingredient={state.ingredient} />
-                <ActionButtons onConsume={handleConsume} onDelete={handleDelete} />
-              </>
-            )}
-          </ScrollView>
-        </KeyboardAvoidingView>
-
+          {state.isEditing ? (
+            <EditForm
+              formData={state.editForm}
+              selectedEmoji={selectedEmoji}
+              onFieldChange={handleFieldChange}
+              onEmojiPress={() => setIsEmojiPickerVisible(true)}
+              onUnitPress={unitPicker.open}
+              onPurchaseDatePress={() => purchaseDatePicker.open(state.editForm.purchased_date || new Date())}
+              onExpiryDatePress={() => expiryDatePicker.open(state.editForm.expiry_date || new Date())}
+              onQuickSelect={handleQuickSelect}
+            />
+          ) : (
+            <>
+              <DetailView ingredient={state.ingredient} />
+              <ActionButtons onConsume={handleConsume} onDelete={handleDelete} />
+            </>
+          )}
+        </KeyboardAwareScrollView>
         {state.isEditing ? (
           <FloatingButton onPress={handleUpdate} label="저장하기" hasTabBar={false} />
         ) : (

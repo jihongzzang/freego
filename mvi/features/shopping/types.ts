@@ -30,13 +30,7 @@ export type ShoppingIntent =
       payload: { id: string; currentStatus: boolean };
     }
   | { type: 'DELETE_ITEM'; payload: { id: string; name: string } }
-  | { type: 'CLEAR_PURCHASED' }
   | { type: 'CLEAR_UNPURCHASED' }
-  | { type: 'TOGGLE_ADD_MODAL'; payload: boolean }
-  | {
-      type: 'UPDATE_ADD_FORM';
-      payload: { field: 'name' | 'category'; value: string };
-    }
   | { type: 'SUBMIT_ADD_ITEM' };
 
 /**
@@ -48,7 +42,7 @@ export type ShoppingEffect =
       payload: {
         title?: string;
         message: string;
-        onConfirm: () => void;
+        onConfirm: () => Promise<any>;
         isDanger?: boolean;
       };
     }

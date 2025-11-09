@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useMemo } from 'react';
 import { Toast, ToastType, ToastPosition } from './Toast';
 
 interface ToastOptions {
@@ -16,24 +16,33 @@ interface ToastContextType {
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [toast, setToast] = useState<(ToastOptions & { visible: boolean }) | null>(null);
+  const [toast, setToast] = useState<(ToastOptions & { visible: boolean; id: number }) | null>(null);
+  const toastIdRef = useRef(0);
 
   const showToast = useCallback((options: ToastOptions) => {
+    console.log('show');
+    // 고유 ID를 생성하여 매번 새로운 토스트로 인식되도록 함
+    toastIdRef.current += 1;
     setToast({
       ...options,
       visible: true,
+      id: toastIdRef.current,
     });
   }, []);
 
   const hideToast = useCallback(() => {
+    console.log('hide');
     setToast((prev) => (prev ? { ...prev, visible: false } : null));
   }, []);
 
+  const contextValue = useMemo(() => ({ showToast, hideToast }), [showToast, hideToast]);
+
   return (
-    <ToastContext.Provider value={{ showToast, hideToast }}>
+    <ToastContext.Provider value={contextValue}>
       {children}
       {toast && (
         <Toast
+          key={toast.id}
           visible={toast.visible}
           message={toast.message}
           type={toast.type}
@@ -48,6 +57,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
 export function useToast() {
   const context = useContext(ToastContext);
+
   if (!context) {
     throw new Error('useToast must be used within ToastProvider');
   }

@@ -11,7 +11,6 @@ interface SubmitButtonProps {
 
 export function SubmitButton({ onSubmit, disabled }: SubmitButtonProps) {
   const { spacing } = useTheme();
-
   const insets = useSafeAreaInsets();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);

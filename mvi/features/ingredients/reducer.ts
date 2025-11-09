@@ -7,10 +7,7 @@
 import { Reducer } from '@/mvi/base';
 import { IngredientsState, IngredientsIntent } from './types';
 
-export const ingredientsReducer: Reducer<IngredientsState, IngredientsIntent> = (
-  state,
-  intent
-): IngredientsState => {
+export const ingredientsReducer: Reducer<IngredientsState, IngredientsIntent> = (state, intent): IngredientsState => {
   switch (intent.type) {
     // LOAD_INGREDIENTS는 미들웨어에서 처리하므로 리듀서에서는 상태 변경 없음
     case 'LOAD_INGREDIENTS':
@@ -36,7 +33,6 @@ export const ingredientsReducer: Reducer<IngredientsState, IngredientsIntent> = 
     case 'NAVIGATE_TO_ADD':
     case 'NAVIGATE_TO_DETAIL':
     case 'NAVIGATE_TO_DETAIL_EDIT':
-    case 'NAVIGATE_BACK':
       return state;
 
     default:

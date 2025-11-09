@@ -30,7 +30,6 @@ export interface OnboardingState extends State {
 export type OnboardingIntent =
   | { type: 'NEXT_STEP' }
   | { type: 'PREVIOUS_STEP' }
-  | { type: 'SKIP_ONBOARDING' }
   | { type: 'SELECT_LIFESTYLE'; payload: string }
   | { type: 'SHOW_PACKAGE_CHOICE' }
   | { type: 'ADD_STARTER_PACKAGE' }
@@ -40,4 +39,13 @@ export type OnboardingIntent =
 /**
  * Onboarding Effect (부수 효과)
  */
-export type OnboardingEffect = { type: 'NAVIGATE_TO_HOME' } | { type: 'ADD_PACKAGE'; payload: string };
+export type OnboardingEffect =
+  | { type: 'NAVIGATE_TO_HOME' }
+  | { type: 'ADD_PACKAGE'; payload: string }
+  | {
+      type: 'SHOW_TOAST';
+      payload: {
+        message: string;
+        variant: 'success' | 'info' | 'warning' | 'error';
+      };
+    };

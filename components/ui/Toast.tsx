@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Animated, Dimensions, Platform } from 'react-native';
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo, useCallback } from 'react';
 import { useTheme } from '@/lib/theme';
 import { Info, CheckCircle2 } from 'lucide-react-native';
 
@@ -31,6 +31,25 @@ export function Toast({
 
   const styles = useMemo(() => createStyles({ spacing, borderRadius, shadows }), [spacing, borderRadius, shadows]);
 
+  const hide = useCallback(() => {
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: position === 'top' ? -100 : 100,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      if (onHide) {
+        onHide();
+      }
+    });
+  }, [translateY, opacity, position, onHide]);
+
   useEffect(() => {
     if (visible) {
       Animated.parallel([
@@ -52,29 +71,8 @@ export function Toast({
       }, duration);
 
       return () => clearTimeout(timer);
-    } else {
-      hide();
     }
-  }, [visible, duration]);
-
-  const hide = () => {
-    Animated.parallel([
-      Animated.timing(translateY, {
-        toValue: position === 'top' ? -100 : 100,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      if (onHide) {
-        onHide();
-      }
-    });
-  };
+  }, [visible, duration, translateY, opacity, hide]);
 
   const getToastIcon = () => {
     const iconSize = 24;
