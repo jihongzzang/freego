@@ -4,7 +4,7 @@
  * Store를 React 컴포넌트에서 사용하기 위한 훅
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Store } from './Store';
 import { Intent, State, Effect } from './types';
 
@@ -19,6 +19,27 @@ export function useStore<S extends State, I extends Intent, E extends Effect>(
 ): [S, (intent: I) => Promise<void>, E | null] {
   const [state, setState] = useState<S>(store.getState());
   const [effect, setEffect] = useState<E | null>(null);
+  const effectQueueRef = useRef<E[]>([]);
+  const processingRef = useRef(false);
+
+  // Effect 큐 처리
+  const processNextEffect = useCallback(() => {
+    if (processingRef.current || effectQueueRef.current.length === 0) {
+      return;
+    }
+
+    processingRef.current = true;
+    const nextEffect = effectQueueRef.current.shift()!;
+
+    setEffect(nextEffect);
+
+    // Effect 처리 완료 후 다음 effect 처리
+    setTimeout(() => {
+      setEffect(null);
+      processingRef.current = false;
+      processNextEffect();
+    }, 0);
+  }, []);
 
   useEffect(() => {
     // 상태 구독
@@ -28,16 +49,15 @@ export function useStore<S extends State, I extends Intent, E extends Effect>(
 
     // Effect 구독
     const unsubscribeEffect = store.subscribeEffect((newEffect) => {
-      setEffect(newEffect);
-      // Effect는 일회성이므로 곧바로 null로 리셋
-      setTimeout(() => setEffect(null), 0);
+      effectQueueRef.current.push(newEffect);
+      processNextEffect();
     });
 
     return () => {
       unsubscribeState();
       unsubscribeEffect();
     };
-  }, [store]);
+  }, [store, processNextEffect]);
 
   const dispatch = useCallback(
     async (intent: I) => {

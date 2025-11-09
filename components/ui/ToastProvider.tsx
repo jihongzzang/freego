@@ -20,7 +20,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const toastIdRef = useRef(0);
 
   const showToast = useCallback((options: ToastOptions) => {
-    console.log('show');
     // 고유 ID를 생성하여 매번 새로운 토스트로 인식되도록 함
     toastIdRef.current += 1;
     setToast({
@@ -31,7 +30,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const hideToast = useCallback(() => {
-    console.log('hide');
     setToast((prev) => (prev ? { ...prev, visible: false } : null));
   }, []);
 

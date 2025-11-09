@@ -82,7 +82,6 @@ export function useHomeLogic() {
       icon: 'Edit3',
       label: '직접 재료 등록',
       onPress: () => {
-        console.log(selectedCategoryId);
         dispatch({
           type: 'NAVIGATE_TO_ADD',
           payload: selectedCategoryId === 0 ? undefined : (selectedCategoryId as number),

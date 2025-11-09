@@ -24,6 +24,5 @@ export default function Index() {
     );
   }
 
-  // return <Redirect href={isOnboardingComplete ? '/(tabs)' : '/onboarding'} />;
-  return <Redirect href={'/onboarding'} />;
+  return <Redirect href={isOnboardingComplete ? '/(tabs)' : '/onboarding'} />;
 }
