@@ -203,6 +203,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
         const items = await shoppingService.getShoppingList();
 
+        console.log(items);
+
         return {
           state: {
             ...state,

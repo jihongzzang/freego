@@ -10,7 +10,7 @@ type StorageLocationOrUnset = StorageLocation | 'unset';
 
 export function useIngredientsData(ingredients: Ingredient[]) {
   const categoryOrder: Category[] = makeCategoryList({ includeAllCategory: false }).map((cat) => cat.id);
-  const storageOrder: StorageLocationOrUnset[] = [...makeStorageList({ lang: 'kr' }).map((loc) => loc.id), 'unset'];
+  const storageOrder: StorageLocationOrUnset[] = [...makeStorageList().map((loc) => loc.id)];
 
   // 아코디언 상태 관리
   const [collapsedCategories, setCollapsedCategories] = useState<Set<Category>>(new Set(categoryOrder));
