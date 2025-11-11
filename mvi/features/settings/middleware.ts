@@ -37,6 +37,49 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
         ],
       };
 
+    case 'DELETE_ALL_DATA': {
+      try {
+        const { ingredientService } = await import('@/services/ingredient.service');
+        const { shoppingService } = await import('@/services/shopping.service');
+
+        await ingredientService.clearAll();
+        await shoppingService.clearAll();
+
+        return {
+          state: {
+            ...state,
+            isClearing: false,
+          },
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: {
+                message: '모든 데이터가 삭제되었어요.',
+                variant: 'success',
+              },
+            },
+          ],
+        };
+      } catch (error) {
+        console.error('Error deleting all data:', error);
+        return {
+          state: {
+            ...state,
+            isClearing: false,
+          },
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: {
+                message: '데이터 삭제 중 문제가 발생했어요.',
+                variant: 'error',
+              },
+            },
+          ],
+        };
+      }
+    }
+
     default:
       return {};
   }

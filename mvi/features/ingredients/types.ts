@@ -31,7 +31,22 @@ export type IngredientsIntent =
   | { type: 'LOAD_INGREDIENTS_SUCCESS'; payload: Ingredient[] }
   | { type: 'LOAD_INGREDIENTS_ERROR'; payload: string }
   | { type: 'DELETE_INGREDIENT'; payload: number }
-  | { type: 'DEDUCT_INGREDIENT'; payload: number }
+  | { type: 'ADD_TO_SHOPPING_LIST_INGREDIENT'; payload: number }
+  | {
+      type: 'BULK_ADD_INGREDIENTS';
+      payload: Array<{
+        name: string;
+        category: number;
+        emoji?: string;
+        storage_location?: number;
+        quantity?: number;
+        unit?: number;
+        registration_date?: string;
+        purchase_date?: string;
+        expiry_date?: string;
+        memo?: string;
+      }>;
+    }
   | { type: 'NAVIGATE_TO_ADD' }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: number }
   | { type: 'NAVIGATE_TO_DETAIL_EDIT'; payload: number };

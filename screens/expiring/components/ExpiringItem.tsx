@@ -11,11 +11,11 @@ import { getDaysRemaining } from '@/utils/time';
 interface ExpiringItemProps {
   item: Ingredient;
   onPress: () => void;
-  onQuickDeduct: () => void;
+  onQuickAdd: () => void;
   onQuickDelete: () => void;
 }
 
-export function ExpiringItem({ item, onPress, onQuickDeduct, onQuickDelete }: ExpiringItemProps) {
+export function ExpiringItem({ item, onPress, onQuickAdd, onQuickDelete }: ExpiringItemProps) {
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
@@ -67,7 +67,7 @@ export function ExpiringItem({ item, onPress, onQuickDeduct, onQuickDelete }: Ex
         style={[styles.quickButton, { borderRadius: borderRadius.lg }]}
         onPress={(e) => {
           e.stopPropagation();
-          onQuickDeduct();
+          onQuickAdd();
         }}
       >
         <ShoppingCart size={20} color={colors.teal500} />

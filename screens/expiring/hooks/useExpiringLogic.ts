@@ -46,8 +46,8 @@ export function useExpiringLogic() {
     dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: id.toString() });
   };
 
-  const handleQuickDeduct = (id: number) => {
-    dispatch({ type: 'DEDUCT_INGREDIENT', payload: id });
+  const handleQuickAdd = (id: number) => {
+    dispatch({ type: 'ADD_TO_SHOPPING_LIST_INGREDIENT', payload: id });
   };
 
   const handleQuickDelete = (id: number) => {
@@ -59,7 +59,7 @@ export function useExpiringLogic() {
     loading: state.loading,
     handleNavigateBack,
     handleNavigateToDetail,
-    handleQuickDeduct,
+    handleQuickAdd,
     handleQuickDelete,
   };
 }

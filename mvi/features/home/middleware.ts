@@ -96,6 +96,43 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
       }
     }
 
+    case 'BULK_ADD_INGREDIENTS': {
+      try {
+        await ingredientService.addMultipleIngredients(intent.payload as any);
+
+        // 추가 후 다시 로드
+        const data = await ingredientService.getIngredients();
+        const ingredients: Ingredient[] = data.map((item) => ({
+          ...item,
+          status: getCalculateStatus(item.expiry_date),
+          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
+        }));
+
+        return {
+          state: {
+            ...state,
+            ingredients,
+          },
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: { message: `${intent.payload.length}개의 재료가 추가됐어요.`, variant: 'success' },
+            },
+          ],
+        };
+      } catch (error) {
+        console.error('Error adding templates:', error);
+        return {
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: { message: '재료 추가 중 오류가 발생했어요.', variant: 'error' },
+            },
+          ],
+        };
+      }
+    }
+
     case 'NAVIGATE_TO_ADD': {
       return {
         effects: [

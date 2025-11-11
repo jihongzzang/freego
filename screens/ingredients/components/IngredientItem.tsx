@@ -12,11 +12,11 @@ interface IngredientItemProps {
   item: Ingredient;
   onPress: () => void;
   onEdit: () => void;
-  onQuickDeduct: () => void;
+  onQuickAdd: () => void;
   onQuickDelete: () => void;
 }
 
-export function IngredientItem({ item, onPress, onEdit, onQuickDeduct, onQuickDelete }: IngredientItemProps) {
+export function IngredientItem({ item, onPress, onEdit, onQuickAdd, onQuickDelete }: IngredientItemProps) {
   const { colors, typography, spacing, borderRadius } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
@@ -94,7 +94,7 @@ export function IngredientItem({ item, onPress, onEdit, onQuickDeduct, onQuickDe
           style={[styles.actionButton]}
           onPress={(e) => {
             e.stopPropagation();
-            onQuickDeduct();
+            onQuickAdd();
           }}
           activeOpacity={0.7}
         >

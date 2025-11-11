@@ -15,7 +15,7 @@ import { Intent, State, Effect } from './types';
  * @returns [state, dispatch, effect] 튜플
  */
 export function useStore<S extends State, I extends Intent, E extends Effect>(
-  store: Store<S, I, E>
+  store: Store<S, I, E>,
 ): [S, (intent: I) => Promise<void>, E | null] {
   const [state, setState] = useState<S>(store.getState());
   const [effect, setEffect] = useState<E | null>(null);
@@ -61,9 +61,13 @@ export function useStore<S extends State, I extends Intent, E extends Effect>(
 
   const dispatch = useCallback(
     async (intent: I) => {
-      await store.dispatch(intent);
+      try {
+        await store.dispatch(intent);
+      } catch (error) {
+        //
+      }
     },
-    [store]
+    [store],
   );
 
   return [state, dispatch, effect];
@@ -76,7 +80,7 @@ export function useStore<S extends State, I extends Intent, E extends Effect>(
  * @returns [state, dispatch, effect] 튜플
  */
 export function useMVIStore<S extends State, I extends Intent, E extends Effect>(
-  createStore: () => Store<S, I, E>
+  createStore: () => Store<S, I, E>,
 ): [S, (intent: I) => Promise<void>, E | null] {
   const [store] = useState(createStore);
   return useStore(store);

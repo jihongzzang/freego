@@ -5,8 +5,9 @@ import { useMVIStore } from '@/mvi/base';
 import { createHomeStore, Ingredient } from '@/mvi/features/home';
 import { useRouter } from '@/hooks/useRouter';
 import { useExpiryDatePicker } from '@/hooks/useExpiryDatePicker';
-import { useBulkAdd } from '@/hooks/useBulkAdd';
+import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 import { Category } from '@/data/enums/category';
+import { Unit } from '@/data/enums/unit';
 import { useToast } from '@/components/ui';
 
 export function useHomeLogic() {
@@ -19,6 +20,11 @@ export function useHomeLogic() {
 
   // 유통기한 수정 모달 상태
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
+
+  // BulkAdd 로컬 상태
+  const [isBulkAddVisible, setIsBulkAddVisible] = useState(false);
+  const [bulkAddCategoryId, setBulkAddCategoryId] = useState<Category | 0>(0);
+  const [selectedTemplates, setSelectedTemplates] = useState<IngredientTemplate[]>([]);
 
   // MVI Store
   const [state, dispatch, effect] = useMVIStore(createHomeStore);
@@ -35,11 +41,6 @@ export function useHomeLogic() {
   // 유통기한 선택 훅
   const expiryDatePicker = useExpiryDatePicker({
     onDateConfirm: updateExpiryDate,
-  });
-
-  // BulkAdd 훅
-  const bulkAdd = useBulkAdd(() => {
-    dispatch({ type: 'LOAD_INGREDIENTS' });
   });
 
   // Effect 처리
@@ -76,6 +77,59 @@ export function useHomeLogic() {
     dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: ingredientId });
   }
 
+  // BulkAdd 핸들러
+  function handleBulkAddOpen() {
+    setIsBulkAddVisible(true);
+  }
+
+  function handleBulkAddClose() {
+    setIsBulkAddVisible(false);
+    setSelectedTemplates([]);
+    setBulkAddCategoryId(0);
+  }
+
+  function handleBulkAddCategoryChange(categoryId: Category | 0) {
+    setBulkAddCategoryId(categoryId);
+  }
+
+  function handleBulkAddTemplateToggle(template: IngredientTemplate) {
+    setSelectedTemplates((prev) => {
+      const isSelected = prev.some((t) => t.id === template.id);
+      if (isSelected) {
+        return prev.filter((t) => t.id !== template.id);
+      } else {
+        return [...prev, template];
+      }
+    });
+  }
+
+  function handleBulkAddConfirm() {
+    if (selectedTemplates.length === 0) {
+      handleBulkAddClose();
+      return;
+    }
+
+    const ingredientsToAdd = selectedTemplates.map((template) => ({
+      name: template.krLabel,
+      category: template.category as Category,
+      emoji: template.emoji,
+      storage_location: undefined,
+      quantity: undefined,
+      unit: template.defaultUnit as Unit,
+      registration_date: new Date().toISOString().split('T')[0],
+      purchase_date: undefined,
+      expiry_date: undefined,
+      memo: '',
+    }));
+
+    dispatch({
+      type: 'BULK_ADD_INGREDIENTS',
+      payload: ingredientsToAdd,
+    });
+
+    handleBulkAddClose();
+  }
+
   // 플로팅 버튼 메뉴 아이템
   const getFloatingMenuItems = () => [
     {
@@ -91,7 +145,7 @@ export function useHomeLogic() {
     {
       icon: 'Grid3x3',
       label: '한꺼번에 재료 등록',
-      onPress: bulkAdd.open,
+      onPress: handleBulkAddOpen,
     },
   ];
 
@@ -105,7 +159,16 @@ export function useHomeLogic() {
     openDatePicker,
     getFloatingMenuItems,
     expiryDatePicker,
-    bulkAdd,
+    bulkAdd: {
+      isVisible: isBulkAddVisible,
+      selectedCategoryId: bulkAddCategoryId,
+      selectedTemplates,
+      open: handleBulkAddOpen,
+      close: handleBulkAddClose,
+      handleCategoryChange: handleBulkAddCategoryChange,
+      handleTemplateToggle: handleBulkAddTemplateToggle,
+      handleConfirm: handleBulkAddConfirm,
+    },
     navigateIngredientDetail,
   };
 }

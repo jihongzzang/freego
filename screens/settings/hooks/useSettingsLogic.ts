@@ -5,8 +5,6 @@ import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/contexts/DialogContext';
 import { useMVIStore } from '@/mvi/base';
 import { createSettingsStore } from '@/mvi/features/settings';
-import { ingredientService } from '@/services/ingredient.service';
-import { shoppingService } from '@/services/shopping.service';
 import { useToast } from '@/components/ui';
 
 export function useSettingsLogic() {
@@ -46,7 +44,7 @@ export function useSettingsLogic() {
       const settings = await Notifications.getPermissionsAsync();
       setHasNotificationPermission((settings as any).granted);
     } catch (error) {
-      console.log('Failed to check notification permission (expected in Expo Go):', error);
+      // console.log('Failed to check notification permission (expected in Expo Go):', error);
       setHasNotificationPermission(false);
     }
   }
@@ -72,7 +70,7 @@ export function useSettingsLogic() {
         });
       }
     } catch (error) {
-      console.log('Failed to request notification permission (expected in Expo Go):', error);
+      // console.log('Failed to request notification permission (expected in Expo Go):', error);
       showToast({
         message: 'Expo Go에서는 알림 권한을 요청할 수 없어요. Development build를 사용해주세요.',
         type: 'warning',
@@ -119,19 +117,7 @@ export function useSettingsLogic() {
       cancelText: '취소',
       isDestructive: true,
       onConfirm: async () => {
-        try {
-          await ingredientService.clearAll();
-          await shoppingService.clearAll();
-          showToast({
-            message: '모든 데이터가 삭제되었어요.',
-            type: 'success',
-          });
-        } catch (error) {
-          showToast({
-            message: '데이터 삭제 중 문제가 발생했어요.',
-            type: 'error',
-          });
-        }
+        dispatch({ type: 'DELETE_ALL_DATA' });
       },
     });
   }

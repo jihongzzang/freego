@@ -108,7 +108,7 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
       }
     }
 
-    case 'DEDUCT_INGREDIENT': {
+    case 'ADD_TO_SHOPPING_LIST_INGREDIENT': {
       try {
         // 현재 식재료 찾기
         const ingredient = state.ingredients.find((item) => item.id === intent.payload);
@@ -128,7 +128,7 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
         await shoppingService.addToShoppingList({
           name: ingredient.name,
           category: ingredient.category,
-          memo: ingredient.memo,
+          emoji: ingredient.emoji,
         });
 
         // 식재료 삭제

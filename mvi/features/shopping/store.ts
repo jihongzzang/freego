@@ -14,6 +14,7 @@ import { shoppingMiddleware } from './middleware';
  */
 const initialState: ShoppingState = {
   shoppingList: [],
+  selectedIds: new Set<number>(),
   loading: false,
   error: null,
   isAddingItem: false,

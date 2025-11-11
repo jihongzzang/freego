@@ -6,7 +6,6 @@ import { useDialog } from '@/contexts/DialogContext';
 import { useToast } from '@/components/ui';
 import { useMVIStore } from '@/mvi/base';
 import { createShoppingStore } from '@/mvi/features/shopping';
-import { useAddShoppingItem } from '@/hooks/useAddShoppingItem';
 import { StorageLocation } from '@/data/enums/storage_location';
 import { Category } from '@/data/enums/category';
 import { getCategoryLabel } from '@/utils/category/getCategoryLabel';
@@ -15,11 +14,13 @@ export function useShoppingLogic() {
   const { confirm } = useDialog();
   const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createShoppingStore);
-  const addShoppingItem = useAddShoppingItem({
-    onSuccess: () => {
-      dispatch({ type: 'LOAD_SHOPPING_LIST' });
-    },
-  });
+
+  // Add Shopping Item State
+  const [isAddingItem, setIsAddingItem] = useState(false);
+  const [addItemName, setAddItemName] = useState('');
+  const [addItemCategory, setAddItemCategory] = useState<Category>(Category.VEGETABLE);
+  const [addItemMemo, setAddItemMemo] = useState('');
+
   const [editingMemoId, setEditingMemoId] = useState<string | null>(null);
   const [editingMemo, setEditingMemo] = useState('');
   const [selectingStorageForItem, setSelectingStorageForItem] = useState<{
@@ -52,23 +53,33 @@ export function useShoppingLogic() {
           message: effect.payload.message,
           onConfirm: async () => {
             const result = await effect.payload.onConfirm();
+
+            // 데이터 다시 로드 (reducer가 selectedIds를 초기화함)
             dispatch({ type: 'LOAD_SHOPPING_LIST' });
 
-            // 삭제 결과에 따라 토스트 표시
+            // 결과에 따라 토스트 표시
             if (result && result.success) {
-              showToast({
-                message: '장보기 항목이 삭제됐어요.',
-                type: 'success',
-              });
+              // count가 있으면 냉장고 추가, 없으면 삭제
+              if (result.count) {
+                showToast({
+                  message: `${result.count}개 항목이 냉장고에 추가됐어요.`,
+                  type: 'success',
+                });
+              } else {
+                showToast({
+                  message: '장보기 항목이 삭제됐어요.',
+                  type: 'success',
+                });
+              }
             } else if (result && result.success === false) {
               showToast({
-                message: '삭제에 실패했어요.',
+                message: effect.payload.isDanger ? '삭제에 실패했어요.' : '냉장고 추가 중 오류가 발생했어요.',
                 type: 'error',
               });
             }
           },
           onCancel: undefined,
-          confirmText: '삭제',
+          confirmText: effect.payload.isDanger ? '삭제' : '확인',
           cancelText: '취소',
           isDestructive: effect.payload.isDanger,
         });
@@ -76,94 +87,44 @@ export function useShoppingLogic() {
     }
   }, [effect, showToast, confirm, dispatch]);
 
-  function handleTogglePurchased(id: string, currentStatus: boolean) {
-    dispatch({ type: 'TOGGLE_PURCHASED', payload: { id, currentStatus } });
+  function handleToggleSelect(id: string) {
+    dispatch({ type: 'TOGGLE_SELECT', payload: { id } });
+  }
+
+  function handleToggleSelectAll() {
+    dispatch({ type: 'TOGGLE_SELECT_ALL' });
+  }
+
+  function handleDeleteSelected() {
+    dispatch({ type: 'DELETE_SELECTED' });
+  }
+
+  function handleAddSelectedToStorage() {
+    dispatch({ type: 'ADD_SELECTED_TO_STORAGE' });
   }
 
   function handleDeleteItem(id: string, name: string) {
     dispatch({ type: 'DELETE_ITEM', payload: { id, name } });
   }
 
-  function handleClearUnpurchased() {
-    dispatch({ type: 'CLEAR_UNPURCHASED' });
-  }
-
-  async function handleAddAllToStorage() {
-    const purchasedItems = state.shoppingList.filter((item) => item.is_purchased);
-
-    if (purchasedItems.length === 0) {
-      return;
-    }
-
-    try {
-      const { ingredientService } = await import('@/services/ingredient.service');
-      const { shoppingService } = await import('@/services/shopping.service');
-
-      // 모든 구매 완료 항목을 storage_location: undefined로 재고에 추가
-      const today = new Date().toISOString().split('T')[0];
-      for (const item of purchasedItems) {
-        await ingredientService.addIngredient({
-          name: item.name,
-          category: item.category,
-          storage_location: undefined,
-          purchased_date: today,
-          memo: '',
-        });
-        await shoppingService.deleteShoppingItem(Number(item.id));
-      }
-
-      dispatch({ type: 'LOAD_SHOPPING_LIST' });
-
-      showToast({
-        message: `${purchasedItems.length}개 품목이 냉장고에 추가되었어요.`,
-        type: 'success',
-      });
-    } catch (error) {
-      console.error('Error adding to storage:', error);
-      showToast({
-        message: '재고 추가 중 오류가 발생했어요.',
-        type: 'error',
-      });
-    }
-  }
-
   function handleAddToStorage(id: string, name: string, category: number) {
     setSelectingStorageForItem({ id, name, category });
   }
 
-  async function handleStorageSelect(storageLocation: StorageLocation) {
+  function handleStorageSelect(storageLocation: StorageLocation) {
     if (!selectingStorageForItem) return;
 
-    try {
-      const { ingredientService } = await import('@/services/ingredient.service');
-      const { shoppingService } = await import('@/services/shopping.service');
-      const today = new Date().toISOString().split('T')[0];
-
-      await ingredientService.addIngredient({
+    dispatch({
+      type: 'ADD_ITEM_TO_STORAGE',
+      payload: {
+        id: selectingStorageForItem.id,
         name: selectingStorageForItem.name,
-        category: selectingStorageForItem.category as any,
-        storage_location: storageLocation as any,
-        purchased_date: today,
-        memo: '',
-      });
+        category: selectingStorageForItem.category,
+        storageLocation: storageLocation as any,
+      },
+    });
 
-      await shoppingService.deleteShoppingItem(Number(selectingStorageForItem.id));
-
-      dispatch({ type: 'LOAD_SHOPPING_LIST' });
-
-      showToast({
-        message: `${selectingStorageForItem.name}이(가) 냉장고에 추가되었어요.`,
-        type: 'success',
-      });
-
-      setSelectingStorageForItem(null);
-    } catch (error) {
-      console.error('Error adding to storage:', error);
-      showToast({
-        message: '재고 추가 중 오류가 발생했어요.',
-        type: 'error',
-      });
-    }
+    setSelectingStorageForItem(null);
   }
 
   function handleShare() {
@@ -241,38 +202,81 @@ export function useShoppingLogic() {
     setEditingMemo(text);
   }
 
-  async function handleMemoSubmit() {
+  function handleMemoSubmit() {
     if (!editingMemoId) return;
 
-    try {
-      const { shoppingService } = await import('@/services/shopping.service');
-      await shoppingService.updateShoppingItem(Number(editingMemoId), {
-        memo: editingMemo.trim() || undefined,
-      });
+    dispatch({
+      type: 'UPDATE_MEMO',
+      payload: {
+        id: editingMemoId,
+        memo: editingMemo,
+      },
+    });
 
-      dispatch({ type: 'LOAD_SHOPPING_LIST' });
-      handleMemoClose();
+    handleMemoClose();
+  }
 
-      showToast({
-        message: '메모가 저장됐어요.',
-        type: 'success',
-      });
-    } catch (error) {
-      console.error('Error updating memo:', error);
-      showToast({
-        message: '메모 저장 중 오류가 발생했어요.',
-        type: 'error',
-      });
+  // Add Shopping Item Handlers
+  function handleOpenAddItem() {
+    setIsAddingItem(true);
+  }
+
+  function handleCloseAddItem() {
+    setIsAddingItem(false);
+    setAddItemName('');
+    setAddItemCategory(Category.VEGETABLE);
+    setAddItemMemo('');
+  }
+
+  function handleAddItemNameChange(text: string) {
+    setAddItemName(text);
+  }
+
+  function handleAddItemCategoryChange(categoryId: number) {
+    setAddItemCategory(categoryId as Category);
+  }
+
+  function handleAddItemMemoChange(text: string) {
+    setAddItemMemo(text);
+  }
+
+  function handleAddItemSubmit() {
+    if (!addItemName.trim()) {
+      handleCloseAddItem();
+      return;
     }
+
+    dispatch({
+      type: 'SUBMIT_ADD_ITEM',
+      payload: {
+        name: addItemName.trim(),
+        category: addItemCategory,
+        memo: addItemMemo.trim() || undefined,
+      },
+    });
+
+    handleCloseAddItem();
   }
 
   return {
     state,
-    addShoppingItem,
-    handleTogglePurchased,
+    addShoppingItem: {
+      isVisible: isAddingItem,
+      name: addItemName,
+      category: addItemCategory,
+      memo: addItemMemo,
+      open: handleOpenAddItem,
+      close: handleCloseAddItem,
+      handleNameChange: handleAddItemNameChange,
+      handleCategoryChange: handleAddItemCategoryChange,
+      handleMemoChange: handleAddItemMemoChange,
+      handleSubmit: handleAddItemSubmit,
+    },
+    handleToggleSelect,
+    handleToggleSelectAll,
+    handleDeleteSelected,
     handleDeleteItem,
-    handleClearUnpurchased,
-    handleAddAllToStorage,
+    handleAddSelectedToStorage,
     handleAddToStorage,
     handleStorageSelect,
     selectingStorageForItem,

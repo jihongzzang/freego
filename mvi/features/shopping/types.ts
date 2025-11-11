@@ -11,6 +11,7 @@ import { Category } from '@/data/enums/category';
  */
 export interface ShoppingState extends State {
   shoppingList: ShoppingItem[];
+  selectedIds: Set<number>; // 선택된 항목 ID
   loading: boolean;
   error: string | null;
   isAddingItem: boolean;
@@ -25,13 +26,14 @@ export interface ShoppingState extends State {
  */
 export type ShoppingIntent =
   | { type: 'LOAD_SHOPPING_LIST' }
-  | {
-      type: 'TOGGLE_PURCHASED';
-      payload: { id: string; currentStatus: boolean };
-    }
+  | { type: 'TOGGLE_SELECT'; payload: { id: string } }
+  | { type: 'TOGGLE_SELECT_ALL' }
   | { type: 'DELETE_ITEM'; payload: { id: string; name: string } }
-  | { type: 'CLEAR_UNPURCHASED' }
-  | { type: 'SUBMIT_ADD_ITEM' };
+  | { type: 'DELETE_SELECTED' }
+  | { type: 'ADD_ITEM_TO_STORAGE'; payload: { id: string; name: string; category: number; storageLocation: number } }
+  | { type: 'ADD_SELECTED_TO_STORAGE' }
+  | { type: 'SUBMIT_ADD_ITEM'; payload: { name: string; category: Category; memo?: string } }
+  | { type: 'UPDATE_MEMO'; payload: { id: string; memo: string } };
 
 /**
  * Shopping Effect (부수 효과)

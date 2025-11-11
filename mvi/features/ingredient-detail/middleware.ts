@@ -141,6 +141,7 @@ export const ingredientDetailMiddleware: Middleware<
                   await shoppingService.addToShoppingList({
                     name: ingredient.name,
                     category: ingredient.category,
+                    emoji: ingredient.emoji,
                   });
                   await ingredientService.deleteIngredient(ingredient.id);
                   return { success: true, ingredientName };

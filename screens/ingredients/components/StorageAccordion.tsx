@@ -16,7 +16,7 @@ interface StorageAccordionProps {
   onToggle: () => void;
   onItemPress: (id: string) => void;
   onItemEdit: (id: string) => void;
-  onQuickDeduct: (id: string) => void;
+  onQuickAdd: (id: string) => void;
   onQuickDelete: (id: string) => void;
 }
 
@@ -27,7 +27,7 @@ export function StorageAccordion({
   onToggle,
   onItemPress,
   onItemEdit,
-  onQuickDeduct,
+  onQuickAdd,
   onQuickDelete,
 }: StorageAccordionProps) {
   const { colors, typography } = useTheme();
@@ -61,7 +61,7 @@ export function StorageAccordion({
               item={item}
               onPress={() => onItemPress(String(item.id))}
               onEdit={() => onItemEdit(String(item.id))}
-              onQuickDeduct={() => onQuickDeduct(String(item.id))}
+              onQuickAdd={() => onQuickAdd(String(item.id))}
               onQuickDelete={() => onQuickDelete(String(item.id))}
             />
           ))}

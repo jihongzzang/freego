@@ -48,51 +48,38 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
       }
     }
 
-    case 'TOGGLE_PURCHASED': {
-      try {
-        await shoppingService.updateShoppingItem(Number(intent.payload.id), {
-          is_purchased: !intent.payload.currentStatus,
-        });
+    case 'DELETE_SELECTED': {
+      const selectedCount = state.selectedIds.size;
 
-        // 다시 로드
-        const items = await shoppingService.getShoppingList();
-        return {
-          state: {
-            ...state,
-            shoppingList: items,
-          },
-        };
-      } catch (error) {
-        console.error('Error toggling purchased status:', error);
+      if (selectedCount === 0) {
         return {
           effects: [
             {
               type: 'SHOW_TOAST',
               payload: {
-                message: '상태 변경에 실패했어요.',
-                variant: 'error',
+                message: '선택된 항목이 없어요.',
+                variant: 'info',
               },
             },
           ],
         };
       }
-    }
 
-    case 'DELETE_ITEM': {
-      const itemName = intent.payload.name;
       return {
         effects: [
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '장보기 목록 삭제',
-              message: `"${itemName}"을(를) 장보기 목록에서 삭제할까요?`,
+              title: '선택 항목 삭제',
+              message: `${selectedCount}개의 항목을 삭제할까요?`,
               onConfirm: async () => {
                 try {
-                  await shoppingService.deleteShoppingItem(Number(intent.payload.id));
-                  return { success: true };
+                  for (const id of state.selectedIds) {
+                    await shoppingService.deleteShoppingItem(id);
+                  }
+                  return { success: true, count: selectedCount };
                 } catch (error) {
-                  console.error('Error deleting shopping item:', error);
+                  console.error('Error deleting selected items:', error);
                   return { success: false };
                 }
               },
@@ -104,7 +91,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
     }
 
     case 'SUBMIT_ADD_ITEM': {
-      if (!state.addForm.name.trim()) {
+      if (!intent.payload.name.trim()) {
         return {
           effects: [
             {
@@ -120,8 +107,9 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
       try {
         await shoppingService.addToShoppingList({
-          name: state.addForm.name.trim(),
-          category: state.addForm.category,
+          name: intent.payload.name.trim(),
+          category: intent.payload.category,
+          memo: intent.payload.memo,
         });
 
         const items = await shoppingService.getShoppingList();
@@ -129,14 +117,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           state: {
             ...state,
             shoppingList: items,
-            isAddingItem: false,
-            addForm: { name: '', category: 1 },
           },
           effects: [
             {
               type: 'SHOW_TOAST',
               payload: {
-                message: '장보기 목록에 추가됐어요.',
+                message: `'${intent.payload.name.trim()}'을(를) 장보기 목록에 추가했어요.`,
                 variant: 'success',
               },
             },
@@ -158,39 +144,20 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
       }
     }
 
-    case 'CLEAR_UNPURCHASED': {
-      const unpurchasedItems = state.shoppingList.filter((item) => !item.is_purchased);
-
-      if (unpurchasedItems.length === 0) {
-        return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '구매 예정 항목이 없어요.',
-                variant: 'info',
-              },
-            },
-          ],
-        };
-      }
-
-      const itemCount = unpurchasedItems.length;
+    case 'DELETE_ITEM': {
       return {
         effects: [
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '구매 예정 항목 삭제',
-              message: `${itemCount}개의 구매 예정 항목을 삭제할까요?`,
+              title: '항목 삭제',
+              message: `"${intent.payload.name}"을(를) 삭제할까요?`,
               onConfirm: async () => {
                 try {
-                  for (const item of unpurchasedItems) {
-                    await shoppingService.deleteShoppingItem(item.id);
-                  }
-                  return { success: true, count: itemCount };
+                  await shoppingService.deleteShoppingItem(Number(intent.payload.id));
+                  return { success: true };
                 } catch (error) {
-                  console.error('Error clearing unpurchased items:', error);
+                  console.error('Error deleting item:', error);
                   return { success: false };
                 }
               },
@@ -199,6 +166,170 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           },
         ],
       };
+    }
+
+    case 'ADD_ITEM_TO_STORAGE': {
+      try {
+        const { ingredientService } = await import('@/services/ingredient.service');
+        const today = new Date().toISOString().split('T')[0];
+        const item = state.shoppingList.find((i) => i.id === Number(intent.payload.id));
+
+        if (!item) {
+          return {
+            effects: [
+              {
+                type: 'SHOW_TOAST',
+                payload: {
+                  message: '항목을 찾을 수 없어요.',
+                  variant: 'error',
+                },
+              },
+            ],
+          };
+        }
+
+        await ingredientService.addIngredient({
+          name: intent.payload.name,
+          category: intent.payload.category,
+          emoji: item.emoji,
+          storage_location: intent.payload.storageLocation as any,
+          purchased_date: today,
+          memo: '',
+        });
+
+        await shoppingService.updateShoppingItem(Number(intent.payload.id), {
+          is_purchased: true,
+        });
+
+        const items = await shoppingService.getShoppingList();
+
+        return {
+          state: {
+            ...state,
+            shoppingList: items,
+            selectedIds: new Set<number>(),
+          },
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: {
+                message: `${intent.payload.name}이(가) 냉장고에 추가되었어요.`,
+                variant: 'success',
+              },
+            },
+          ],
+        };
+      } catch (error) {
+        return {
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: {
+                message: '재고 추가 중 오류가 발생했어요.',
+                variant: 'error',
+              },
+            },
+          ],
+        };
+      }
+    }
+
+    case 'ADD_SELECTED_TO_STORAGE': {
+      const selectedCount = state.selectedIds.size;
+
+      if (selectedCount === 0) {
+        return {
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: {
+                message: '선택된 항목이 없어요.',
+                variant: 'info',
+              },
+            },
+          ],
+        };
+      }
+
+      return {
+        effects: [
+          {
+            type: 'SHOW_CONFIRM',
+            payload: {
+              title: '냉장고에 넣기',
+              message: `${selectedCount}개의 항목을 냉장고에 추가할까요?`,
+              onConfirm: async () => {
+                try {
+                  const { ingredientService } = await import('@/services/ingredient.service');
+                  const today = new Date().toISOString().split('T')[0];
+                  const selectedItems = state.shoppingList.filter((item) => state.selectedIds.has(item.id));
+
+                  // 모든 선택된 항목을 냉장고에 추가하고 구매 완료 처리
+                  for (const item of selectedItems) {
+                    await ingredientService.addIngredient({
+                      name: item.name,
+                      category: item.category,
+                      emoji: item.emoji,
+                      storage_location: undefined, // 위치 미지정
+                      purchased_date: today,
+                      memo: '',
+                    });
+
+                    // 구매 완료로 표시
+                    await shoppingService.updateShoppingItem(item.id, {
+                      is_purchased: true,
+                    });
+                  }
+
+                  return { success: true, count: selectedCount };
+                } catch (error) {
+                  console.error('Error adding selected items to storage:', error);
+                  return { success: false };
+                }
+              },
+              isDanger: false,
+            },
+          },
+        ],
+      };
+    }
+
+    case 'UPDATE_MEMO': {
+      try {
+        await shoppingService.updateShoppingItem(Number(intent.payload.id), {
+          memo: intent.payload.memo.trim() || undefined,
+        });
+
+        const items = await shoppingService.getShoppingList();
+        return {
+          state: {
+            ...state,
+            shoppingList: items,
+          },
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: {
+                message: '메모가 저장됐어요.',
+                variant: 'success',
+              },
+            },
+          ],
+        };
+      } catch (error) {
+        console.error('Error updating memo:', error);
+        return {
+          effects: [
+            {
+              type: 'SHOW_TOAST',
+              payload: {
+                message: '메모 저장 중 오류가 발생했어요.',
+                variant: 'error',
+              },
+            },
+          ],
+        };
+      }
     }
 
     default:

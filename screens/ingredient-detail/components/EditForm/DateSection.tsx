@@ -118,7 +118,7 @@ export function DateSection({
               },
             ]}
           >
-            {expiryDate || '날짜 선택'}
+            {expiryDate ? toLocalDate(expiryDate) : '날짜 선택'}
           </Text>
         </TouchableOpacity>
       </View>

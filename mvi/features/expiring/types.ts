@@ -28,7 +28,7 @@ export type ExpiringIntent =
   | { type: 'LOAD_INGREDIENTS_SUCCESS'; payload: Ingredient[] }
   | { type: 'LOAD_INGREDIENTS_ERROR'; payload: string }
   | { type: 'DELETE_INGREDIENT'; payload: number }
-  | { type: 'DEDUCT_INGREDIENT'; payload: number }
+  | { type: 'ADD_TO_SHOPPING_LIST_INGREDIENT'; payload: number }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: string }
   | { type: 'NAVIGATE_BACK' };
 

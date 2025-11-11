@@ -30,7 +30,7 @@ export default function IngredientsScreen() {
     handleNavigateToEdit,
     handleNavigateToAdd,
     handleQuickDelete,
-    handleQuickDeduct,
+    handleQuickAdd,
   } = useIngredientsLogic();
 
   const {
@@ -100,7 +100,7 @@ export default function IngredientsScreen() {
                   onToggle={() => toggleCategory(catId)}
                   onItemPress={handleNavigateToDetail}
                   onItemEdit={handleNavigateToEdit}
-                  onQuickDeduct={handleQuickDeduct}
+                  onQuickAdd={handleQuickAdd}
                   onQuickDelete={handleQuickDelete}
                 />
               );
@@ -121,7 +121,7 @@ export default function IngredientsScreen() {
                   onToggle={() => toggleStorage(storageId)}
                   onItemPress={handleNavigateToDetail}
                   onItemEdit={handleNavigateToEdit}
-                  onQuickDeduct={handleQuickDeduct}
+                  onQuickAdd={handleQuickAdd}
                   onQuickDelete={handleQuickDelete}
                 />
               );

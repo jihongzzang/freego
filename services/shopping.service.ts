@@ -15,7 +15,7 @@ export const shoppingService = {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       const list = data ? JSON.parse(data) : [];
-      return list.filter((item: ShoppingItem) => !item.deleted_at);
+      return list.filter((item: ShoppingItem) => !item.deleted_at && !item.is_purchased);
     } catch (error) {
       console.error('Error reading shopping list:', error);
       return [];
@@ -25,18 +25,14 @@ export const shoppingService = {
   async addToShoppingList(item: Omit<ShoppingItem, 'id' | 'created_at' | 'is_purchased'>): Promise<void> {
     try {
       const shoppingList = await this.getShoppingList();
-      const existing = shoppingList.find((i) => i.name === item.name && i.category === item.category);
-
-      if (!existing) {
-        const newItem: ShoppingItem = {
-          ...item,
-          id: generateId(),
-          is_purchased: false,
-          created_at: new Date().toISOString(),
-        };
-        shoppingList.push(newItem);
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shoppingList));
-      }
+      const newItem: ShoppingItem = {
+        ...item,
+        id: generateId(),
+        is_purchased: false,
+        created_at: new Date().toISOString(),
+      };
+      shoppingList.push(newItem);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shoppingList));
     } catch (error) {
       console.error('Error adding to shopping list:', error);
       throw error;
