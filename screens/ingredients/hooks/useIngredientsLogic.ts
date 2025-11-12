@@ -8,6 +8,7 @@ import { createIngredientsStore } from '@/mvi/features/ingredients';
 import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 import { Category } from '@/data/enums/category';
 import { Unit } from '@/data/enums/unit';
+import { StorageLocation } from '@/data/enums/storage_location';
 
 export type ViewMode = 'category' | 'storage';
 
@@ -28,6 +29,25 @@ export function useIngredientsLogic() {
   const [isBulkAddVisible, setIsBulkAddVisible] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<Category | 0>(0);
   const [selectedTemplates, setSelectedTemplates] = useState<IngredientTemplate[]>([]);
+
+  // QuickUpdateExpiry 로컬 상태
+  const [isExpiryUpdateVisible, setIsExpiryUpdateVisible] = useState(false);
+  const [selectedIngredientId, setSelectedIngredientId] = useState<number | null>(null);
+  const [expiryDate, setExpiryDate] = useState<Date>(new Date());
+
+  // QuickUpdateQuantity 로컬 상태
+  const [isQuantityUpdateVisible, setIsQuantityUpdateVisible] = useState(false);
+  const [selectedQuantityIngredientId, setSelectedQuantityIngredientId] = useState<number | null>(null);
+  const [quantity, setQuantity] = useState<string>('');
+
+  // QuickUpdateStorge 로컬 상태
+  const [isStorageUpdateVisible, setIsStorageUpdateVisible] = useState(false);
+  const [selectedStorageIngredientId, setSelectedStorageIngredientId] = useState<number | null>(null);
+
+  // QuickUpdateMemo 로컬 상태
+  const [isMemoUpdateVisible, setIsMemoUpdateVisible] = useState(false);
+  const [selectedMemoIngredientId, setSelectedMemoIngredientId] = useState<number | null>(null);
+  const [memo, setMemo] = useState<string>('');
 
   // Effect 처리
   useEffect(() => {
@@ -75,6 +95,151 @@ export function useIngredientsLogic() {
 
   function handleQuickAdd(id: string) {
     dispatch({ type: 'ADD_TO_SHOPPING_LIST_INGREDIENT', payload: Number(id) });
+  }
+
+  // QuickUpdateExpiry 핸들러
+  function handleQuickUpdateExpiryOpen(id: string) {
+    const ingredient = ingredients.find((ing) => ing.id === Number(id));
+    if (ingredient) {
+      setSelectedIngredientId(Number(id));
+      setExpiryDate(ingredient.expiry_date ? new Date(ingredient.expiry_date) : new Date());
+      setIsExpiryUpdateVisible(true);
+    }
+  }
+
+  function handleQuickUpdateExpiryClose() {
+    setIsExpiryUpdateVisible(false);
+    setSelectedIngredientId(null);
+  }
+
+  function handleExpiryDateChange(date: Date) {
+    setExpiryDate(date);
+  }
+
+  function handleExpiryDateConfirm() {
+    if (selectedIngredientId !== null) {
+      dispatch({
+        type: 'UPDATE_INGREDIENT_EXPIRY',
+        payload: {
+          id: selectedIngredientId,
+          expiry_date: expiryDate.toISOString(),
+        },
+      });
+      handleQuickUpdateExpiryClose();
+    }
+  }
+
+  // QuickUpdateQuantity 핸들러
+  function handleQuickUpdateQuantityOpen(id: string) {
+    const ingredient = ingredients.find((ing) => ing.id === Number(id));
+    if (ingredient) {
+      setSelectedQuantityIngredientId(Number(id));
+      setQuantity(String(ingredient.quantity || ''));
+      setIsQuantityUpdateVisible(true);
+    }
+  }
+
+  function handleQuickUpdateQuantityClose() {
+    setIsQuantityUpdateVisible(false);
+    setSelectedQuantityIngredientId(null);
+    setQuantity('');
+  }
+
+  function handleQuantityChange(quantity: string) {
+    setQuantity(quantity);
+  }
+
+  function handleQuantityConfirm() {
+    if (selectedQuantityIngredientId !== null) {
+      // 0개 입력 시 에러 메시지
+      if (quantity === '0') {
+        showToast({
+          message: '수량은 0보다 커야 해요',
+          type: 'error',
+          position: 'top',
+        });
+        return;
+      }
+
+      // 빈 문자열 또는 유효한 숫자만 허용
+      if (quantity !== '' && (isNaN(Number(quantity)) || Number(quantity) < 0)) {
+        showToast({
+          message: '올바른 수량을 입력해주세요',
+          type: 'error',
+          position: 'top',
+        });
+        return;
+      }
+
+      dispatch({
+        type: 'UPDATE_INGREDIENT_QUANTITY',
+        payload: {
+          id: selectedQuantityIngredientId,
+          quantity: quantity,
+        },
+      });
+      handleQuickUpdateQuantityClose();
+    }
+  }
+
+  // StorageUpdate 핸들러
+  function handleQuickUpdateStorageOpen(id: string) {
+    const ingredient = ingredients.find((ing) => ing.id === Number(id));
+    if (ingredient) {
+      setSelectedStorageIngredientId(Number(id));
+      setIsStorageUpdateVisible(true);
+    }
+  }
+
+  function handleQuickUpdateStorageClose() {
+    setIsStorageUpdateVisible(false);
+    setSelectedStorageIngredientId(null);
+  }
+
+  function handleStorageSelect(storageLocation: StorageLocation) {
+    if (selectedStorageIngredientId !== null) {
+      dispatch({
+        type: 'UPDATE_INGREDIENT_STORAGE',
+        payload: {
+          id: selectedStorageIngredientId,
+          storage_location: storageLocation,
+        },
+      });
+      handleQuickUpdateStorageClose();
+    }
+  }
+
+  // MemoUpdate 핸들러
+  function handleQuickUpdateMemoOpen(id: string) {
+    const ingredient = ingredients.find((ing) => ing.id === Number(id));
+    if (ingredient) {
+      setSelectedMemoIngredientId(Number(id));
+      setMemo(ingredient.memo || '');
+      setIsMemoUpdateVisible(true);
+    }
+  }
+
+  function handleQuickUpdateMemoClose() {
+    setIsMemoUpdateVisible(false);
+    setSelectedMemoIngredientId(null);
+    setMemo('');
+  }
+
+  function handleMemoChange(memo: string) {
+    setMemo(memo);
+  }
+
+  function handleMemoConfirm() {
+    if (selectedMemoIngredientId !== null) {
+      dispatch({
+        type: 'UPDATE_MEMO',
+        payload: {
+          id: selectedMemoIngredientId,
+          memo: memo,
+        },
+      });
+      handleQuickUpdateMemoClose();
+    }
   }
 
   // BulkAdd 핸들러
@@ -146,6 +311,36 @@ export function useIngredientsLogic() {
       handleCategoryChange: handleBulkAddCategoryChange,
       handleTemplateToggle: handleBulkAddTemplateToggle,
       handleConfirm: handleBulkAddConfirm,
+    },
+    expiryUpdate: {
+      isVisible: isExpiryUpdateVisible,
+      expiryDate,
+      open: handleQuickUpdateExpiryOpen,
+      close: handleQuickUpdateExpiryClose,
+      handleDateChange: handleExpiryDateChange,
+      handleConfirm: handleExpiryDateConfirm,
+    },
+    quantityUpdate: {
+      isVisible: isQuantityUpdateVisible,
+      quantity,
+      open: handleQuickUpdateQuantityOpen,
+      close: handleQuickUpdateQuantityClose,
+      handleQuantityChange,
+      handleConfirm: handleQuantityConfirm,
+    },
+    storageUpate: {
+      isVisible: isStorageUpdateVisible,
+      open: handleQuickUpdateStorageOpen,
+      close: handleQuickUpdateStorageClose,
+      handleSelect: handleStorageSelect,
+    },
+    memoUpdate: {
+      isVisible: isMemoUpdateVisible,
+      memo,
+      open: handleQuickUpdateMemoOpen,
+      close: handleQuickUpdateMemoClose,
+      handleMemoChange,
+      handleConfirm: handleMemoConfirm,
     },
     handleNavigateToDetail,
     handleNavigateToEdit,

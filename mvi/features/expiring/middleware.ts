@@ -5,11 +5,16 @@
  */
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
-import { ExpiringState, ExpiringIntent, ExpiringEffect, Ingredient } from './types';
+import { ExpiringState, ExpiringIntent, ExpiringEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
-import { getCalculateDaysRemaining } from '@/utils/time';
-import { getCalculateStatus } from '@/utils/status';
 import { shoppingService } from '@/services/shopping.service';
+import { getCalculateDaysRemaining } from '@/utils/time';
+import {
+  enrichIngredients,
+  createSuccessEffect,
+  createErrorEffect,
+  createNavigateEffect,
+} from '@/mvi/shared';
 
 /**
  * Expiring Middleware
@@ -22,16 +27,12 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
     case 'LOAD_INGREDIENTS': {
       try {
         const data = await ingredientService.getIngredients();
-        const ingredients: Ingredient[] = data
-          .filter((item) => {
-            const days = getCalculateDaysRemaining(item.expiry_date);
-            return days !== null && days < 4;
-          })
-          .map((item) => ({
-            ...item,
-            status: getCalculateStatus(item.expiry_date),
-            daysRemaining: getCalculateDaysRemaining(item.expiry_date),
-          }));
+        // 유통기한 4일 이내만 필터링
+        const filtered = data.filter((item) => {
+          const days = getCalculateDaysRemaining(item.expiry_date);
+          return days !== null && days < 4;
+        });
+        const ingredients = enrichIngredients(filtered);
 
         return {
           state: {
@@ -48,15 +49,7 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
             loading: false,
             error: error instanceof Error ? error.message : '데이터 로드 실패',
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '식재료 데이터를 불러오는데 실패했어요.',
-                variant: 'error',
-              },
-            },
-          ],
+          effects: [createErrorEffect('식재료 데이터를 불러오는데 실패했어요.')],
         };
       }
     }
@@ -67,43 +60,22 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
 
         // 삭제 후 다시 로드
         const data = await ingredientService.getIngredients();
-        const ingredients: Ingredient[] = data
-          .filter((item) => {
-            const days = getCalculateDaysRemaining(item.expiry_date);
-            return days !== null && days < 4;
-          })
-          .map((item) => ({
-            ...item,
-            status: getCalculateStatus(item.expiry_date),
-            daysRemaining: getCalculateDaysRemaining(item.expiry_date),
-          }));
+        const filtered = data.filter((item) => {
+          const days = getCalculateDaysRemaining(item.expiry_date);
+          return days !== null && days < 4;
+        });
+        const ingredients = enrichIngredients(filtered);
 
         return {
           state: {
             ...state,
             ingredients,
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '식재료가 삭제됐어요.',
-                variant: 'success',
-              },
-            },
-          ],
+          effects: [createSuccessEffect('식재료가 삭제됐어요.')],
         };
       } catch (error) {
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '식재료 삭제에 실패했어요.',
-                variant: 'error',
-              },
-            },
-          ],
+          effects: [createErrorEffect('식재료 삭제에 실패했어요.')],
         };
       }
     }
@@ -115,12 +87,7 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
 
         if (!ingredient) {
           return {
-            effects: [
-              {
-                type: 'SHOW_TOAST',
-                payload: { message: '식재료를 찾을 수 없어요.', variant: 'error' },
-              },
-            ],
+            effects: [createErrorEffect('식재료를 찾을 수 없어요.')],
           };
         }
 
@@ -136,44 +103,30 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
 
         // 삭제 후 다시 로드
         const data = await ingredientService.getIngredients();
-        const ingredients: Ingredient[] = data.map((item) => ({
-          ...item,
-          status: getCalculateStatus(item.expiry_date),
-          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
-        }));
+        const ingredients = enrichIngredients(data);
 
         return {
           state: {
             ...state,
             ingredients,
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '장보기 목록에 추가했어요', variant: 'success' },
-            },
-          ],
+          effects: [createSuccessEffect('장보기 목록에 추가했어요')],
         };
       } catch (error) {
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '장보기 목록 추가에 실패했어요.', variant: 'error' },
-            },
-          ],
+          effects: [createErrorEffect('장보기 목록 추가에 실패했어요.')],
         };
       }
     }
 
     case 'NAVIGATE_TO_DETAIL':
       return {
-        effects: [{ type: 'NAVIGATE', payload: `/ingredient/${intent.payload}` }],
+        effects: [createNavigateEffect(`/ingredient/${intent.payload}`)],
       };
 
     case 'NAVIGATE_BACK':
       return {
-        effects: [{ type: 'NAVIGATE', payload: 'back' }],
+        effects: [createNavigateEffect('back')],
       };
 
     default:

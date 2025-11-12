@@ -5,7 +5,7 @@ import { useTheme } from '@/lib/theme';
 import Header from '@/components/ui/Header';
 import SelectUnitBottomSheet from '@/components/SelectUnitBottomSheet';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
-import AddEmojiBottomSheet from '@/components/AddEmojiBottomSheet';
+import EmojiBottomSheet from '@/components/EmojiBottomSheet';
 import { useAddLogic } from './hooks/useAddLogic';
 import { AddForm } from './components/AddForm';
 import { SubmitButton } from './components/SubmitButton';
@@ -85,11 +85,9 @@ export default function AddIngredientScreen() {
         onUnitSelect={unitPicker.handleUnitSelect}
       />
 
-      <AddEmojiBottomSheet
+      <EmojiBottomSheet
         visible={isEmojiPickerVisible}
         onClose={() => setIsEmojiPickerVisible(false)}
-        selectedCategoryId={state.form.category}
-        selectedTemplates={selectedEmoji ? [selectedEmoji] : []}
         onTemplateToggle={handleEmojiSelect}
       />
     </View>

@@ -10,7 +10,7 @@ interface HeaderProps {
   rightComponent?: React.ReactNode;
 }
 
-const HEADER_CONTENT_HEIGHT = 56;
+export const HEADER_HEIGHT = 44;
 
 export default function Header({ title, onBackPress, rightComponent }: HeaderProps) {
   const { colors, typography, borderRadius } = useTheme();
@@ -23,7 +23,7 @@ export default function Header({ title, onBackPress, rightComponent }: HeaderPro
         {
           backgroundColor: colors.surface,
           paddingTop: insets.top,
-          height: insets.top + HEADER_CONTENT_HEIGHT,
+          height: insets.top + HEADER_HEIGHT,
         },
       ]}
     >

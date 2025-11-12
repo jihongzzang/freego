@@ -1,17 +1,13 @@
-import { View, StyleSheet, Text } from 'react-native';
-import Accordion from '@/components/ui/Accordion';
-import EmptyStateUI from '@/components/ui/EmptyState';
+import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '@/lib/theme';
 import { Ingredient } from '@/mvi/features/ingredients';
 import { IngredientsTableRow } from './IngredientsTableRow';
-import { useTheme } from '@/lib/theme';
 import { useMemo } from 'react';
 
-interface IngredientsTableAccordionProps {
+interface IngredientsTableViewProps {
   title: string;
   leftIcon: React.ReactNode;
   items: Ingredient[];
-  isExpanded: boolean;
-  onToggle: () => void;
   onItemPress: (id: string) => void;
   onItemEdit: (id: string) => void;
   onQuickAdd: (id: string) => void;
@@ -19,16 +15,13 @@ interface IngredientsTableAccordionProps {
   onQuickUpdateExpiry: (id: string) => void;
   onQuickUpdateQuantity: (id: string) => void;
   onQuickUpdateStorage: (id: string) => void;
-  onQuickUpdateMemo: (id: string) => void;
   onViewDetail: (id: string) => void;
 }
 
-export function IngredientsTableAccordion({
+export function IngredientsTableView({
   title,
   leftIcon,
   items,
-  isExpanded,
-  onToggle,
   onItemPress,
   onItemEdit,
   onQuickAdd,
@@ -36,36 +29,39 @@ export function IngredientsTableAccordion({
   onQuickUpdateExpiry,
   onQuickUpdateQuantity,
   onQuickUpdateStorage,
-  onQuickUpdateMemo,
   onViewDetail,
-}: IngredientsTableAccordionProps) {
+}: IngredientsTableViewProps) {
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
 
+  if (items.length === 0) return null;
+
   return (
-    <Accordion
-      title={title}
-      leftIcon={leftIcon}
-      badge={
-        items.length > 0 ? (
-          <Text style={[typography.styles.t7Bold, { color: colors.textSecondary }]}>{items.length}</Text>
-        ) : undefined
-      }
-      defaultExpanded={isExpanded}
-      onToggle={onToggle}
-    >
-      {items.length > 0 ? (
-        <View
-          style={[
-            styles.tableWrapper,
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              borderWidth: 1,
-            },
-          ]}
-        >
+    <View style={styles.container}>
+      {/* Section Title */}
+      <View style={styles.sectionHeader}>
+        <View style={styles.titleContainer}>
+          {leftIcon}
+          <Text style={[typography.styles.t6Bold, { color: colors.text, marginLeft: spacing.sm }]}>{title}</Text>
+          <Text style={[typography.styles.t7Bold, { color: colors.textSecondary, marginLeft: spacing.xs }]}>
+            {items.length}
+          </Text>
+        </View>
+      </View>
+
+      {/* Table */}
+      <View
+        style={[
+          styles.tableWrapper,
+          {
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            borderWidth: 1,
+          },
+        ]}
+      >
+        <View>
           {/* Header */}
           <View
             style={[
@@ -74,7 +70,7 @@ export function IngredientsTableAccordion({
             ]}
           >
             <View style={[styles.cell, styles.emojiCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
-              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}> </Text>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}></Text>
             </View>
             <View style={[styles.cell, styles.nameCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
@@ -103,7 +99,6 @@ export function IngredientsTableAccordion({
               onQuickUpdateExpiry={() => onQuickUpdateExpiry(String(item.id))}
               onQuickUpdateQuantity={() => onQuickUpdateQuantity(String(item.id))}
               onQuickUpdateStorage={() => onQuickUpdateStorage(String(item.id))}
-              onQuickUpdateMemo={() => onQuickUpdateMemo(String(item.id))}
               onQuickAdd={() => onQuickAdd(String(item.id))}
               onQuickDelete={() => onQuickDelete(String(item.id))}
               onViewDetail={() => onViewDetail(String(item.id))}
@@ -111,10 +106,8 @@ export function IngredientsTableAccordion({
             />
           ))}
         </View>
-      ) : (
-        <EmptyStateUI title="재료가 없어요" />
-      )}
-    </Accordion>
+      </View>
+    </View>
   );
 }
 
@@ -126,6 +119,19 @@ const createStyles = ({
   borderRadius: typeof import('@/lib/theme').borderRadius;
 }) =>
   StyleSheet.create({
+    container: {
+      marginBottom: spacing.xxl,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    titleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
     tableWrapper: {
       borderRadius: borderRadius.sm,
       overflow: 'hidden',

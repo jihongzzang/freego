@@ -1,6 +1,5 @@
 import { View, StyleSheet } from 'react-native';
 import { AddFormData } from '@/mvi/features/add';
-import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 import { BasicInfoSection } from '../../ingredient-detail/components/EditForm/BasicInfoSection';
 import { CategorySection } from '../../ingredient-detail/components/EditForm/CategorySection';
 import { QuantitySection } from '../../ingredient-detail/components/EditForm/QuantitySection';
@@ -13,7 +12,7 @@ import { useMemo } from 'react';
 interface AddFormProps {
   formData: AddFormData;
   errors: Partial<Record<keyof AddFormData, string>>;
-  selectedEmoji: IngredientTemplate | null;
+  selectedEmoji: string | null;
   onFieldChange: (field: keyof AddFormData, value: string) => void;
   onEmojiPress: () => void;
   onUnitPress: () => void;

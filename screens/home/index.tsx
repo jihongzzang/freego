@@ -1,7 +1,7 @@
 import { View, Animated, TouchableOpacity, Platform } from 'react-native';
 import { Bell, Edit3, Grid3x3 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
-import Header from '@/components/ui/Header';
+import Header, { HEADER_HEIGHT } from '@/components/ui/Header';
 import FloatingButton from '@/components/ui/FloatingButton';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
 import BulkAddBottomSheet from '@/components/BulkAddBottomSheet';
@@ -106,7 +106,7 @@ export default function HomeScreen() {
         })}
         scrollEventThrottle={16}
         contentContainerStyle={{
-          paddingTop: 56 + inset.top + 56,
+          paddingTop: HEADER_HEIGHT + inset.top + 56,
           paddingBottom: 200,
           paddingHorizontal: spacing.lg,
         }}

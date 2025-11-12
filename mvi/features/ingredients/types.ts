@@ -2,51 +2,37 @@
  * Ingredients Screen MVI Types
  */
 
-import { Intent, State, Effect } from '@/mvi/base';
-import { Ingredient as StoredIngredient } from '@/data/models/ingredient.model';
-import { StatusType } from '@/data/enums/status';
+import { StorageLocation } from '@/data/enums/storage_location';
+import {
+  IngredientListState,
+  LoadIngredientsIntent,
+  CommonEffect,
+  BulkAddIngredientsPayload,
+  EnrichedIngredient,
+} from '@/mvi/shared';
 
 /**
- * Ingredient with status
+ * Ingredient 타입 re-export (하위 호환성)
  */
-export interface Ingredient extends StoredIngredient {
-  status: StatusType;
-  daysRemaining: number | null;
-}
+export type Ingredient = EnrichedIngredient;
 
 /**
  * Ingredients State
  */
-export interface IngredientsState extends State {
-  ingredients: Ingredient[];
-  loading: boolean;
-  error: string | null;
-}
+export interface IngredientsState extends IngredientListState {}
 
 /**
  * Ingredients Intent (사용자 액션)
  */
 export type IngredientsIntent =
-  | { type: 'LOAD_INGREDIENTS' }
-  | { type: 'LOAD_INGREDIENTS_SUCCESS'; payload: Ingredient[] }
-  | { type: 'LOAD_INGREDIENTS_ERROR'; payload: string }
+  | LoadIngredientsIntent
   | { type: 'DELETE_INGREDIENT'; payload: number }
   | { type: 'ADD_TO_SHOPPING_LIST_INGREDIENT'; payload: number }
-  | {
-      type: 'BULK_ADD_INGREDIENTS';
-      payload: Array<{
-        name: string;
-        category: number;
-        emoji?: string;
-        storage_location?: number;
-        quantity?: number;
-        unit?: number;
-        registration_date?: string;
-        purchase_date?: string;
-        expiry_date?: string;
-        memo?: string;
-      }>;
-    }
+  | { type: 'BULK_ADD_INGREDIENTS'; payload: BulkAddIngredientsPayload[] }
+  | { type: 'UPDATE_INGREDIENT_EXPIRY'; payload: { id: number; expiry_date: string } }
+  | { type: 'UPDATE_INGREDIENT_QUANTITY'; payload: { id: number; quantity: string } }
+  | { type: 'UPDATE_INGREDIENT_STORAGE'; payload: { id: number; storage_location: StorageLocation } }
+  | { type: 'UPDATE_MEMO'; payload: { id: number; memo?: string } }
   | { type: 'NAVIGATE_TO_ADD' }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: number }
   | { type: 'NAVIGATE_TO_DETAIL_EDIT'; payload: number };
@@ -54,12 +40,4 @@ export type IngredientsIntent =
 /**
  * Ingredients Effect (부수 효과)
  */
-export type IngredientsEffect =
-  | { type: 'NAVIGATE'; payload: string }
-  | {
-      type: 'SHOW_TOAST';
-      payload: {
-        message: string;
-        variant: 'success' | 'error' | 'info' | 'warning';
-      };
-    };
+export type IngredientsEffect = CommonEffect;

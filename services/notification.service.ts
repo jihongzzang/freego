@@ -5,13 +5,9 @@
  */
 
 import * as Notifications from 'expo-notifications';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ingredientService } from './ingredient.service';
+import { ingredientRepository } from '@/data/repositories/ingredient.repository';
+import { notificationRepository } from '@/data/repositories/notification.repository';
 import { getCalculateDaysRemaining } from '@/utils/time';
-
-const LAST_NOTIFICATION_KEY = '@last_notification_date';
-const NOTIFICATION_DAYS_KEY = '@notification_days';
-const NOTIFICATION_INTERVAL_KEY = '@notification_interval';
 
 /**
  * 알림 핸들러 설정
@@ -29,58 +25,42 @@ Notifications.setNotificationHandler({
  * 알림 주기 저장
  */
 export async function saveNotificationDays(days: number): Promise<void> {
-  await AsyncStorage.setItem(NOTIFICATION_DAYS_KEY, days.toString());
+  await notificationRepository.saveNotificationDays(days);
 }
 
 /**
  * 알림 주기 불러오기
  */
 export async function getNotificationDays(): Promise<number> {
-  try {
-    const value = await AsyncStorage.getItem(NOTIFICATION_DAYS_KEY);
-    return value ? parseInt(value) : 3; // 기본값: 3일
-  } catch (error) {
-    return 3;
-  }
+  return notificationRepository.getNotificationDays();
 }
 
 /**
  * 최소 알림 간격 저장 (분 단위)
  */
 export async function saveNotificationInterval(minutes: number): Promise<void> {
-  await AsyncStorage.setItem(NOTIFICATION_INTERVAL_KEY, minutes.toString());
+  await notificationRepository.saveNotificationInterval(minutes);
 }
 
 /**
  * 최소 알림 간격 불러오기 (분 단위)
  */
 export async function getNotificationInterval(): Promise<number> {
-  try {
-    const value = await AsyncStorage.getItem(NOTIFICATION_INTERVAL_KEY);
-    return value ? parseInt(value) : 10; // 기본값: 10분
-  } catch (error) {
-    return 10;
-  }
+  return notificationRepository.getNotificationInterval();
 }
 
 /**
  * 마지막 알림 시간 저장
  */
 async function saveLastNotificationDate(): Promise<void> {
-  const now = new Date().toISOString();
-  await AsyncStorage.setItem(LAST_NOTIFICATION_KEY, now);
+  await notificationRepository.saveLastNotificationDate();
 }
 
 /**
  * 마지막 알림 시간 불러오기
  */
 async function getLastNotificationDate(): Promise<Date | null> {
-  try {
-    const value = await AsyncStorage.getItem(LAST_NOTIFICATION_KEY);
-    return value ? new Date(value) : null;
-  } catch (error) {
-    return null;
-  }
+  return notificationRepository.getLastNotificationDate();
 }
 
 /**
@@ -141,7 +121,7 @@ export async function checkExpiryAndNotify(): Promise<void> {
     // console.log('[Notification] 알림 주기 (일):', notificationDays);
 
     // 모든 재료 가져오기
-    const ingredients = await ingredientService.getIngredients();
+    const ingredients = await ingredientRepository.getIngredients();
     // console.log('[Notification] 전체 재료 개수:', ingredients.length);
 
     // ===== 프로덕션 로직 (일 단위) - 테스트 후 주석 해제 =====

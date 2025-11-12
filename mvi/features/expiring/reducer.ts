@@ -6,31 +6,17 @@
 
 import { Reducer } from '@/mvi/base';
 import { ExpiringState, ExpiringIntent } from './types';
+import { handleLoadIngredientsReducer } from '@/mvi/shared';
 
-export const expiringReducer: Reducer<ExpiringState, ExpiringIntent> = (
-  state,
-  intent
-): ExpiringState => {
+export const expiringReducer: Reducer<ExpiringState, ExpiringIntent> = (state, intent): ExpiringState => {
+  // 공통 로딩 로직 처리
+  const commonState = handleLoadIngredientsReducer(state, intent);
+  if (commonState !== state) {
+    return commonState;
+  }
+
+  // Expiring feature 특화 로직
   switch (intent.type) {
-    // LOAD_INGREDIENTS는 미들웨어에서 처리하므로 리듀서에서는 상태 변경 없음
-    case 'LOAD_INGREDIENTS':
-      return state;
-
-    case 'LOAD_INGREDIENTS_SUCCESS':
-      return {
-        ...state,
-        ingredients: intent.payload,
-        loading: false,
-        error: null,
-      };
-
-    case 'LOAD_INGREDIENTS_ERROR':
-      return {
-        ...state,
-        loading: false,
-        error: intent.payload,
-      };
-
     default:
       return state;
   }

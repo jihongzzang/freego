@@ -7,7 +7,7 @@ import Header from '@/components/ui/Header';
 import FloatingButton from '@/components/ui/FloatingButton';
 import SelectUnitBottomSheet from '@/components/SelectUnitBottomSheet';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
-import AddEmojiBottomSheet from '@/components/AddEmojiBottomSheet';
+import EmojiBottomSheet from '@/components/EmojiBottomSheet';
 import { useIngredientDetailLogic } from './hooks/useIngredientDetailLogic';
 import { DetailView } from './components/DetailView';
 import { EditForm } from './components/EditForm';
@@ -113,11 +113,9 @@ export default function IngredientDetailScreen() {
         onUnitSelect={unitPicker.handleUnitSelect}
       />
 
-      <AddEmojiBottomSheet
+      <EmojiBottomSheet
         visible={isEmojiPickerVisible}
         onClose={() => setIsEmojiPickerVisible(false)}
-        selectedCategoryId={state.editForm.category}
-        selectedTemplates={selectedEmoji ? [selectedEmoji] : []}
         onTemplateToggle={handleEmojiSelect}
       />
     </>

@@ -1,27 +1,29 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, StyleSheet, TextInput } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import BottomSheet from '@/components/ui/BottomSheet';
 import { Button } from './ui';
 
-interface EditMemoBottomSheetProps {
+interface QuantityBottomSheetProps {
   visible: boolean;
   onClose: () => void;
-  memo: string;
-  onMemoChange: (text: string) => void;
-  onSubmit: () => void;
+  title: string;
+  quantity: string;
+  onQuantityChange: (text: string) => void;
+  onConfirm: () => void;
 }
 
-export default function EditMemoBottomSheet({
+export default function QuantityBottomSheet({
   visible,
   onClose,
-  memo,
-  onMemoChange,
-  onSubmit,
-}: EditMemoBottomSheetProps) {
+  title,
+  quantity,
+  onQuantityChange,
+  onConfirm,
+}: QuantityBottomSheetProps) {
   const { colors, typography, isDark, spacing } = useTheme();
 
   return (
-    <BottomSheet maxHeight={360} visible={visible} onClose={onClose} title={memo ? '메모 수정' : '메모 추가'}>
+    <BottomSheet maxHeight={280} visible={visible} onClose={onClose} title={title}>
       <View style={styles.container}>
         <View style={styles.content}>
           <TextInput
@@ -34,13 +36,11 @@ export default function EditMemoBottomSheet({
                 borderColor: colors.border,
               },
             ]}
-            value={memo}
-            onChangeText={onMemoChange}
-            placeholder="메모를 입력하세요"
+            value={quantity}
+            onChangeText={onQuantityChange}
+            placeholder="수량을 입력하세요"
             placeholderTextColor={colors.textTertiary}
-            multiline
-            numberOfLines={5}
-            textAlignVertical="top"
+            keyboardType="numeric"
             autoFocus
           />
         </View>
@@ -55,8 +55,8 @@ export default function EditMemoBottomSheet({
             },
           ]}
         >
-          <Button size="large" variant="primary" onPress={onSubmit}>
-            저장
+          <Button size="large" variant="primary" onPress={onConfirm}>
+            확인
           </Button>
         </View>
       </View>
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderWidth: 1,
-    minHeight: 170,
+    minHeight: 56,
   },
   confirmButtonContainer: {
     paddingHorizontal: 20,

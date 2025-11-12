@@ -72,7 +72,6 @@ export function ShoppingTableRow({
             typography.styles.t7Semibold,
             {
               color: colors.text,
-              fontSize: 13,
             },
           ]}
           numberOfLines={1}

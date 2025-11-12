@@ -1,38 +1,19 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ingredient } from '@/data/models/ingredient.model';
-import { generateId } from './utils/generateId';
+import { ingredientRepository } from '@/data/repositories/ingredient.repository';
 import { checkExpiryAndNotify } from './notification.service';
 
 /**
- * AsyncStorage 키 상수
- */
-const STORAGE_KEY = '@ingredients';
-
-/**
  * 재료 관련 서비스
+ * 비즈니스 로직 (알림 등)을 처리하고 repository에 위임
  */
 export const ingredientService = {
   async getIngredients(): Promise<Ingredient[]> {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
-      const ingredients = data ? JSON.parse(data) : [];
-      return ingredients.filter((item: Ingredient) => !item.deleted_at);
-    } catch (error) {
-      console.error('Error reading ingredients:', error);
-      return [];
-    }
+    return ingredientRepository.getIngredients();
   },
 
   async addIngredient(ingredient: Omit<Ingredient, 'id' | 'created_at'>): Promise<void> {
     try {
-      const ingredients = await this.getIngredients();
-      const newIngredient: Ingredient = {
-        ...ingredient,
-        id: generateId(),
-        created_at: new Date().toISOString(),
-      };
-      ingredients.push(newIngredient);
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+      await ingredientRepository.addIngredient(ingredient);
 
       // 유통기한 알림 체크 (트리거 2: 재료 등록)
       await checkExpiryAndNotify();
@@ -44,14 +25,7 @@ export const ingredientService = {
 
   async addMultipleIngredients(ingredientList: Omit<Ingredient, 'id' | 'created_at'>[]): Promise<void> {
     try {
-      const ingredients = await this.getIngredients();
-      const newIngredients: Ingredient[] = ingredientList.map((ingredient) => ({
-        ...ingredient,
-        id: generateId(),
-        created_at: new Date().toISOString(),
-      }));
-      ingredients.push(...newIngredients);
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+      await ingredientRepository.addMultipleIngredients(ingredientList);
 
       // 유통기한 알림 체크 (트리거 2: 재료 등록)
       await checkExpiryAndNotify();
@@ -63,16 +37,9 @@ export const ingredientService = {
 
   async updateIngredient(id: number, updates: Partial<Ingredient>): Promise<void> {
     try {
-      const ingredients = await this.getIngredients();
-      const index = ingredients.findIndex((item) => item.id === id);
-      if (index !== -1) {
-        ingredients[index] = {
-          ...ingredients[index],
-          ...updates,
-          updated_at: new Date().toISOString(),
-        };
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+      const updated = await ingredientRepository.updateIngredient(id, updates);
 
+      if (updated) {
         // 유통기한 알림 체크 (트리거 3: 재료 수정)
         await checkExpiryAndNotify();
       }
@@ -84,16 +51,9 @@ export const ingredientService = {
 
   async deleteIngredient(id: number): Promise<void> {
     try {
-      const ingredients = await this.getIngredients();
-      const index = ingredients.findIndex((item) => item.id === id);
+      const deleted = await ingredientRepository.deleteIngredient(id);
 
-      if (index !== -1) {
-        ingredients[index] = {
-          ...ingredients[index],
-          deleted_at: new Date().toISOString(), // 삭제 시각 기록
-        };
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
-
+      if (deleted) {
         // 유통기한 알림 체크 (트리거 4: 재료 삭제)
         await checkExpiryAndNotify();
       }
@@ -104,11 +64,6 @@ export const ingredientService = {
   },
 
   async clearAll(): Promise<void> {
-    try {
-      await AsyncStorage.removeItem(STORAGE_KEY);
-    } catch (error) {
-      console.error('Error clearing storage:', error);
-      throw error;
-    }
+    return ingredientRepository.clearAll();
   },
 };

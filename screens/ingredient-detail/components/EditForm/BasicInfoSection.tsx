@@ -1,12 +1,11 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import { EditFormData } from '@/mvi/features/ingredient-detail';
-import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 import { useMemo } from 'react';
 
 interface BasicInfoSectionProps {
   formData: EditFormData;
-  selectedEmoji: IngredientTemplate | null;
+  selectedEmoji: string | null;
   onFieldChange: (field: keyof EditFormData, value: string) => void;
   onEmojiPress: () => void;
 }
@@ -26,7 +25,7 @@ export function BasicInfoSection({ formData, selectedEmoji, onFieldChange, onEmo
         >
           {selectedEmoji ? (
             <View style={styles.emojiButtonContent}>
-              <Text style={typography.styles.t7}>{selectedEmoji.emoji}</Text>
+              <Text style={typography.styles.t7}>{selectedEmoji}</Text>
               <Text style={[typography.styles.t7, { color: colors.textTertiary }]}>+</Text>
             </View>
           ) : (

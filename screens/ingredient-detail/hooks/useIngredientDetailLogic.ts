@@ -8,7 +8,6 @@ import { useMVIStore } from '@/mvi/base';
 import { createIngredientDetailStore, EditFormData } from '@/mvi/features/ingredient-detail';
 import { useUnitPicker } from '@/hooks/useUnitPicker';
 import { useExpiryDatePicker } from '@/hooks/useExpiryDatePicker';
-import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 
 export function useIngredientDetailLogic() {
   const router = useRouter();
@@ -17,7 +16,7 @@ export function useIngredientDetailLogic() {
   const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createIngredientDetailStore);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
-  const [selectedEmoji, setSelectedEmoji] = useState<IngredientTemplate | null>(null);
+  const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
   const processedEffectRef = useRef<typeof effect>(null);
 
   const handleFieldChange = (field: keyof EditFormData, value: any) => {
@@ -52,15 +51,10 @@ export function useIngredientDetailLogic() {
 
   // 재료가 로드되면 이모지 상태 초기화
   useEffect(() => {
-    if (state.ingredient?.emoji && state.editForm.emoji) {
-      const { getTemplatesByCategory } = require('@/constants/ingredientTemplates');
-      const templates = getTemplatesByCategory(state.ingredient.category);
-      const matchedTemplate = templates.find((t: IngredientTemplate) => t.emoji === state.editForm.emoji);
-      if (matchedTemplate) {
-        setSelectedEmoji(matchedTemplate);
-      }
+    if (state.ingredient?.emoji) {
+      setSelectedEmoji(state.ingredient.emoji);
     }
-  }, [state.ingredient, state.editForm.emoji]);
+  }, [state.ingredient?.emoji]);
 
   // Effect 처리
   useEffect(() => {
@@ -142,9 +136,9 @@ export function useIngredientDetailLogic() {
     handleFieldChange('expiry_date', formattedDate);
   };
 
-  const handleEmojiSelect = (template: IngredientTemplate) => {
-    setSelectedEmoji(template);
-    handleFieldChange('emoji', template.emoji);
+  const handleEmojiSelect = (emoji: string) => {
+    setSelectedEmoji(emoji);
+    handleFieldChange('emoji', emoji);
     setIsEmojiPickerVisible(false);
   };
 

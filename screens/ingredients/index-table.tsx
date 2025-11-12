@@ -1,29 +1,45 @@
-import { View, StyleSheet } from 'react-native';
-import { useMemo } from 'react';
+import { View, StyleSheet, useWindowDimensions, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { useMemo, useState } from 'react';
 import { Edit3, Grid3x3 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
-import Header from '@/components/ui/Header';
+import Header, { HEADER_HEIGHT } from '@/components/ui/Header';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FloatingButton from '@/components/ui/FloatingButton';
 import BulkAddBottomSheet from '@/components/BulkAddBottomSheet';
+import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
+import QuantityBottomSheet from '@/components/QuantityBottomSheet';
 import EmptyStateUI from '@/components/ui/EmptyState';
 import { useIngredientsLogic } from './hooks/useIngredientsLogic';
 import { useIngredientsData } from './hooks/useIngredientsData';
 import { IngredientsTableAccordion } from './components/IngredientsTableAccordion';
-import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
+import { TabView, SceneRendererProps, NavigationState } from 'react-native-tab-view';
 import { getCategoryIcon, getCategoryLabel } from '@/utils/category';
 import { getStorageLocationIcon, getStorageLocationLabel } from '@/utils/storageLocation';
 import { Category } from '@/data/enums/category';
 import { StorageLocation } from '@/data/enums/storage_location';
+import SelectStorageBottomSheet from '@/components/SelectStorageBottomSheet';
+import MemoBottomSheet from '@/components/MemoBottomSheet';
+
+export const TAB_BAR_HEIGHT = 48;
+
+type Route = {
+  key: string;
+  title: string;
+};
 
 export default function IngredientsTableScreen() {
   const { colors, spacing, typography } = useTheme();
   const insets = useSafeAreaInsets();
+  const layout = useWindowDimensions();
 
   const {
     ingredients,
     loading,
     bulkAdd,
+    expiryUpdate,
+    quantityUpdate,
+    storageUpate,
+    memoUpdate,
     handleNavigateToDetail,
     handleNavigateToEdit,
     handleNavigateToAdd,
@@ -42,19 +58,44 @@ export default function IngredientsTableScreen() {
     toggleStorage,
   } = useIngredientsData(ingredients);
 
-  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
+  const [index, setIndex] = useState(0);
+  const [routes] = useState<Route[]>([
+    { key: 'category', title: '카테고리별' },
+    { key: 'storage', title: '보관위치별' },
+  ]);
 
-  const renderHeader = () => <Header title="재료 관리" />;
+  const headerHeight = HEADER_HEIGHT + insets.top;
+  const totalHeaderHeight = headerHeight + TAB_BAR_HEIGHT;
 
-  const renderTabBar = (props: any) => (
-    <MaterialTabBar
-      {...props}
-      indicatorStyle={{ backgroundColor: colors.primary }}
-      style={{ backgroundColor: colors.surface }}
-      activeColor={colors.primary}
-      inactiveColor={colors.textSecondary}
-      labelStyle={typography.styles.t6Bold}
-    />
+  const styles = useMemo(
+    () => createStyles({ spacing, colors, totalHeaderHeight }),
+    [spacing, colors, totalHeaderHeight],
+  );
+
+  const renderTabBar = (props: SceneRendererProps & { navigationState: NavigationState<Route> }) => (
+    <View style={styles.headerContainer}>
+      <Header title="재료 관리" />
+      <View style={styles.tabBar}>
+        {props.navigationState.routes.map((route, i) => {
+          const isActive = index === i;
+          return (
+            <TouchableOpacity key={route.key} style={styles.tabItem} onPress={() => setIndex(i)}>
+              <Text
+                style={[
+                  typography.styles.t7Bold,
+                  {
+                    color: isActive ? colors.primary : colors.textSecondary,
+                  },
+                ]}
+              >
+                {route.title}
+              </Text>
+              {isActive && <View style={[styles.tabIndicator, { backgroundColor: colors.primary }]} />}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
   );
 
   const CategoryRoute = () => {
@@ -75,14 +116,13 @@ export default function IngredientsTableScreen() {
     }
 
     return (
-      <Tabs.ScrollView
+      <ScrollView
         contentContainerStyle={{
           paddingBottom: insets.bottom + 180,
           paddingHorizontal: spacing.lg,
-          paddingTop: spacing.lg,
+          paddingTop: totalHeaderHeight + spacing.lg,
         }}
         showsVerticalScrollIndicator={false}
-        removeClippedSubviews={false}
       >
         <View style={styles.accordionsContainer}>
           {categoryOrder.map((catId) => {
@@ -99,13 +139,18 @@ export default function IngredientsTableScreen() {
                 onToggle={() => toggleCategory(catId)}
                 onItemPress={handleNavigateToDetail}
                 onItemEdit={handleNavigateToEdit}
+                onQuickUpdateExpiry={expiryUpdate.open}
+                onQuickUpdateQuantity={quantityUpdate.open}
+                onQuickUpdateStorage={storageUpate.open}
+                onQuickUpdateMemo={memoUpdate.open}
                 onQuickAdd={handleQuickAdd}
                 onQuickDelete={handleQuickDelete}
+                onViewDetail={handleNavigateToDetail}
               />
             );
           })}
         </View>
-      </Tabs.ScrollView>
+      </ScrollView>
     );
   };
 
@@ -127,14 +172,13 @@ export default function IngredientsTableScreen() {
     }
 
     return (
-      <Tabs.ScrollView
+      <ScrollView
         contentContainerStyle={{
           paddingBottom: insets.bottom + 180,
           paddingHorizontal: spacing.lg,
-          paddingTop: spacing.lg,
+          paddingTop: totalHeaderHeight + spacing.lg,
         }}
         showsVerticalScrollIndicator={false}
-        removeClippedSubviews={false}
       >
         <View style={styles.accordionsContainer}>
           {storageOrder.map((storageId) => {
@@ -151,34 +195,41 @@ export default function IngredientsTableScreen() {
                 onToggle={() => toggleStorage(storageId)}
                 onItemPress={handleNavigateToDetail}
                 onItemEdit={handleNavigateToEdit}
+                onQuickUpdateExpiry={expiryUpdate.open}
+                onQuickUpdateQuantity={quantityUpdate.open}
+                onQuickUpdateStorage={storageUpate.open}
+                onQuickUpdateMemo={memoUpdate.open}
                 onQuickAdd={handleQuickAdd}
                 onQuickDelete={handleQuickDelete}
+                onViewDetail={handleNavigateToDetail}
               />
             );
           })}
         </View>
-      </Tabs.ScrollView>
+      </ScrollView>
     );
+  };
+
+  const renderScene = ({ route }: { route: Route }) => {
+    switch (route.key) {
+      case 'category':
+        return <CategoryRoute />;
+      case 'storage':
+        return <StorageRoute />;
+      default:
+        return null;
+    }
   };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Tabs.Container
-        renderHeader={renderHeader}
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
         renderTabBar={renderTabBar}
-        headerContainerStyle={{
-          shadowOpacity: 0,
-          elevation: 0,
-          backgroundColor: colors.surface,
-        }}
-      >
-        <Tabs.Tab name="category" label="카테고리별">
-          <CategoryRoute />
-        </Tabs.Tab>
-        <Tabs.Tab name="storage" label="보관위치별">
-          <StorageRoute />
-        </Tabs.Tab>
-      </Tabs.Container>
+        onIndexChange={setIndex}
+        initialLayout={{ width: layout.width }}
+      />
 
       <FloatingButton
         menuItems={[
@@ -208,14 +259,82 @@ export default function IngredientsTableScreen() {
         onTemplateToggle={bulkAdd.handleTemplateToggle}
         onConfirm={bulkAdd.handleConfirm}
       />
+
+      <SelectDateBottomSheet
+        visible={expiryUpdate.isVisible}
+        onClose={expiryUpdate.close}
+        title="유통기한 변경"
+        selectedDate={expiryUpdate.expiryDate}
+        onDateChange={expiryUpdate.handleDateChange}
+        onConfirm={expiryUpdate.handleConfirm}
+      />
+
+      <QuantityBottomSheet
+        visible={quantityUpdate.isVisible}
+        onClose={quantityUpdate.close}
+        title="수량 변경"
+        quantity={quantityUpdate.quantity}
+        onQuantityChange={quantityUpdate.handleQuantityChange}
+        onConfirm={quantityUpdate.handleConfirm}
+      />
+
+      <SelectStorageBottomSheet
+        visible={storageUpate.isVisible}
+        title="보관위치 변경"
+        onClose={storageUpate.close}
+        onSelect={storageUpate.handleSelect}
+      />
+
+      <MemoBottomSheet
+        visible={memoUpdate.isVisible}
+        onClose={memoUpdate.close}
+        memo={memoUpdate.memo}
+        title="메모 변경"
+        onMemoChange={memoUpdate.handleMemoChange}
+        onSubmit={memoUpdate.handleConfirm}
+      />
     </View>
   );
 }
 
-const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
+const createStyles = ({
+  spacing,
+  colors,
+  totalHeaderHeight,
+}: {
+  spacing: typeof import('@/lib/theme').spacing;
+  colors: any;
+  totalHeaderHeight: number;
+}) =>
   StyleSheet.create({
     container: {
       flex: 1,
+    },
+    headerContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 10,
+      backgroundColor: colors.surface,
+    },
+    tabBar: {
+      flexDirection: 'row',
+      height: TAB_BAR_HEIGHT,
+      backgroundColor: colors.surface,
+    },
+    tabItem: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'relative',
+    },
+    tabIndicator: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 2,
     },
     sceneContainer: {
       flex: 1,

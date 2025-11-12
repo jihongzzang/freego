@@ -5,11 +5,16 @@
  */
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
-import { HomeState, HomeIntent, HomeEffect, Ingredient } from './types';
+import { HomeState, HomeIntent, HomeEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
-import { getCalculateStatus } from '@/utils/status';
-import { getCalculateDaysRemaining } from '@/utils/time';
 import { checkExpiryAndNotify } from '@/services/notification.service';
+import {
+  handleLoadIngredients,
+  enrichIngredients,
+  createSuccessEffect,
+  createErrorEffect,
+  createNavigateEffect,
+} from '@/mvi/shared';
 
 /**
  * Home Middleware
@@ -20,40 +25,12 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
 ): Promise<MiddlewareResult<HomeState, HomeEffect>> => {
   switch (intent.type) {
     case 'LOAD_INGREDIENTS': {
-      try {
-        const data = await ingredientService.getIngredients();
-        const ingredients: Ingredient[] = data.map((item) => ({
-          ...item,
-          status: getCalculateStatus(item.expiry_date),
-          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
-        }));
+      const result = await handleLoadIngredients<HomeState, HomeEffect>();
 
-        // 유통기한 알림 체크 (트리거 1: 앱 접속)
-        await checkExpiryAndNotify();
+      // 유통기한 알림 체크 (트리거 1: 앱 접속)
+      await checkExpiryAndNotify();
 
-        return {
-          state: {
-            ...state,
-            ingredients,
-            loading: false,
-            error: null,
-          },
-        };
-      } catch (error) {
-        return {
-          state: {
-            ...state,
-            loading: false,
-            error: error instanceof Error ? error.message : '데이터 로드 실패',
-          },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '식재료 데이터를 불러오는데 실패했어요.', variant: 'error' },
-            },
-          ],
-        };
-      }
+      return result;
     }
 
     case 'UPDATE_EXPIRY_DATE': {
@@ -64,34 +41,19 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
 
         // 업데이트 후 다시 로드
         const data = await ingredientService.getIngredients();
-
-        const ingredients: Ingredient[] = data.map((item) => ({
-          ...item,
-          status: getCalculateStatus(item.expiry_date),
-          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
-        }));
+        const ingredients = enrichIngredients(data);
 
         return {
           state: {
             ...state,
             ingredients,
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '유통기한이 수정됐어요.', variant: 'success' },
-            },
-          ],
+          effects: [createSuccessEffect('유통기한이 수정됐어요.')],
         };
       } catch (error) {
         console.error('Middleware: UPDATE_EXPIRY_DATE 에러', error);
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '유통기한 수정에 실패했어요.', variant: 'error' },
-            },
-          ],
+          effects: [createErrorEffect('유통기한 수정에 실패했어요.')],
         };
       }
     }
@@ -102,56 +64,38 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
 
         // 추가 후 다시 로드
         const data = await ingredientService.getIngredients();
-        const ingredients: Ingredient[] = data.map((item) => ({
-          ...item,
-          status: getCalculateStatus(item.expiry_date),
-          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
-        }));
+        const ingredients = enrichIngredients(data);
 
         return {
           state: {
             ...state,
             ingredients,
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: `${intent.payload.length}개의 재료가 추가됐어요.`, variant: 'success' },
-            },
-          ],
+          effects: [createSuccessEffect(`${intent.payload.length}개의 재료가 추가됐어요.`)],
         };
       } catch (error) {
         console.error('Error adding templates:', error);
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '재료 추가 중 오류가 발생했어요.', variant: 'error' },
-            },
-          ],
+          effects: [createErrorEffect('재료 추가 중 오류가 발생했어요.')],
         };
       }
     }
 
     case 'NAVIGATE_TO_ADD': {
+      const path = intent.payload ? `/add?category=${encodeURIComponent(intent.payload)}` : '/add';
       return {
-        effects: [
-          {
-            type: 'NAVIGATE',
-            payload: intent.payload ? `/add?category=${encodeURIComponent(intent.payload)}` : '/add',
-          },
-        ],
+        effects: [createNavigateEffect(path)],
       };
     }
 
     case 'NAVIGATE_TO_EXPIRING':
       return {
-        effects: [{ type: 'NAVIGATE', payload: '/expiring' }],
+        effects: [createNavigateEffect('/expiring')],
       };
 
     case 'NAVIGATE_TO_DETAIL':
       return {
-        effects: [{ type: 'NAVIGATE', payload: `/ingredient/${intent.payload}` }],
+        effects: [createNavigateEffect(`/ingredient/${intent.payload}`)],
       };
 
     default:

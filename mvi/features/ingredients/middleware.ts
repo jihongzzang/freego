@@ -5,11 +5,16 @@
  */
 
 import { Middleware, MiddlewareResult } from '@/mvi/base';
-import { IngredientsState, IngredientsIntent, IngredientsEffect, Ingredient } from './types';
+import { IngredientsState, IngredientsIntent, IngredientsEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
 import { shoppingService } from '@/services/shopping.service';
-import { getCalculateStatus } from '@/utils/status';
-import { getCalculateDaysRemaining } from '@/utils/time';
+import {
+  handleLoadIngredients,
+  enrichIngredients,
+  createSuccessEffect,
+  createErrorEffect,
+  createNavigateEffect,
+} from '@/mvi/shared';
 
 /**
  * Ingredients Middleware
@@ -20,37 +25,7 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
 ): Promise<MiddlewareResult<IngredientsState, IngredientsEffect>> => {
   switch (intent.type) {
     case 'LOAD_INGREDIENTS': {
-      try {
-        const data = await ingredientService.getIngredients();
-        const ingredients: Ingredient[] = data.map((item) => ({
-          ...item,
-          status: getCalculateStatus(item.expiry_date),
-          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
-        }));
-
-        return {
-          state: {
-            ...state,
-            ingredients,
-            loading: false,
-            error: null,
-          },
-        };
-      } catch (error) {
-        return {
-          state: {
-            ...state,
-            loading: false,
-            error: error instanceof Error ? error.message : '데이터 로드 실패',
-          },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '식재료 데이터를 불러오는데 실패했어요.', variant: 'error' },
-            },
-          ],
-        };
-      }
+      return handleLoadIngredients<IngredientsState, IngredientsEffect>();
     }
 
     case 'DELETE_INGREDIENT': {
@@ -59,32 +34,18 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
 
         // 삭제 후 다시 로드
         const data = await ingredientService.getIngredients();
-        const ingredients: Ingredient[] = data.map((item) => ({
-          ...item,
-          status: getCalculateStatus(item.expiry_date),
-          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
-        }));
+        const ingredients = enrichIngredients(data);
 
         return {
           state: {
             ...state,
             ingredients,
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '식재료가 삭제됐어요', variant: 'error' },
-            },
-          ],
+          effects: [createErrorEffect('식재료가 삭제됐어요')],
         };
       } catch (error) {
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '식재료 삭제에 실패했어요.', variant: 'error' },
-            },
-          ],
+          effects: [createErrorEffect('식재료 삭제에 실패했어요.')],
         };
       }
     }
@@ -96,12 +57,7 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
 
         if (!ingredient) {
           return {
-            effects: [
-              {
-                type: 'SHOW_TOAST',
-                payload: { message: '식재료를 찾을 수 없어요.', variant: 'error' },
-              },
-            ],
+            effects: [createErrorEffect('식재료를 찾을 수 없어요.')],
           };
         }
 
@@ -117,32 +73,18 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
 
         // 삭제 후 다시 로드
         const data = await ingredientService.getIngredients();
-        const ingredients: Ingredient[] = data.map((item) => ({
-          ...item,
-          status: getCalculateStatus(item.expiry_date),
-          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
-        }));
+        const ingredients = enrichIngredients(data);
 
         return {
           state: {
             ...state,
             ingredients,
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '장보기 목록에 추가했어요', variant: 'success' },
-            },
-          ],
+          effects: [createSuccessEffect('장보기 목록에 추가했어요')],
         };
       } catch (error) {
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '장보기 목록 추가에 실패했어요.', variant: 'error' },
-            },
-          ],
+          effects: [createErrorEffect('장보기 목록 추가에 실패했어요.')],
         };
       }
     }
@@ -153,50 +95,132 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
 
         // 추가 후 다시 로드
         const data = await ingredientService.getIngredients();
-        const ingredients: Ingredient[] = data.map((item) => ({
-          ...item,
-          status: getCalculateStatus(item.expiry_date),
-          daysRemaining: getCalculateDaysRemaining(item.expiry_date),
-        }));
+        const ingredients = enrichIngredients(data);
 
         return {
           state: {
             ...state,
             ingredients,
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: `${intent.payload.length}개의 재료가 추가됐어요.`, variant: 'success' },
-            },
-          ],
+          effects: [createSuccessEffect(`${intent.payload.length}개의 재료가 추가됐어요.`)],
         };
       } catch (error) {
         console.error('Error adding templates:', error);
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: { message: '재료 추가 중 오류가 발생했어요.', variant: 'error' },
-            },
-          ],
+          effects: [createErrorEffect('재료 추가 중 오류가 발생했어요.')],
+        };
+      }
+    }
+
+    case 'UPDATE_INGREDIENT_EXPIRY': {
+      try {
+        await ingredientService.updateIngredient(intent.payload.id, {
+          expiry_date: intent.payload.expiry_date,
+        });
+
+        // 업데이트 후 다시 로드
+        const data = await ingredientService.getIngredients();
+        const ingredients = enrichIngredients(data);
+
+        return {
+          state: {
+            ...state,
+            ingredients,
+          },
+          effects: [createSuccessEffect('유통기한이 수정됐어요')],
+        };
+      } catch (error) {
+        return {
+          effects: [createErrorEffect('유통기한 수정에 실패했어요.')],
+        };
+      }
+    }
+
+    case 'UPDATE_INGREDIENT_QUANTITY': {
+      try {
+        await ingredientService.updateIngredient(intent.payload.id, {
+          quantity: intent.payload.quantity ? Number(intent.payload.quantity) : undefined,
+        });
+
+        // 업데이트 후 다시 로드
+        const data = await ingredientService.getIngredients();
+        const ingredients = enrichIngredients(data);
+
+        return {
+          state: {
+            ...state,
+            ingredients,
+          },
+          effects: [createSuccessEffect('수량이 수정됐어요')],
+        };
+      } catch (error) {
+        return {
+          effects: [createErrorEffect('수량 수정에 실패했어요.')],
+        };
+      }
+    }
+
+    case 'UPDATE_INGREDIENT_STORAGE': {
+      try {
+        await ingredientService.updateIngredient(intent.payload.id, {
+          storage_location: intent.payload.storage_location,
+        });
+
+        // 업데이트 후 다시 로드
+        const data = await ingredientService.getIngredients();
+        const ingredients = enrichIngredients(data);
+
+        return {
+          state: {
+            ...state,
+            ingredients,
+          },
+          effects: [createSuccessEffect('보관위치를 수정했어요.')],
+        };
+      } catch (error) {
+        return {
+          effects: [createErrorEffect('보관위치 수정에 실패했어요.')],
+        };
+      }
+    }
+
+    case 'UPDATE_MEMO': {
+      try {
+        await ingredientService.updateIngredient(intent.payload.id, {
+          memo: intent.payload.memo ? intent.payload.memo : undefined,
+        });
+
+        // 업데이트 후 다시 로드
+        const data = await ingredientService.getIngredients();
+        const ingredients = enrichIngredients(data);
+
+        return {
+          state: {
+            ...state,
+            ingredients,
+          },
+          effects: [createSuccessEffect('메모를 수정했어요.')],
+        };
+      } catch (error) {
+        return {
+          effects: [createErrorEffect('메모 수정에 실패했어요.')],
         };
       }
     }
 
     case 'NAVIGATE_TO_ADD':
       return {
-        effects: [{ type: 'NAVIGATE', payload: '/add' }],
+        effects: [createNavigateEffect('/add')],
       };
 
     case 'NAVIGATE_TO_DETAIL':
       return {
-        effects: [{ type: 'NAVIGATE', payload: `/ingredient/${intent.payload}` }],
+        effects: [createNavigateEffect(`/ingredient/${intent.payload}`)],
       };
 
     case 'NAVIGATE_TO_DETAIL_EDIT':
       return {
-        effects: [{ type: 'NAVIGATE', payload: `/ingredient/${intent.payload}?mode=edit` }],
+        effects: [createNavigateEffect(`/ingredient/${intent.payload}?mode=edit`)],
       };
 
     default:

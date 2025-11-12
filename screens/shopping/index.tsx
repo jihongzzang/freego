@@ -1,18 +1,19 @@
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { useMemo } from 'react';
-import { ShoppingCart, Share2, Plus } from 'lucide-react-native';
-import { useTheme } from '@/lib/theme';
-import Header from '@/components/ui/Header';
-import AddShoppingListBottomSheet from '@/components/AddShoppingListBottomSheet';
-import EditMemoBottomSheet from '@/components/EditMemoBottomSheet';
-import SelectStorageBottomSheet from '@/components/SelectStorageBottomSheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import FloatingButton from '@/components/ui/FloatingButton';
-import EmptyStateUI from '@/components/ui/EmptyState';
-import { useShoppingLogic } from './hooks/useShoppingLogic';
-import { ShoppingSection } from './components/ShoppingSection';
+// import { View, StyleSheet, ScrollView } from 'react-native';
+// import { useMemo } from 'react';
+// import { ShoppingCart, Share2, Plus } from 'lucide-react-native';
+// import { useTheme } from '@/lib/theme';
+// import Header from '@/components/ui/Header';
+// import AddShoppingListBottomSheet from '@/components/AddShoppingListBottomSheet';
+// import EditMemoBottomSheet from '@/components/EditMemoBottomSheet';
+// import SelectStorageBottomSheet from '@/components/SelectStorageBottomSheet';
+// import { useSafeAreaInsets } from 'react-native-safe-area-context';
+// import FloatingButton from '@/components/ui/FloatingButton';
+// import EmptyStateUI from '@/components/ui/EmptyState';
+// import { useShoppingLogic } from './hooks/useShoppingLogic';
+// import { ShoppingSection } from './components/ShoppingSection';
 
 export default function ShoppingListScreen() {
+  return null;
   // const { colors, spacing } = useTheme();
   // const insets = useSafeAreaInsets();
   // const {
@@ -128,13 +129,13 @@ export default function ShoppingListScreen() {
   // );
 }
 
-const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    content: {
-      flex: 1,
-      padding: spacing.lg,
-    },
-  });
+// const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
+//   StyleSheet.create({
+//     container: {
+//       flex: 1,
+//     },
+//     content: {
+//       flex: 1,
+//       padding: spacing.lg,
+//     },
+//   });

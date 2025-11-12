@@ -1,6 +1,6 @@
 import { View, StyleSheet } from 'react-native';
 import { EditFormData } from '@/mvi/features/ingredient-detail';
-import { type IngredientTemplate } from '@/constants/ingredientTemplates';
+
 import { BasicInfoSection } from './BasicInfoSection';
 import { CategorySection } from './CategorySection';
 import { QuantitySection } from './QuantitySection';
@@ -12,7 +12,7 @@ import { useTheme } from '@/lib/theme';
 
 interface EditFormProps {
   formData: EditFormData;
-  selectedEmoji: IngredientTemplate | null;
+  selectedEmoji: string | null;
   onFieldChange: (field: keyof EditFormData, value: any) => void;
   onEmojiPress: () => void;
   onUnitPress: () => void;

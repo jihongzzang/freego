@@ -114,10 +114,10 @@ export function ShoppingTableView({
             ]}
           >
             <View style={[styles.cell, styles.checkboxCell]}>
-              <Text style={[typography.styles.t7Bold, { color: colors.textSecondary, fontSize: 11 }]}>완료</Text>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>완료</Text>
             </View>
             <View style={[styles.cell, styles.nameCell]}>
-              <Text style={[typography.styles.t7Bold, { color: colors.textSecondary, fontSize: 11 }]}>이름</Text>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
             </View>
           </View>
 

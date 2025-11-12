@@ -8,7 +8,6 @@ import type { AddFormData } from '@/mvi/features/add';
 import { useUnitPicker } from '@/hooks/useUnitPicker';
 import { useExpiryDatePicker } from '@/hooks/useExpiryDatePicker';
 import { usePurchaseDatePicker } from '@/hooks/usePurchateDatePicker';
-import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 
 export function useAddLogic() {
   const router = useRouter();
@@ -16,7 +15,7 @@ export function useAddLogic() {
   const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createAddStore);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
-  const [selectedEmoji, setSelectedEmoji] = useState<IngredientTemplate | null>(null);
+  const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
 
   const handleFieldChange = (field: keyof AddFormData, value: any) => {
     dispatch({ type: 'UPDATE_FIELD', payload: { field, value } });
@@ -74,9 +73,9 @@ export function useAddLogic() {
     handleFieldChange('expiry_date', formattedDate);
   };
 
-  const handleEmojiSelect = (template: IngredientTemplate) => {
-    setSelectedEmoji(template);
-    handleFieldChange('emoji', template.emoji);
+  const handleEmojiSelect = (emoji: string) => {
+    setSelectedEmoji(emoji);
+    handleFieldChange('emoji', emoji);
     setIsEmojiPickerVisible(false);
   };
 
