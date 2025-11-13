@@ -16,7 +16,7 @@ export interface Ingredient {
   unit: Unit | null; // 단위 ID (enum) (optional)
   storage_location: StorageLocation | null; // 보관 위치 ID (enum) (optional)
   purchased_date_time: string | null; // 구매 일시 (ISO, 00:00:00 기준) (optional)
-  expiry_date_time: string | null; // 유통기한 (ISO, 00:00:00 기준)  (optional)
+  expired_date_time: string | null; // 유통기한 (ISO, 00:00:00 기준)  (optional)
 
   created_date_time: string | null; // 생성 일시 (ISO)
   last_modifed_date_time: string | null; // 수정 일시 (ISO) (optional)

@@ -2,6 +2,7 @@ import { Category } from '@/data/enums/category';
 
 export function getCategoryLabel({ category, lang = 'kr' }: { category: Category | null; lang?: 'kr' | 'en' }): string {
   const map: Record<Category, { kr: string; en: string }> = {
+    [Category.ALL]: { kr: '전체', en: 'all' },
     [Category.VEGETABLE]: { kr: '채소', en: 'vegetable' },
     [Category.FRUIT]: { kr: '과일', en: 'fruit' },
     [Category.MEAT]: { kr: '육류', en: 'meat' },

@@ -7,7 +7,7 @@ import { StorageLocation } from '@/data/enums/storage_location';
 import { Chip } from '@/components/ui';
 
 interface StorageSectionProps {
-  storageLocation?: StorageLocation;
+  storageLocation: StorageLocation | null;
   onFieldChange: (field: keyof EditFormData, value: StorageLocation) => void;
 }
 

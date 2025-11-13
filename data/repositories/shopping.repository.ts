@@ -19,7 +19,7 @@ export const shoppingRepository = {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       const list = data ? JSON.parse(data) : [];
-      return list.filter((item: ShoppingItem) => !item.deleted_at && !item.is_purchased);
+      return list.filter((item: ShoppingItem) => !item.deleted_date_time && !item.is_purchased);
     } catch (error) {
       console.error('Error reading shopping list:', error);
       return [];
@@ -54,14 +54,16 @@ export const shoppingRepository = {
   /**
    * 장보기 아이템 추가
    */
-  async addToShoppingList(item: Omit<ShoppingItem, 'id' | 'created_at' | 'is_purchased'>): Promise<ShoppingItem> {
+  async addToShoppingList(
+    item: Omit<ShoppingItem, 'id' | 'created_date_time' | 'is_purchased'>,
+  ): Promise<ShoppingItem> {
     try {
       const shoppingList = await this.getAllShoppingItemsRaw();
       const newItem: ShoppingItem = {
         ...item,
         id: generateId(),
         is_purchased: false,
-        created_at: new Date().toISOString(),
+        created_date_time: new Date().toISOString(),
       };
       shoppingList.push(newItem);
       await this.saveShoppingList(shoppingList);
@@ -75,7 +77,7 @@ export const shoppingRepository = {
   /**
    * 장보기 아이템 업데이트
    */
-  async updateShoppingItem(id: number, updates: Partial<ShoppingItem>): Promise<boolean> {
+  async updateShoppingItem(id: string, updates: Partial<ShoppingItem>): Promise<boolean> {
     try {
       const shoppingList = await this.getAllShoppingItemsRaw();
       const index = shoppingList.findIndex((item) => item.id === id);
@@ -84,7 +86,7 @@ export const shoppingRepository = {
         shoppingList[index] = {
           ...shoppingList[index],
           ...updates,
-          updated_at: new Date().toISOString(),
+          last_modifed_date_time: new Date().toISOString(),
         };
         await this.saveShoppingList(shoppingList);
         return true;
@@ -99,7 +101,7 @@ export const shoppingRepository = {
   /**
    * 장보기 아이템 삭제 (soft delete)
    */
-  async deleteShoppingItem(id: number): Promise<boolean> {
+  async deleteShoppingItem(id: string): Promise<boolean> {
     try {
       const shoppingList = await this.getAllShoppingItemsRaw();
       const index = shoppingList.findIndex((item) => item.id === id);
@@ -107,7 +109,7 @@ export const shoppingRepository = {
       if (index !== -1) {
         shoppingList[index] = {
           ...shoppingList[index],
-          deleted_at: new Date().toISOString(),
+          deleted_date_time: new Date().toISOString(),
         };
         await this.saveShoppingList(shoppingList);
         return true;

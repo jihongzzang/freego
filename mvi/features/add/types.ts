@@ -12,14 +12,14 @@ import { Unit } from '@/data/enums/unit';
  */
 export interface AddFormData {
   name: string;
-  emoji?: string;
+  emoji: string | null;
   category: Category;
-  quantity?: string;
-  unit?: Unit;
-  purchased_date?: string;
-  expiry_date?: string;
-  storage_location?: StorageLocation;
-  memo?: string;
+  quantity: string | null;
+  unit: Unit | null;
+  purchased_date_time: string | null;
+  expired_date_time: string | null;
+  storage_location: StorageLocation | null;
+  memo: string | null;
 }
 
 /**
@@ -27,7 +27,6 @@ export interface AddFormData {
  */
 export interface ValidationErrors {
   name?: string;
-  expiry_date?: string;
 }
 
 /**

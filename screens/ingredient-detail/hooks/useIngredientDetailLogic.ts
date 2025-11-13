@@ -28,17 +28,17 @@ export function useIngredientDetailLogic() {
   });
 
   const expiryDatePicker = useExpiryDatePicker({
-    onDateConfirm: (date) => handleFieldChange('expiry_date', date),
+    onDateConfirm: (date) => handleFieldChange('expired_date_time', date),
   });
 
   const purchaseDatePicker = useExpiryDatePicker({
-    onDateConfirm: (date) => handleFieldChange('purchased_date', date),
+    onDateConfirm: (date) => handleFieldChange('purchased_date_time', date),
   });
 
   // 식재료 데이터 로드
   useEffect(() => {
-    if (id && !isNaN(Number(id))) {
-      dispatch({ type: 'LOAD_INGREDIENT', payload: Number(id) });
+    if (id) {
+      dispatch({ type: 'LOAD_INGREDIENT', payload: id as string });
     }
   }, [id, dispatch]);
 
@@ -133,7 +133,7 @@ export function useIngredientDetailLogic() {
     const date = new Date();
     date.setDate(date.getDate() + days);
     const formattedDate = date.toISOString();
-    handleFieldChange('expiry_date', formattedDate);
+    handleFieldChange('expired_date_time', formattedDate);
   };
 
   const handleEmojiSelect = (emoji: string) => {

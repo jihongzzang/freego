@@ -25,11 +25,11 @@ export interface HomeState extends IngredientListState {}
  */
 export type HomeIntent =
   | LoadIngredientsIntent
-  | { type: 'UPDATE_EXPIRY_DATE'; payload: { id: number; expiryDate: string } }
+  | { type: 'UPDATE_EXPIRY_DATE'; payload: { id: string; expired_date_time: string } }
   | { type: 'BULK_ADD_INGREDIENTS'; payload: BulkAddIngredientsPayload[] }
-  | { type: 'NAVIGATE_TO_ADD'; payload?: number }
+  | { type: 'NAVIGATE_TO_ADD'; payload?: string }
   | { type: 'NAVIGATE_TO_EXPIRING' }
-  | { type: 'NAVIGATE_TO_DETAIL'; payload: number };
+  | { type: 'NAVIGATE_TO_DETAIL'; payload: string };
 
 /**
  * Home Effect (부수 효과)

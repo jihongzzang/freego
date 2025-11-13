@@ -47,14 +47,13 @@ export function AddForm({
       <StorageSection storageLocation={formData.storage_location} onFieldChange={onFieldChange as any} />
       <DateSection
         isEdit={false}
-        purchaseDate={formData.purchased_date}
-        expiryDate={formData.expiry_date || ''}
+        purchaseDate={formData.purchased_date_time}
+        expiryDate={formData.expired_date_time}
         onFieldChange={onFieldChange as any}
         onPurchaseDatePress={onPurchaseDatePress}
         onExpiryDatePress={onExpiryDatePress}
         onQuickSelect={onQuickSelect}
       />
-
       <QuantitySection
         quantity={formData.quantity}
         unit={formData.unit}

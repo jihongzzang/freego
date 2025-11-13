@@ -12,6 +12,7 @@ import { useHomeData } from './hooks/useHomeData';
 import { useHomeAnimation } from './hooks/useHomeAnimation';
 import { CategoryCarousel } from './components/CategoryCarousel';
 import { IngredientsSection } from './components/IngredientsSection';
+import { Category } from '@/data/enums/category';
 
 export default function HomeScreen() {
   const { colors, spacing } = useTheme();
@@ -119,13 +120,21 @@ export default function HomeScreen() {
         ) : filteredIngredients.length === 0 ? (
           <View style={{ paddingTop: 24 }}>
             <EmptyStateUI
-              title={selectedCategoryId === 0 ? '관리할 재료가 없어요' : `${selectedCategoryItem?.label} 재료가 없어요`}
+              title={
+                selectedCategoryId === null || selectedCategoryId == Category.ALL
+                  ? '관리할 재료가 없어요'
+                  : `${selectedCategoryItem?.label} 재료가 없어요`
+              }
               description="기억하고 싶은 재료만 추가해보세요"
             />
           </View>
         ) : (
           <IngredientsSection
-            title={selectedCategoryId === 0 ? '전체 재료' : selectedCategoryItem?.label || ''}
+            title={
+              selectedCategoryId === null || selectedCategoryId == Category.ALL
+                ? '전체 재료'
+                : selectedCategoryItem?.label || ''
+            }
             count={filteredIngredients.length}
             items={filteredIngredients}
             onCardPress={(item) => navigateIngredientDetail(item.id)}

@@ -12,7 +12,7 @@ interface ShoppingItemProps {
   name: string;
   category: Category;
   isPurchased: boolean;
-  memo?: string;
+  memo: string | null;
   onToggle: () => void;
   onDelete: () => void;
   onMemoPress?: () => void;

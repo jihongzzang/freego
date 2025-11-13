@@ -26,7 +26,7 @@ export function useShoppingLogic() {
   const [selectingStorageForItem, setSelectingStorageForItem] = useState<{
     id: string;
     name: string;
-    category: number;
+    category: Category;
   } | null>(null);
 
   // 화면 포커스 시 데이터 로드
@@ -107,7 +107,7 @@ export function useShoppingLogic() {
     dispatch({ type: 'DELETE_ITEM', payload: { id, name } });
   }
 
-  function handleAddToStorage(id: string, name: string, category: number) {
+  function handleAddToStorage(id: string, name: string, category: Category) {
     setSelectingStorageForItem({ id, name, category });
   }
 
@@ -152,7 +152,7 @@ export function useShoppingLogic() {
 
     Object.keys(groupedItems).forEach((categoryId) => {
       const items = groupedItems[categoryId];
-      const categoryLabel = getCategoryLabel({ category: Number(categoryId) as Category, lang: 'kr' });
+      const categoryLabel = getCategoryLabel({ category: categoryId as Category, lang: 'kr' });
 
       shareText += `${categoryLabel}\n`;
       items.forEach((item) => {
@@ -188,7 +188,7 @@ export function useShoppingLogic() {
     }, 300);
   }
 
-  function handleMemoPress(id: string, currentMemo?: string) {
+  function handleMemoPress(id: string, currentMemo: string | null) {
     setEditingMemoId(id);
     setEditingMemo(currentMemo || '');
   }
@@ -232,8 +232,8 @@ export function useShoppingLogic() {
     setAddItemName(text);
   }
 
-  function handleAddItemCategoryChange(categoryId: number) {
-    setAddItemCategory(categoryId as Category);
+  function handleAddItemCategoryChange(categoryId: Category) {
+    setAddItemCategory(categoryId);
   }
 
   function handleAddItemMemoChange(text: string) {

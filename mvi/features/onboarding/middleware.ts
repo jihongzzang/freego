@@ -42,10 +42,12 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
               quantity: item.quantity,
               unit: item.unit,
               storage_location: item.storage_location,
-              registration_date: new Date().toISOString().split('T')[0],
-              purchase_date: undefined,
-              expiry_date: undefined,
-              memo: '',
+              purchased_date_time: null,
+              expired_date_time: null,
+              last_modifed_date_time: null,
+              deleted_date_time: null,
+              memo: null,
+              consumed_date_time: null,
             }));
 
             await ingredientService.addMultipleIngredients(ingredientsToAdd);

@@ -23,12 +23,12 @@ export function usePurchaseDatePicker({ onDateConfirm }: UsePurchaseDatePickerPr
   }, [visible]);
 
   // Date를 YYYY-MM-DD 포맷으로 변환
-  const formatDate = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  // const formatDate = (date: Date): string => {
+  //   const year = date.getFullYear();
+  //   const month = String(date.getMonth() + 1).padStart(2, '0');
+  //   const day = String(date.getDate()).padStart(2, '0');
+  //   return `${year}-${month}-${day}`;
+  // };
 
   const open = (date?: Date | string) => {
     // 날짜를 ref에 저장하고 바텀시트 열기
@@ -49,7 +49,7 @@ export function usePurchaseDatePicker({ onDateConfirm }: UsePurchaseDatePickerPr
 
   // 확인 버튼 핸들러
   const handleConfirm = () => {
-    const formattedDate = formatDate(selectedDate);
+    const formattedDate = selectedDate.toISOString();
     onDateConfirm(formattedDate);
     close();
   };

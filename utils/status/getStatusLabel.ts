@@ -1,10 +1,4 @@
-export function getStatusLabel({
-  expiryDate,
-  lang = 'kr',
-}: {
-  expiryDate?: string | null;
-  lang?: 'kr' | 'en';
-}): string {
+export function getStatusLabel({ expiryDate, lang = 'kr' }: { expiryDate: string | null; lang?: 'kr' | 'en' }): string {
   if (!expiryDate) return lang === 'kr' ? '미설정' : 'Not Set';
 
   const today = new Date();

@@ -2147,6 +2147,7 @@ export function getTemplatesByCategory(category: Category | null): IngredientTem
 }
 
 export const categoryDefaultEmojis: Record<Category, string> = {
+  [Category.ALL]: '📦',
   [Category.VEGETABLE]: '🥬',
   [Category.FRUIT]: '🍎',
   [Category.MEAT]: '🥩',

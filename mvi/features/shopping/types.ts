@@ -5,13 +5,14 @@
 import { Intent, State, Effect } from '@/mvi/base';
 import { ShoppingItem } from '@/data/models/shopping.model';
 import { Category } from '@/data/enums/category';
+import { StorageLocation } from '@/data/enums/storage_location';
 
 /**
  * Shopping State
  */
 export interface ShoppingState extends State {
   shoppingList: ShoppingItem[];
-  selectedIds: Set<number>; // 선택된 항목 ID
+  selectedIds: Set<string>; // 선택된 항목 ID
   loading: boolean;
   error: string | null;
   isAddingItem: boolean;
@@ -30,10 +31,13 @@ export type ShoppingIntent =
   | { type: 'TOGGLE_SELECT_ALL' }
   | { type: 'DELETE_ITEM'; payload: { id: string; name: string } }
   | { type: 'DELETE_SELECTED' }
-  | { type: 'ADD_ITEM_TO_STORAGE'; payload: { id: string; name: string; category: number; storageLocation: number } }
+  | {
+      type: 'ADD_ITEM_TO_STORAGE';
+      payload: { id: string; name: string; category: Category; storageLocation: StorageLocation };
+    }
   | { type: 'ADD_SELECTED_TO_STORAGE' }
   | { type: 'SUBMIT_ADD_ITEM'; payload: { name: string; category: Category; memo?: string } }
-  | { type: 'UPDATE_MEMO'; payload: { id: string; memo: string } };
+  | { type: 'UPDATE_MEMO'; payload: { id: string; memo?: string } };
 
 /**
  * Shopping Effect (부수 효과)

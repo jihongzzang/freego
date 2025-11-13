@@ -27,26 +27,26 @@ export function useIngredientsLogic() {
 
   // BulkAdd 로컬 상태
   const [isBulkAddVisible, setIsBulkAddVisible] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<Category | 0>(0);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<Category | null>(null);
   const [selectedTemplates, setSelectedTemplates] = useState<IngredientTemplate[]>([]);
 
   // QuickUpdateExpiry 로컬 상태
   const [isExpiryUpdateVisible, setIsExpiryUpdateVisible] = useState(false);
-  const [selectedIngredientId, setSelectedIngredientId] = useState<number | null>(null);
+  const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
   const [expiryDate, setExpiryDate] = useState<Date>(new Date());
 
   // QuickUpdateQuantity 로컬 상태
   const [isQuantityUpdateVisible, setIsQuantityUpdateVisible] = useState(false);
-  const [selectedQuantityIngredientId, setSelectedQuantityIngredientId] = useState<number | null>(null);
+  const [selectedQuantityIngredientId, setSelectedQuantityIngredientId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<string>('');
 
   // QuickUpdateStorge 로컬 상태
   const [isStorageUpdateVisible, setIsStorageUpdateVisible] = useState(false);
-  const [selectedStorageIngredientId, setSelectedStorageIngredientId] = useState<number | null>(null);
+  const [selectedStorageIngredientId, setSelectedStorageIngredientId] = useState<string | null>(null);
 
   // QuickUpdateMemo 로컬 상태
   const [isMemoUpdateVisible, setIsMemoUpdateVisible] = useState(false);
-  const [selectedMemoIngredientId, setSelectedMemoIngredientId] = useState<number | null>(null);
+  const [selectedMemoIngredientId, setSelectedMemoIngredientId] = useState<string | null>(null);
   const [memo, setMemo] = useState<string>('');
 
   // Effect 처리
@@ -78,11 +78,11 @@ export function useIngredientsLogic() {
   );
 
   function handleNavigateToDetail(id: string) {
-    dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: Number(id) });
+    dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: id });
   }
 
   function handleNavigateToEdit(id: string) {
-    dispatch({ type: 'NAVIGATE_TO_DETAIL_EDIT', payload: Number(id) });
+    dispatch({ type: 'NAVIGATE_TO_DETAIL_EDIT', payload: id });
   }
 
   function handleNavigateToAdd() {
@@ -90,19 +90,19 @@ export function useIngredientsLogic() {
   }
 
   function handleQuickDelete(id: string) {
-    dispatch({ type: 'DELETE_INGREDIENT', payload: Number(id) });
+    dispatch({ type: 'DELETE_INGREDIENT', payload: id });
   }
 
   function handleQuickAdd(id: string) {
-    dispatch({ type: 'ADD_TO_SHOPPING_LIST_INGREDIENT', payload: Number(id) });
+    dispatch({ type: 'ADD_TO_SHOPPING_LIST_INGREDIENT', payload: id });
   }
 
   // QuickUpdateExpiry 핸들러
   function handleQuickUpdateExpiryOpen(id: string) {
-    const ingredient = ingredients.find((ing) => ing.id === Number(id));
+    const ingredient = ingredients.find((ing) => ing.id === id);
     if (ingredient) {
-      setSelectedIngredientId(Number(id));
-      setExpiryDate(ingredient.expiry_date ? new Date(ingredient.expiry_date) : new Date());
+      setSelectedIngredientId(id);
+      setExpiryDate(ingredient.expired_date_time ? new Date(ingredient.expired_date_time) : new Date());
       setIsExpiryUpdateVisible(true);
     }
   }
@@ -122,7 +122,7 @@ export function useIngredientsLogic() {
         type: 'UPDATE_INGREDIENT_EXPIRY',
         payload: {
           id: selectedIngredientId,
-          expiry_date: expiryDate.toISOString(),
+          expired_date_time: expiryDate.toISOString(),
         },
       });
       handleQuickUpdateExpiryClose();
@@ -131,9 +131,9 @@ export function useIngredientsLogic() {
 
   // QuickUpdateQuantity 핸들러
   function handleQuickUpdateQuantityOpen(id: string) {
-    const ingredient = ingredients.find((ing) => ing.id === Number(id));
+    const ingredient = ingredients.find((ing) => ing.id === id);
     if (ingredient) {
-      setSelectedQuantityIngredientId(Number(id));
+      setSelectedQuantityIngredientId(id);
       setQuantity(String(ingredient.quantity || ''));
       setIsQuantityUpdateVisible(true);
     }
@@ -184,9 +184,9 @@ export function useIngredientsLogic() {
 
   // StorageUpdate 핸들러
   function handleQuickUpdateStorageOpen(id: string) {
-    const ingredient = ingredients.find((ing) => ing.id === Number(id));
+    const ingredient = ingredients.find((ing) => ing.id === id);
     if (ingredient) {
-      setSelectedStorageIngredientId(Number(id));
+      setSelectedStorageIngredientId(id);
       setIsStorageUpdateVisible(true);
     }
   }
@@ -211,9 +211,9 @@ export function useIngredientsLogic() {
 
   // MemoUpdate 핸들러
   function handleQuickUpdateMemoOpen(id: string) {
-    const ingredient = ingredients.find((ing) => ing.id === Number(id));
+    const ingredient = ingredients.find((ing) => ing.id === id);
     if (ingredient) {
-      setSelectedMemoIngredientId(Number(id));
+      setSelectedMemoIngredientId(id);
       setMemo(ingredient.memo || '');
       setIsMemoUpdateVisible(true);
     }
@@ -235,7 +235,7 @@ export function useIngredientsLogic() {
         type: 'UPDATE_MEMO',
         payload: {
           id: selectedMemoIngredientId,
-          memo: memo,
+          memo: memo ? memo : null,
         },
       });
       handleQuickUpdateMemoClose();
@@ -250,10 +250,10 @@ export function useIngredientsLogic() {
   function handleBulkAddClose() {
     setIsBulkAddVisible(false);
     setSelectedTemplates([]);
-    setSelectedCategoryId(0);
+    setSelectedCategoryId(null);
   }
 
-  function handleBulkAddCategoryChange(categoryId: Category | 0) {
+  function handleBulkAddCategoryChange(categoryId: Category | null) {
     setSelectedCategoryId(categoryId);
   }
 
@@ -278,13 +278,12 @@ export function useIngredientsLogic() {
       name: template.krLabel,
       category: template.category as Category,
       emoji: template.emoji,
-      storage_location: undefined,
-      quantity: undefined,
+      storage_location: null,
+      quantity: null,
       unit: template.defaultUnit as Unit,
-      registration_date: new Date().toISOString().split('T')[0],
-      purchase_date: undefined,
-      expiry_date: undefined,
-      memo: '',
+      purchased_date_time: null,
+      expired_date_time: null,
+      memo: null,
     }));
 
     dispatch({

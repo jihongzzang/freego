@@ -66,6 +66,9 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
           name: ingredient.name,
           category: ingredient.category,
           emoji: ingredient.emoji,
+          memo: null,
+          last_modifed_date_time: null,
+          deleted_date_time: null,
         });
 
         // 식재료 삭제
@@ -115,7 +118,7 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
     case 'UPDATE_INGREDIENT_EXPIRY': {
       try {
         await ingredientService.updateIngredient(intent.payload.id, {
-          expiry_date: intent.payload.expiry_date,
+          expired_date_time: intent.payload.expired_date_time,
         });
 
         // 업데이트 후 다시 로드
@@ -139,7 +142,7 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
     case 'UPDATE_INGREDIENT_QUANTITY': {
       try {
         await ingredientService.updateIngredient(intent.payload.id, {
-          quantity: intent.payload.quantity ? Number(intent.payload.quantity) : undefined,
+          quantity: intent.payload.quantity ? Number(intent.payload.quantity) : null,
         });
 
         // 업데이트 후 다시 로드
@@ -187,7 +190,7 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
     case 'UPDATE_MEMO': {
       try {
         await ingredientService.updateIngredient(intent.payload.id, {
-          memo: intent.payload.memo ? intent.payload.memo : undefined,
+          memo: intent.payload.memo ? intent.payload.memo : null,
         });
 
         // 업데이트 후 다시 로드

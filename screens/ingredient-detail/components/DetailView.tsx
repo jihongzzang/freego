@@ -23,13 +23,13 @@ export function DetailView({ ingredient }: DetailViewProps) {
         <Badge
           variant="primary"
           style={{
-            backgroundColor: getStatusColor(getCalculateStatus(ingredient.expiry_date)),
+            backgroundColor: getStatusColor(getCalculateStatus(ingredient.expired_date_time)),
             paddingHorizontal: 12,
             paddingVertical: 6,
           }}
         >
           <Text style={[typography.styles.t7Semibold, { color: '#ffffff' }]}>
-            {getStatusLabel({ expiryDate: ingredient.expiry_date })}
+            {getStatusLabel({ expiryDate: ingredient.expired_date_time })}
           </Text>
         </Badge>
       </View>
@@ -60,19 +60,19 @@ export function DetailView({ ingredient }: DetailViewProps) {
         <View style={styles.infoItem}>
           <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>등록일</Text>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
-            {toLocalDate(ingredient.created_at) || '-'}
+            {ingredient.created_date_time ? toLocalDate(ingredient.created_date_time) : '-'}
           </Text>
         </View>
         <View style={styles.infoItem}>
           <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>구매일</Text>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
-            {ingredient.purchased_date ? toLocalDate(ingredient.purchased_date) : '-'}
+            {ingredient.purchased_date_time ? toLocalDate(ingredient.purchased_date_time) : '-'}
           </Text>
         </View>
         <View style={styles.infoItem}>
           <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>유통기한</Text>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
-            {ingredient.expiry_date ? toLocalDate(ingredient.expiry_date) : '-'}
+            {ingredient.expired_date_time ? toLocalDate(ingredient.expired_date_time) : '-'}
           </Text>
         </View>
       </View>

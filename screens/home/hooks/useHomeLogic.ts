@@ -16,25 +16,25 @@ export function useHomeLogic() {
   const { showToast } = useToast();
 
   // 선택된 카테고리 상태
-  const [selectedCategoryId, setSelectedCategoryId] = useState<Category | 0>(0);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<Category | null>(null);
 
   // 유통기한 수정 모달 상태
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
 
   // BulkAdd 로컬 상태
   const [isBulkAddVisible, setIsBulkAddVisible] = useState(false);
-  const [bulkAddCategoryId, setBulkAddCategoryId] = useState<Category | 0>(0);
+  const [bulkAddCategoryId, setBulkAddCategoryId] = useState<Category | null>(null);
   const [selectedTemplates, setSelectedTemplates] = useState<IngredientTemplate[]>([]);
 
   // MVI Store
   const [state, dispatch, effect] = useMVIStore(createHomeStore);
 
   // 유통기한 업데이트 함수
-  const updateExpiryDate = (expiryDate: string) => {
+  const updateExpiryDate = (expired_date_time: string) => {
     if (!selectedIngredient) return;
     dispatch({
       type: 'UPDATE_EXPIRY_DATE',
-      payload: { id: Number(selectedIngredient.id), expiryDate },
+      payload: { id: selectedIngredient.id, expired_date_time },
     });
   };
 
@@ -70,10 +70,10 @@ export function useHomeLogic() {
   // 유통기한 수정 모달 열기
   function openDatePicker(item: Ingredient) {
     setSelectedIngredient(item);
-    expiryDatePicker.open(item.expiry_date || new Date());
+    expiryDatePicker.open(item.expired_date_time || new Date());
   }
 
-  function navigateIngredientDetail(ingredientId: number) {
+  function navigateIngredientDetail(ingredientId: string) {
     dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: ingredientId });
   }
 
@@ -85,10 +85,10 @@ export function useHomeLogic() {
   function handleBulkAddClose() {
     setIsBulkAddVisible(false);
     setSelectedTemplates([]);
-    setBulkAddCategoryId(0);
+    setBulkAddCategoryId(null);
   }
 
-  function handleBulkAddCategoryChange(categoryId: Category | 0) {
+  function handleBulkAddCategoryChange(categoryId: Category | null) {
     setBulkAddCategoryId(categoryId);
   }
 
@@ -113,13 +113,12 @@ export function useHomeLogic() {
       name: template.krLabel,
       category: template.category as Category,
       emoji: template.emoji,
-      storage_location: undefined,
-      quantity: undefined,
+      storage_location: null,
+      quantity: null,
       unit: template.defaultUnit as Unit,
-      registration_date: new Date().toISOString().split('T')[0],
-      purchase_date: undefined,
-      expiry_date: undefined,
-      memo: '',
+      purchased_date_time: null,
+      expired_date_time: null,
+      memo: null,
     }));
 
     dispatch({
@@ -138,7 +137,10 @@ export function useHomeLogic() {
       onPress: () => {
         dispatch({
           type: 'NAVIGATE_TO_ADD',
-          payload: selectedCategoryId === 0 ? undefined : (selectedCategoryId as number),
+          payload:
+            selectedCategoryId === null || selectedCategoryId === Category.ALL
+              ? undefined
+              : (selectedCategoryId as string),
         });
       },
     },

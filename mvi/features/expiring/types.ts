@@ -2,12 +2,7 @@
  * Expiring Screen MVI Types
  */
 
-import {
-  IngredientListState,
-  LoadIngredientsIntent,
-  CommonEffect,
-  EnrichedIngredient,
-} from '@/mvi/shared';
+import { IngredientListState, LoadIngredientsIntent, CommonEffect, EnrichedIngredient } from '@/mvi/shared';
 
 /**
  * Ingredient 타입 re-export (하위 호환성)
@@ -24,8 +19,8 @@ export interface ExpiringState extends IngredientListState {}
  */
 export type ExpiringIntent =
   | LoadIngredientsIntent
-  | { type: 'DELETE_INGREDIENT'; payload: number }
-  | { type: 'ADD_TO_SHOPPING_LIST_INGREDIENT'; payload: number }
+  | { type: 'DELETE_INGREDIENT'; payload: string }
+  | { type: 'ADD_TO_SHOPPING_LIST_INGREDIENT'; payload: string }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: string }
   | { type: 'NAVIGATE_BACK' };
 

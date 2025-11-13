@@ -109,7 +109,10 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         await shoppingService.addToShoppingList({
           name: intent.payload.name.trim(),
           category: intent.payload.category,
-          memo: intent.payload.memo,
+          emoji: null,
+          memo: intent.payload.memo || null,
+          last_modifed_date_time: null,
+          deleted_date_time: null,
         });
 
         const items = await shoppingService.getShoppingList();
@@ -154,7 +157,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
               message: `"${intent.payload.name}"을(를) 삭제할까요?`,
               onConfirm: async () => {
                 try {
-                  await shoppingService.deleteShoppingItem(Number(intent.payload.id));
+                  await shoppingService.deleteShoppingItem(intent.payload.id);
                   return { success: true };
                 } catch (error) {
                   console.error('Error deleting item:', error);
@@ -172,7 +175,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
       try {
         const { ingredientService } = await import('@/services/ingredient.service');
         const today = new Date().toISOString().split('T')[0];
-        const item = state.shoppingList.find((i) => i.id === Number(intent.payload.id));
+        const item = state.shoppingList.find((i) => i.id === intent.payload.id);
 
         if (!item) {
           return {
@@ -193,11 +196,17 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           category: intent.payload.category,
           emoji: item.emoji,
           storage_location: intent.payload.storageLocation as any,
-          purchased_date: today,
-          memo: '',
+          purchased_date_time: today,
+          memo: null,
+          last_modifed_date_time: null,
+          deleted_date_time: null,
+          quantity: null,
+          unit: null,
+          expired_date_time: null,
+          consumed_date_time: null,
         });
 
-        await shoppingService.updateShoppingItem(Number(intent.payload.id), {
+        await shoppingService.updateShoppingItem(intent.payload.id, {
           is_purchased: true,
         });
 
@@ -209,7 +218,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           state: {
             ...state,
             shoppingList: items,
-            selectedIds: new Set<number>(),
+            selectedIds: new Set<string>(),
           },
           effects: [
             {
@@ -272,9 +281,15 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
                       name: item.name,
                       category: item.category,
                       emoji: item.emoji,
-                      storage_location: undefined, // 위치 미지정
-                      purchased_date: today,
-                      memo: '',
+                      storage_location: null,
+                      purchased_date_time: today,
+                      memo: null,
+                      quantity: null,
+                      unit: null,
+                      expired_date_time: null,
+                      last_modifed_date_time: null,
+                      deleted_date_time: null,
+                      consumed_date_time: null,
                     });
 
                     // 구매 완료로 표시
@@ -298,8 +313,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
     case 'UPDATE_MEMO': {
       try {
-        await shoppingService.updateShoppingItem(Number(intent.payload.id), {
-          memo: intent.payload.memo.trim() || undefined,
+        await shoppingService.updateShoppingItem(intent.payload.id, {
+          memo: intent.payload.memo || null,
         });
 
         const items = await shoppingService.getShoppingList();

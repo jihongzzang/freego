@@ -8,8 +8,8 @@ import { toLocalDate } from '@/utils/time';
 
 interface DateSectionProps {
   isEdit: boolean;
-  purchaseDate?: string;
-  expiryDate?: string;
+  purchaseDate: string | null;
+  expiryDate: string | null;
   onFieldChange: (field: keyof EditFormData, value: string) => void;
   onPurchaseDatePress: () => void;
   onExpiryDatePress: () => void;
@@ -41,7 +41,7 @@ export function DateSection({
             <TouchableOpacity
               style={[styles.sameCreatedButton, { backgroundColor: colors.surface, borderColor: colors.surface }]}
               onPress={() => {
-                onFieldChange('purchased_date', today);
+                onFieldChange('purchased_date_time', today);
               }}
               activeOpacity={0.7}
             >

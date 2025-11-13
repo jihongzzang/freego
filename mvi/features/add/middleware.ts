@@ -8,7 +8,6 @@ import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { AddState, AddIntent, AddEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
 import { categoryDefaultEmojis } from '@/constants/ingredientTemplates';
-import { Category } from '@/data/enums/category';
 
 /**
  * 폼 유효성 검사
@@ -83,17 +82,19 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
       }
 
       try {
-        // 스토리지에 저장
         await ingredientService.addIngredient({
           name: state.form.name,
           category: state.form.category,
           emoji: state.form.emoji || categoryDefaultEmojis[state.form.category] || '🍴',
-          quantity: state.form.quantity && state.form.quantity.trim() ? parseInt(state.form.quantity) : undefined,
-          unit: state.form.unit || undefined,
-          purchased_date: state.form.purchased_date || undefined,
-          expiry_date: state.form.expiry_date || undefined,
-          storage_location: state.form.storage_location || undefined,
+          quantity: Number.isInteger(Number(state.form.quantity?.trim())) ? Number(state.form.quantity) : null,
+          unit: state.form.unit || null,
+          purchased_date_time: state.form.purchased_date_time || null,
+          expired_date_time: state.form.expired_date_time || null,
+          storage_location: state.form.storage_location || null,
           memo: state.form.memo,
+          last_modifed_date_time: null,
+          deleted_date_time: null,
+          consumed_date_time: null,
         });
 
         return {
@@ -102,13 +103,14 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
             isSubmitting: false,
             form: {
               name: '',
-              category: Category.VEGETABLE,
-              quantity: undefined,
-              unit: undefined,
-              purchased_date: undefined,
-              expiry_date: undefined,
-              storage_location: undefined,
-              memo: undefined,
+              category: state.form.category,
+              quantity: null,
+              unit: null,
+              emoji: null,
+              purchased_date_time: null,
+              expired_date_time: null,
+              storage_location: null,
+              memo: null,
             },
             errors: {},
           },

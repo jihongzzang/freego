@@ -3,7 +3,7 @@
  * @param expirationDate 유통기한 (YYYY-MM-DD)
  * @returns D-day 문자열 (예: "D+3", "D-1", "D-day")
  */
-export function calculateDday(expirationDate?: string): string {
+export function calculateDday(expirationDate?: string | null): string {
   if (!expirationDate) return '-';
 
   const today = new Date();

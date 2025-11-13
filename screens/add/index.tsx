@@ -52,8 +52,8 @@ export default function AddIngredientScreen() {
             onFieldChange={handleFieldChange}
             onEmojiPress={() => setIsEmojiPickerVisible(true)}
             onUnitPress={unitPicker.open}
-            onPurchaseDatePress={() => purchaseDatePicker.open(state.form.purchased_date || new Date())}
-            onExpiryDatePress={() => expiryDatePicker.open(state.form.expiry_date || new Date())}
+            onPurchaseDatePress={() => purchaseDatePicker.open(state.form.purchased_date_time || new Date())}
+            onExpiryDatePress={() => expiryDatePicker.open(state.form.expired_date_time || new Date())}
             onQuickSelect={handleQuickSelect}
           />
         </KeyboardAwareScrollView>

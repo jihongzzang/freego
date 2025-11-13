@@ -19,7 +19,7 @@ export const ingredientRepository = {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       const ingredients = data ? JSON.parse(data) : [];
-      return ingredients.filter((item: Ingredient) => !item.deleted_at);
+      return ingredients.filter((item: Ingredient) => !item.deleted_date_time);
     } catch (error) {
       console.error('Error reading ingredients:', error);
       return [];
@@ -54,13 +54,13 @@ export const ingredientRepository = {
   /**
    * 단일 재료 추가
    */
-  async addIngredient(ingredient: Omit<Ingredient, 'id' | 'created_at'>): Promise<Ingredient> {
+  async addIngredient(ingredient: Omit<Ingredient, 'id' | 'created_date_time'>): Promise<Ingredient> {
     try {
       const ingredients = await this.getAllIngredientsRaw();
       const newIngredient: Ingredient = {
         ...ingredient,
         id: generateId(),
-        created_at: new Date().toISOString(),
+        created_date_time: new Date().toISOString(),
       };
       ingredients.push(newIngredient);
       await this.saveIngredients(ingredients);
@@ -74,13 +74,13 @@ export const ingredientRepository = {
   /**
    * 여러 재료 추가
    */
-  async addMultipleIngredients(ingredientList: Omit<Ingredient, 'id' | 'created_at'>[]): Promise<Ingredient[]> {
+  async addMultipleIngredients(ingredientList: Omit<Ingredient, 'id' | 'created_date_time'>[]): Promise<Ingredient[]> {
     try {
       const ingredients = await this.getAllIngredientsRaw();
       const newIngredients: Ingredient[] = ingredientList.map((ingredient) => ({
         ...ingredient,
         id: generateId(),
-        created_at: new Date().toISOString(),
+        created_date_time: new Date().toISOString(),
       }));
       ingredients.push(...newIngredients);
       await this.saveIngredients(ingredients);
@@ -94,7 +94,7 @@ export const ingredientRepository = {
   /**
    * 재료 업데이트
    */
-  async updateIngredient(id: number, updates: Partial<Ingredient>): Promise<boolean> {
+  async updateIngredient(id: string, updates: Partial<Ingredient>): Promise<boolean> {
     try {
       const ingredients = await this.getAllIngredientsRaw();
       const index = ingredients.findIndex((item) => item.id === id);
@@ -102,7 +102,7 @@ export const ingredientRepository = {
         ingredients[index] = {
           ...ingredients[index],
           ...updates,
-          updated_at: new Date().toISOString(),
+          last_modifed_date_time: new Date().toISOString(),
         };
         await this.saveIngredients(ingredients);
         return true;
@@ -117,7 +117,7 @@ export const ingredientRepository = {
   /**
    * 재료 삭제 (soft delete)
    */
-  async deleteIngredient(id: number): Promise<boolean> {
+  async deleteIngredient(id: string): Promise<boolean> {
     try {
       const ingredients = await this.getAllIngredientsRaw();
       const index = ingredients.findIndex((item) => item.id === id);
@@ -125,7 +125,7 @@ export const ingredientRepository = {
       if (index !== -1) {
         ingredients[index] = {
           ...ingredients[index],
-          deleted_at: new Date().toISOString(),
+          deleted_date_time: new Date().toISOString(),
         };
         await this.saveIngredients(ingredients);
         return true;

@@ -10,7 +10,7 @@ export const shoppingService = {
     return shoppingRepository.getShoppingList();
   },
 
-  async addToShoppingList(item: Omit<ShoppingItem, 'id' | 'created_at' | 'is_purchased'>): Promise<void> {
+  async addToShoppingList(item: Omit<ShoppingItem, 'id' | 'created_date_time' | 'is_purchased'>): Promise<void> {
     try {
       await shoppingRepository.addToShoppingList(item);
     } catch (error) {
@@ -19,7 +19,7 @@ export const shoppingService = {
     }
   },
 
-  async updateShoppingItem(id: number, updates: Partial<ShoppingItem>): Promise<void> {
+  async updateShoppingItem(id: string, updates: Partial<ShoppingItem>): Promise<void> {
     try {
       await shoppingRepository.updateShoppingItem(id, updates);
     } catch (error) {
@@ -28,7 +28,7 @@ export const shoppingService = {
     }
   },
 
-  async deleteShoppingItem(id: number): Promise<void> {
+  async deleteShoppingItem(id: string): Promise<void> {
     try {
       await shoppingRepository.deleteShoppingItem(id);
     } catch (error) {

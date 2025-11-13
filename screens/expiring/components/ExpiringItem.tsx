@@ -32,10 +32,10 @@ export function ExpiringItem({ item, onPress, onQuickAdd, onQuickDelete }: Expir
             <Badge
               dot
               variant="primary"
-              style={{ backgroundColor: getStatusColor(getCalculateStatus(item.expiry_date)) }}
+              style={{ backgroundColor: getStatusColor(getCalculateStatus(item.expired_date_time)) }}
             />
           </View>
-          {item.expiry_date ? (
+          {item.expired_date_time ? (
             <Text
               style={[
                 typography.styles.t7,
@@ -45,7 +45,7 @@ export function ExpiringItem({ item, onPress, onQuickAdd, onQuickDelete }: Expir
                 },
               ]}
             >
-              유통기한: {item.expiry_date}
+              유통기한: {item.expired_date_time}
               {item.daysRemaining !== null && ` (${getDaysRemaining(item.daysRemaining)})`}
             </Text>
           ) : (

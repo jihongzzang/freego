@@ -6,21 +6,6 @@
 
 import { Reducer } from '@/mvi/base';
 import { AddState, AddIntent } from './types';
-import { Category } from '@/data/enums/category';
-
-/**
- * 초기 폼 데이터
- */
-const initialFormData = {
-  name: '',
-  category: Category.VEGETABLE,
-  quantity: undefined,
-  unit: undefined,
-  purchase_date: undefined,
-  expiry_date: undefined,
-  storage_location: undefined,
-  memo: undefined,
-};
 
 export const addReducer: Reducer<AddState, AddIntent> = (state, intent): AddState => {
   switch (intent.type) {

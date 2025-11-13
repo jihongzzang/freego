@@ -13,14 +13,14 @@ import { Unit } from '@/data/enums/unit';
  */
 export interface EditFormData {
   name: string;
-  emoji?: string;
+  emoji: string | null;
   category: Category;
-  quantity?: string;
-  unit?: Unit;
-  purchased_date?: string;
-  expiry_date?: string;
-  storage_location?: StorageLocation;
-  memo?: string;
+  quantity: string | null;
+  unit: Unit | null;
+  purchased_date_time: string | null;
+  expired_date_time: string | null;
+  storage_location: StorageLocation | null;
+  memo: string | null;
 }
 
 /**
@@ -38,7 +38,7 @@ export interface IngredientDetailState extends State {
  * Ingredient Detail Intent (사용자 액션)
  */
 export type IngredientDetailIntent =
-  | { type: 'LOAD_INGREDIENT'; payload: number }
+  | { type: 'LOAD_INGREDIENT'; payload: string }
   | { type: 'SET_EDITING'; payload: boolean }
   | {
       type: 'UPDATE_FORM_FIELD';

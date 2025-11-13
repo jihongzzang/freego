@@ -11,8 +11,8 @@ import { Button, Chip } from './ui';
 interface BulkAddBottomSheetProps {
   visible: boolean;
   onClose: () => void;
-  selectedCategoryId: Category | 0;
-  onCategoryChange: (categoryId: Category | 0) => void;
+  selectedCategoryId: Category | null;
+  onCategoryChange: (categoryId: Category | null) => void;
   selectedTemplates: IngredientTemplate[];
   onTemplateToggle: (template: IngredientTemplate) => void;
   onConfirm: () => void;
@@ -37,7 +37,9 @@ export default function BulkAddBottomSheet({
   const categories = useMemo(() => makeCategoryList({ includeAllCategory: true, lang: 'kr' }), []);
 
   const filteredTemplates = useMemo(() => {
-    return getTemplatesByCategory(selectedCategoryId === 0 ? null : selectedCategoryId);
+    return getTemplatesByCategory(
+      selectedCategoryId === null || selectedCategoryId === Category.ALL ? null : selectedCategoryId,
+    );
   }, [selectedCategoryId]);
 
   function isTemplateSelected(template: IngredientTemplate) {
@@ -62,7 +64,7 @@ export default function BulkAddBottomSheet({
                 variant={selectedCategoryId === cat.id ? 'primary' : 'secondary'}
                 color={selectedCategoryId === cat.id ? 'green' : 'grey'}
                 size="xlarge"
-                leftIcon={cat.id !== 0 && getCategoryIcon(cat.id, 16)}
+                leftIcon={cat.id !== Category.ALL && getCategoryIcon(cat.id, 16)}
               />
             ))}
           </ScrollView>

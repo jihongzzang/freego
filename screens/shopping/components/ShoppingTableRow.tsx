@@ -12,7 +12,7 @@ interface ShoppingTableRowProps {
   name: string;
   category: Category;
   isSelected: boolean;
-  memo?: string;
+  memo: string | null;
   onToggle: () => void;
   onMemoPress?: () => void;
   onDelete?: () => void;

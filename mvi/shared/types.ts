@@ -7,6 +7,9 @@
 import { State } from '@/mvi/base';
 import { Ingredient as StoredIngredient } from '@/data/models/ingredient.model';
 import { StatusType } from '@/data/enums/status';
+import { StorageLocation } from '@/data/enums/storage_location';
+import { Unit } from '@/data/enums/unit';
+import { Category } from '@/data/enums/category';
 
 /**
  * 상태가 추가된 재료 (status, daysRemaining)
@@ -65,13 +68,12 @@ export type LoadIngredientsIntent =
  */
 export interface BulkAddIngredientsPayload {
   name: string;
-  category: number;
-  emoji?: string;
-  storage_location?: number;
-  quantity?: number;
-  unit?: number;
-  registration_date?: string;
-  purchase_date?: string;
-  expiry_date?: string;
-  memo?: string;
+  category: Category;
+  emoji: string | null;
+  storage_location: StorageLocation | null;
+  quantity: number | null;
+  unit: Unit | null;
+  purchased_date_time: string | null;
+  expired_date_time: string | null;
+  memo: string | null;
 }

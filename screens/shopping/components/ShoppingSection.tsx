@@ -12,7 +12,7 @@ interface ShoppingSectionProps {
   items: ShoppingListItem[];
   onToggleItem: (id: string, isPurchased: boolean) => void;
   onDeleteItem: (id: string, name: string) => void;
-  onMemoPress?: (id: string, currentMemo?: string) => void;
+  onMemoPress?: (id: string, currentMemo: string | null) => void;
   onAddToStorage?: (id: string, name: string, category: Category) => void;
   onClearAll: () => void;
   clearButtonText: string;
@@ -74,7 +74,9 @@ export function ShoppingSection({
             onToggle={() => onToggleItem(String(item.id), item.is_purchased)}
             onDelete={() => onDeleteItem(String(item.id), item.name)}
             onMemoPress={onMemoPress ? () => onMemoPress(String(item.id), item.memo) : undefined}
-            onAddToStorage={onAddToStorage ? () => onAddToStorage(String(item.id), item.name, item.category) : undefined}
+            onAddToStorage={
+              onAddToStorage ? () => onAddToStorage(String(item.id), item.name, item.category) : undefined
+            }
             isLast={index === items.length - 1}
           />
         ))}

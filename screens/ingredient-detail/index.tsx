@@ -65,8 +65,8 @@ export default function IngredientDetailScreen() {
               onFieldChange={handleFieldChange}
               onEmojiPress={() => setIsEmojiPickerVisible(true)}
               onUnitPress={unitPicker.open}
-              onPurchaseDatePress={() => purchaseDatePicker.open(state.editForm.purchased_date || new Date())}
-              onExpiryDatePress={() => expiryDatePicker.open(state.editForm.expiry_date || new Date())}
+              onPurchaseDatePress={() => purchaseDatePicker.open(state.editForm.purchased_date_time || new Date())}
+              onExpiryDatePress={() => expiryDatePicker.open(state.editForm.expired_date_time || new Date())}
               onQuickSelect={handleQuickSelect}
             />
           ) : (

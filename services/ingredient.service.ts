@@ -11,7 +11,7 @@ export const ingredientService = {
     return ingredientRepository.getIngredients();
   },
 
-  async addIngredient(ingredient: Omit<Ingredient, 'id' | 'created_at'>): Promise<void> {
+  async addIngredient(ingredient: Omit<Ingredient, 'id' | 'created_date_time'>): Promise<void> {
     try {
       await ingredientRepository.addIngredient(ingredient);
 
@@ -23,7 +23,7 @@ export const ingredientService = {
     }
   },
 
-  async addMultipleIngredients(ingredientList: Omit<Ingredient, 'id' | 'created_at'>[]): Promise<void> {
+  async addMultipleIngredients(ingredientList: Omit<Ingredient, 'id' | 'created_date_time'>[]): Promise<void> {
     try {
       await ingredientRepository.addMultipleIngredients(ingredientList);
 
@@ -35,7 +35,7 @@ export const ingredientService = {
     }
   },
 
-  async updateIngredient(id: number, updates: Partial<Ingredient>): Promise<void> {
+  async updateIngredient(id: string, updates: Partial<Ingredient>): Promise<void> {
     try {
       const updated = await ingredientRepository.updateIngredient(id, updates);
 
@@ -49,7 +49,7 @@ export const ingredientService = {
     }
   },
 
-  async deleteIngredient(id: number): Promise<void> {
+  async deleteIngredient(id: string): Promise<void> {
     try {
       const deleted = await ingredientRepository.deleteIngredient(id);
 

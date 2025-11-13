@@ -26,11 +26,11 @@ export function useAddLogic() {
   });
 
   const expiryDatePicker = useExpiryDatePicker({
-    onDateConfirm: (formattedDate) => handleFieldChange('expiry_date', formattedDate),
+    onDateConfirm: (formattedDate) => handleFieldChange('expired_date_time', formattedDate),
   });
 
   const purchaseDatePicker = usePurchaseDatePicker({
-    onDateConfirm: (formattedDate) => handleFieldChange('purchased_date', formattedDate),
+    onDateConfirm: (formattedDate) => handleFieldChange('purchased_date_time', formattedDate),
   });
 
   // Effect 처리
@@ -70,7 +70,7 @@ export function useAddLogic() {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
-    handleFieldChange('expiry_date', formattedDate);
+    handleFieldChange('expired_date_time', formattedDate);
   };
 
   const handleEmojiSelect = (emoji: string) => {

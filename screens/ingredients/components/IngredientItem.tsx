@@ -51,7 +51,7 @@ export function IngredientItem({ item, onPress, onEdit, onQuickAdd, onQuickDelet
           {getIngredientDetails && (
             <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>{getIngredientDetails}</Text>
           )}
-          {item.expiry_date ? (
+          {item.expired_date_time ? (
             <Text
               style={[
                 typography.styles.t7,
@@ -61,7 +61,7 @@ export function IngredientItem({ item, onPress, onEdit, onQuickAdd, onQuickDelet
                 },
               ]}
             >
-              유통기한: {item.expiry_date}
+              유통기한: {item.expired_date_time}
               {item.daysRemaining !== null && ` (${getDaysRemaining(item.daysRemaining)})`}
             </Text>
           ) : (

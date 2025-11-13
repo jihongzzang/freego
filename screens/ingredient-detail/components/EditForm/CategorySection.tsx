@@ -29,7 +29,7 @@ export function CategorySection({ selectedCategory, onCategoryChange }: Category
             variant={selectedCategory === cat.id ? 'primary' : 'secondary'}
             color={selectedCategory === cat.id ? 'green' : 'grey'}
             size="xlarge"
-            leftIcon={cat.id !== 0 && getCategoryIcon(cat.id, 18)}
+            leftIcon={cat.id !== Category.ALL && getCategoryIcon(cat.id, 18)}
           />
         ))}
       </ScrollView>

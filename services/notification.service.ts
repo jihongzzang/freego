@@ -126,9 +126,9 @@ export async function checkExpiryAndNotify(): Promise<void> {
 
     // ===== 프로덕션 로직 (일 단위) - 테스트 후 주석 해제 =====
     const expiringIngredients = ingredients.filter((ingredient) => {
-      if (!ingredient.expiry_date) return false;
+      if (!ingredient.expired_date_time) return false;
 
-      const daysRemaining = getCalculateDaysRemaining(ingredient.expiry_date);
+      const daysRemaining = getCalculateDaysRemaining(ingredient.expired_date_time);
       return daysRemaining !== null && daysRemaining >= 0 && daysRemaining <= notificationDays;
     });
 

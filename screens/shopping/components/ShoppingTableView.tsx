@@ -9,13 +9,13 @@ import { getDefaultEmoji } from '@/utils/category';
 
 interface ShoppingTableViewProps {
   items: ShoppingListItem[];
-  selectedIds: Set<number>;
+  selectedIds: Set<string>;
   onToggleSelect: (id: string) => void;
   onToggleSelectAll: () => void;
   onDeleteSelected: () => void;
   onAddSelectedToStorage: () => void;
   onDeleteItem?: (id: string, name: string) => void;
-  onMemoPress?: (id: string, currentMemo?: string) => void;
+  onMemoPress?: (id: string, currentMemo: string | null) => void;
   onAddToStorage?: (id: string, name: string, category: Category) => void;
 }
 

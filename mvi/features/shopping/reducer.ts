@@ -11,7 +11,7 @@ export const shoppingReducer: Reducer<ShoppingState, ShoppingIntent> = (state, i
   switch (intent.type) {
     case 'TOGGLE_SELECT': {
       const newSelectedIds = new Set(state.selectedIds);
-      const id = Number(intent.payload.id);
+      const id = intent.payload.id;
 
       if (newSelectedIds.has(id)) {
         newSelectedIds.delete(id);
@@ -30,9 +30,7 @@ export const shoppingReducer: Reducer<ShoppingState, ShoppingIntent> = (state, i
 
       return {
         ...state,
-        selectedIds: allSelected
-          ? new Set<number>()
-          : new Set(state.shoppingList.map(item => item.id)),
+        selectedIds: allSelected ? new Set<string>() : new Set(state.shoppingList.map((item) => item.id)),
       };
     }
 
@@ -40,7 +38,7 @@ export const shoppingReducer: Reducer<ShoppingState, ShoppingIntent> = (state, i
       // 로드 시 선택 해제
       return {
         ...state,
-        selectedIds: new Set<number>(),
+        selectedIds: new Set<string>(),
       };
     }
 

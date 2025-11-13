@@ -1,6 +1,6 @@
 import { StatusType } from '@/data/enums/status';
 
-export function getCalculateStatus(expiryDate?: string | null): StatusType {
+export function getCalculateStatus(expiryDate: string | null): StatusType {
   if (!expiryDate) return 'not_set';
 
   const today = new Date();

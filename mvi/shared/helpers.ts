@@ -15,8 +15,8 @@ import { getCalculateDaysRemaining } from '@/utils/time';
 export function enrichIngredients(ingredients: Ingredient[]): EnrichedIngredient[] {
   return ingredients.map((item) => ({
     ...item,
-    status: getCalculateStatus(item.expiry_date),
-    daysRemaining: getCalculateDaysRemaining(item.expiry_date),
+    status: getCalculateStatus(item.expired_date_time),
+    daysRemaining: getCalculateDaysRemaining(item.expired_date_time),
   }));
 }
 

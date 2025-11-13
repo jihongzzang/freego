@@ -45,7 +45,7 @@ export function IngredientsTableRow({
     storage: item.storage_location,
   });
 
-  const dday = calculateDday(item.expiry_date);
+  const dday = calculateDday(item.expired_date_time);
   const ddayColorType = getDdayColor(dday);
   const ddayColor =
     ddayColorType === 'danger' ? colors.red500 : ddayColorType === 'warning' ? colors.orange500 : colors.green500;

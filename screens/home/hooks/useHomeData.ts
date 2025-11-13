@@ -4,7 +4,7 @@ import { Category } from '@/data/enums/category';
 import { StatusType } from '@/data/enums/status';
 import { makeCategoryList } from '@/utils/category/makeCategoryList';
 
-export function useHomeData(ingredients: Ingredient[], selectedCategoryId: Category | 0) {
+export function useHomeData(ingredients: Ingredient[], selectedCategoryId: Category | null) {
   // 만료된 재료 필터링
   const expiringItems = useMemo(() => {
     return ingredients.filter((item) => item.status === 'expired');
@@ -19,15 +19,15 @@ export function useHomeData(ingredients: Ingredient[], selectedCategoryId: Categ
 
   // 선택된 카테고리에 따른 재료 필터링
   const filteredIngredients = useMemo(() => {
-    if (selectedCategoryId === 0) {
+    if (selectedCategoryId === null || selectedCategoryId === Category.ALL) {
       return ingredients;
     }
     return ingredients.filter((item) => item.category === selectedCategoryId);
   }, [ingredients, selectedCategoryId]);
 
   // 카테고리별 개수 계산
-  const getCategoryCount = (categoryId: Category | 0) => {
-    if (categoryId === 0) {
+  const getCategoryCount = (categoryId: Category | null) => {
+    if (categoryId === null || categoryId === Category.ALL) {
       return ingredients.length;
     }
     return ingredients.filter((item) => item.category === categoryId).length;

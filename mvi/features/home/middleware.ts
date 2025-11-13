@@ -35,9 +35,9 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
 
     case 'UPDATE_EXPIRY_DATE': {
       try {
-        const { id, expiryDate } = intent.payload;
+        const { id, expired_date_time } = intent.payload;
 
-        await ingredientService.updateIngredient(id, { expiry_date: expiryDate });
+        await ingredientService.updateIngredient(id, { expired_date_time: expired_date_time });
 
         // 업데이트 후 다시 로드
         const data = await ingredientService.getIngredients();
@@ -82,7 +82,7 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
     }
 
     case 'NAVIGATE_TO_ADD': {
-      const path = intent.payload ? `/add?category=${encodeURIComponent(intent.payload)}` : '/add';
+      const path = intent.payload ? `/add?category=${intent.payload}` : '/add';
       return {
         effects: [createNavigateEffect(path)],
       };

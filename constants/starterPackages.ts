@@ -11,10 +11,15 @@ export interface PackageIngredient {
   id: string;
   name: string;
   category: Category;
-  quantity?: number;
+  quantity: number | null;
   unit: Unit;
   emoji: string;
-  storage_location?: StorageLocation;
+  memo: string | null;
+  storage_location: StorageLocation | null;
+  purchased_date_time: string | null;
+  expired_date_time: string | null;
+  last_modifed_date_time?: string | null;
+  deleted_date_time?: string | null;
 }
 
 export interface LifestylePackage {
@@ -52,10 +57,15 @@ function ingredient({
     id: id,
     name: template.krLabel,
     category: template.category,
-    quantity,
+    quantity: quantity ?? null,
     emoji: template.emoji,
     unit: template.defaultUnit,
-    storage_location: undefined, // 기본값
+    storage_location: null,
+    memo: null,
+    purchased_date_time: null,
+    expired_date_time: null,
+    last_modifed_date_time: null,
+    deleted_date_time: null,
     ...overrides,
   };
 }

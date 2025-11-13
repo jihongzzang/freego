@@ -7,9 +7,9 @@ import { useMemo } from 'react';
 import { getCategoryIcon } from '@/utils/category';
 
 interface CategoryCarouselProps {
-  selectedCategoryId: Category | 0;
-  onCategorySelect: (categoryId: Category | 0) => void;
-  getCategoryCount: (categoryId: Category | 0) => number;
+  selectedCategoryId: Category | null;
+  onCategorySelect: (categoryId: Category | null) => void;
+  getCategoryCount: (categoryId: Category | null) => number;
 }
 
 export function CategoryCarousel({ selectedCategoryId, onCategorySelect }: CategoryCarouselProps) {

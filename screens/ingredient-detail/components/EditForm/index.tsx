@@ -55,8 +55,8 @@ export function EditForm({
 
       <DateSection
         isEdit
-        purchaseDate={formData.purchased_date}
-        expiryDate={formData.expiry_date}
+        purchaseDate={formData.purchased_date_time}
+        expiryDate={formData.expired_date_time}
         onFieldChange={onFieldChange}
         onPurchaseDatePress={onPurchaseDatePress}
         onExpiryDatePress={onExpiryDatePress}

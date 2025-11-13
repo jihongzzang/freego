@@ -7,8 +7,8 @@ import { getUnitLabel } from '@/utils/unit';
 import { useMemo } from 'react';
 
 interface QuantitySectionProps {
-  quantity?: string;
-  unit?: Unit;
+  quantity: string | null;
+  unit: Unit | null;
   onFieldChange: (field: keyof EditFormData, value: string) => void;
   onUnitPress: () => void;
 }
@@ -33,7 +33,7 @@ export function QuantitySection({ quantity, unit, onFieldChange, onUnitPress }: 
               borderRadius: borderRadius.md,
             },
           ]}
-          value={quantity}
+          value={quantity || ''}
           onChangeText={(text) => onFieldChange('quantity', text)}
           keyboardType="numeric"
           placeholder="입력"
