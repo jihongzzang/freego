@@ -12,10 +12,10 @@ interface IngredientsTableAccordionProps {
   items: Ingredient[];
   isExpanded: boolean;
   onToggle: () => void;
-  onItemPress: (id: string) => void;
   onItemEdit: (id: string) => void;
   onQuickAdd: (id: string) => void;
   onQuickDelete: (id: string) => void;
+  onQuickUpdateEmoji: (id: string) => void;
   onQuickUpdateExpiry: (id: string) => void;
   onQuickUpdateQuantity: (id: string) => void;
   onQuickUpdateStorage: (id: string) => void;
@@ -29,10 +29,10 @@ export function IngredientsTableAccordion({
   items,
   isExpanded,
   onToggle,
-  onItemPress,
   onItemEdit,
   onQuickAdd,
   onQuickDelete,
+  onQuickUpdateEmoji,
   onQuickUpdateExpiry,
   onQuickUpdateQuantity,
   onQuickUpdateStorage,
@@ -70,7 +70,7 @@ export function IngredientsTableAccordion({
           <View
             style={[
               styles.headerRow,
-              { backgroundColor: isDark ? colors.grey900 : colors.grey50, borderBottomColor: colors.border },
+              { backgroundColor: isDark ? colors.grey900 : colors.surface, borderBottomColor: colors.border },
             ]}
           >
             <View style={[styles.cell, styles.emojiCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
@@ -80,16 +80,24 @@ export function IngredientsTableAccordion({
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
             </View>
             <View style={[styles.cell, styles.quantityCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
-              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>수량</Text>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
+                수량
+              </Text>
             </View>
             <View style={[styles.cell, styles.storageCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
-              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>보관</Text>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
+                보관
+              </Text>
             </View>
             <View style={[styles.cell, styles.expiryCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
-              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>유통기한</Text>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
+                유통기한
+              </Text>
             </View>
             <View style={[styles.cell, styles.memoCell]}>
-              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>메모</Text>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
+                메모
+              </Text>
             </View>
           </View>
 
@@ -98,8 +106,8 @@ export function IngredientsTableAccordion({
             <IngredientsTableRow
               key={item.id}
               item={item}
-              onPress={() => onItemPress(String(item.id))}
               onEdit={() => onItemEdit(String(item.id))}
+              onQuickUpdateEmoji={() => onQuickUpdateEmoji(String(item.id))}
               onQuickUpdateExpiry={() => onQuickUpdateExpiry(String(item.id))}
               onQuickUpdateQuantity={() => onQuickUpdateQuantity(String(item.id))}
               onQuickUpdateStorage={() => onQuickUpdateStorage(String(item.id))}
@@ -127,21 +135,22 @@ const createStyles = ({
 }) =>
   StyleSheet.create({
     tableWrapper: {
-      borderRadius: borderRadius.sm,
+      borderRadius: 4,
       overflow: 'hidden',
     },
     headerRow: {
       flexDirection: 'row',
-      borderBottomWidth: 2,
-      paddingVertical: spacing.sm,
+      borderBottomWidth: 1,
+      // paddingVertical: spacing.sm,
       paddingHorizontal: spacing.xs,
     },
     cell: {
       justifyContent: 'center',
       paddingHorizontal: spacing.xs,
+      paddingVertical: spacing.sm,
     },
     emojiCell: {
-      width: 24,
+      width: 32,
       alignItems: 'center',
     },
     nameCell: {

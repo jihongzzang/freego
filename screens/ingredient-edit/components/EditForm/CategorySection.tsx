@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import { getCategoryIcon } from '@/utils/category';
-import { EditFormData } from '@/mvi/features/ingredient-detail';
+import { EditFormData } from '@/mvi/features/ingredient-edit';
 import { makeCategoryList } from '@/utils/category/makeCategoryList';
 import { Category } from '@/data/enums/category';
 import { useMemo } from 'react';

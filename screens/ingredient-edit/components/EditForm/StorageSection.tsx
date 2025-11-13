@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '@/lib/theme';
-import { EditFormData } from '@/mvi/features/ingredient-detail';
+import { EditFormData } from '@/mvi/features/ingredient-edit';
 import { getStorageLocationIcon } from '@/utils/storageLocation';
 import { makeStorageList } from '@/utils/category/makeStorageList';
 import { StorageLocation } from '@/data/enums/storage_location';

@@ -26,16 +26,17 @@ export interface IngredientsState extends IngredientListState {}
  */
 export type IngredientsIntent =
   | LoadIngredientsIntent
-  | { type: 'DELETE_INGREDIENT'; payload: string }
   | { type: 'ADD_TO_SHOPPING_LIST_INGREDIENT'; payload: string }
+  | { type: 'NAVIGATE_TO_DETAIL_EDIT'; payload: string }
+  | { type: 'NAVIGATE_TO_DETAIL'; payload: string }
+  | { type: 'DELETE_INGREDIENT'; payload: string }
+  | { type: 'NAVIGATE_TO_ADD' }
   | { type: 'BULK_ADD_INGREDIENTS'; payload: BulkAddIngredientsPayload[] }
   | { type: 'UPDATE_INGREDIENT_EXPIRY'; payload: { id: string; expired_date_time: string } }
   | { type: 'UPDATE_INGREDIENT_QUANTITY'; payload: { id: string; quantity: string } }
   | { type: 'UPDATE_INGREDIENT_STORAGE'; payload: { id: string; storage_location: StorageLocation } }
-  | { type: 'UPDATE_MEMO'; payload: { id: string; memo: string | null } }
-  | { type: 'NAVIGATE_TO_ADD' }
-  | { type: 'NAVIGATE_TO_DETAIL'; payload: string }
-  | { type: 'NAVIGATE_TO_DETAIL_EDIT'; payload: string };
+  | { type: 'UPDATE_INGREDIENT_EMOJI'; payload: { id: string; emoji: string } }
+  | { type: 'UPDATE_MEMO'; payload: { id: string; memo: string | null } };
 
 /**
  * Ingredients Effect (부수 효과)

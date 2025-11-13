@@ -1,18 +1,18 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { MessageSquare } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { Ingredient } from '@/mvi/features/ingredients';
-import { getStorageLocationLabel } from '@/utils/storageLocation';
+import { getStorageLocationIcon, getStorageLocationLabel } from '@/utils/storageLocation';
 import { calculateDday, getDdayColor } from '@/utils/date/calculateDday';
 import { useMemo } from 'react';
 import { MenuView } from '@react-native-menu/menu';
 
 interface IngredientsTableRowProps {
   item: Ingredient;
-  onPress: () => void;
   onEdit?: () => void;
   onQuickAdd?: () => void;
   onQuickDelete?: () => void;
+  onQuickUpdateEmoji?: () => void;
   onQuickUpdateExpiry?: () => void;
   onQuickUpdateQuantity?: () => void;
   onQuickUpdateStorage?: () => void;
@@ -23,10 +23,10 @@ interface IngredientsTableRowProps {
 
 export function IngredientsTableRow({
   item,
-  onPress,
   onEdit,
   onQuickAdd,
   onQuickDelete,
+  onQuickUpdateEmoji,
   onQuickUpdateExpiry,
   onQuickUpdateQuantity,
   onQuickUpdateStorage,
@@ -34,21 +34,18 @@ export function IngredientsTableRow({
   onViewDetail,
   isLast,
 }: IngredientsTableRowProps) {
-  const { colors, typography, spacing, borderRadius } = useTheme();
-
-  // 디버깅: item 데이터 출력
-  console.log('IngredientsTableRow - item:', {
-    id: item.id,
-    name: item.name,
-    emoji: item.emoji,
-    quantity: item.quantity,
-    storage: item.storage_location,
-  });
+  const { colors, typography, spacing } = useTheme();
 
   const dday = calculateDday(item.expired_date_time);
   const ddayColorType = getDdayColor(dday);
   const ddayColor =
-    ddayColorType === 'danger' ? colors.red500 : ddayColorType === 'warning' ? colors.orange500 : colors.green500;
+    ddayColorType === 'danger'
+      ? colors.red500
+      : ddayColorType === 'warning'
+        ? colors.orange500
+        : ddayColorType === 'none'
+          ? colors.textSecondary
+          : colors.green500;
 
   const storageLabel = item.storage_location
     ? getStorageLocationLabel({ storageLocation: item.storage_location, lang: 'kr' })
@@ -56,10 +53,7 @@ export function IngredientsTableRow({
 
   const quantityLabel = item.quantity ? item.quantity : '-';
 
-  const styles = useMemo(
-    () => createStyles({ spacing, borderRadius, isLast: isLast || false }),
-    [spacing, borderRadius, isLast],
-  );
+  const styles = useMemo(() => createStyles({ spacing, isLast: isLast || false }), [spacing, isLast]);
 
   return (
     <View
@@ -71,9 +65,16 @@ export function IngredientsTableRow({
       ]}
     >
       {/* Emoji Cell */}
-      <View style={[styles.cell, styles.emojiCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
-        <Text style={[typography.styles.t8Medium]}>{item.emoji || '-'}</Text>
-      </View>
+      <TouchableOpacity
+        style={[styles.cell, styles.emojiCell, { borderRightWidth: 1, borderRightColor: colors.border }]}
+        onPress={(e) => {
+          e.stopPropagation();
+          onQuickUpdateEmoji?.();
+        }}
+        activeOpacity={0.7}
+      >
+        <Text style={[typography.styles.t8Medium, { textAlign: 'center' }]}>{item.emoji || '-'}</Text>
+      </TouchableOpacity>
 
       {/* Name Cell - With MenuView */}
       <MenuView
@@ -98,25 +99,41 @@ export function IngredientsTableRow({
           {
             id: 'add-to-shopping',
             title: '장보기 항목에 추가',
-            image: 'cart',
+            image: Platform.select({
+              ios: 'cart',
+              android: undefined,
+            }),
+            imageColor: colors.primary,
           },
           {
             id: 'edit',
             title: '수정하기',
-            image: 'pencil',
+            image: Platform.select({
+              ios: 'square.and.pencil',
+              android: undefined,
+            }),
+            imageColor: colors.blue500,
           },
           {
             id: 'view-detail',
             title: '상세로 이동',
-            image: 'eye',
+            image: Platform.select({
+              ios: 'chevron.right',
+              android: undefined,
+            }),
+            imageColor: colors.grey600,
           },
           {
             id: 'delete',
             title: '재료 삭제',
-            image: 'trash',
+            image: Platform.select({
+              ios: 'trash',
+              android: undefined,
+            }),
             attributes: {
               destructive: true,
             },
+            imageColor: colors.red500,
           },
         ]}
       >
@@ -125,7 +142,7 @@ export function IngredientsTableRow({
             style={[
               typography.styles.t7,
               {
-                color: colors.text,
+                color: colors.textSecondary,
               },
             ]}
             numberOfLines={1}
@@ -175,7 +192,7 @@ export function IngredientsTableRow({
           ]}
           numberOfLines={1}
         >
-          {storageLabel}
+          {item.storage_location ? getStorageLocationIcon(item.storage_location, 16) : '-'}
         </Text>
       </TouchableOpacity>
 
@@ -219,30 +236,22 @@ export function IngredientsTableRow({
   );
 }
 
-const createStyles = ({
-  spacing,
-  borderRadius,
-  isLast,
-}: {
-  spacing: typeof import('@/lib/theme').spacing;
-  borderRadius: typeof import('@/lib/theme').borderRadius;
-  isLast: boolean;
-}) =>
+const createStyles = ({ spacing, isLast }: { spacing: typeof import('@/lib/theme').spacing; isLast: boolean }) =>
   StyleSheet.create({
     row: {
       flexDirection: 'row',
-      paddingVertical: spacing.sm,
       paddingHorizontal: spacing.xs,
       borderBottomWidth: isLast ? 0 : 1,
       minHeight: 48,
-      alignItems: 'center',
+      alignItems: 'stretch',
     },
     cell: {
       justifyContent: 'center',
       paddingHorizontal: spacing.xs,
+      alignSelf: 'stretch',
     },
     emojiCell: {
-      width: 24,
+      width: 32,
       alignItems: 'center',
     },
     nameCell: {
@@ -251,9 +260,11 @@ const createStyles = ({
     },
     quantityCell: {
       width: 60,
+      alignItems: 'center',
     },
     storageCell: {
       width: 60,
+      alignItems: 'center',
     },
     expiryCell: {
       width: 60,

@@ -9,6 +9,7 @@ import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 import { Category } from '@/data/enums/category';
 import { Unit } from '@/data/enums/unit';
 import { StorageLocation } from '@/data/enums/storage_location';
+import ERROR_MESSAGES from '@/constants/toast/errorMessages';
 
 export type ViewMode = 'category' | 'storage';
 
@@ -30,10 +31,9 @@ export function useIngredientsLogic() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<Category | null>(null);
   const [selectedTemplates, setSelectedTemplates] = useState<IngredientTemplate[]>([]);
 
-  // QuickUpdateExpiry 로컬 상태
-  const [isExpiryUpdateVisible, setIsExpiryUpdateVisible] = useState(false);
-  const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
-  const [expiryDate, setExpiryDate] = useState<Date>(new Date());
+  // QuickUpdateEmoji 로컬 상태
+  const [isEmojiUpdateVisible, setIsEmojiUpdateVisible] = useState(false);
+  const [selectedEmojiIngredientId, setSelectedEmojiIngredientId] = useState<string | null>(null);
 
   // QuickUpdateQuantity 로컬 상태
   const [isQuantityUpdateVisible, setIsQuantityUpdateVisible] = useState(false);
@@ -43,6 +43,11 @@ export function useIngredientsLogic() {
   // QuickUpdateStorge 로컬 상태
   const [isStorageUpdateVisible, setIsStorageUpdateVisible] = useState(false);
   const [selectedStorageIngredientId, setSelectedStorageIngredientId] = useState<string | null>(null);
+
+  // QuickUpdateExpiry 로컬 상태
+  const [isExpiryUpdateVisible, setIsExpiryUpdateVisible] = useState(false);
+  const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
+  const [expiryDate, setExpiryDate] = useState<Date>(new Date());
 
   // QuickUpdateMemo 로컬 상태
   const [isMemoUpdateVisible, setIsMemoUpdateVisible] = useState(false);
@@ -129,6 +134,33 @@ export function useIngredientsLogic() {
     }
   }
 
+  // QuickUpdateEmoji 핸들러
+  function handleQuickUpdateEmojiOpen(id: string) {
+    const ingredient = ingredients.find((ing) => ing.id === id);
+    if (ingredient) {
+      setSelectedEmojiIngredientId(id);
+      setIsEmojiUpdateVisible(true);
+    }
+  }
+
+  function handleQuickUpdateEmojiClose() {
+    setIsEmojiUpdateVisible(false);
+    setSelectedEmojiIngredientId(null);
+  }
+
+  function handleEmojiSelect(emoji: string) {
+    if (selectedEmojiIngredientId !== null) {
+      dispatch({
+        type: 'UPDATE_INGREDIENT_EMOJI',
+        payload: {
+          id: selectedEmojiIngredientId,
+          emoji: emoji,
+        },
+      });
+      handleQuickUpdateEmojiClose();
+    }
+  }
+
   // QuickUpdateQuantity 핸들러
   function handleQuickUpdateQuantityOpen(id: string) {
     const ingredient = ingredients.find((ing) => ing.id === id);
@@ -151,24 +183,29 @@ export function useIngredientsLogic() {
 
   function handleQuantityConfirm() {
     if (selectedQuantityIngredientId !== null) {
-      // 0개 입력 시 에러 메시지
-      if (quantity === '0') {
-        showToast({
-          message: '수량은 0보다 커야 해요',
-          type: 'error',
-          position: 'top',
-        });
-        return;
-      }
+      // 수량 검증 (선택적 - 안 쓰거나 양수만)
+      if (quantity) {
+        const trimmedQuantity = quantity.trim();
 
-      // 빈 문자열 또는 유효한 숫자만 허용
-      if (quantity !== '' && (isNaN(Number(quantity)) || Number(quantity) < 0)) {
-        showToast({
-          message: '올바른 수량을 입력해주세요',
-          type: 'error',
-          position: 'top',
-        });
-        return;
+        // 빈 문자열이 아닌 경우에만 검증
+        if (trimmedQuantity !== '') {
+          // 숫자가 아닌 경우
+          if (isNaN(Number(trimmedQuantity))) {
+            showToast({
+              message: ERROR_MESSAGES.ERROR_INVALID_INGREDIENT_QUANTITY,
+              type: 'error',
+            });
+            return;
+          }
+          // 0 이하인 경우 (0 포함, 음수 포함)
+          else if (Number(trimmedQuantity) <= 0) {
+            showToast({
+              message: ERROR_MESSAGES.ERROR_INGREDIENT_QUANTITY_MUST_BE_GREATER_THAN_ZERO,
+              type: 'error',
+            });
+            return;
+          }
+        }
       }
 
       dispatch({
@@ -281,8 +318,6 @@ export function useIngredientsLogic() {
       storage_location: null,
       quantity: null,
       unit: template.defaultUnit as Unit,
-      purchased_date_time: null,
-      expired_date_time: null,
       memo: null,
     }));
 
@@ -311,13 +346,11 @@ export function useIngredientsLogic() {
       handleTemplateToggle: handleBulkAddTemplateToggle,
       handleConfirm: handleBulkAddConfirm,
     },
-    expiryUpdate: {
-      isVisible: isExpiryUpdateVisible,
-      expiryDate,
-      open: handleQuickUpdateExpiryOpen,
-      close: handleQuickUpdateExpiryClose,
-      handleDateChange: handleExpiryDateChange,
-      handleConfirm: handleExpiryDateConfirm,
+    emojiUpdate: {
+      isVisible: isEmojiUpdateVisible,
+      open: handleQuickUpdateEmojiOpen,
+      close: handleQuickUpdateEmojiClose,
+      handleSelect: handleEmojiSelect,
     },
     quantityUpdate: {
       isVisible: isQuantityUpdateVisible,
@@ -327,11 +360,19 @@ export function useIngredientsLogic() {
       handleQuantityChange,
       handleConfirm: handleQuantityConfirm,
     },
-    storageUpate: {
+    storageUpdate: {
       isVisible: isStorageUpdateVisible,
       open: handleQuickUpdateStorageOpen,
       close: handleQuickUpdateStorageClose,
       handleSelect: handleStorageSelect,
+    },
+    expiryUpdate: {
+      isVisible: isExpiryUpdateVisible,
+      expiryDate,
+      open: handleQuickUpdateExpiryOpen,
+      close: handleQuickUpdateExpiryClose,
+      handleDateChange: handleExpiryDateChange,
+      handleConfirm: handleExpiryDateConfirm,
     },
     memoUpdate: {
       isVisible: isMemoUpdateVisible,

@@ -9,6 +9,8 @@ import { createShoppingStore } from '@/mvi/features/shopping';
 import { StorageLocation } from '@/data/enums/storage_location';
 import { Category } from '@/data/enums/category';
 import { getCategoryLabel } from '@/utils/category/getCategoryLabel';
+import ERROR_MESSAGES from '@/constants/toast/errorMessages';
+import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
 
 export function useShoppingLogic() {
   const { confirm } = useDialog();
@@ -67,13 +69,15 @@ export function useShoppingLogic() {
                 });
               } else {
                 showToast({
-                  message: '장보기 항목이 삭제됐어요.',
+                  message: SUCCESS_MESSAGES.SUCCESS_DELETE_SHOPPING_LIST_ITEM,
                   type: 'success',
                 });
               }
             } else if (result && result.success === false) {
               showToast({
-                message: effect.payload.isDanger ? '삭제에 실패했어요.' : '냉장고 추가 중 오류가 발생했어요.',
+                message: effect.payload.isDanger
+                  ? ERROR_MESSAGES.ERROR_SHOPPING_ITEM_DELETE_FAILED
+                  : ERROR_MESSAGES.ERROR_INGREDIENT_CREATE_ERROR,
                 type: 'error',
               });
             }
@@ -174,13 +178,9 @@ export function useShoppingLogic() {
       } catch (error) {
         try {
           await Clipboard.setStringAsync(shareText);
-          showToast({
-            message: '장보기 목록이 클립보드에 복사되었어요.',
-            type: 'success',
-          });
         } catch (clipboardError) {
           showToast({
-            message: '공유 중 오류가 발생했어요.',
+            message: ERROR_MESSAGES.ERROR_SHARING_FAILED,
             type: 'error',
           });
         }

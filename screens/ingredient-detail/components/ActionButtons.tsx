@@ -11,13 +11,13 @@ export function ActionButtons({ onConsume, onDelete }: ActionButtonsProps) {
   return (
     <View style={styles.container}>
       <View style={{ flex: 1 }}>
-        <Button variant="primary" size="large" onPress={onConsume} leftIcon={<Minus size={20} color="#ffffff" />}>
-          소모
+        <Button variant="primary" size="large" onPress={onConsume}>
+          소모하기
         </Button>
       </View>
       <View style={{ flex: 1 }}>
-        <Button variant="danger" size="large" onPress={onDelete} leftIcon={<Trash2 size={20} color="#ffffff" />}>
-          삭제
+        <Button variant="danger" size="large" onPress={onDelete}>
+          삭제하기
         </Button>
       </View>
     </View>

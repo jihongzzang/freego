@@ -26,6 +26,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       ...options,
       visible: true,
       id: toastIdRef.current,
+      position: options.type === 'error' ? 'top' : 'bottom',
     });
   }, []);
 

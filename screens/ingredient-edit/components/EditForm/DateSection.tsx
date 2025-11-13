@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/lib/theme';
-import { EditFormData } from '@/mvi/features/ingredient-detail';
+import { EditFormData } from '@/mvi/features/ingredient-edit';
 import { QUICK_SELECT_OPTIONS } from '@/constants/quickSelectOptions';
 import { useMemo } from 'react';
 import { toLocalDate } from '@/utils/time';
@@ -29,7 +29,12 @@ export function DateSection({
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
-  const today = new Date().toISOString();
+  function getTodayMidnightISO() {
+    const todayMidnight = new Date();
+    todayMidnight.setHours(0, 0, 0, 0);
+    const iso = todayMidnight.toISOString();
+    return iso;
+  }
 
   return (
     <>
@@ -41,7 +46,7 @@ export function DateSection({
             <TouchableOpacity
               style={[styles.sameCreatedButton, { backgroundColor: colors.surface, borderColor: colors.surface }]}
               onPress={() => {
-                onFieldChange('purchased_date_time', today);
+                onFieldChange('purchased_date_time', getTodayMidnightISO());
               }}
               activeOpacity={0.7}
             >

@@ -1,61 +1,68 @@
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { useMemo } from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useTheme } from '@/lib/theme';
 import Header from '@/components/ui/Header';
+import FloatingButton from '@/components/ui/FloatingButton';
 import SelectUnitBottomSheet from '@/components/SelectUnitBottomSheet';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
 import EmojiBottomSheet from '@/components/EmojiBottomSheet';
-import { useAddLogic } from './hooks/useAddLogic';
-import { AddForm } from './components/AddForm';
-import { SubmitButton } from './components/SubmitButton';
+import { useIngredientEditLogic } from './hooks/useIngredientEditLogic';
+import { EditForm } from '@/screens/ingredient-edit/components/EditForm';
+import { Save } from 'lucide-react-native';
 
-export default function AddIngredientScreen() {
-  const { colors, spacing } = useTheme();
+export default function IngredientEditScreen() {
+  const { colors, typography, spacing } = useTheme();
 
   const {
     state,
-    isEmojiPickerVisible,
-    setIsEmojiPickerVisible,
     unitPicker,
     expiryDatePicker,
     purchaseDatePicker,
+    isEmojiPickerVisible,
+    setIsEmojiPickerVisible,
     handleFieldChange,
+    handleUpdate,
     handleQuickSelect,
     handleEmojiSelect,
-    handleSubmit,
     handleBackPress,
-  } = useAddLogic();
+  } = useIngredientEditLogic();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
+  if (!state.ingredient) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[typography.styles.t6, { color: colors.text }]}>로딩 중이에요...</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={{ flex: 1 }}>
+    <>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header title="" onBackPress={handleBackPress} />
         <KeyboardAwareScrollView
           style={styles.content}
-          contentContainerStyle={{ paddingBottom: spacing.xxxl }}
+          contentContainerStyle={{ paddingBottom: 200 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          enableOnAndroid={true}
+          enableOnAndroid
           enableAutomaticScroll
           extraScrollHeight={Platform.OS === 'ios' ? 0 : 80}
           extraHeight={150}
-          enableResetScrollToCoords={false}
         >
-          <AddForm
-            formData={state.form}
-            errors={state.errors}
+          <EditForm
+            formData={state.editForm}
             onFieldChange={handleFieldChange}
             onEmojiPress={() => setIsEmojiPickerVisible(true)}
             onUnitPress={unitPicker.open}
-            onPurchaseDatePress={() => purchaseDatePicker.open(state.form.purchased_date_time || new Date())}
-            onExpiryDatePress={() => expiryDatePicker.open(state.form.expired_date_time || new Date())}
+            onPurchaseDatePress={() => purchaseDatePicker.open(state.editForm.purchased_date_time || new Date())}
+            onExpiryDatePress={() => expiryDatePicker.open(state.editForm.expired_date_time || new Date())}
             onQuickSelect={handleQuickSelect}
           />
         </KeyboardAwareScrollView>
-        <SubmitButton onSubmit={handleSubmit} />
+        <FloatingButton onPress={handleUpdate} icon={<Save size={24} color="#FFFFFF" />} hasTabBar={false} />
       </View>
 
       <SelectDateBottomSheet
@@ -79,7 +86,7 @@ export default function AddIngredientScreen() {
       <SelectUnitBottomSheet
         visible={unitPicker.visible}
         onClose={unitPicker.close}
-        selectedUnit={state.form.unit as any}
+        selectedUnit={state.editForm.unit as any}
         onUnitSelect={unitPicker.handleUnitSelect}
       />
 
@@ -88,7 +95,7 @@ export default function AddIngredientScreen() {
         onClose={() => setIsEmojiPickerVisible(false)}
         onSelect={handleEmojiSelect}
       />
-    </View>
+    </>
   );
 }
 

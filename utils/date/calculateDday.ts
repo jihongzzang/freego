@@ -15,7 +15,7 @@ export function calculateDday(expirationDate?: string | null): string {
   const diffTime = expDate.getTime() - today.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return 'D-day';
+  if (diffDays === 0) return '오늘';
   if (diffDays > 0) return `D+${diffDays}`;
   return `D${diffDays}`;
 }
@@ -25,9 +25,10 @@ export function calculateDday(expirationDate?: string | null): string {
  * @param dday D-day 문자열
  * @returns color type: 'safe' | 'warning' | 'danger'
  */
-export function getDdayColor(dday: string): 'safe' | 'warning' | 'danger' {
-  if (dday === '-') return 'safe';
-  if (dday === 'D-day') return 'warning';
+export function getDdayColor(dday: string): 'none' | 'safe' | 'warning' | 'danger' {
+  if (dday === '-') return 'none';
+
+  if (dday === '오늘') return 'warning';
 
   const match = dday.match(/D([+-]\d+)/);
   if (!match) return 'safe';

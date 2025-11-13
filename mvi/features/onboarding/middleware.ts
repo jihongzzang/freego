@@ -9,7 +9,8 @@ import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { OnboardingState, OnboardingIntent, OnboardingEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
 import { findLifestylePackageById } from '@/constants/starterPackages';
-import { categoryDefaultEmojis } from '@/constants/ingredientTemplates';
+import { createErrorEffect, createSuccessEffect } from '@/mvi/shared';
+import ERROR_MESSAGES from '@/constants/toast/errorMessages';
 
 const ONBOARDING_KEY = '@onboarding_completed';
 
@@ -38,7 +39,7 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
             const ingredientsToAdd = lifestylePackage.ingredients.map((item) => ({
               name: item.name,
               category: item.category,
-              emoji: item.emoji ? item.emoji : categoryDefaultEmojis[item.category] || '🍴',
+              emoji: item.emoji,
               quantity: item.quantity,
               unit: item.unit,
               storage_location: item.storage_location,
@@ -55,13 +56,7 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
             await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
             return {
               effects: [
-                {
-                  type: 'SHOW_TOAST',
-                  payload: {
-                    message: `${ingredientsToAdd.length}개의 식재료가 추가됐어요.`,
-                    variant: 'success',
-                  },
-                },
+                createSuccessEffect(`${ingredientsToAdd.length}개의 식재료가 추가됐어요.`),
                 { type: 'REQUEST_NOTIFICATION_PERMISSION' },
                 { type: 'NAVIGATE_TO_HOME' },
               ],
@@ -71,13 +66,7 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
             await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
             return {
               effects: [
-                {
-                  type: 'SHOW_TOAST',
-                  payload: {
-                    message: '스타터 패키지 추가 중 오류가 발생했어요.',
-                    variant: 'error',
-                  },
-                },
+                createErrorEffect(ERROR_MESSAGES.ERROR_STARTER_PACKAGE_ADD_FAILED),
                 { type: 'REQUEST_NOTIFICATION_PERMISSION' },
                 { type: 'NAVIGATE_TO_HOME' },
               ],

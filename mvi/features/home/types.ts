@@ -27,7 +27,7 @@ export type HomeIntent =
   | LoadIngredientsIntent
   | { type: 'UPDATE_EXPIRY_DATE'; payload: { id: string; expired_date_time: string } }
   | { type: 'BULK_ADD_INGREDIENTS'; payload: BulkAddIngredientsPayload[] }
-  | { type: 'NAVIGATE_TO_ADD'; payload?: string }
+  | { type: 'NAVIGATE_TO_ADD'; payload: string | null }
   | { type: 'NAVIGATE_TO_EXPIRING' }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: string };
 

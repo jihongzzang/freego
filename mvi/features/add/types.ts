@@ -6,6 +6,7 @@ import { State } from '@/mvi/base';
 import { Category } from '@/data/enums/category';
 import { StorageLocation } from '@/data/enums/storage_location';
 import { Unit } from '@/data/enums/unit';
+import { CommonEffect } from '@/mvi/shared';
 
 /**
  * Add Form State
@@ -27,6 +28,7 @@ export interface AddFormData {
  */
 export interface ValidationErrors {
   name?: string;
+  quantity?: string;
 }
 
 /**
@@ -53,13 +55,4 @@ export type AddIntent =
 /**
  * Add Effect (부수 효과)
  */
-export type AddEffect =
-  | {
-      type: 'SHOW_TOAST';
-      payload: {
-        message: string;
-        variant: 'success' | 'error' | 'info' | 'warning';
-      };
-    }
-  | { type: 'NAVIGATE_HOME' }
-  | { type: 'NAVIGATE_BACK' };
+export type AddEffect = CommonEffect;

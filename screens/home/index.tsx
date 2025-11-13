@@ -1,4 +1,4 @@
-import { View, Animated, TouchableOpacity, Platform } from 'react-native';
+import { View, Animated, TouchableOpacity, Platform, Dimensions, ScrollView } from 'react-native';
 import { Bell, Edit3, Grid3x3 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import Header, { HEADER_HEIGHT } from '@/components/ui/Header';
@@ -13,6 +13,9 @@ import { useHomeAnimation } from './hooks/useHomeAnimation';
 import { CategoryCarousel } from './components/CategoryCarousel';
 import { IngredientsSection } from './components/IngredientsSection';
 import { Category } from '@/data/enums/category';
+import { useRef, useCallback } from 'react';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const { colors, spacing } = useTheme();
@@ -34,9 +37,40 @@ export default function HomeScreen() {
   } = useHomeLogic();
 
   // Data hooks
-  const { expiringItems, selectedCategoryItem, filteredIngredients, getCategoryCount, getExpiryDisplay } = useHomeData(
+  const { expiringItems, getCategoryCount, getExpiryDisplay, categories, ingredientsByCategory } = useHomeData(
     state.ingredients,
     selectedCategoryId,
+  );
+
+  // Horizontal scroll ref
+  const horizontalScrollRef = useRef<ScrollView>(null);
+
+  // Handle category change - scroll to category page
+  const handleCategorySelect = useCallback(
+    (categoryId: Category) => {
+      const categoryIndex = categories.findIndex((cat) => cat.id === categoryId);
+      if (categoryIndex !== -1 && horizontalScrollRef.current) {
+        horizontalScrollRef.current.scrollTo({
+          x: categoryIndex * SCREEN_WIDTH,
+          animated: true,
+        });
+      }
+      setSelectedCategoryId(categoryId);
+    },
+    [categories, setSelectedCategoryId],
+  );
+
+  // Handle horizontal scroll - update selected category
+  const handleHorizontalScroll = useCallback(
+    (event: any) => {
+      const offsetX = event.nativeEvent.contentOffset.x;
+      const index = Math.round(offsetX / SCREEN_WIDTH);
+      const category = categories[index];
+      if (category && category.id !== selectedCategoryId) {
+        setSelectedCategoryId(category.id);
+      }
+    },
+    [categories, selectedCategoryId, setSelectedCategoryId],
   );
 
   // Animation hooks
@@ -46,7 +80,7 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Animated Header */}
+      {/* Fixed Header */}
       <Animated.View
         style={{
           transform: [{ translateY: headerTranslateY }],
@@ -95,54 +129,69 @@ export default function HomeScreen() {
         </Animated.View>
 
         <CategoryCarousel
+          isIncludeAllCategory
           selectedCategoryId={selectedCategoryId}
-          onCategorySelect={setSelectedCategoryId}
+          onCategorySelect={handleCategorySelect}
           getCategoryCount={getCategoryCount}
         />
       </Animated.View>
 
-      <Animated.ScrollView
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-          useNativeDriver: Platform.OS == 'android' ? false : true,
-        })}
+      <ScrollView
+        ref={horizontalScrollRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={handleHorizontalScroll}
         scrollEventThrottle={16}
-        contentContainerStyle={{
-          paddingTop: HEADER_HEIGHT + inset.top + 56,
-          paddingBottom: 200,
-          paddingHorizontal: spacing.lg,
-        }}
-        showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }}
       >
-        {state.loading ? (
-          <View style={{ paddingTop: 24 }}>
-            <EmptyStateUI title="로딩 중이에요..." />
-          </View>
-        ) : filteredIngredients.length === 0 ? (
-          <View style={{ paddingTop: 24 }}>
-            <EmptyStateUI
-              title={
-                selectedCategoryId === null || selectedCategoryId == Category.ALL
-                  ? '관리할 재료가 없어요'
-                  : `${selectedCategoryItem?.label} 재료가 없어요`
-              }
-              description="기억하고 싶은 재료만 추가해보세요"
-            />
-          </View>
-        ) : (
-          <IngredientsSection
-            title={
-              selectedCategoryId === null || selectedCategoryId == Category.ALL
-                ? '전체 재료'
-                : selectedCategoryItem?.label || ''
-            }
-            count={filteredIngredients.length}
-            items={filteredIngredients}
-            onCardPress={(item) => navigateIngredientDetail(item.id)}
-            onCalendarPress={openDatePicker}
-            getExpiryDisplay={getExpiryDisplay}
-          />
-        )}
-      </Animated.ScrollView>
+        {categories.map((category) => {
+          const items = ingredientsByCategory[category.id] || [];
+          return (
+            <View
+              key={category.id}
+              style={{
+                width: SCREEN_WIDTH,
+              }}
+            >
+              <Animated.ScrollView
+                onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+                  useNativeDriver: Platform.OS == 'android' ? false : true,
+                })}
+                scrollEventThrottle={16}
+                contentContainerStyle={{
+                  paddingTop: HEADER_HEIGHT + inset.top + 56,
+                  paddingBottom: 200,
+                  paddingHorizontal: spacing.lg,
+                }}
+                showsVerticalScrollIndicator={false}
+              >
+                {state.loading ? (
+                  <View style={{ paddingTop: 24 }}>
+                    <EmptyStateUI title="로딩 중이에요..." />
+                  </View>
+                ) : items.length === 0 ? (
+                  <View style={{ paddingTop: 24 }}>
+                    <EmptyStateUI
+                      title={category.id === Category.ALL ? '관리할 재료가 없어요' : `${category.label} 재료가 없어요`}
+                      description="기억하고 싶은 재료만 추가해보세요"
+                    />
+                  </View>
+                ) : (
+                  <IngredientsSection
+                    title={category.id === Category.ALL ? '전체 재료' : category.label}
+                    count={items.length}
+                    items={items}
+                    onCardPress={(item) => navigateIngredientDetail(item.id)}
+                    onCalendarPress={openDatePicker}
+                    getExpiryDisplay={getExpiryDisplay}
+                  />
+                )}
+              </Animated.ScrollView>
+            </View>
+          );
+        })}
+      </ScrollView>
 
       <FloatingButton
         menuItems={[

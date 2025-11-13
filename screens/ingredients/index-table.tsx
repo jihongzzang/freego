@@ -19,6 +19,7 @@ import { Category } from '@/data/enums/category';
 import { StorageLocation } from '@/data/enums/storage_location';
 import SelectStorageBottomSheet from '@/components/SelectStorageBottomSheet';
 import MemoBottomSheet from '@/components/MemoBottomSheet';
+import EmojiBottomSheet from '@/components/EmojiBottomSheet';
 
 export const TAB_BAR_HEIGHT = 48;
 
@@ -36,9 +37,10 @@ export default function IngredientsTableScreen() {
     ingredients,
     loading,
     bulkAdd,
-    expiryUpdate,
+    emojiUpdate,
     quantityUpdate,
-    storageUpate,
+    storageUpdate,
+    expiryUpdate,
     memoUpdate,
     handleNavigateToDetail,
     handleNavigateToEdit,
@@ -137,11 +139,11 @@ export default function IngredientsTableScreen() {
                 items={categoryItems}
                 isExpanded={isExpanded}
                 onToggle={() => toggleCategory(catId)}
-                onItemPress={handleNavigateToDetail}
                 onItemEdit={handleNavigateToEdit}
+                onQuickUpdateEmoji={emojiUpdate.open}
                 onQuickUpdateExpiry={expiryUpdate.open}
                 onQuickUpdateQuantity={quantityUpdate.open}
-                onQuickUpdateStorage={storageUpate.open}
+                onQuickUpdateStorage={storageUpdate.open}
                 onQuickUpdateMemo={memoUpdate.open}
                 onQuickAdd={handleQuickAdd}
                 onQuickDelete={handleQuickDelete}
@@ -193,11 +195,11 @@ export default function IngredientsTableScreen() {
                 items={storageItems}
                 isExpanded={isExpanded}
                 onToggle={() => toggleStorage(storageId)}
-                onItemPress={handleNavigateToDetail}
                 onItemEdit={handleNavigateToEdit}
+                onQuickUpdateEmoji={emojiUpdate.open}
                 onQuickUpdateExpiry={expiryUpdate.open}
                 onQuickUpdateQuantity={quantityUpdate.open}
-                onQuickUpdateStorage={storageUpate.open}
+                onQuickUpdateStorage={storageUpdate.open}
                 onQuickUpdateMemo={memoUpdate.open}
                 onQuickAdd={handleQuickAdd}
                 onQuickDelete={handleQuickDelete}
@@ -250,6 +252,12 @@ export default function IngredientsTableScreen() {
         ]}
       />
 
+      <EmojiBottomSheet
+        visible={emojiUpdate.isVisible}
+        onClose={emojiUpdate.close}
+        onSelect={emojiUpdate.handleSelect}
+      />
+
       <BulkAddBottomSheet
         visible={bulkAdd.isVisible}
         onClose={bulkAdd.close}
@@ -279,10 +287,10 @@ export default function IngredientsTableScreen() {
       />
 
       <SelectStorageBottomSheet
-        visible={storageUpate.isVisible}
+        visible={storageUpdate.isVisible}
         title="보관위치 변경"
-        onClose={storageUpate.close}
-        onSelect={storageUpate.handleSelect}
+        onClose={storageUpdate.close}
+        onSelect={storageUpdate.handleSelect}
       />
 
       <MemoBottomSheet

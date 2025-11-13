@@ -15,18 +15,6 @@ import { Category } from '@/data/enums/category';
  */
 const initialState: IngredientDetailState = {
   ingredient: null,
-  editForm: {
-    name: '',
-    category: Category.VEGETABLE,
-    emoji: null,
-    quantity: null,
-    unit: null,
-    purchased_date_time: null,
-    expired_date_time: null,
-    storage_location: null,
-    memo: null,
-  },
-  isEditing: false,
   loading: true,
   error: null,
 };

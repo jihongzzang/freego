@@ -10,6 +10,8 @@ import { ingredientService } from '@/services/ingredient.service';
 import { shoppingService } from '@/services/shopping.service';
 import { getCalculateDaysRemaining } from '@/utils/time';
 import { enrichIngredients, createSuccessEffect, createErrorEffect, createNavigateEffect } from '@/mvi/shared';
+import ERROR_MESSAGES from '@/constants/toast/errorMessages';
+import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
 
 /**
  * Expiring Middleware
@@ -44,7 +46,7 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
             loading: false,
             error: error instanceof Error ? error.message : '데이터 로드 실패',
           },
-          effects: [createErrorEffect('식재료 데이터를 불러오는데 실패했어요.')],
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_LOAD_FAILED)],
         };
       }
     }
@@ -66,11 +68,11 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect('식재료가 삭제됐어요.')],
+          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_DELETE_INGREDIENT)],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect('식재료 삭제에 실패했어요.')],
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_DELETE_FAILED)],
         };
       }
     }
@@ -82,7 +84,7 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
 
         if (!ingredient) {
           return {
-            effects: [createErrorEffect('식재료를 찾을 수 없어요.')],
+            effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_ITEM_NOT_FOUND)],
           };
         }
 
@@ -108,11 +110,11 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect('장보기 목록에 추가했어요')],
+          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_ADD_SHOPPING_LIST_ITEM)],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect('장보기 목록 추가에 실패했어요.')],
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_SHOPPING_ITEM_ADD_FAILED)],
         };
       }
     }

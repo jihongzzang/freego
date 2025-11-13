@@ -7,15 +7,23 @@ import { useMemo } from 'react';
 import { getCategoryIcon } from '@/utils/category';
 
 interface CategoryCarouselProps {
-  selectedCategoryId: Category | null;
-  onCategorySelect: (categoryId: Category | null) => void;
-  getCategoryCount: (categoryId: Category | null) => number;
+  isIncludeAllCategory: boolean;
+  selectedCategoryId: Category;
+  onCategorySelect: (categoryId: Category) => void;
+  getCategoryCount: (categoryId: Category) => number;
 }
 
-export function CategoryCarousel({ selectedCategoryId, onCategorySelect }: CategoryCarouselProps) {
+export function CategoryCarousel({
+  isIncludeAllCategory,
+  selectedCategoryId,
+  onCategorySelect,
+}: CategoryCarouselProps) {
   const { colors, spacing } = useTheme();
 
-  const categories = useMemo(() => makeCategoryList({ includeAllCategory: true, lang: 'kr' }), []);
+  const categories = useMemo(
+    () => makeCategoryList({ includeAllCategory: isIncludeAllCategory, lang: 'kr' }),
+    [isIncludeAllCategory],
+  );
 
   const styles = useMemo(() => createStyles({ colors, spacing }), [colors, spacing]);
 

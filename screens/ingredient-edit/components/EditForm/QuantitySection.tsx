@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/lib/theme';
-import { EditFormData } from '@/mvi/features/ingredient-detail';
+import { EditFormData } from '@/mvi/features/ingredient-edit';
 import { Unit } from '@/data/enums/unit';
 import { getUnitLabel } from '@/utils/unit';
 import { useMemo } from 'react';

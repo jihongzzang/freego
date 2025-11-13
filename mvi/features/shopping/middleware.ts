@@ -7,6 +7,9 @@
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { ShoppingState, ShoppingIntent, ShoppingEffect } from './types';
 import { shoppingService } from '@/services/shopping.service';
+import { createErrorEffect, createInfoEffect, createSuccessEffect, createWarningEffect } from '@/mvi/shared';
+import ERROR_MESSAGES from '@/constants/toast/errorMessages';
+import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
 
 /**
  * Shopping Middleware
@@ -35,15 +38,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             loading: false,
             error: error instanceof Error ? error.message : '데이터 로드 실패',
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '장보기 목록을 불러오는데 실패했어요.',
-                variant: 'error',
-              },
-            },
-          ],
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_SHOPPING_LIST_LOAD_FAILED)],
         };
       }
     }
@@ -53,15 +48,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
       if (selectedCount === 0) {
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '선택된 항목이 없어요.',
-                variant: 'info',
-              },
-            },
-          ],
+          effects: [createWarningEffect('선택된 항목이 없어요.')],
         };
       }
 
@@ -93,15 +80,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
     case 'SUBMIT_ADD_ITEM': {
       if (!intent.payload.name.trim()) {
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '재료 이름을 입력해주세요.',
-                variant: 'warning',
-              },
-            },
-          ],
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_MISSING_INGREDIENT_NAME)],
         };
       }
 
@@ -121,28 +100,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             ...state,
             shoppingList: items,
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: `'${intent.payload.name.trim()}'을(를) 장보기 목록에 추가했어요.`,
-                variant: 'success',
-              },
-            },
-          ],
+          effects: [createSuccessEffect(`'${intent.payload.name.trim()}'을(를) 장보기 목록에 추가했어요.`)],
         };
       } catch (error) {
         console.error('Error adding shopping item:', error);
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '항목 추가에 실패했어요.',
-                variant: 'error',
-              },
-            },
-          ],
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_SHOPPING_ITEM_ADD_FAILED)],
         };
       }
     }
@@ -174,20 +137,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
     case 'ADD_ITEM_TO_STORAGE': {
       try {
         const { ingredientService } = await import('@/services/ingredient.service');
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString();
         const item = state.shoppingList.find((i) => i.id === intent.payload.id);
 
         if (!item) {
           return {
-            effects: [
-              {
-                type: 'SHOW_TOAST',
-                payload: {
-                  message: '항목을 찾을 수 없어요.',
-                  variant: 'error',
-                },
-              },
-            ],
+            effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_ITEM_NOT_FOUND)],
           };
         }
 
@@ -220,27 +175,11 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             shoppingList: items,
             selectedIds: new Set<string>(),
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: `${intent.payload.name}이(가) 냉장고에 추가되었어요.`,
-                variant: 'success',
-              },
-            },
-          ],
+          effects: [createSuccessEffect(`${intent.payload.name}이(가) 냉장고에 추가되었어요.`)],
         };
       } catch (error) {
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '재고 추가 중 오류가 발생했어요.',
-                variant: 'error',
-              },
-            },
-          ],
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_CREATE_ERROR)],
         };
       }
     }
@@ -250,15 +189,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
       if (selectedCount === 0) {
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '선택된 항목이 없어요.',
-                variant: 'info',
-              },
-            },
-          ],
+          effects: [createWarningEffect('선택된 항목이 없어요.')],
         };
       }
 
@@ -323,28 +254,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             ...state,
             shoppingList: items,
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '메모가 저장됐어요.',
-                variant: 'success',
-              },
-            },
-          ],
+          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_MEMO_UPDATE)],
         };
       } catch (error) {
         console.error('Error updating memo:', error);
         return {
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '메모 저장 중 오류가 발생했어요.',
-                variant: 'error',
-              },
-            },
-          ],
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_MEMO_UPDATE_FAILED)],
         };
       }
     }

@@ -170,10 +170,10 @@ const createStyles = ({
       paddingHorizontal: spacing.lg,
     },
     topPosition: {
-      top: Platform.OS === 'ios' ? 60 : 20,
+      top: Platform.OS === 'ios' ? 100 : 60,
     },
     bottomPosition: {
-      bottom: Platform.OS === 'ios' ? 100 : 80,
+      bottom: Platform.OS === 'ios' ? 140 : 120,
     },
     toast: {
       width: width - spacing.lg * 2,

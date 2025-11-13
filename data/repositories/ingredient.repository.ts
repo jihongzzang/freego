@@ -19,7 +19,9 @@ export const ingredientRepository = {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       const ingredients = data ? JSON.parse(data) : [];
-      return ingredients.filter((item: Ingredient) => !item.deleted_date_time);
+      const result = ingredients.filter((item: Ingredient) => !item.deleted_date_time && !item.consumed_date_time);
+      // console.log('😀 식재료 가져오기', JSON.stringify(result, null, 2));
+      return result;
     } catch (error) {
       console.error('Error reading ingredients:', error);
       return [];
@@ -32,7 +34,9 @@ export const ingredientRepository = {
   async getAllIngredientsRaw(): Promise<Ingredient[]> {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
+      const result = data ? JSON.parse(data) : [];
+      // console.log('💙 식재료 데이터 가져오기', JSON.stringify(result, null, 2));
+      return result;
     } catch (error) {
       console.error('Error reading all ingredients:', error);
       return [];
@@ -58,10 +62,11 @@ export const ingredientRepository = {
     try {
       const ingredients = await this.getAllIngredientsRaw();
       const newIngredient: Ingredient = {
-        ...ingredient,
         id: generateId(),
+        ...ingredient,
         created_date_time: new Date().toISOString(),
       };
+      console.log('🩵 단일 재료 추가', JSON.stringify(newIngredient, null, 2));
       ingredients.push(newIngredient);
       await this.saveIngredients(ingredients);
       return newIngredient;
@@ -74,14 +79,31 @@ export const ingredientRepository = {
   /**
    * 여러 재료 추가
    */
-  async addMultipleIngredients(ingredientList: Omit<Ingredient, 'id' | 'created_date_time'>[]): Promise<Ingredient[]> {
+  async addMultipleIngredients(
+    ingredientList: Omit<
+      Ingredient,
+      | 'id'
+      | 'created_date_time'
+      | 'purchased_date_time'
+      | 'expired_date_time'
+      | 'last_modifed_date_time'
+      | 'deleted_date_time'
+      | 'consumed_date_time'
+    >[],
+  ): Promise<Ingredient[]> {
     try {
       const ingredients = await this.getAllIngredientsRaw();
       const newIngredients: Ingredient[] = ingredientList.map((ingredient) => ({
-        ...ingredient,
         id: generateId(),
+        ...ingredient,
+        purchased_date_time: null,
+        expired_date_time: null,
+        consumed_date_time: null,
+        deleted_date_time: null,
+        last_modifed_date_time: null,
         created_date_time: new Date().toISOString(),
       }));
+      console.log('💜 여러 재료 추가', JSON.stringify(newIngredients, null, 2));
       ingredients.push(...newIngredients);
       await this.saveIngredients(ingredients);
       return newIngredients;
@@ -104,6 +126,7 @@ export const ingredientRepository = {
           ...updates,
           last_modifed_date_time: new Date().toISOString(),
         };
+        console.log('🤎 재료 업데이트', JSON.stringify(ingredients, null, 2));
         await this.saveIngredients(ingredients);
         return true;
       }
@@ -127,12 +150,38 @@ export const ingredientRepository = {
           ...ingredients[index],
           deleted_date_time: new Date().toISOString(),
         };
+        console.log('🖤 재료 삭제', JSON.stringify(ingredients, null, 2));
         await this.saveIngredients(ingredients);
         return true;
       }
       return false;
     } catch (error) {
       console.error('Error marking ingredient as deleted:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * 재료 삭제 (soft delete)
+   */
+  async consumeIngredient(id: string): Promise<boolean> {
+    try {
+      const ingredients = await this.getAllIngredientsRaw();
+      const index = ingredients.findIndex((item) => item.id === id);
+
+      if (index !== -1) {
+        ingredients[index] = {
+          ...ingredients[index],
+          quantity: 0,
+          consumed_date_time: new Date().toISOString(),
+        };
+        console.log('💛 재료 소비', JSON.stringify(ingredients, null, 2));
+        await this.saveIngredients(ingredients);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error marking ingredient as consumed:', error);
       throw error;
     }
   },

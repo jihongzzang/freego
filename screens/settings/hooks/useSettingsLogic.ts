@@ -6,6 +6,7 @@ import { useDialog } from '@/contexts/DialogContext';
 import { useMVIStore } from '@/mvi/base';
 import { createSettingsStore } from '@/mvi/features/settings';
 import { useToast } from '@/components/ui';
+import ERROR_MESSAGES from '@/constants/toast/errorMessages';
 
 export function useSettingsLogic() {
   const { isDark, themePreference, setTheme } = useTheme();
@@ -103,7 +104,7 @@ export function useSettingsLogic() {
       await Linking.openURL(url);
     } else {
       showToast({
-        message: '이메일 앱을 열 수 없어요.',
+        message: ERROR_MESSAGES.ERROR_EMAIL_APP_OPEN_FAILED,
         type: 'error',
       });
     }

@@ -1,39 +1,19 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { BackHandler } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
 import { useDialog } from '@/contexts/DialogContext';
 import { useToast } from '@/components/ui';
 import { useMVIStore } from '@/mvi/base';
-import { createIngredientDetailStore, EditFormData } from '@/mvi/features/ingredient-detail';
-import { useUnitPicker } from '@/hooks/useUnitPicker';
-import { useExpiryDatePicker } from '@/hooks/useExpiryDatePicker';
+import { createIngredientDetailStore } from '@/mvi/features/ingredient-detail';
 
 export function useIngredientDetailLogic() {
   const router = useRouter();
-  const { id, mode } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
   const { confirm } = useDialog();
   const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createIngredientDetailStore);
-  const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
-  const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
   const processedEffectRef = useRef<typeof effect>(null);
-
-  const handleFieldChange = (field: keyof EditFormData, value: any) => {
-    dispatch({ type: 'UPDATE_FORM_FIELD', payload: { field, value } });
-  };
-
-  const unitPicker = useUnitPicker({
-    onUnitChange: (unitId) => handleFieldChange('unit', unitId),
-  });
-
-  const expiryDatePicker = useExpiryDatePicker({
-    onDateConfirm: (date) => handleFieldChange('expired_date_time', date),
-  });
-
-  const purchaseDatePicker = useExpiryDatePicker({
-    onDateConfirm: (date) => handleFieldChange('purchased_date_time', date),
-  });
 
   // 식재료 데이터 로드
   useEffect(() => {
@@ -41,20 +21,6 @@ export function useIngredientDetailLogic() {
       dispatch({ type: 'LOAD_INGREDIENT', payload: id as string });
     }
   }, [id, dispatch]);
-
-  // mode=edit 쿼리 파라미터가 있으면 편집 모드 활성화
-  useEffect(() => {
-    if (mode === 'edit' && state.ingredient) {
-      dispatch({ type: 'SET_EDITING', payload: true });
-    }
-  }, [mode, state.ingredient, dispatch]);
-
-  // 재료가 로드되면 이모지 상태 초기화
-  useEffect(() => {
-    if (state.ingredient?.emoji) {
-      setSelectedEmoji(state.ingredient.emoji);
-    }
-  }, [state.ingredient?.emoji]);
 
   // Effect 처리
   useEffect(() => {
@@ -104,19 +70,6 @@ export function useIngredientDetailLogic() {
     }
   }, [effect, confirm, showToast, router, dispatch]);
 
-  // Android 시스템 백버튼 핸들링
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (state.isEditing) {
-        dispatch({ type: 'SET_EDITING', payload: false });
-        return true;
-      }
-      return false;
-    });
-
-    return () => backHandler.remove();
-  }, [state.isEditing, dispatch]);
-
   const handleDelete = () => {
     dispatch({ type: 'DELETE_INGREDIENT' });
   };
@@ -125,51 +78,20 @@ export function useIngredientDetailLogic() {
     dispatch({ type: 'CONSUME_INGREDIENT' });
   };
 
-  const handleUpdate = () => {
-    dispatch({ type: 'UPDATE_INGREDIENT' });
-  };
-
-  const handleQuickSelect = (days: number) => {
-    const date = new Date();
-    date.setDate(date.getDate() + days);
-    const formattedDate = date.toISOString();
-    handleFieldChange('expired_date_time', formattedDate);
-  };
-
-  const handleEmojiSelect = (emoji: string) => {
-    setSelectedEmoji(emoji);
-    handleFieldChange('emoji', emoji);
-    setIsEmojiPickerVisible(false);
-  };
-
   const handleBackPress = () => {
-    if (state.isEditing) {
-      dispatch({ type: 'SET_EDITING', payload: false });
-    } else {
-      dispatch({ type: 'NAVIGATE_BACK' });
-    }
+    dispatch({ type: 'NAVIGATE_BACK' });
   };
 
-  const handleToggleEdit = () => {
-    dispatch({ type: 'SET_EDITING', payload: !state.isEditing });
+  const handleEdit = () => {
+    router.push(`/ingredient-edit/${id}` as any);
   };
 
   return {
     state,
     dispatch,
-    unitPicker,
-    expiryDatePicker,
-    purchaseDatePicker,
-    isEmojiPickerVisible,
-    setIsEmojiPickerVisible,
-    selectedEmoji,
-    handleFieldChange,
     handleDelete,
     handleConsume,
-    handleUpdate,
-    handleQuickSelect,
-    handleEmojiSelect,
     handleBackPress,
-    handleToggleEdit,
+    handleEdit,
   };
 }

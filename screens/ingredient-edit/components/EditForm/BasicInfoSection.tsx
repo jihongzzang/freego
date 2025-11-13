@@ -1,6 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '@/lib/theme';
-import { EditFormData } from '@/mvi/features/ingredient-detail';
+import { EditFormData } from '@/mvi/features/ingredient-edit';
 import { useMemo } from 'react';
 
 interface BasicInfoSectionProps {

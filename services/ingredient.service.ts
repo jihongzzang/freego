@@ -49,6 +49,20 @@ export const ingredientService = {
     }
   },
 
+  async consumeIngredient(id: string): Promise<void> {
+    try {
+      const consumed = await ingredientRepository.consumeIngredient(id);
+
+      if (consumed) {
+        // 유통기한 알림 체크 (트리거 4: 재료 삭제)
+        await checkExpiryAndNotify();
+      }
+    } catch (error) {
+      console.error('Error marking ingredient as deleted:', error);
+      throw error;
+    }
+  },
+
   async deleteIngredient(id: string): Promise<void> {
     try {
       const deleted = await ingredientRepository.deleteIngredient(id);

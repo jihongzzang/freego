@@ -1,5 +1,5 @@
 import { View, StyleSheet } from 'react-native';
-import { EditFormData } from '@/mvi/features/ingredient-detail';
+import { EditFormData } from '@/mvi/features/ingredient-edit';
 
 import { BasicInfoSection } from './BasicInfoSection';
 import { CategorySection } from './CategorySection';
@@ -12,7 +12,6 @@ import { useTheme } from '@/lib/theme';
 
 interface EditFormProps {
   formData: EditFormData;
-  selectedEmoji: string | null;
   onFieldChange: (field: keyof EditFormData, value: any) => void;
   onEmojiPress: () => void;
   onUnitPress: () => void;
@@ -23,7 +22,6 @@ interface EditFormProps {
 
 export function EditForm({
   formData,
-  selectedEmoji,
   onFieldChange,
   onEmojiPress,
   onUnitPress,
@@ -39,7 +37,7 @@ export function EditForm({
     <View style={styles.container}>
       <BasicInfoSection
         formData={formData}
-        selectedEmoji={selectedEmoji}
+        selectedEmoji={formData.emoji}
         onFieldChange={onFieldChange}
         onEmojiPress={onEmojiPress}
       />

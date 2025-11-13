@@ -8,6 +8,7 @@ import { MiddlewareResult, Effect } from '@/mvi/base';
 import { IngredientListState, CommonEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
 import { enrichIngredients, createErrorEffect } from './helpers';
+import ERROR_MESSAGES from '@/constants/toast/errorMessages';
 
 /**
  * 재료 로딩 공통 로직
@@ -16,7 +17,7 @@ import { enrichIngredients, createErrorEffect } from './helpers';
  */
 export async function handleLoadIngredients<
   TState extends IngredientListState,
-  TEffect extends Effect = CommonEffect
+  TEffect extends Effect = CommonEffect,
 >(): Promise<MiddlewareResult<TState, TEffect>> {
   try {
     const data = await ingredientService.getIngredients();
@@ -35,7 +36,7 @@ export async function handleLoadIngredients<
         loading: false,
         error: error instanceof Error ? error.message : '데이터 로드 실패',
       } as any as TState,
-      effects: [createErrorEffect('식재료 데이터를 불러오는데 실패했어요.')] as any as TEffect[],
+      effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_LOAD_FAILED)] as any as TEffect[],
     };
   }
 }

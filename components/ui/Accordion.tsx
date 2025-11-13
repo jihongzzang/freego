@@ -73,6 +73,6 @@ const styles = StyleSheet.create({
   },
   badge: {},
   content: {
-    marginTop: 12,
+    // marginTop: 12,
   },
 });

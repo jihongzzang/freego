@@ -15,6 +15,8 @@ import {
   createErrorEffect,
   createNavigateEffect,
 } from '@/mvi/shared';
+import ERROR_MESSAGES from '@/constants/toast/errorMessages';
+import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
 
 /**
  * Home Middleware
@@ -48,12 +50,12 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect('유통기한이 수정됐어요.')],
+          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_EXPIRY_DATE_UPDATE)],
         };
       } catch (error) {
         console.error('Middleware: UPDATE_EXPIRY_DATE 에러', error);
         return {
-          effects: [createErrorEffect('유통기한 수정에 실패했어요.')],
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_EXPIRY_DATE_UPDATE_FAILED)],
         };
       }
     }
@@ -76,7 +78,7 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
       } catch (error) {
         console.error('Error adding templates:', error);
         return {
-          effects: [createErrorEffect('재료 추가 중 오류가 발생했어요.')],
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_CREATE_ERROR)],
         };
       }
     }

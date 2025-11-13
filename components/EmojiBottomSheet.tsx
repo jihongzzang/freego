@@ -6,10 +6,10 @@ import { ALL_ROUTINE_FOOD_EMOJI } from '@/constants/emojiTemplate';
 interface EmojiBottomSheetProps {
   visible: boolean;
   onClose: () => void;
-  onTemplateToggle: (emoji: string) => void;
+  onSelect: (emoji: string) => void;
 }
 
-export default function EmojiBottomSheet({ visible, onClose, onTemplateToggle }: EmojiBottomSheetProps) {
+export default function EmojiBottomSheet({ visible, onClose, onSelect }: EmojiBottomSheetProps) {
   const { spacing } = useTheme();
 
   const list = ALL_ROUTINE_FOOD_EMOJI;
@@ -35,7 +35,7 @@ export default function EmojiBottomSheet({ visible, onClose, onTemplateToggle }:
               <TouchableOpacity
                 key={emoji}
                 style={[styles.templateItem, { width: ITEM_WIDTH }]}
-                onPress={() => onTemplateToggle(emoji)}
+                onPress={() => onSelect(emoji)}
               >
                 <Text style={{ fontSize: 24 }}>{emoji}</Text>
               </TouchableOpacity>

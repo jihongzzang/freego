@@ -3,6 +3,7 @@
  */
 
 import { Intent, State, Effect } from '@/mvi/base';
+import { CommonEffect } from '@/mvi/shared';
 
 /**
  * Settings State
@@ -23,10 +24,4 @@ export type SettingsIntent =
 /**
  * Settings Effect
  */
-export type SettingsEffect = {
-  type: 'SHOW_TOAST';
-  payload: {
-    message: string;
-    variant: 'success' | 'error' | 'info' | 'warning';
-  };
-};
+export type SettingsEffect = CommonEffect;

@@ -5,6 +5,9 @@
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { SettingsState, SettingsIntent, SettingsEffect } from './types';
 import { saveNotificationDays, getNotificationDays } from '@/services/notification.service';
+import { createErrorEffect, createSuccessEffect } from '@/mvi/shared';
+import ERROR_MESSAGES from '@/constants/toast/errorMessages';
+import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
 
 export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, SettingsEffect> = async (
   state,
@@ -26,15 +29,7 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
       await saveNotificationDays(intent.payload);
 
       return {
-        effects: [
-          {
-            type: 'SHOW_TOAST',
-            payload: {
-              message: `알림 주기가 ${intent.payload}일로 변경됐어요.`,
-              variant: 'success',
-            },
-          },
-        ],
+        effects: [createSuccessEffect(`알림 주기가 ${intent.payload}일로 변경됐어요.`)],
       };
 
     case 'DELETE_ALL_DATA': {
@@ -50,15 +45,7 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
             ...state,
             isClearing: false,
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '모든 데이터가 삭제되었어요.',
-                variant: 'success',
-              },
-            },
-          ],
+          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_DELETE_DATA)],
         };
       } catch (error) {
         console.error('Error deleting all data:', error);
@@ -67,15 +54,7 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
             ...state,
             isClearing: false,
           },
-          effects: [
-            {
-              type: 'SHOW_TOAST',
-              payload: {
-                message: '데이터 삭제 중 문제가 발생했어요.',
-                variant: 'error',
-              },
-            },
-          ],
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_DELETE_DATA_FAILED)],
         };
       }
     }

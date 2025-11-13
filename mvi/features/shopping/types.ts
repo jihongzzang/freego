@@ -6,6 +6,7 @@ import { Intent, State, Effect } from '@/mvi/base';
 import { ShoppingItem } from '@/data/models/shopping.model';
 import { Category } from '@/data/enums/category';
 import { StorageLocation } from '@/data/enums/storage_location';
+import { CommonEffect } from '@/mvi/shared';
 
 /**
  * Shopping State
@@ -42,20 +43,4 @@ export type ShoppingIntent =
 /**
  * Shopping Effect (부수 효과)
  */
-export type ShoppingEffect =
-  | {
-      type: 'SHOW_CONFIRM';
-      payload: {
-        title?: string;
-        message: string;
-        onConfirm: () => Promise<any>;
-        isDanger?: boolean;
-      };
-    }
-  | {
-      type: 'SHOW_TOAST';
-      payload: {
-        message: string;
-        variant: 'success' | 'info' | 'warning' | 'error';
-      };
-    };
+export type ShoppingEffect = CommonEffect;

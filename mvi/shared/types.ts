@@ -70,10 +70,8 @@ export interface BulkAddIngredientsPayload {
   name: string;
   category: Category;
   emoji: string | null;
-  storage_location: StorageLocation | null;
+  memo: string | null;
   quantity: number | null;
   unit: Unit | null;
-  purchased_date_time: string | null;
-  expired_date_time: string | null;
-  memo: string | null;
+  storage_location: StorageLocation | null;
 }

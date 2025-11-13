@@ -33,6 +33,21 @@ export function useHomeData(ingredients: Ingredient[], selectedCategoryId: Categ
     return ingredients.filter((item) => item.category === categoryId).length;
   };
 
+  // 카테고리별로 재료 그룹화
+  const ingredientsByCategory = useMemo(() => {
+    const grouped: Record<Category, Ingredient[]> = {} as Record<Category, Ingredient[]>;
+
+    categories.forEach((cat) => {
+      if (cat.id === Category.ALL) {
+        grouped[cat.id] = ingredients;
+      } else {
+        grouped[cat.id] = ingredients.filter((item) => item.category === cat.id);
+      }
+    });
+
+    return grouped;
+  }, [ingredients, categories]);
+
   // 유통기한 표시 텍스트
   function getExpiryDisplay(status: StatusType, daysRemaining: number | null): string {
     if (status === 'not_set') return '유통기한 입력필요';
@@ -47,9 +62,9 @@ export function useHomeData(ingredients: Ingredient[], selectedCategoryId: Categ
 
   return {
     expiringItems,
-    selectedCategoryItem,
-    filteredIngredients,
     getCategoryCount,
     getExpiryDisplay,
+    categories,
+    ingredientsByCategory,
   };
 }

@@ -16,7 +16,7 @@ export function useHomeLogic() {
   const { showToast } = useToast();
 
   // 선택된 카테고리 상태
-  const [selectedCategoryId, setSelectedCategoryId] = useState<Category | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<Category>(Category.ALL);
 
   // 유통기한 수정 모달 상태
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
@@ -116,8 +116,6 @@ export function useHomeLogic() {
       storage_location: null,
       quantity: null,
       unit: template.defaultUnit as Unit,
-      purchased_date_time: null,
-      expired_date_time: null,
       memo: null,
     }));
 
@@ -137,10 +135,7 @@ export function useHomeLogic() {
       onPress: () => {
         dispatch({
           type: 'NAVIGATE_TO_ADD',
-          payload:
-            selectedCategoryId === null || selectedCategoryId === Category.ALL
-              ? undefined
-              : (selectedCategoryId as string),
+          payload: selectedCategoryId === Category.ALL ? null : (selectedCategoryId as string),
         });
       },
     },
