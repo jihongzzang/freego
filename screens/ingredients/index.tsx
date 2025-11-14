@@ -1,5 +1,5 @@
 import { View, StyleSheet, useWindowDimensions, ScrollView, Text, TouchableOpacity } from 'react-native';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback, useRef } from 'react';
 import { Edit3, Grid3x3 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import Header, { HEADER_HEIGHT } from '@/components/ui/Header';
@@ -12,7 +12,6 @@ import EmptyStateUI from '@/components/ui/EmptyState';
 import { useIngredientsLogic } from './hooks/useIngredientsLogic';
 import { useIngredientsData } from './hooks/useIngredientsData';
 import { IngredientsTableAccordion } from './components/IngredientsTableAccordion';
-import { TabView, SceneRendererProps, NavigationState } from 'react-native-tab-view';
 import { getCategoryIcon, getCategoryLabel } from '@/utils/category';
 import { getStorageLocationIcon, getStorageLocationLabel } from '@/utils/storageLocation';
 import { Category } from '@/data/enums/category';
@@ -67,174 +66,170 @@ export default function IngredientsTableScreen() {
     { key: 'storage', title: '보관위치별' },
   ]);
 
+  const horizontalScrollRef = useRef<ScrollView>(null);
+
   const headerHeight = HEADER_HEIGHT + insets.top;
   const totalHeaderHeight = headerHeight + TAB_BAR_HEIGHT;
 
-  const styles = useMemo(
-    () => createStyles({ spacing, colors, totalHeaderHeight }),
-    [spacing, colors, totalHeaderHeight],
+  const styles = useMemo(() => createStyles({ spacing, colors }), [spacing, colors]);
+
+  // Handle horizontal scroll - update selected tab
+  const handleHorizontalScroll = useCallback(
+    (event: any) => {
+      const offsetX = event.nativeEvent.contentOffset.x;
+      const newIndex = Math.round(offsetX / layout.width);
+      if (newIndex !== index) {
+        setIndex(newIndex);
+      }
+    },
+    [layout.width, index],
   );
 
-  const renderTabBar = (props: SceneRendererProps & { navigationState: NavigationState<Route> }) => (
-    <View style={styles.headerContainer}>
-      <Header title="재료 관리" />
-      <View style={styles.tabBar}>
-        {props.navigationState.routes.map((route, i) => {
-          const isActive = index === i;
-          return (
-            <TouchableOpacity key={route.key} style={styles.tabItem} onPress={() => setIndex(i)}>
-              <Text
-                style={[
-                  typography.styles.t7Bold,
-                  {
-                    color: isActive ? colors.primary : colors.textSecondary,
-                  },
-                ]}
-              >
-                {route.title}
-              </Text>
-              {isActive && <View style={[styles.tabIndicator, { backgroundColor: colors.primary }]} />}
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    </View>
+  // Handle tab press - scroll to page
+  const handleTabPress = useCallback(
+    (tabIndex: number) => {
+      if (horizontalScrollRef.current) {
+        horizontalScrollRef.current.scrollTo({
+          x: tabIndex * layout.width,
+          animated: true,
+        });
+      }
+      setIndex(tabIndex);
+    },
+    [layout.width],
   );
-
-  const CategoryRoute = () => {
-    if (loading) {
-      return (
-        <View style={styles.sceneContainer}>
-          <EmptyStateUI title="로딩 중이에요..." />
-        </View>
-      );
-    }
-
-    if (categoryOrder.length === 0) {
-      return (
-        <View style={styles.sceneContainer}>
-          <EmptyStateUI title="등록된 재료가 없어요." description="재료를 추가해주세요" />
-        </View>
-      );
-    }
-
-    return (
-      <ScrollView
-        contentContainerStyle={{
-          paddingBottom: insets.bottom + 180,
-          paddingHorizontal: spacing.lg,
-          paddingTop: totalHeaderHeight + spacing.lg,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.accordionsContainer}>
-          {categoryOrder.map((catId) => {
-            const categoryItems = groupedByCategory[catId] || [];
-            const isExpanded = !collapsedCategories.has(catId);
-
-            return (
-              <IngredientsTableAccordion
-                key={catId}
-                title={getCategoryLabel({ category: catId as Category, lang: 'kr' })}
-                leftIcon={getCategoryIcon(catId as Category, 20)}
-                items={categoryItems}
-                isExpanded={isExpanded}
-                onToggle={() => toggleCategory(catId)}
-                onItemEdit={handleNavigateToEdit}
-                onQuickUpdateEmoji={emojiUpdate.open}
-                onQuickUpdateExpiry={expiryUpdate.open}
-                onQuickUpdateQuantity={quantityUpdate.open}
-                onQuickUpdateStorage={storageUpdate.open}
-                onQuickUpdateMemo={memoUpdate.open}
-                onQuickAdd={handleQuickAdd}
-                onQuickConsume={handleQuickConsume}
-                onQuickDelete={handleQuickDelete}
-                onViewDetail={handleNavigateToDetail}
-              />
-            );
-          })}
-        </View>
-      </ScrollView>
-    );
-  };
-
-  const StorageRoute = () => {
-    if (loading) {
-      return (
-        <View style={styles.sceneContainer}>
-          <EmptyStateUI title="로딩 중이에요..." />
-        </View>
-      );
-    }
-
-    if (storageOrder.length === 0) {
-      return (
-        <View style={styles.sceneContainer}>
-          <EmptyStateUI title="등록된 재료가 없어요." description="재료를 추가해주세요" />
-        </View>
-      );
-    }
-
-    return (
-      <ScrollView
-        contentContainerStyle={{
-          paddingBottom: insets.bottom + 180,
-          paddingHorizontal: spacing.lg,
-          paddingTop: totalHeaderHeight + spacing.lg,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.accordionsContainer}>
-          {storageOrder.map((storageId) => {
-            const storageItems = groupedByStorage[storageId] || [];
-            const isExpanded = !collapsedStorages.has(storageId);
-
-            return (
-              <IngredientsTableAccordion
-                key={storageId}
-                title={getStorageLocationLabel({ storageLocation: storageId as StorageLocation, lang: 'kr' })}
-                leftIcon={getStorageLocationIcon(storageId as StorageLocation, 20)}
-                items={storageItems}
-                isExpanded={isExpanded}
-                onToggle={() => toggleStorage(storageId)}
-                onItemEdit={handleNavigateToEdit}
-                onQuickUpdateEmoji={emojiUpdate.open}
-                onQuickUpdateExpiry={expiryUpdate.open}
-                onQuickUpdateQuantity={quantityUpdate.open}
-                onQuickUpdateStorage={storageUpdate.open}
-                onQuickUpdateMemo={memoUpdate.open}
-                onQuickAdd={handleQuickAdd}
-                onQuickDelete={handleQuickDelete}
-                onQuickConsume={handleQuickConsume}
-                onViewDetail={handleNavigateToDetail}
-              />
-            );
-          })}
-        </View>
-      </ScrollView>
-    );
-  };
-
-  const renderScene = ({ route }: { route: Route }) => {
-    switch (route.key) {
-      case 'category':
-        return <CategoryRoute />;
-      case 'storage':
-        return <StorageRoute />;
-      default:
-        return null;
-    }
-  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <TabView
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        renderTabBar={renderTabBar}
-        onIndexChange={setIndex}
-        initialLayout={{ width: layout.width }}
-      />
+      {/* Fixed Header */}
+      <View style={styles.headerContainer}>
+        <Header title="재료 관리" />
+        <View style={styles.tabBar}>
+          {routes.map((route, i) => {
+            const isActive = index === i;
+            return (
+              <TouchableOpacity key={route.key} style={styles.tabItem} onPress={() => handleTabPress(i)}>
+                <Text
+                  style={[
+                    typography.styles.t6Bold,
+                    {
+                      color: isActive ? colors.primary : colors.textSecondary,
+                    },
+                  ]}
+                >
+                  {route.title}
+                </Text>
+                {isActive && <View style={[styles.tabIndicator, { backgroundColor: colors.primary }]} />}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* Horizontal Scrollable Content */}
+      <ScrollView
+        ref={horizontalScrollRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={handleHorizontalScroll}
+        scrollEventThrottle={16}
+        style={{ flex: 1 }}
+      >
+        {routes.map((route) => {
+          const isCategoryRoute = route.key === 'category';
+          const items = isCategoryRoute ? categoryOrder : storageOrder;
+          const isEmpty = items.length === 0;
+
+          return (
+            <View key={route.key} style={{ width: layout.width }}>
+              <ScrollView
+                contentContainerStyle={{
+                  paddingBottom: insets.bottom + 180,
+                  paddingHorizontal: spacing.lg,
+                  paddingTop: totalHeaderHeight + spacing.lg,
+                }}
+                showsVerticalScrollIndicator={false}
+              >
+                {loading ? (
+                  <View style={styles.sceneContainer}>
+                    <EmptyStateUI title="로딩 중이에요..." />
+                  </View>
+                ) : isEmpty ? (
+                  <View style={styles.sceneContainer}>
+                    <EmptyStateUI title="등록된 재료가 없어요." description="재료를 추가해주세요" />
+                  </View>
+                ) : (
+                  <View style={styles.accordionsContainer}>
+                    {isCategoryRoute ? (
+                      // Category Route
+                      <>
+                        {categoryOrder.map((catId) => {
+                          const categoryItems = groupedByCategory[catId] || [];
+                          const isExpanded = !collapsedCategories.has(catId);
+
+                          return (
+                            <IngredientsTableAccordion
+                              key={catId}
+                              title={getCategoryLabel({ category: catId as Category, lang: 'kr' })}
+                              leftIcon={getCategoryIcon(catId as Category, 20)}
+                              items={categoryItems}
+                              isExpanded={isExpanded}
+                              onToggle={() => toggleCategory(catId)}
+                              onItemEdit={handleNavigateToEdit}
+                              onQuickUpdateEmoji={emojiUpdate.open}
+                              onQuickUpdateExpiry={expiryUpdate.open}
+                              onQuickUpdateQuantity={quantityUpdate.open}
+                              onQuickUpdateStorage={storageUpdate.open}
+                              onQuickUpdateMemo={memoUpdate.open}
+                              onQuickAdd={handleQuickAdd}
+                              onQuickConsume={handleQuickConsume}
+                              onQuickDelete={handleQuickDelete}
+                              onViewDetail={handleNavigateToDetail}
+                            />
+                          );
+                        })}
+                      </>
+                    ) : (
+                      // Storage Route
+                      <>
+                        {storageOrder.map((storageId) => {
+                          const storageItems = groupedByStorage[storageId] || [];
+                          const isExpanded = !collapsedStorages.has(storageId);
+
+                          return (
+                            <IngredientsTableAccordion
+                              key={storageId}
+                              title={getStorageLocationLabel({
+                                storageLocation: storageId as StorageLocation,
+                                lang: 'kr',
+                              })}
+                              leftIcon={getStorageLocationIcon(storageId as StorageLocation, 20)}
+                              items={storageItems}
+                              isExpanded={isExpanded}
+                              onToggle={() => toggleStorage(storageId)}
+                              onItemEdit={handleNavigateToEdit}
+                              onQuickUpdateEmoji={emojiUpdate.open}
+                              onQuickUpdateExpiry={expiryUpdate.open}
+                              onQuickUpdateQuantity={quantityUpdate.open}
+                              onQuickUpdateStorage={storageUpdate.open}
+                              onQuickUpdateMemo={memoUpdate.open}
+                              onQuickAdd={handleQuickAdd}
+                              onQuickDelete={handleQuickDelete}
+                              onQuickConsume={handleQuickConsume}
+                              onViewDetail={handleNavigateToDetail}
+                            />
+                          );
+                        })}
+                      </>
+                    )}
+                  </View>
+                )}
+              </ScrollView>
+            </View>
+          );
+        })}
+      </ScrollView>
 
       <FloatingButton
         menuItems={[
@@ -309,15 +304,7 @@ export default function IngredientsTableScreen() {
   );
 }
 
-const createStyles = ({
-  spacing,
-  colors,
-  totalHeaderHeight,
-}: {
-  spacing: typeof import('@/lib/theme').spacing;
-  colors: any;
-  totalHeaderHeight: number;
-}) =>
+const createStyles = ({ spacing, colors }: { spacing: typeof import('@/lib/theme').spacing; colors: any }) =>
   StyleSheet.create({
     container: {
       flex: 1,

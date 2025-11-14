@@ -1,1 +1,1 @@
-export { default } from '@/screens/ingredients/index_v2';
+export { default } from '@/screens/ingredients';

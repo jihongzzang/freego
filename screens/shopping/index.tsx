@@ -1,5 +1,5 @@
 import { View, StyleSheet, useWindowDimensions, ScrollView, Text, TouchableOpacity } from 'react-native';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { ShoppingCart, Share2, Plus } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import Header, { HEADER_HEIGHT } from '@/components/ui/Header';
@@ -11,7 +11,6 @@ import FloatingButton from '@/components/ui/FloatingButton';
 import EmptyStateUI from '@/components/ui/EmptyState';
 import { useShoppingLogic } from './hooks/useShoppingLogic';
 import { ShoppingTableView } from './components/ShoppingTableView';
-import { TabView, SceneRendererProps, NavigationState } from 'react-native-tab-view';
 import EmojiBottomSheet from '@/components/EmojiBottomSheet';
 
 const TAB_BAR_HEIGHT = 48;
@@ -58,6 +57,11 @@ export default function ShoppingListTableScreen() {
     { key: 'purchased', title: '구매 완료' },
   ]);
 
+  const horizontalScrollRef = useRef<ScrollView>(null);
+
+  const unpurchasedItems = useMemo(() => state.shoppingList.filter((item) => !item.is_purchased), [state.shoppingList]);
+  const purchasedItems = useMemo(() => state.shoppingList.filter((item) => item.is_purchased), [state.shoppingList]);
+
   // 탭이 바뀔 때 선택 해제
   useEffect(() => {
     console.log('🟣 Tab changed:', { index, route: routes[index].key });
@@ -71,9 +75,6 @@ export default function ShoppingListTableScreen() {
     () => createStyles({ spacing, colors, totalHeaderHeight }),
     [spacing, colors, totalHeaderHeight],
   );
-
-  const unpurchasedItems = state.shoppingList.filter((item) => !item.is_purchased);
-  const purchasedItems = state.shoppingList.filter((item) => item.is_purchased);
 
   // selectedIds에서 구매 완료된 항목만 제거 (나머지는 유지)
   useEffect(() => {
@@ -105,145 +106,116 @@ export default function ShoppingListTableScreen() {
     });
   }, [state.selectedIds]);
 
-  const renderTabBar = (props: SceneRendererProps & { navigationState: NavigationState<Route> }) => (
-    <View style={styles.headerContainer}>
-      <Header title="장보기" />
-      <View style={styles.tabBar}>
-        {props.navigationState.routes.map((route, i) => {
-          const isActive = index === i;
-          return (
-            <TouchableOpacity key={route.key} style={styles.tabItem} onPress={() => setIndex(i)}>
-              <Text
-                style={[
-                  typography.styles.t7Bold,
-                  {
-                    color: isActive ? colors.primary : colors.textSecondary,
-                  },
-                ]}
-              >
-                {route.title}
-              </Text>
-              {isActive && <View style={[styles.tabIndicator, { backgroundColor: colors.primary }]} />}
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    </View>
+  // Handle horizontal scroll - update selected tab
+  const handleHorizontalScroll = useCallback(
+    (event: any) => {
+      const offsetX = event.nativeEvent.contentOffset.x;
+      const newIndex = Math.round(offsetX / layout.width);
+      if (newIndex !== index) {
+        setIndex(newIndex);
+      }
+    },
+    [layout.width, index],
   );
 
-  const UnpurchasedRoute = () => {
-    if (state.loading) {
-      return (
-        <View style={styles.sceneContainer}>
-          <EmptyStateUI title="로딩 중이에요..." />
-        </View>
-      );
-    }
-
-    if (unpurchasedItems.length === 0) {
-      return (
-        <View style={styles.sceneContainer}>
-          <EmptyStateUI
-            icon={<ShoppingCart size={64} color={colors.textTertiary} />}
-            title="구매 예정 항목이 없어요."
-            description="식재료를 소모하면 자동으로 추가돼요"
-          />
-        </View>
-      );
-    }
-
-    return (
-      <ScrollView
-        contentContainerStyle={{
-          paddingBottom: insets.bottom + 80,
-          paddingHorizontal: spacing.lg,
-          paddingTop: totalHeaderHeight + spacing.lg,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <ShoppingTableView
-          items={unpurchasedItems}
-          selectedIds={state.selectedIds}
-          onToggleSelect={handleToggleSelect}
-          onToggleSelectAll={handleToggleSelectAll}
-          onDeleteSelected={handleDeleteSelected}
-          onAddSelectedToStorage={handleAddSelectedToStorage}
-          onDeleteItem={handleDeleteItem}
-          onMemoPress={handleMemoPress}
-          onAddToStorage={handleAddToStorage}
-          onEmojiPress={handleEmojiPress}
-        />
-      </ScrollView>
-    );
-  };
-
-  const PurchasedRoute = () => {
-    if (state.loading) {
-      return (
-        <View style={styles.sceneContainer}>
-          <EmptyStateUI title="로딩 중이에요..." />
-        </View>
-      );
-    }
-
-    if (purchasedItems.length === 0) {
-      return (
-        <View style={styles.sceneContainer}>
-          <EmptyStateUI
-            icon={<ShoppingCart size={64} color={colors.textTertiary} />}
-            title="구매 완료 항목이 없어요."
-            description=""
-          />
-        </View>
-      );
-    }
-
-    return (
-      <ScrollView
-        contentContainerStyle={{
-          paddingBottom: insets.bottom + 80,
-          paddingHorizontal: spacing.lg,
-          paddingTop: totalHeaderHeight + spacing.lg,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <ShoppingTableView
-          items={purchasedItems}
-          selectedIds={state.selectedIds}
-          onToggleSelect={handleToggleSelect}
-          onToggleSelectAll={handleToggleSelectAll}
-          onDeleteSelected={handleDeleteSelected}
-          onAddSelectedToStorage={handleAddSelectedToStorage}
-          onDeleteItem={handleDeleteItem}
-          onMemoPress={handleMemoPress}
-          onAddToStorage={handleAddToStorage}
-          onEmojiPress={handleEmojiPress}
-          isPurchasedView={true}
-        />
-      </ScrollView>
-    );
-  };
-
-  const renderScene = ({ route }: { route: Route }) => {
-    switch (route.key) {
-      case 'unpurchased':
-        return <UnpurchasedRoute />;
-      case 'purchased':
-        return <PurchasedRoute />;
-      default:
-        return null;
-    }
-  };
+  // Handle tab press
+  const handleTabPress = useCallback(
+    (tabIndex: number) => {
+      if (horizontalScrollRef.current) {
+        horizontalScrollRef.current.scrollTo({
+          x: tabIndex * layout.width,
+          animated: true,
+        });
+      }
+      setIndex(tabIndex);
+    },
+    [layout.width],
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <TabView
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        renderTabBar={renderTabBar}
-        onIndexChange={setIndex}
-        initialLayout={{ width: layout.width }}
-      />
+      {/* Fixed Header */}
+      <View style={styles.headerContainer}>
+        <Header title="장보기" />
+        <View style={styles.tabBar}>
+          {routes.map((route, i) => {
+            const isActive = index === i;
+            return (
+              <TouchableOpacity key={route.key} style={styles.tabItem} onPress={() => handleTabPress(i)}>
+                <Text
+                  style={[
+                    typography.styles.t6Bold,
+                    {
+                      color: isActive ? colors.primary : colors.textSecondary,
+                    },
+                  ]}
+                >
+                  {route.title}
+                </Text>
+                {isActive && <View style={[styles.tabIndicator, { backgroundColor: colors.primary }]} />}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* Horizontal Scrollable Content */}
+      <ScrollView
+        ref={horizontalScrollRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={handleHorizontalScroll}
+        scrollEventThrottle={16}
+        style={{ flex: 1 }}
+      >
+        {routes.map((route) => {
+          const isUnpurchasedRoute = route.key === 'unpurchased';
+          const items = isUnpurchasedRoute ? unpurchasedItems : purchasedItems;
+          const isEmpty = items.length === 0;
+
+          return (
+            <View key={route.key} style={{ width: layout.width }}>
+              <ScrollView
+                contentContainerStyle={{
+                  paddingBottom: insets.bottom + 80,
+                  paddingHorizontal: spacing.lg,
+                  paddingTop: totalHeaderHeight + spacing.lg,
+                }}
+                showsVerticalScrollIndicator={false}
+              >
+                {state.loading ? (
+                  <View style={styles.sceneContainer}>
+                    <EmptyStateUI title="로딩 중이에요..." />
+                  </View>
+                ) : isEmpty ? (
+                  <View style={styles.sceneContainer}>
+                    <EmptyStateUI
+                      icon={<ShoppingCart size={64} color={colors.textTertiary} />}
+                      title={isUnpurchasedRoute ? '구매 예정 항목이 없어요.' : '구매 완료 항목이 없어요.'}
+                      description={isUnpurchasedRoute ? '식재료를 소모하면 자동으로 추가돼요' : ''}
+                    />
+                  </View>
+                ) : (
+                  <ShoppingTableView
+                    items={items}
+                    selectedIds={state.selectedIds}
+                    onToggleSelect={handleToggleSelect}
+                    onToggleSelectAll={handleToggleSelectAll}
+                    onDeleteSelected={handleDeleteSelected}
+                    onAddSelectedToStorage={handleAddSelectedToStorage}
+                    onDeleteItem={handleDeleteItem}
+                    onMemoPress={handleMemoPress}
+                    onAddToStorage={handleAddToStorage}
+                    onEmojiPress={handleEmojiPress}
+                    isPurchasedView={!isUnpurchasedRoute}
+                  />
+                )}
+              </ScrollView>
+            </View>
+          );
+        })}
+      </ScrollView>
 
       <FloatingButton
         menuItems={[
@@ -348,8 +320,7 @@ const createStyles = ({
     },
     sceneContainer: {
       flex: 1,
-      paddingTop: totalHeaderHeight + spacing.xxl,
-      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.xxl,
     },
     content: {
       flex: 1,

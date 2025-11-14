@@ -1,1 +1,1 @@
-export { default } from '@/screens/shopping/index_v2';
+export { default } from '@/screens/shopping';
