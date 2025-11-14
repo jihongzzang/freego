@@ -26,6 +26,8 @@ Notifications.setNotificationHandler({
  */
 export async function saveNotificationDays(days: number): Promise<void> {
   await notificationRepository.saveNotificationDays(days);
+  // 설정 변경 후 새로운 주기에 맞춰 알림 재스케줄링
+  await checkExpiryAndNotify();
 }
 
 /**
