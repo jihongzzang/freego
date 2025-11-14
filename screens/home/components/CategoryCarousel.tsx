@@ -3,14 +3,12 @@ import { ColorPalette, useTheme } from '@/lib/theme';
 import { Category } from '@/data/enums/category';
 import { makeCategoryList } from '@/utils/category/makeCategoryList';
 import Chip from '@/components/ui/Chip';
-import { useMemo, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { getCategoryIcon } from '@/utils/category';
+import { useMemo, useRef, forwardRef, useImperativeHandle } from 'react';
 
 interface CategoryCarouselProps {
   isIncludeAllCategory: boolean;
   selectedCategoryId: Category;
   onCategorySelect: (categoryId: Category) => void;
-  getCategoryCount: (categoryId: Category) => number;
 }
 
 export interface CategoryCarouselRef {
@@ -62,7 +60,9 @@ export const CategoryCarousel = forwardRef<CategoryCarouselRef, CategoryCarousel
             return (
               <View
                 key={categoryItem.id}
-                ref={(el) => (chipRefs.current[categoryItem.id] = el)}
+                ref={(el) => {
+                  chipRefs.current[categoryItem.id] = el;
+                }}
                 collapsable={false}
               >
                 <Chip

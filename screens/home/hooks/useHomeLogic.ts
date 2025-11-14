@@ -23,7 +23,7 @@ export function useHomeLogic() {
 
   // BulkAdd 로컬 상태
   const [isBulkAddVisible, setIsBulkAddVisible] = useState(false);
-  const [bulkAddCategoryId, setBulkAddCategoryId] = useState<Category | null>(null);
+  const [bulkAddCategoryId, setBulkAddCategoryId] = useState<Category>(Category.VEGETABLE);
   const [selectedTemplates, setSelectedTemplates] = useState<IngredientTemplate[]>([]);
 
   // MVI Store
@@ -85,10 +85,9 @@ export function useHomeLogic() {
   function handleBulkAddClose() {
     setIsBulkAddVisible(false);
     setSelectedTemplates([]);
-    setBulkAddCategoryId(null);
   }
 
-  function handleBulkAddCategoryChange(categoryId: Category | null) {
+  function handleBulkAddCategoryChange(categoryId: Category) {
     setBulkAddCategoryId(categoryId);
   }
 

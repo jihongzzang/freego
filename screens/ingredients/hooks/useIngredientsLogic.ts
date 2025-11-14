@@ -28,7 +28,7 @@ export function useIngredientsLogic() {
 
   // BulkAdd 로컬 상태
   const [isBulkAddVisible, setIsBulkAddVisible] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<Category | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<Category>(Category.VEGETABLE);
   const [selectedTemplates, setSelectedTemplates] = useState<IngredientTemplate[]>([]);
 
   // QuickUpdateEmoji 로컬 상태
@@ -291,10 +291,9 @@ export function useIngredientsLogic() {
   function handleBulkAddClose() {
     setIsBulkAddVisible(false);
     setSelectedTemplates([]);
-    setSelectedCategoryId(null);
   }
 
-  function handleBulkAddCategoryChange(categoryId: Category | null) {
+  function handleBulkAddCategoryChange(categoryId: Category) {
     setSelectedCategoryId(categoryId);
   }
 

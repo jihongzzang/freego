@@ -55,6 +55,12 @@ export default function HomeScreen() {
         });
       }
       setSelectedCategoryId(categoryId);
+
+      if (categoryId === Category.ALL || categoryId == Category.OTHER) {
+        bulkAdd.handleCategoryChange(Category.VEGETABLE);
+      } else {
+        bulkAdd.handleCategoryChange(categoryId);
+      }
     },
     [categories, setSelectedCategoryId],
   );
@@ -128,7 +134,6 @@ export default function HomeScreen() {
           isIncludeAllCategory
           selectedCategoryId={selectedCategoryId}
           onCategorySelect={handleCategorySelect}
-          getCategoryCount={getCategoryCount}
         />
       </View>
 
