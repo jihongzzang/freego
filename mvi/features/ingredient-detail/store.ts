@@ -8,7 +8,6 @@ import { Store } from '@/mvi/base';
 import { IngredientDetailState, IngredientDetailIntent, IngredientDetailEffect } from './types';
 import { ingredientDetailReducer } from './reducer';
 import { ingredientDetailMiddleware } from './middleware';
-import { Category } from '@/data/enums/category';
 
 /**
  * 초기 상태
