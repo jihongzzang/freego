@@ -36,9 +36,11 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
       try {
         const { ingredientService } = await import('@/services/ingredient.service');
         const { shoppingService } = await import('@/services/shopping.service');
+        const { achievementService } = await import('@/services/achievement.service');
 
         await ingredientService.clearAll();
         await shoppingService.clearAll();
+        await achievementService.resetAll();
 
         return {
           state: {

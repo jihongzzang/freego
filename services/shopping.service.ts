@@ -1,5 +1,6 @@
 import { ShoppingItem } from '@/data/models/shopping.model';
 import { shoppingRepository } from '@/data/repositories/shopping.repository';
+import { achievementService } from './achievement.service';
 
 /**
  * 장보기 리스트 관련 서비스
@@ -24,6 +25,11 @@ export const shoppingService = {
   async updateShoppingItem(id: string, updates: Partial<ShoppingItem>): Promise<void> {
     try {
       await shoppingRepository.updateShoppingItem(id, updates);
+
+      // 장보기 완료 시 업적 업데이트
+      if (updates.is_purchased === true) {
+        await achievementService.onShoppingCompleted();
+      }
     } catch (error) {
       console.error('Error updating shopping item:', error);
       throw error;

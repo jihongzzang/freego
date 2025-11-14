@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Package, Settings } from 'lucide-react-native';
+import { Award, ClipboardList, Home, Layers, Package, Refrigerator, Settings, ShoppingCart } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/lib/theme';
 import { Platform, Text, TouchableOpacity } from 'react-native';
@@ -80,7 +80,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '내 냉장고',
+          title: '홈',
           sceneStyle: { backgroundColor: colors.background },
           tabBarLabel: ({ focused }) => (
             <Text
@@ -101,7 +101,7 @@ export default function TabLayout() {
             </Text>
           ),
           tabBarIcon: ({ focused }) => (
-            <Home
+            <Refrigerator
               size={24}
               color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
             />
@@ -132,7 +132,7 @@ export default function TabLayout() {
             </Text>
           ),
           tabBarIcon: ({ focused }) => (
-            <Package
+            <ClipboardList
               size={24}
               color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
             />
@@ -163,7 +163,38 @@ export default function TabLayout() {
             </Text>
           ),
           tabBarIcon: ({ focused }) => (
-            <Package
+            <ShoppingCart
+              size={24}
+              color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="achievement"
+        options={{
+          title: '챌린지',
+          sceneStyle: { backgroundColor: colors.background },
+          tabBarLabel: ({ focused }) => (
+            <Text
+              style={[
+                typography.styles.t8Medium,
+                {
+                  color: isDark
+                    ? focused
+                      ? colors.grey200
+                      : colors.grey600
+                    : focused
+                      ? colors.grey900
+                      : colors.grey600,
+                },
+              ]}
+            >
+              챌린지
+            </Text>
+          ),
+          tabBarIcon: ({ focused }) => (
+            <Award
               size={24}
               color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
             />
