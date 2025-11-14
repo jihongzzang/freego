@@ -57,9 +57,16 @@ export function useShoppingLogic() {
           title: effect.payload.title,
           message: effect.payload.message,
           onConfirm: async () => {
+            console.log('🟠 SHOW_CONFIRM onConfirm started');
             const result = await effect.payload.onConfirm();
+            console.log('🟠 SHOW_CONFIRM result:', result);
 
-            // 데이터 다시 로드 (reducer가 selectedIds를 초기화함)
+            // 선택 상태 먼저 초기화
+            console.log('🟠 Dispatching CLEAR_SELECTION');
+            dispatch({ type: 'CLEAR_SELECTION' });
+
+            // 데이터 다시 로드
+            console.log('🟠 Dispatching LOAD_SHOPPING_LIST');
             dispatch({ type: 'LOAD_SHOPPING_LIST' });
 
             // 결과에 따라 토스트 표시
@@ -286,6 +293,7 @@ export function useShoppingLogic() {
 
   return {
     state,
+    dispatch,
     addShoppingItem: {
       isVisible: isAddingItem,
       name: addItemName,

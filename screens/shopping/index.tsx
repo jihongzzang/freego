@@ -28,6 +28,7 @@ export default function ShoppingListTableScreen() {
 
   const {
     state,
+    dispatch,
     addShoppingItem,
     handleToggleSelect,
     handleToggleSelectAll,
@@ -57,6 +58,12 @@ export default function ShoppingListTableScreen() {
     { key: 'purchased', title: '구매 완료' },
   ]);
 
+  // 탭이 바뀔 때 선택 해제
+  useEffect(() => {
+    console.log('🟣 Tab changed:', { index, route: routes[index].key });
+    dispatch({ type: 'CLEAR_SELECTION' });
+  }, [index, dispatch, routes]);
+
   const headerHeight = HEADER_HEIGHT + insets.top;
   const totalHeaderHeight = headerHeight + TAB_BAR_HEIGHT;
 
@@ -67,6 +74,36 @@ export default function ShoppingListTableScreen() {
 
   const unpurchasedItems = state.shoppingList.filter((item) => !item.is_purchased);
   const purchasedItems = state.shoppingList.filter((item) => item.is_purchased);
+
+  // selectedIds에서 구매 완료된 항목만 제거 (나머지는 유지)
+  useEffect(() => {
+    const unpurchasedIds = new Set(unpurchasedItems.map((item) => item.id));
+    const hasInvalidSelection = Array.from(state.selectedIds).some((id) => !unpurchasedIds.has(id));
+
+    // 선택된 항목 중 구매 완료된 것이 있으면, 구매 예정 항목만 남기기
+    if (hasInvalidSelection && state.selectedIds.size > 0) {
+      console.log('🔸 Removing purchased items from selection (keeping unpurchased)');
+      // 구매 예정 항목만 필터링해서 새로운 선택 상태로 업데이트
+      const validSelectedIds = Array.from(state.selectedIds).filter((id) => unpurchasedIds.has(id));
+
+      // 유효한 선택이 있으면 그것만 유지, 없으면 전체 초기화
+      if (validSelectedIds.length > 0) {
+        console.log('🔸 Keeping valid selections:', validSelectedIds);
+        dispatch({ type: 'SET_SELECTION', payload: { ids: validSelectedIds } });
+      } else {
+        console.log('🔸 No valid selections remaining, clearing all');
+        dispatch({ type: 'CLEAR_SELECTION' });
+      }
+    }
+  }, [unpurchasedItems, state.selectedIds, dispatch]);
+
+  // selectedIds 변경 추적
+  useEffect(() => {
+    console.log('⭐ selectedIds changed:', {
+      size: state.selectedIds.size,
+      ids: Array.from(state.selectedIds),
+    });
+  }, [state.selectedIds]);
 
   const renderTabBar = (props: SceneRendererProps & { navigationState: NavigationState<Route> }) => (
     <View style={styles.headerContainer}>

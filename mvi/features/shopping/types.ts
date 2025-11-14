@@ -30,6 +30,8 @@ export type ShoppingIntent =
   | { type: 'LOAD_SHOPPING_LIST' }
   | { type: 'TOGGLE_SELECT'; payload: { id: string } }
   | { type: 'TOGGLE_SELECT_ALL' }
+  | { type: 'CLEAR_SELECTION' }
+  | { type: 'SET_SELECTION'; payload: { ids: string[] } }
   | { type: 'DELETE_ITEM'; payload: { id: string; name: string } }
   | { type: 'DELETE_SELECTED' }
   | {

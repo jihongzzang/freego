@@ -21,6 +21,9 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
   switch (intent.type) {
     case 'LOAD_SHOPPING_LIST': {
       try {
+        console.log('🟡 LOAD_SHOPPING_LIST (middleware):', {
+          currentSelectedIds: state.selectedIds.size,
+        });
         const items = await shoppingService.getShoppingList();
         return {
           state: {
@@ -174,7 +177,6 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           state: {
             ...state,
             shoppingList: items,
-            selectedIds: new Set<string>(),
           },
           effects: [createSuccessEffect(`${intent.payload.name}이(가) 냉장고에 추가되었어요.`)],
         };
