@@ -11,6 +11,7 @@ import { Category } from '@/data/enums/category';
 import { getCategoryLabel } from '@/utils/category/getCategoryLabel';
 import ERROR_MESSAGES from '@/constants/toast/errorMessages';
 import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
+import { getRandomEmojiForCategory } from '@/constants/ingredientTemplates';
 
 export function useShoppingLogic() {
   const { confirm } = useDialog();
@@ -249,6 +250,39 @@ export function useShoppingLogic() {
     handleEmojiClose();
   }
 
+  // Cancel Purchase Handler
+  function handleCancelPurchase(id: string, name: string) {
+    dispatch({
+      type: 'CANCEL_PURCHASE',
+      payload: {
+        id,
+        name,
+      },
+    });
+  }
+
+  // Repurchase Handler
+  function handleRepurchase(id: string, name: string) {
+    dispatch({
+      type: 'REPURCHASE',
+      payload: {
+        id,
+        name,
+      },
+    });
+  }
+
+  // Delete Date Items Handler
+  function handleDeleteDateItems(dateKey: string, itemIds: string[]) {
+    dispatch({
+      type: 'DELETE_DATE_ITEMS',
+      payload: {
+        dateKey,
+        itemIds,
+      },
+    });
+  }
+
   // Add Shopping Item Handlers
   function handleOpenAddItem() {
     setIsAddingItem(true);
@@ -285,6 +319,7 @@ export function useShoppingLogic() {
         name: addItemName.trim(),
         category: addItemCategory,
         memo: addItemMemo.trim() || undefined,
+        emoji: getRandomEmojiForCategory(addItemCategory),
       },
     });
 
@@ -326,5 +361,8 @@ export function useShoppingLogic() {
     editingEmojiId,
     handleEmojiClose,
     handleEmojiSubmit,
+    handleCancelPurchase,
+    handleRepurchase,
+    handleDeleteDateItems,
   };
 }

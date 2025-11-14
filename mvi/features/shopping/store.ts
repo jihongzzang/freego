@@ -22,6 +22,7 @@ const initialState: ShoppingState = {
   addForm: {
     name: '',
     category: Category.VEGETABLE,
+    emoji: null,
   },
 };
 

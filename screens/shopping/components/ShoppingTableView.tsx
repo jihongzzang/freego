@@ -5,6 +5,7 @@ import { ShoppingItem as ShoppingListItem } from '@/data/models/shopping.model';
 import { Category } from '@/data/enums/category';
 import { useMemo } from 'react';
 import { ShoppingTableRow } from './ShoppingTableRow';
+import Accordion from '@/components/ui/Accordion';
 
 // 날짜를 "YYYY-MM-DD" 형식으로 변환
 function formatDateKey(dateString: string | null): string {
@@ -51,6 +52,9 @@ interface ShoppingTableViewProps {
   onMemoPress?: (id: string, currentMemo: string | null) => void;
   onAddToStorage?: (id: string, name: string, category: Category) => void;
   onEmojiPress?: (id: string) => void;
+  onCancelPurchase?: (id: string, name: string) => void;
+  onRepurchase?: (id: string, name: string) => void;
+  onDeleteDateItems?: (dateKey: string, itemIds: string[]) => void;
   isPurchasedView?: boolean;
 }
 
@@ -65,6 +69,9 @@ export function ShoppingTableView({
   onMemoPress,
   onAddToStorage,
   onEmojiPress,
+  onCancelPurchase,
+  onRepurchase,
+  onDeleteDateItems,
   isPurchasedView = false,
 }: ShoppingTableViewProps) {
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
@@ -141,48 +148,66 @@ export function ShoppingTableView({
       )}
 
       {isPurchasedView && groupedItems ? (
-        // 구매 완료 탭: 날짜별 그룹화
+        // 구매 완료 탭: 날짜별 아코디언
         Object.entries(groupedItems).map(([dateKey, dateItems]) => (
           <View key={dateKey} style={styles.dateSection}>
-            <View style={styles.dateSectionHeader}>
-              <Text style={[typography.styles.t7Bold, { color: colors.text }]}>{dateKey}</Text>
-              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>
-                {dateItems.length}개 항목
-              </Text>
-            </View>
-            <View style={styles.tableWrapper}>
-              {/* Header */}
-              <View
-                style={[
-                  styles.headerRow,
-                  { backgroundColor: isDark ? colors.grey900 : colors.surface, borderColor: colors.border },
-                ]}
-              >
-                <View style={[styles.cell, styles.nameCell]}>
-                  <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
+            <Accordion
+              title={dateKey}
+              badge={
+                <Text style={[typography.styles.t7Bold, { color: colors.textSecondary }]}>
+                  {dateItems.length}
+                </Text>
+              }
+              rightAction={
+                onDeleteDateItems ? (
+                  <TouchableOpacity
+                    onPress={() => onDeleteDateItems(dateKey, dateItems.map((item) => item.id))}
+                    activeOpacity={0.7}
+                  >
+                    <Trash2 size={18} color={colors.red500} />
+                  </TouchableOpacity>
+                ) : undefined
+              }
+              defaultExpanded={true}
+            >
+              <View style={styles.tableWrapper}>
+                {/* Header */}
+                <View
+                  style={[
+                    styles.headerRow,
+                    { backgroundColor: isDark ? colors.grey900 : colors.surface, borderColor: colors.border },
+                  ]}
+                >
+                  <View style={[styles.cell, styles.nameCell]}>
+                    <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
+                  </View>
                 </View>
-              </View>
 
-              {/* Data Rows */}
-              {dateItems.map((item) => (
-                <ShoppingTableRow
-                  key={item.id}
-                  id={String(item.id)}
-                  name={item.emoji ? `${item.emoji} ${item.name}` : `${item.name}`}
-                  isSelected={selectedIds.has(item.id)}
-                  isPurchased={item.is_purchased}
-                  memo={item.memo}
-                  onToggle={() => onToggleSelect(String(item.id))}
-                  onMemoPress={onMemoPress ? () => onMemoPress(String(item.id), item.memo) : undefined}
-                  onDelete={onDeleteItem ? () => onDeleteItem(String(item.id), item.name) : undefined}
-                  onAddToStorage={
-                    onAddToStorage ? () => onAddToStorage(String(item.id), item.name, item.category) : undefined
-                  }
-                  onEmojiPress={onEmojiPress ? () => onEmojiPress(String(item.id)) : undefined}
-                  hideCheckbox={isPurchasedView}
-                />
-              ))}
-            </View>
+                {/* Data Rows */}
+                {dateItems.map((item) => (
+                  <ShoppingTableRow
+                    key={item.id}
+                    id={String(item.id)}
+                    name={item.emoji ? `${item.emoji} ${item.name}` : `${item.name}`}
+                    isSelected={selectedIds.has(item.id)}
+                    isPurchased={item.is_purchased}
+                    memo={item.memo}
+                    onToggle={() => onToggleSelect(String(item.id))}
+                    onMemoPress={onMemoPress ? () => onMemoPress(String(item.id), item.memo) : undefined}
+                    onDelete={onDeleteItem ? () => onDeleteItem(String(item.id), item.name) : undefined}
+                    onAddToStorage={
+                      onAddToStorage ? () => onAddToStorage(String(item.id), item.name, item.category) : undefined
+                    }
+                    onEmojiPress={onEmojiPress ? () => onEmojiPress(String(item.id)) : undefined}
+                    onCancelPurchase={
+                      onCancelPurchase ? () => onCancelPurchase(String(item.id), item.name) : undefined
+                    }
+                    onRepurchase={onRepurchase ? () => onRepurchase(String(item.id), item.name) : undefined}
+                    hideCheckbox={isPurchasedView}
+                  />
+                ))}
+              </View>
+            </Accordion>
           </View>
         ))
       ) : (
@@ -268,14 +293,6 @@ const createStyles = ({
 
     dateSection: {
       marginBottom: spacing.lg,
-    },
-
-    dateSectionHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: spacing.sm,
-      paddingHorizontal: spacing.xs,
     },
 
     tableWrapper: {

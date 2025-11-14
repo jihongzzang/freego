@@ -49,6 +49,9 @@ export default function ShoppingListTableScreen() {
     editingEmojiId,
     handleEmojiClose,
     handleEmojiSubmit,
+    handleCancelPurchase,
+    handleRepurchase,
+    handleDeleteDateItems,
   } = useShoppingLogic();
 
   const [index, setIndex] = useState(0);
@@ -208,6 +211,9 @@ export default function ShoppingListTableScreen() {
                     onMemoPress={handleMemoPress}
                     onAddToStorage={handleAddToStorage}
                     onEmojiPress={handleEmojiPress}
+                    onCancelPurchase={handleCancelPurchase}
+                    onRepurchase={handleRepurchase}
+                    onDeleteDateItems={handleDeleteDateItems}
                     isPurchasedView={!isUnpurchasedRoute}
                   />
                 )}
@@ -250,7 +256,6 @@ export default function ShoppingListTableScreen() {
         onMemoChange={addShoppingItem.handleMemoChange}
         onSubmit={addShoppingItem.handleSubmit}
       />
-
       <MemoBottomSheet
         visible={editingMemoId !== null}
         onClose={handleMemoClose}

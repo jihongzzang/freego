@@ -8,6 +8,7 @@ interface AccordionProps {
   children: React.ReactNode;
   leftIcon?: React.ReactNode;
   badge?: React.ReactNode;
+  rightAction?: React.ReactNode;
   defaultExpanded?: boolean;
   onToggle?: (expanded: boolean) => void;
   style?: ViewStyle;
@@ -18,6 +19,7 @@ export default function Accordion({
   children,
   leftIcon,
   badge,
+  rightAction,
   defaultExpanded = false,
   onToggle,
   style,
@@ -40,6 +42,7 @@ export default function Accordion({
 
         <View style={styles.headerRight}>
           {badge && <View style={styles.badge}>{badge}</View>}
+          {rightAction && <View style={styles.rightAction}>{rightAction}</View>}
           <View style={{ transform: [{ rotate: isExpanded ? '180deg' : '0deg' }] }}>
             <ChevronDown size={20} color={colors.textTertiary} />
           </View>
@@ -72,6 +75,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   badge: {},
+  rightAction: {},
   content: {
     // marginTop: 12,
   },

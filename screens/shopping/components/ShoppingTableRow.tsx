@@ -15,6 +15,8 @@ interface ShoppingTableRowProps {
   onDelete?: () => void;
   onAddToStorage?: () => void;
   onEmojiPress?: () => void;
+  onCancelPurchase?: () => void;
+  onRepurchase?: () => void;
   hideCheckbox?: boolean;
 }
 
@@ -28,6 +30,8 @@ export function ShoppingTableRow({
   onDelete,
   onAddToStorage,
   onEmojiPress,
+  onCancelPurchase,
+  onRepurchase,
   hideCheckbox = false,
 }: ShoppingTableRowProps) {
   const { colors, typography, spacing } = useTheme();
@@ -66,39 +70,7 @@ export function ShoppingTableRow({
       )}
 
       {/* Name + Memo Cell - With MenuView */}
-      {isPurchased ? (
-        <View style={[styles.cell, styles.nameCell]}>
-          <Text
-            style={[
-              typography.styles.t7Semibold,
-              {
-                color: colors.text,
-              },
-            ]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {name}
-          </Text>
-          {memo && (
-            <Text
-              style={[
-                typography.styles.t7,
-                {
-                  color: colors.textSecondary,
-                  fontSize: 11,
-                  marginTop: 2,
-                },
-              ]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {memo}
-            </Text>
-          )}
-        </View>
-      ) : (
-        <MenuView
+      <MenuView
           style={{ flex: 1 }}
           onPressAction={({ nativeEvent }) => {
             switch (nativeEvent.event) {
@@ -114,6 +86,12 @@ export function ShoppingTableRow({
               case 'memo':
                 onMemoPress?.();
                 break;
+              case 'cancel-purchase':
+                onCancelPurchase?.();
+                break;
+              case 'repurchase':
+                onRepurchase?.();
+                break;
               case 'delete':
                 onDelete?.();
                 break;
@@ -122,6 +100,24 @@ export function ShoppingTableRow({
           actions={
             isPurchased
               ? [
+                  {
+                    id: 'cancel-purchase',
+                    title: '구매완료 취소',
+                    image: Platform.select({
+                      ios: 'arrow.uturn.backward',
+                      android: undefined,
+                    }),
+                    imageColor: colors.orange600,
+                  },
+                  {
+                    id: 'repurchase',
+                    title: '재구매',
+                    image: Platform.select({
+                      ios: 'arrow.clockwise',
+                      android: undefined,
+                    }),
+                    imageColor: colors.blue600,
+                  },
                   {
                     id: 'delete',
                     title: '삭제하기',
@@ -209,7 +205,6 @@ export function ShoppingTableRow({
             )}
           </View>
         </MenuView>
-      )}
     </View>
   );
 }

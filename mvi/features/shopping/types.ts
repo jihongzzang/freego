@@ -20,6 +20,7 @@ export interface ShoppingState extends State {
   addForm: {
     name: string;
     category: Category;
+    emoji: string | null;
   };
 }
 
@@ -34,14 +35,17 @@ export type ShoppingIntent =
   | { type: 'SET_SELECTION'; payload: { ids: string[] } }
   | { type: 'DELETE_ITEM'; payload: { id: string; name: string } }
   | { type: 'DELETE_SELECTED' }
+  | { type: 'DELETE_DATE_ITEMS'; payload: { dateKey: string; itemIds: string[] } }
   | {
       type: 'ADD_ITEM_TO_STORAGE';
       payload: { id: string; name: string; category: Category; storageLocation: StorageLocation };
     }
   | { type: 'ADD_SELECTED_TO_STORAGE' }
-  | { type: 'SUBMIT_ADD_ITEM'; payload: { name: string; category: Category; memo?: string } }
+  | { type: 'SUBMIT_ADD_ITEM'; payload: { name: string; category: Category; memo?: string; emoji: string } }
   | { type: 'UPDATE_MEMO'; payload: { id: string; memo?: string } }
-  | { type: 'UPDATE_EMOJI'; payload: { id: string; emoji: string } };
+  | { type: 'UPDATE_EMOJI'; payload: { id: string; emoji: string } }
+  | { type: 'CANCEL_PURCHASE'; payload: { id: string; name: string } }
+  | { type: 'REPURCHASE'; payload: { id: string; name: string } };
 
 /**
  * Shopping Effect (부수 효과)

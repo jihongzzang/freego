@@ -91,7 +91,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         await shoppingService.addToShoppingList({
           name: intent.payload.name.trim(),
           category: intent.payload.category,
-          emoji: null,
+          emoji: intent.payload.emoji,
           memo: intent.payload.memo || null,
           last_modified_date_time: null,
           deleted_date_time: null,
@@ -290,6 +290,99 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           effects: [createErrorEffect('이모지 변경에 실패했어요.')],
         };
       }
+    }
+
+    case 'CANCEL_PURCHASE': {
+      return {
+        effects: [
+          {
+            type: 'SHOW_CONFIRM',
+            payload: {
+              title: '구매완료 취소',
+              message: `"${intent.payload.name}"의 구매완료를 취소할까요?`,
+              onConfirm: async () => {
+                try {
+                  await shoppingService.updateShoppingItem(intent.payload.id, {
+                    is_purchased: false,
+                    purchased_date_time: null,
+                  });
+                  return { success: true };
+                } catch (error) {
+                  console.error('Error canceling purchase:', error);
+                  return { success: false };
+                }
+              },
+              isDanger: false,
+            },
+          },
+        ],
+      };
+    }
+
+    case 'REPURCHASE': {
+      try {
+        const item = state.shoppingList.find((i) => i.id === intent.payload.id);
+
+        if (!item) {
+          return {
+            effects: [createErrorEffect('항목을 찾을 수 없어요.')],
+          };
+        }
+
+        await shoppingService.addToShoppingList({
+          name: item.name,
+          category: item.category,
+          emoji: item.emoji,
+          memo: item.memo,
+          last_modified_date_time: null,
+          deleted_date_time: null,
+        });
+
+        const items = await shoppingService.getShoppingList();
+        return {
+          state: {
+            ...state,
+            shoppingList: items,
+          },
+          effects: [createSuccessEffect(`'${item.name}'을(를) 구매 예정에 추가했어요.`)],
+        };
+      } catch (error) {
+        console.error('Error repurchasing item:', error);
+        return {
+          effects: [createErrorEffect('재구매 추가에 실패했어요.')],
+        };
+      }
+    }
+
+    case 'DELETE_DATE_ITEMS': {
+      const itemCount = intent.payload.itemIds.length;
+
+      return {
+        effects: [
+          {
+            type: 'SHOW_CONFIRM',
+            payload: {
+              title: '날짜별 항목 삭제',
+              message: `${intent.payload.dateKey}의 ${itemCount}개 항목을 삭제할까요?`,
+              onConfirm: async () => {
+                try {
+                  const now = new Date().toISOString();
+                  for (const id of intent.payload.itemIds) {
+                    await shoppingService.updateShoppingItem(id, {
+                      deleted_date_time: now,
+                    });
+                  }
+                  return { success: true, count: itemCount };
+                } catch (error) {
+                  console.error('Error deleting date items:', error);
+                  return { success: false };
+                }
+              },
+              isDanger: true,
+            },
+          },
+        ],
+      };
     }
 
     default:
