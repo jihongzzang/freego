@@ -58,21 +58,15 @@ export function IngredientsTableAccordion({
       onToggle={onToggle}
     >
       {items.length > 0 ? (
-        <View
-          style={[
-            styles.tableWrapper,
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              borderWidth: 1,
-            },
-          ]}
-        >
+        <View style={styles.tableWrapper}>
           {/* Header */}
           <View
             style={[
               styles.headerRow,
-              { backgroundColor: isDark ? colors.grey900 : colors.surface, borderBottomColor: colors.border },
+              {
+                backgroundColor: isDark ? colors.grey900 : colors.surface,
+                borderColor: colors.border,
+              },
             ]}
           >
             <View style={[styles.cell, styles.emojiCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
@@ -118,7 +112,6 @@ export function IngredientsTableAccordion({
               onQuickConsume={() => onQuickConsume(String(item.id))}
               onQuickDelete={() => onQuickDelete(String(item.id))}
               onViewDetail={() => onViewDetail(String(item.id))}
-              isLast={index === items.length - 1}
             />
           ))}
         </View>
@@ -138,37 +131,48 @@ const createStyles = ({
 }) =>
   StyleSheet.create({
     tableWrapper: {
-      borderRadius: 4,
       overflow: 'hidden',
+      flexDirection: 'column',
+      gap: spacing.sm,
     },
+
     headerRow: {
       flexDirection: 'row',
-      borderBottomWidth: 1,
       paddingHorizontal: spacing.xs,
+      marginBottom: spacing.xs,
+      borderRadius: spacing.sm,
+      borderWidth: 1,
     },
+
     cell: {
       justifyContent: 'center',
       paddingHorizontal: spacing.sm,
       paddingVertical: spacing.sm,
     },
+
     emojiCell: {
       width: 32,
       alignItems: 'center',
     },
+
     nameCell: {
       flex: 1,
       minWidth: 80,
     },
+
     quantityCell: {
       width: 60,
     },
+
     storageCell: {
       width: 60,
     },
+
     expiryCell: {
       width: 60,
       alignItems: 'center',
     },
+
     memoCell: {
       width: 40,
       alignItems: 'center',

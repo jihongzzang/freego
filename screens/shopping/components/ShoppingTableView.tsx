@@ -33,7 +33,7 @@ function groupByPurchasedDate(items: ShoppingListItem[]): Record<string, Shoppin
   });
 
   const sortedGrouped: Record<string, ShoppingListItem[]> = {};
-  sortedKeys.forEach(key => {
+  sortedKeys.forEach((key) => {
     sortedGrouped[key] = grouped[key];
   });
 
@@ -114,7 +114,9 @@ export function ShoppingTableView({
                 activeOpacity={0.7}
               >
                 <Package size={14} color={colors.white} />
-                <Text style={[typography.styles.t7Medium, { color: colors.white }]}>냉장고에 넣기 ({selectedCount})</Text>
+                <Text style={[typography.styles.t7Medium, { color: colors.white }]}>
+                  냉장고에 넣기 ({selectedCount})
+                </Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity
@@ -148,106 +150,82 @@ export function ShoppingTableView({
                 {dateItems.length}개 항목
               </Text>
             </View>
-            <View
-              style={[
-                styles.tableWrapper,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  borderWidth: 1,
-                },
-              ]}
-            >
-              <View>
-                {/* Header */}
-                <View
-                  style={[
-                    styles.headerRow,
-                    { backgroundColor: isDark ? colors.grey900 : colors.surface, borderBottomColor: colors.border },
-                  ]}
-                >
-                  <View style={[styles.cell, styles.nameCell]}>
-                    <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
-                  </View>
+            <View style={styles.tableWrapper}>
+              {/* Header */}
+              <View
+                style={[
+                  styles.headerRow,
+                  { backgroundColor: isDark ? colors.grey900 : colors.surface, borderColor: colors.border },
+                ]}
+              >
+                <View style={[styles.cell, styles.nameCell]}>
+                  <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
                 </View>
-
-                {/* Data Rows */}
-                {dateItems.map((item, index) => (
-                  <ShoppingTableRow
-                    key={item.id}
-                    id={String(item.id)}
-                    name={item.emoji ? `${item.emoji} ${item.name}` : `${item.name}`}
-                    isSelected={selectedIds.has(item.id)}
-                    isPurchased={item.is_purchased}
-                    memo={item.memo}
-                    onToggle={() => onToggleSelect(String(item.id))}
-                    onMemoPress={onMemoPress ? () => onMemoPress(String(item.id), item.memo) : undefined}
-                    onDelete={onDeleteItem ? () => onDeleteItem(String(item.id), item.name) : undefined}
-                    onAddToStorage={
-                      onAddToStorage ? () => onAddToStorage(String(item.id), item.name, item.category) : undefined
-                    }
-                    onEmojiPress={onEmojiPress ? () => onEmojiPress(String(item.id)) : undefined}
-                    isLast={index === dateItems.length - 1}
-                    hideCheckbox={isPurchasedView}
-                  />
-                ))}
               </View>
+
+              {/* Data Rows */}
+              {dateItems.map((item) => (
+                <ShoppingTableRow
+                  key={item.id}
+                  id={String(item.id)}
+                  name={item.emoji ? `${item.emoji} ${item.name}` : `${item.name}`}
+                  isSelected={selectedIds.has(item.id)}
+                  isPurchased={item.is_purchased}
+                  memo={item.memo}
+                  onToggle={() => onToggleSelect(String(item.id))}
+                  onMemoPress={onMemoPress ? () => onMemoPress(String(item.id), item.memo) : undefined}
+                  onDelete={onDeleteItem ? () => onDeleteItem(String(item.id), item.name) : undefined}
+                  onAddToStorage={
+                    onAddToStorage ? () => onAddToStorage(String(item.id), item.name, item.category) : undefined
+                  }
+                  onEmojiPress={onEmojiPress ? () => onEmojiPress(String(item.id)) : undefined}
+                  hideCheckbox={isPurchasedView}
+                />
+              ))}
             </View>
           </View>
         ))
       ) : (
         // 구매 예정 탭: 일반 리스트
-        <View
-          style={[
-            styles.tableWrapper,
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              borderWidth: 1,
-            },
-          ]}
-        >
-          <View>
-            {/* Header */}
-            <View
-              style={[
-                styles.headerRow,
-                { backgroundColor: isDark ? colors.grey900 : colors.surface, borderBottomColor: colors.border },
-              ]}
-            >
-              {!isPurchasedView && (
-                <View
-                  style={[styles.cell, styles.checkboxCell, { borderRightWidth: 1, borderRightColor: colors.border }]}
-                >
-                  <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>완료</Text>
-                </View>
-              )}
-              <View style={[styles.cell, styles.nameCell]}>
-                <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
+        <View style={styles.tableWrapper}>
+          {/* Header */}
+          <View
+            style={[
+              styles.headerRow,
+              { backgroundColor: isDark ? colors.grey900 : colors.surface, borderColor: colors.border },
+            ]}
+          >
+            {!isPurchasedView && (
+              <View
+                style={[styles.cell, styles.checkboxCell, { borderRightWidth: 1, borderRightColor: colors.border }]}
+              >
+                <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>완료</Text>
               </View>
+            )}
+            <View style={[styles.cell, styles.nameCell]}>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
             </View>
-
-            {/* Data Rows */}
-            {items.map((item, index) => (
-              <ShoppingTableRow
-                key={item.id}
-                id={String(item.id)}
-                name={item.emoji ? `${item.emoji} ${item.name}` : `${item.name}`}
-                isSelected={selectedIds.has(item.id)}
-                isPurchased={item.is_purchased}
-                memo={item.memo}
-                onToggle={() => onToggleSelect(String(item.id))}
-                onMemoPress={onMemoPress ? () => onMemoPress(String(item.id), item.memo) : undefined}
-                onDelete={onDeleteItem ? () => onDeleteItem(String(item.id), item.name) : undefined}
-                onAddToStorage={
-                  onAddToStorage ? () => onAddToStorage(String(item.id), item.name, item.category) : undefined
-                }
-                onEmojiPress={onEmojiPress ? () => onEmojiPress(String(item.id)) : undefined}
-                isLast={index === items.length - 1}
-                hideCheckbox={isPurchasedView}
-              />
-            ))}
           </View>
+
+          {/* Data Rows */}
+          {items.map((item) => (
+            <ShoppingTableRow
+              key={item.id}
+              id={String(item.id)}
+              name={item.emoji ? `${item.emoji} ${item.name}` : `${item.name}`}
+              isSelected={selectedIds.has(item.id)}
+              isPurchased={item.is_purchased}
+              memo={item.memo}
+              onToggle={() => onToggleSelect(String(item.id))}
+              onMemoPress={onMemoPress ? () => onMemoPress(String(item.id), item.memo) : undefined}
+              onDelete={onDeleteItem ? () => onDeleteItem(String(item.id), item.name) : undefined}
+              onAddToStorage={
+                onAddToStorage ? () => onAddToStorage(String(item.id), item.name, item.category) : undefined
+              }
+              onEmojiPress={onEmojiPress ? () => onEmojiPress(String(item.id)) : undefined}
+              hideCheckbox={isPurchasedView}
+            />
+          ))}
         </View>
       )}
     </View>
@@ -266,16 +244,19 @@ const createStyles = ({
       marginBottom: spacing.xxl,
       paddingTop: spacing.xl,
     },
+
     sectionHeader: {
       flexDirection: 'row',
       justifyContent: 'flex-end',
       alignItems: 'center',
       marginBottom: spacing.md,
     },
+
     actionButtons: {
       flexDirection: 'row',
       gap: spacing.sm,
     },
+
     clearButton: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -284,9 +265,11 @@ const createStyles = ({
       paddingVertical: spacing.xs,
       borderRadius: borderRadius.md,
     },
+
     dateSection: {
       marginBottom: spacing.lg,
     },
+
     dateSectionHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -294,24 +277,32 @@ const createStyles = ({
       marginBottom: spacing.sm,
       paddingHorizontal: spacing.xs,
     },
+
     tableWrapper: {
-      borderRadius: 4,
       overflow: 'hidden',
+      flexDirection: 'column',
+      gap: spacing.sm,
     },
+
     headerRow: {
       flexDirection: 'row',
-      borderBottomWidth: 1,
       paddingHorizontal: spacing.xs,
+      marginBottom: spacing.xs,
+      borderRadius: spacing.sm,
+      borderWidth: 1,
     },
+
     cell: {
       justifyContent: 'center',
       paddingHorizontal: spacing.sm,
       paddingVertical: spacing.sm,
     },
+
     checkboxCell: {
       width: 40,
       alignItems: 'center',
     },
+
     nameCell: {
       flex: 1,
       minWidth: 100,

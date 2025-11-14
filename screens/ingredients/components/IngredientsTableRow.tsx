@@ -19,7 +19,6 @@ interface IngredientsTableRowProps {
   onQuickUpdateStorage?: () => void;
   onQuickUpdateMemo?: () => void;
   onViewDetail?: () => void;
-  isLast?: boolean;
 }
 
 export function IngredientsTableRow({
@@ -34,9 +33,8 @@ export function IngredientsTableRow({
   onQuickUpdateStorage,
   onQuickUpdateMemo,
   onViewDetail,
-  isLast,
 }: IngredientsTableRowProps) {
-  const { colors, typography, spacing } = useTheme();
+  const { isDark, colors, typography, spacing } = useTheme();
 
   const dday = calculateDday(item.expired_date_time);
   const ddayColorType = getDdayColor(dday);
@@ -49,20 +47,19 @@ export function IngredientsTableRow({
           ? colors.textSecondary
           : colors.green500;
 
-  const storageLabel = item.storage_location
-    ? getStorageLocationLabel({ storageLocation: item.storage_location, lang: 'kr' })
-    : '-';
-
   const quantityLabel = item.quantity ? item.quantity : '-';
 
-  const styles = useMemo(() => createStyles({ spacing, isLast: isLast || false }), [spacing, isLast]);
+  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
   return (
     <View
       style={[
         styles.row,
         {
-          borderBottomColor: colors.border,
+          backgroundColor: isDark ? colors.grey900 : colors.surface,
+          borderColor: colors.border,
+          borderRadius: spacing.sm,
+          borderWidth: 1,
         },
       ]}
     >
@@ -250,40 +247,48 @@ export function IngredientsTableRow({
   );
 }
 
-const createStyles = ({ spacing, isLast }: { spacing: typeof import('@/lib/theme').spacing; isLast: boolean }) =>
+const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
   StyleSheet.create({
     row: {
       flexDirection: 'row',
       paddingHorizontal: spacing.xs,
-      borderBottomWidth: isLast ? 0 : 1,
       minHeight: 48,
       alignItems: 'stretch',
+      borderRadius: spacing.sm,
+      borderWidth: 1,
     },
+
     cell: {
       justifyContent: 'center',
       paddingHorizontal: spacing.sm,
       alignSelf: 'stretch',
     },
+
     emojiCell: {
       width: 32,
       alignItems: 'center',
     },
+
     nameCell: {
       flex: 1,
       minWidth: 80,
     },
+
     quantityCell: {
       width: 60,
       alignItems: 'center',
     },
+
     storageCell: {
       width: 60,
       alignItems: 'center',
     },
+
     expiryCell: {
       width: 60,
       alignItems: 'center',
     },
+
     memoCell: {
       width: 40,
       alignItems: 'center',

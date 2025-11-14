@@ -15,7 +15,6 @@ interface ShoppingTableRowProps {
   onDelete?: () => void;
   onAddToStorage?: () => void;
   onEmojiPress?: () => void;
-  isLast?: boolean;
   hideCheckbox?: boolean;
 }
 
@@ -29,19 +28,18 @@ export function ShoppingTableRow({
   onDelete,
   onAddToStorage,
   onEmojiPress,
-  isLast,
   hideCheckbox = false,
 }: ShoppingTableRowProps) {
   const { colors, typography, spacing } = useTheme();
 
-  const styles = useMemo(() => createStyles({ spacing, isLast: isLast || false }), [spacing, isLast]);
+  const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
   return (
     <View
       style={[
         styles.row,
         {
-          borderBottomColor: colors.border,
+          borderColor: colors.border,
           backgroundColor: colors.surface,
         },
       ]}
@@ -101,133 +99,135 @@ export function ShoppingTableRow({
         </View>
       ) : (
         <MenuView
-        style={{ flex: 1 }}
-        onPressAction={({ nativeEvent }) => {
-          switch (nativeEvent.event) {
-            case 'toggle':
-              onToggle?.();
-              break;
-            case 'add-to-storage':
-              onAddToStorage?.();
-              break;
-            case 'emoji':
-              onEmojiPress?.();
-              break;
-            case 'memo':
-              onMemoPress?.();
-              break;
-            case 'delete':
-              onDelete?.();
-              break;
+          style={{ flex: 1 }}
+          onPressAction={({ nativeEvent }) => {
+            switch (nativeEvent.event) {
+              case 'toggle':
+                onToggle?.();
+                break;
+              case 'add-to-storage':
+                onAddToStorage?.();
+                break;
+              case 'emoji':
+                onEmojiPress?.();
+                break;
+              case 'memo':
+                onMemoPress?.();
+                break;
+              case 'delete':
+                onDelete?.();
+                break;
+            }
+          }}
+          actions={
+            isPurchased
+              ? [
+                  {
+                    id: 'delete',
+                    title: '삭제하기',
+                    image: Platform.select({
+                      ios: 'trash',
+                      android: undefined,
+                    }),
+                    attributes: {
+                      destructive: true,
+                    },
+                    imageColor: colors.red600,
+                  },
+                ]
+              : [
+                  {
+                    id: 'add-to-storage',
+                    title: '냉장고에 넣기',
+                    image: Platform.select({
+                      ios: 'refrigerator',
+                      android: undefined,
+                    }),
+                    imageColor: colors.blue600,
+                  },
+                  {
+                    id: 'emoji',
+                    title: '이모지 수정하기',
+                    image: Platform.select({
+                      ios: 'face.smiling',
+                      android: undefined,
+                    }),
+                    imageColor: colors.orange600,
+                  },
+                  {
+                    id: 'memo',
+                    title: '메모 수정하기',
+                    image: Platform.select({
+                      ios: 'text.bubble',
+                      android: undefined,
+                    }),
+                    imageColor: colors.primary,
+                  },
+                  {
+                    id: 'delete',
+                    title: '삭제하기',
+                    image: Platform.select({
+                      ios: 'trash',
+                      android: undefined,
+                    }),
+                    attributes: {
+                      destructive: true,
+                    },
+                    imageColor: colors.red600,
+                  },
+                ]
           }
-        }}
-        actions={
-          isPurchased
-            ? [
-                {
-                  id: 'delete',
-                  title: '삭제하기',
-                  image: Platform.select({
-                    ios: 'trash',
-                    android: undefined,
-                  }),
-                  attributes: {
-                    destructive: true,
-                  },
-                  imageColor: colors.red600,
-                },
-              ]
-            : [
-                {
-                  id: 'add-to-storage',
-                  title: '냉장고에 넣기',
-                  image: Platform.select({
-                    ios: 'refrigerator',
-                    android: undefined,
-                  }),
-                  imageColor: colors.blue600,
-                },
-                {
-                  id: 'emoji',
-                  title: '이모지 수정하기',
-                  image: Platform.select({
-                    ios: 'face.smiling',
-                    android: undefined,
-                  }),
-                  imageColor: colors.orange600,
-                },
-                {
-                  id: 'memo',
-                  title: '메모 수정하기',
-                  image: Platform.select({
-                    ios: 'text.bubble',
-                    android: undefined,
-                  }),
-                  imageColor: colors.primary,
-                },
-                {
-                  id: 'delete',
-                  title: '삭제하기',
-                  image: Platform.select({
-                    ios: 'trash',
-                    android: undefined,
-                  }),
-                  attributes: {
-                    destructive: true,
-                  },
-                  imageColor: colors.red600,
-                },
-              ]
-        }
-      >
-        <View style={[styles.cell, styles.nameCell]}>
-          <Text
-            style={[
-              typography.styles.t7Semibold,
-              {
-                color: colors.text,
-              },
-            ]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {name}
-          </Text>
-          {memo && (
+        >
+          <View style={[styles.cell, styles.nameCell]}>
             <Text
               style={[
-                typography.styles.t7,
+                typography.styles.t7Semibold,
                 {
-                  color: colors.textSecondary,
-                  fontSize: 11,
-                  marginTop: 2,
+                  color: colors.text,
                 },
               ]}
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {memo}
+              {name}
             </Text>
-          )}
-        </View>
+            {memo && (
+              <Text
+                style={[
+                  typography.styles.t7,
+                  {
+                    color: colors.textSecondary,
+                    fontSize: 11,
+                    marginTop: 2,
+                  },
+                ]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {memo}
+              </Text>
+            )}
+          </View>
         </MenuView>
       )}
     </View>
   );
 }
 
-const createStyles = ({ spacing, isLast }: { spacing: typeof import('@/lib/theme').spacing; isLast: boolean }) =>
+const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spacing }) =>
   StyleSheet.create({
     row: {
       flexDirection: 'row',
       paddingHorizontal: spacing.xs,
-      borderBottomWidth: isLast ? 0 : 1,
       minHeight: 48,
       alignItems: 'stretch',
+      borderRadius: spacing.sm,
+      borderWidth: 1,
     },
     cell: {
       justifyContent: 'center',
       paddingHorizontal: spacing.sm,
+      alignSelf: 'stretch',
     },
     checkboxCell: {
       width: 40,
