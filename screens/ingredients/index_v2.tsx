@@ -71,10 +71,7 @@ export default function IngredientsTableScreen() {
   const headerHeight = HEADER_HEIGHT + insets.top;
   const totalHeaderHeight = headerHeight + TAB_BAR_HEIGHT;
 
-  const styles = useMemo(
-    () => createStyles({ spacing, colors, totalHeaderHeight }),
-    [spacing, colors, totalHeaderHeight],
-  );
+  const styles = useMemo(() => createStyles({ spacing, colors }), [spacing, colors]);
 
   // Handle horizontal scroll - update selected tab
   const handleHorizontalScroll = useCallback(
@@ -114,7 +111,7 @@ export default function IngredientsTableScreen() {
               <TouchableOpacity key={route.key} style={styles.tabItem} onPress={() => handleTabPress(i)}>
                 <Text
                   style={[
-                    typography.styles.t7Bold,
+                    typography.styles.t6Bold,
                     {
                       color: isActive ? colors.primary : colors.textSecondary,
                     },
@@ -203,7 +200,10 @@ export default function IngredientsTableScreen() {
                           return (
                             <IngredientsTableAccordion
                               key={storageId}
-                              title={getStorageLocationLabel({ storageLocation: storageId as StorageLocation, lang: 'kr' })}
+                              title={getStorageLocationLabel({
+                                storageLocation: storageId as StorageLocation,
+                                lang: 'kr',
+                              })}
                               leftIcon={getStorageLocationIcon(storageId as StorageLocation, 20)}
                               items={storageItems}
                               isExpanded={isExpanded}
@@ -304,15 +304,7 @@ export default function IngredientsTableScreen() {
   );
 }
 
-const createStyles = ({
-  spacing,
-  colors,
-  totalHeaderHeight,
-}: {
-  spacing: typeof import('@/lib/theme').spacing;
-  colors: any;
-  totalHeaderHeight: number;
-}) =>
+const createStyles = ({ spacing, colors }: { spacing: typeof import('@/lib/theme').spacing; colors: any }) =>
   StyleSheet.create({
     container: {
       flex: 1,

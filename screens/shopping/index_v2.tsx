@@ -144,7 +144,7 @@ export default function ShoppingListTableScreen() {
               <TouchableOpacity key={route.key} style={styles.tabItem} onPress={() => handleTabPress(i)}>
                 <Text
                   style={[
-                    typography.styles.t7Bold,
+                    typography.styles.t6Bold,
                     {
                       color: isActive ? colors.primary : colors.textSecondary,
                     },
