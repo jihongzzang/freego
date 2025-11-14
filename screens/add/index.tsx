@@ -85,6 +85,7 @@ export default function AddIngredientScreen() {
 
       <EmojiBottomSheet
         visible={isEmojiPickerVisible}
+        title="이모지 선택"
         onClose={() => setIsEmojiPickerVisible(false)}
         onSelect={handleEmojiSelect}
       />

@@ -6,7 +6,7 @@ import { getStatusColor, getCalculateStatus } from '@/utils/status';
 import Badge from '@/components/ui/Badge';
 import { useMemo } from 'react';
 import { Ingredient } from '@/mvi/features/expiring/types';
-import { getDaysRemaining } from '@/utils/time';
+import { getDaysRemaining, toLocalDate } from '@/utils/time';
 
 interface ExpiringItemProps {
   item: Ingredient;
@@ -45,7 +45,7 @@ export function ExpiringItem({ item, onPress, onQuickAdd, onQuickDelete }: Expir
                 },
               ]}
             >
-              유통기한: {item.expired_date_time}
+              유통기한: {toLocalDate(item.expired_date_time)}
               {item.daysRemaining !== null && ` (${getDaysRemaining(item.daysRemaining)})`}
             </Text>
           ) : (

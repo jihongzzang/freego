@@ -31,6 +31,9 @@ export function useShoppingLogic() {
     category: Category;
   } | null>(null);
 
+  // Emoji Update State
+  const [editingEmojiId, setEditingEmojiId] = useState<string | null>(null);
+
   // 화면 포커스 시 데이터 로드
   useFocusEffect(
     useCallback(() => {
@@ -216,6 +219,29 @@ export function useShoppingLogic() {
     handleMemoClose();
   }
 
+  // Emoji Update Handlers
+  function handleEmojiPress(id: string) {
+    setEditingEmojiId(id);
+  }
+
+  function handleEmojiClose() {
+    setEditingEmojiId(null);
+  }
+
+  function handleEmojiSubmit(emoji: string) {
+    if (!editingEmojiId) return;
+
+    dispatch({
+      type: 'UPDATE_EMOJI',
+      payload: {
+        id: editingEmojiId,
+        emoji,
+      },
+    });
+
+    handleEmojiClose();
+  }
+
   // Add Shopping Item Handlers
   function handleOpenAddItem() {
     setIsAddingItem(true);
@@ -288,5 +314,9 @@ export function useShoppingLogic() {
     handleMemoClose,
     handleMemoChange,
     handleMemoSubmit,
+    handleEmojiPress,
+    editingEmojiId,
+    handleEmojiClose,
+    handleEmojiSubmit,
   };
 }

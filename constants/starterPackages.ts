@@ -18,7 +18,7 @@ export interface PackageIngredient {
   storage_location: StorageLocation | null;
   purchased_date_time: string | null;
   expired_date_time: string | null;
-  last_modifed_date_time?: string | null;
+  last_modified_date_time?: string | null;
   deleted_date_time?: string | null;
 }
 
@@ -64,7 +64,7 @@ function ingredient({
     memo: null,
     purchased_date_time: null,
     expired_date_time: null,
-    last_modifed_date_time: null,
+    last_modified_date_time: null,
     deleted_date_time: null,
     ...overrides,
   };

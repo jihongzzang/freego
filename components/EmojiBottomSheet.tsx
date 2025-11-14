@@ -5,11 +5,12 @@ import { ALL_ROUTINE_FOOD_EMOJI } from '@/constants/emojiTemplate';
 
 interface EmojiBottomSheetProps {
   visible: boolean;
+  title: string;
   onClose: () => void;
   onSelect: (emoji: string) => void;
 }
 
-export default function EmojiBottomSheet({ visible, onClose, onSelect }: EmojiBottomSheetProps) {
+export default function EmojiBottomSheet({ visible, title, onClose, onSelect }: EmojiBottomSheetProps) {
   const { spacing } = useTheme();
 
   const list = ALL_ROUTINE_FOOD_EMOJI;
@@ -23,7 +24,7 @@ export default function EmojiBottomSheet({ visible, onClose, onSelect }: EmojiBo
   const ITEM_WIDTH = (screenWidth - H_PADDING - GAP * (NUM_COLUMNS - 1) - 24) / NUM_COLUMNS;
 
   return (
-    <BottomSheet maxHeight={450} visible={visible} onClose={onClose} title="이모지 추가">
+    <BottomSheet maxHeight={450} visible={visible} onClose={onClose} title={title}>
       <View style={styles.container}>
         <ScrollView
           showsVerticalScrollIndicator={false}

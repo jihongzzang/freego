@@ -68,7 +68,7 @@ export default function IngredientEditScreen() {
       <SelectDateBottomSheet
         visible={purchaseDatePicker.visible}
         onClose={purchaseDatePicker.close}
-        title="구매일 선택"
+        title="구매일 수정"
         selectedDate={purchaseDatePicker.selectedDate}
         onDateChange={purchaseDatePicker.handleDateChange}
         onConfirm={purchaseDatePicker.handleConfirm}
@@ -77,7 +77,7 @@ export default function IngredientEditScreen() {
       <SelectDateBottomSheet
         visible={expiryDatePicker.visible}
         onClose={expiryDatePicker.close}
-        title="유통기한 선택"
+        title="유통기한 수정"
         selectedDate={expiryDatePicker.selectedDate}
         onDateChange={expiryDatePicker.handleDateChange}
         onConfirm={expiryDatePicker.handleConfirm}
@@ -92,6 +92,7 @@ export default function IngredientEditScreen() {
 
       <EmojiBottomSheet
         visible={isEmojiPickerVisible}
+        title="이모지 수정"
         onClose={() => setIsEmojiPickerVisible(false)}
         onSelect={handleEmojiSelect}
       />

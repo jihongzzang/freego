@@ -1,45 +1,43 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Check, Trash2, MessageSquare, Refrigerator } from 'lucide-react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { Check } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
-import { getCategoryColor } from '@/utils/category/getCategoryColor';
-import { getCategoryLabel } from '@/utils/category/getCategoryLabel';
-import { Category } from '@/data/enums/category';
 import { useMemo } from 'react';
-import { getCategoryIcon } from '@/utils/category';
+import { MenuView } from '@react-native-menu/menu';
 
 interface ShoppingTableRowProps {
   id: string;
   name: string;
-  category: Category;
   isSelected: boolean;
+  isPurchased: boolean;
   memo: string | null;
   onToggle: () => void;
   onMemoPress?: () => void;
   onDelete?: () => void;
   onAddToStorage?: () => void;
+  onEmojiPress?: () => void;
   isLast?: boolean;
+  hideCheckbox?: boolean;
 }
 
 export function ShoppingTableRow({
   name,
-  category,
   isSelected,
+  isPurchased,
   memo,
   onToggle,
   onMemoPress,
   onDelete,
   onAddToStorage,
+  onEmojiPress,
   isLast,
+  hideCheckbox = false,
 }: ShoppingTableRowProps) {
-  const { colors, typography, spacing, borderRadius } = useTheme();
+  const { colors, typography, spacing } = useTheme();
 
-  const styles = useMemo(
-    () => createStyles({ spacing, borderRadius, isLast: isLast || false }),
-    [spacing, borderRadius, isLast],
-  );
+  const styles = useMemo(() => createStyles({ spacing, isLast: isLast || false }), [spacing, isLast]);
 
   return (
-    <TouchableOpacity
+    <View
       style={[
         styles.row,
         {
@@ -47,133 +45,189 @@ export function ShoppingTableRow({
           backgroundColor: colors.surface,
         },
       ]}
-      onPress={onToggle}
-      activeOpacity={0.7}
     >
       {/* Checkbox Cell */}
-      <View style={[styles.cell, styles.checkboxCell]}>
-        <View
-          style={[
-            styles.checkbox,
-            {
-              borderColor: isSelected ? colors.primary : colors.border,
-              backgroundColor: isSelected ? colors.primary : colors.background,
-            },
-          ]}
+      {!hideCheckbox && (
+        <TouchableOpacity
+          style={[styles.cell, styles.checkboxCell, { borderRightWidth: 1, borderRightColor: colors.border }]}
+          onPress={onToggle}
+          activeOpacity={0.7}
         >
-          {isSelected && <Check size={12} color={colors.white} />}
-        </View>
-      </View>
+          <View
+            style={[
+              styles.checkbox,
+              {
+                borderColor: isSelected ? colors.primary : colors.border,
+                backgroundColor: isSelected ? colors.primary : colors.background,
+              },
+            ]}
+          >
+            {isSelected && <Check size={12} color={colors.white} />}
+          </View>
+        </TouchableOpacity>
+      )}
 
-      {/* Name + Memo Cell */}
-      <View style={[styles.cell, styles.nameCell]}>
-        <Text
-          style={[
-            typography.styles.t7Semibold,
-            {
-              color: colors.text,
-            },
-          ]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {name}
-        </Text>
-        {memo && (
+      {/* Name + Memo Cell - With MenuView */}
+      {isPurchased ? (
+        <View style={[styles.cell, styles.nameCell]}>
           <Text
             style={[
-              typography.styles.t7,
+              typography.styles.t7Semibold,
               {
-                color: colors.textSecondary,
-                fontSize: 11,
-                marginTop: 2,
+                color: colors.text,
               },
             ]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {memo}
+            {name}
           </Text>
-        )}
-      </View>
-
-      {/* Action Cell */}
-      <View style={[styles.cell, styles.actionCell]}>
-        <View style={styles.actionButtons}>
-          {isSelected ? (
-            // 선택된 상태: 냉장고 아이콘만
-            onAddToStorage && (
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={(e) => {
-                  e.stopPropagation();
-                  onAddToStorage();
-                }}
-                activeOpacity={0.7}
-              >
-                <Refrigerator size={18} color={colors.blue500} />
-              </TouchableOpacity>
-            )
-          ) : (
-            // 선택되지 않은 상태: 메모 + 삭제 아이콘
-            <>
-              {onMemoPress && (
-                <TouchableOpacity
-                  style={styles.actionButton}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    onMemoPress();
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <MessageSquare
-                    size={16}
-                    fill={memo ? colors.green500 : colors.surface}
-                    color={memo ? colors.green500 : colors.green500}
-                  />
-                </TouchableOpacity>
-              )}
-              {onDelete && (
-                <TouchableOpacity
-                  style={styles.actionButton}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    onDelete();
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Trash2 size={16} color={colors.red500} />
-                </TouchableOpacity>
-              )}
-            </>
+          {memo && (
+            <Text
+              style={[
+                typography.styles.t7,
+                {
+                  color: colors.textSecondary,
+                  fontSize: 11,
+                  marginTop: 2,
+                },
+              ]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {memo}
+            </Text>
           )}
         </View>
-      </View>
-    </TouchableOpacity>
+      ) : (
+        <MenuView
+        style={{ flex: 1 }}
+        onPressAction={({ nativeEvent }) => {
+          switch (nativeEvent.event) {
+            case 'toggle':
+              onToggle?.();
+              break;
+            case 'add-to-storage':
+              onAddToStorage?.();
+              break;
+            case 'emoji':
+              onEmojiPress?.();
+              break;
+            case 'memo':
+              onMemoPress?.();
+              break;
+            case 'delete':
+              onDelete?.();
+              break;
+          }
+        }}
+        actions={
+          isPurchased
+            ? [
+                {
+                  id: 'delete',
+                  title: '삭제하기',
+                  image: Platform.select({
+                    ios: 'trash',
+                    android: undefined,
+                  }),
+                  attributes: {
+                    destructive: true,
+                  },
+                  imageColor: colors.red600,
+                },
+              ]
+            : [
+                {
+                  id: 'add-to-storage',
+                  title: '냉장고에 넣기',
+                  image: Platform.select({
+                    ios: 'refrigerator',
+                    android: undefined,
+                  }),
+                  imageColor: colors.blue600,
+                },
+                {
+                  id: 'emoji',
+                  title: '이모지 수정하기',
+                  image: Platform.select({
+                    ios: 'face.smiling',
+                    android: undefined,
+                  }),
+                  imageColor: colors.orange600,
+                },
+                {
+                  id: 'memo',
+                  title: '메모 수정하기',
+                  image: Platform.select({
+                    ios: 'text.bubble',
+                    android: undefined,
+                  }),
+                  imageColor: colors.primary,
+                },
+                {
+                  id: 'delete',
+                  title: '삭제하기',
+                  image: Platform.select({
+                    ios: 'trash',
+                    android: undefined,
+                  }),
+                  attributes: {
+                    destructive: true,
+                  },
+                  imageColor: colors.red600,
+                },
+              ]
+        }
+      >
+        <View style={[styles.cell, styles.nameCell]}>
+          <Text
+            style={[
+              typography.styles.t7Semibold,
+              {
+                color: colors.text,
+              },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {name}
+          </Text>
+          {memo && (
+            <Text
+              style={[
+                typography.styles.t7,
+                {
+                  color: colors.textSecondary,
+                  fontSize: 11,
+                  marginTop: 2,
+                },
+              ]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {memo}
+            </Text>
+          )}
+        </View>
+        </MenuView>
+      )}
+    </View>
   );
 }
 
-const createStyles = ({
-  spacing,
-  borderRadius,
-  isLast,
-}: {
-  spacing: typeof import('@/lib/theme').spacing;
-  borderRadius: typeof import('@/lib/theme').borderRadius;
-  isLast: boolean;
-}) =>
+const createStyles = ({ spacing, isLast }: { spacing: typeof import('@/lib/theme').spacing; isLast: boolean }) =>
   StyleSheet.create({
     row: {
       flexDirection: 'row',
-      paddingVertical: spacing.sm,
       paddingHorizontal: spacing.xs,
       borderBottomWidth: isLast ? 0 : 1,
       minHeight: 48,
-      alignItems: 'center',
+      alignItems: 'stretch',
     },
     cell: {
       justifyContent: 'center',
-      paddingHorizontal: spacing.xs,
+      paddingHorizontal: spacing.sm,
     },
     checkboxCell: {
       width: 40,
@@ -183,10 +237,6 @@ const createStyles = ({
       flex: 1,
       minWidth: 100,
     },
-    actionCell: {
-      width: 80,
-      alignItems: 'center',
-    },
     checkbox: {
       width: 20,
       height: 20,
@@ -194,13 +244,5 @@ const createStyles = ({
       borderWidth: 1,
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    actionButtons: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 4,
-    },
-    actionButton: {
-      padding: 4,
     },
   });

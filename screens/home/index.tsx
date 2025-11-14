@@ -1,4 +1,4 @@
-import { View, Animated, TouchableOpacity, Platform, Dimensions, ScrollView } from 'react-native';
+import { View, TouchableOpacity, Platform, Dimensions, ScrollView } from 'react-native';
 import { Bell, Edit3, Grid3x3 } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import Header, { HEADER_HEIGHT } from '@/components/ui/Header';
@@ -9,8 +9,7 @@ import EmptyStateUI from '@/components/ui/EmptyState';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHomeLogic } from './hooks/useHomeLogic';
 import { useHomeData } from './hooks/useHomeData';
-import { useHomeAnimation } from './hooks/useHomeAnimation';
-import { CategoryCarousel } from './components/CategoryCarousel';
+import { CategoryCarousel, CategoryCarouselRef } from './components/CategoryCarousel';
 import { IngredientsSection } from './components/IngredientsSection';
 import { Category } from '@/data/enums/category';
 import { useRef, useCallback } from 'react';
@@ -28,7 +27,6 @@ export default function HomeScreen() {
     selectedCategoryId,
     setSelectedCategoryId,
     selectedIngredient,
-    scrollY,
     openDatePicker,
     getFloatingMenuItems,
     expiryDatePicker,
@@ -44,6 +42,7 @@ export default function HomeScreen() {
 
   // Horizontal scroll ref
   const horizontalScrollRef = useRef<ScrollView>(null);
+  const categoryCarouselRef = useRef<CategoryCarouselRef>(null);
 
   // Handle category change - scroll to category page
   const handleCategorySelect = useCallback(
@@ -68,22 +67,20 @@ export default function HomeScreen() {
       const category = categories[index];
       if (category && category.id !== selectedCategoryId) {
         setSelectedCategoryId(category.id);
+        // Auto scroll category carousel
+        categoryCarouselRef.current?.scrollToCategory(category.id);
       }
     },
     [categories, selectedCategoryId, setSelectedCategoryId],
   );
-
-  // Animation hooks
-  const { headerTranslateY, contentOpacity } = useHomeAnimation(scrollY);
 
   const floatingMenuItems = getFloatingMenuItems();
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* Fixed Header */}
-      <Animated.View
+      <View
         style={{
-          transform: [{ translateY: headerTranslateY }],
           backgroundColor: colors.surface,
           position: 'absolute',
           top: 0,
@@ -92,49 +89,48 @@ export default function HomeScreen() {
           zIndex: 10,
         }}
       >
-        <Animated.View style={{ opacity: contentOpacity }}>
-          <Header
-            title="내 냉장고"
-            rightComponent={
-              <TouchableOpacity
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 100,
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  position: 'relative',
-                }}
-                onPress={() => {
-                  dispatch({ type: 'NAVIGATE_TO_EXPIRING' });
-                }}
-              >
-                <Bell size={24} color={expiringItems.length > 0 ? colors.danger : colors.textSecondary} />
-                {expiringItems.length > 0 && (
-                  <View
-                    style={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: 3,
-                      backgroundColor: colors.danger,
-                      position: 'absolute',
-                      top: 10,
-                      right: 5,
-                    }}
-                  />
-                )}
-              </TouchableOpacity>
-            }
-          />
-        </Animated.View>
+        <Header
+          title="내 냉장고"
+          // rightComponent={
+          //   <TouchableOpacity
+          //     style={{
+          //       width: 44,
+          //       height: 44,
+          //       borderRadius: 100,
+          //       justifyContent: 'center',
+          //       alignItems: 'flex-end',
+          //       position: 'relative',
+          //     }}
+          //     onPress={() => {
+          //       dispatch({ type: 'NAVIGATE_TO_EXPIRING' });
+          //     }}
+          //   >
+          //     <Bell size={24} color={expiringItems.length > 0 ? colors.danger : colors.textSecondary} />
+          //     {expiringItems.length > 0 && (
+          //       <View
+          //         style={{
+          //           width: 6,
+          //           height: 6,
+          //           borderRadius: 3,
+          //           backgroundColor: colors.danger,
+          //           position: 'absolute',
+          //           top: 10,
+          //           right: 5,
+          //         }}
+          //       />
+          //     )}
+          //   </TouchableOpacity>
+          // }
+        />
 
         <CategoryCarousel
+          ref={categoryCarouselRef}
           isIncludeAllCategory
           selectedCategoryId={selectedCategoryId}
           onCategorySelect={handleCategorySelect}
           getCategoryCount={getCategoryCount}
         />
-      </Animated.View>
+      </View>
 
       <ScrollView
         ref={horizontalScrollRef}
@@ -154,11 +150,7 @@ export default function HomeScreen() {
                 width: SCREEN_WIDTH,
               }}
             >
-              <Animated.ScrollView
-                onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-                  useNativeDriver: Platform.OS == 'android' ? false : true,
-                })}
-                scrollEventThrottle={16}
+              <ScrollView
                 contentContainerStyle={{
                   paddingTop: HEADER_HEIGHT + inset.top + 56,
                   paddingBottom: 200,
@@ -187,7 +179,7 @@ export default function HomeScreen() {
                     getExpiryDisplay={getExpiryDisplay}
                   />
                 )}
-              </Animated.ScrollView>
+              </ScrollView>
             </View>
           );
         })}

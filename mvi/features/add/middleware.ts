@@ -107,7 +107,7 @@ export const addMiddleware: Middleware<AddState, AddIntent, AddEffect> = async (
           expired_date_time: state.form.expired_date_time || null,
           storage_location: state.form.storage_location || null,
           memo: state.form.memo || null,
-          last_modifed_date_time: null,
+          last_modified_date_time: null,
           deleted_date_time: null,
           consumed_date_time: null,
         });

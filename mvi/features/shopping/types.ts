@@ -38,7 +38,8 @@ export type ShoppingIntent =
     }
   | { type: 'ADD_SELECTED_TO_STORAGE' }
   | { type: 'SUBMIT_ADD_ITEM'; payload: { name: string; category: Category; memo?: string } }
-  | { type: 'UPDATE_MEMO'; payload: { id: string; memo?: string } };
+  | { type: 'UPDATE_MEMO'; payload: { id: string; memo?: string } }
+  | { type: 'UPDATE_EMOJI'; payload: { id: string; emoji: string } };
 
 /**
  * Shopping Effect (부수 효과)

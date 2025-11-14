@@ -90,10 +90,10 @@ export const homeMiddleware: Middleware<HomeState, HomeIntent, HomeEffect> = asy
       };
     }
 
-    case 'NAVIGATE_TO_EXPIRING':
-      return {
-        effects: [createNavigateEffect('/expiring')],
-      };
+    // case 'NAVIGATE_TO_EXPIRING':
+    //   return {
+    //     effects: [createNavigateEffect('/expiring')],
+    //   };
 
     case 'NAVIGATE_TO_DETAIL':
       return {

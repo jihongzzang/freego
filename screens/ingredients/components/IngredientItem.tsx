@@ -6,7 +6,7 @@ import { getStatusColor } from '@/utils/status/getStatusColor';
 import { getStorageLocationLabel } from '@/utils/storageLocation';
 import { getUnitLabel } from '@/utils/unit';
 import { useMemo } from 'react';
-import { getDaysRemaining } from '@/utils/time';
+import { getDaysRemaining, toLocalDate } from '@/utils/time';
 
 interface IngredientItemProps {
   item: Ingredient;
@@ -61,7 +61,7 @@ export function IngredientItem({ item, onPress, onEdit, onQuickAdd, onQuickDelet
                 },
               ]}
             >
-              유통기한: {item.expired_date_time}
+              유통기한: {toLocalDate(item.expired_date_time)}
               {item.daysRemaining !== null && ` (${getDaysRemaining(item.daysRemaining)})`}
             </Text>
           ) : (

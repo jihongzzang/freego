@@ -10,7 +10,9 @@ export const shoppingService = {
     return shoppingRepository.getShoppingList();
   },
 
-  async addToShoppingList(item: Omit<ShoppingItem, 'id' | 'created_date_time' | 'is_purchased'>): Promise<void> {
+  async addToShoppingList(
+    item: Omit<ShoppingItem, 'id' | 'created_date_time' | 'is_purchased' | 'purchased_date_time'>,
+  ): Promise<void> {
     try {
       await shoppingRepository.addToShoppingList(item);
     } catch (error) {

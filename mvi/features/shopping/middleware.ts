@@ -90,7 +90,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           category: intent.payload.category,
           emoji: null,
           memo: intent.payload.memo || null,
-          last_modifed_date_time: null,
+          last_modified_date_time: null,
           deleted_date_time: null,
         });
 
@@ -137,7 +137,9 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
     case 'ADD_ITEM_TO_STORAGE': {
       try {
         const { ingredientService } = await import('@/services/ingredient.service');
-        const today = new Date().toISOString();
+        const todayMidnight = new Date();
+        todayMidnight.setHours(0, 0, 0, 0);
+        const todayIso = todayMidnight.toISOString();
         const item = state.shoppingList.find((i) => i.id === intent.payload.id);
 
         if (!item) {
@@ -150,10 +152,10 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           name: intent.payload.name,
           category: intent.payload.category,
           emoji: item.emoji,
-          storage_location: intent.payload.storageLocation as any,
-          purchased_date_time: today,
+          storage_location: intent.payload.storageLocation,
+          purchased_date_time: todayIso,
           memo: null,
-          last_modifed_date_time: null,
+          last_modified_date_time: null,
           deleted_date_time: null,
           quantity: null,
           unit: null,
@@ -163,11 +165,10 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
         await shoppingService.updateShoppingItem(intent.payload.id, {
           is_purchased: true,
+          purchased_date_time: todayMidnight.toISOString(),
         });
 
         const items = await shoppingService.getShoppingList();
-
-        console.log(items);
 
         return {
           state: {
@@ -203,7 +204,9 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
               onConfirm: async () => {
                 try {
                   const { ingredientService } = await import('@/services/ingredient.service');
-                  const today = new Date().toISOString().split('T')[0];
+                  const todayMidnight = new Date();
+                  todayMidnight.setHours(0, 0, 0, 0);
+                  const todayIso = todayMidnight.toISOString();
                   const selectedItems = state.shoppingList.filter((item) => state.selectedIds.has(item.id));
 
                   // 모든 선택된 항목을 냉장고에 추가하고 구매 완료 처리
@@ -213,12 +216,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
                       category: item.category,
                       emoji: item.emoji,
                       storage_location: null,
-                      purchased_date_time: today,
+                      purchased_date_time: todayIso,
                       memo: null,
                       quantity: null,
                       unit: null,
                       expired_date_time: null,
-                      last_modifed_date_time: null,
+                      last_modified_date_time: null,
                       deleted_date_time: null,
                       consumed_date_time: null,
                     });
@@ -226,6 +229,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
                     // 구매 완료로 표시
                     await shoppingService.updateShoppingItem(item.id, {
                       is_purchased: true,
+                      purchased_date_time: todayMidnight.toISOString(),
                     });
                   }
 
@@ -260,6 +264,28 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
         console.error('Error updating memo:', error);
         return {
           effects: [createErrorEffect(ERROR_MESSAGES.ERROR_MEMO_UPDATE_FAILED)],
+        };
+      }
+    }
+
+    case 'UPDATE_EMOJI': {
+      try {
+        await shoppingService.updateShoppingItem(intent.payload.id, {
+          emoji: intent.payload.emoji,
+        });
+
+        const items = await shoppingService.getShoppingList();
+        return {
+          state: {
+            ...state,
+            shoppingList: items,
+          },
+          effects: [createSuccessEffect('이모지가 변경되었어요.')],
+        };
+      } catch (error) {
+        console.error('Error updating emoji:', error);
+        return {
+          effects: [createErrorEffect('이모지 변경에 실패했어요.')],
         };
       }
     }

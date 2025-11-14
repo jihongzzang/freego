@@ -13,6 +13,7 @@ const ERROR_MESSAGES = {
   ERROR_INGREDIENT_CREATE_ERROR: '재료 추가 중 오류가 발생했어요.',
 
   ERROR_INGREDIENT_DELETE_FAILED: '재료 삭제에 실패했어요.',
+  ERROR_INGREDIENT_CONSUME_FAILED: '재료 소모에 실패했어요.',
 
   ERROR_INVALID_INPUT_FIELDS: '입력 항목을 확인해주세요.',
   ERROR_EXPIRY_DATE_UPDATE_FAILED: '유통기한 수정에 실패했어요.',
@@ -20,7 +21,6 @@ const ERROR_MESSAGES = {
   ERROR_EMOJI_UPDATE_FAILED: '이모지 수정에 실패했어요.',
   ERROR_STORAGE_UPDATE_FAILED: '보관위치 수정에 실패했어요.',
   ERROR_INGREDIENT_UPDATE_FAILED: '재료 수정에 실패했어요.',
-
   ERROR_MEMO_UPDATE_FAILED: '메모 수정에 실패했어요.',
 
   ERROR_STARTER_PACKAGE_ADD_FAILED: '스타터 패키지 추가 중 오류가 발생했어요.',

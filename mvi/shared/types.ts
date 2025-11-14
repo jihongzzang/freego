@@ -42,7 +42,7 @@ export interface ToastPayload {
 export interface ConfirmPayload {
   title: string;
   message: string;
-  onConfirm: () => Promise<{ success: boolean; count?: number }>;
+  onConfirm: () => Promise<{ success: boolean; count?: number; ingredientName?: string }>;
   isDanger?: boolean;
 }
 

@@ -102,15 +102,15 @@ export const ingredientDetailMiddleware: Middleware<
               message: `${ingredient.name}을(를) 소모 처리할까요?\n장보기 목록에 자동으로 추가돼요.`,
               onConfirm: async () => {
                 try {
+                  await ingredientService.consumeIngredient(ingredient.id);
                   await shoppingService.addToShoppingList({
                     name: ingredient.name,
                     category: ingredient.category,
                     emoji: ingredient.emoji,
                     memo: null,
-                    last_modifed_date_time: null,
+                    last_modified_date_time: null,
                     deleted_date_time: null,
                   });
-                  await ingredientService.consumeIngredient(ingredient.id);
                   return { success: true, ingredientName };
                 } catch (error) {
                   console.error('Error consuming ingredient:', error);

@@ -14,6 +14,7 @@ interface IngredientsTableAccordionProps {
   onToggle: () => void;
   onItemEdit: (id: string) => void;
   onQuickAdd: (id: string) => void;
+  onQuickConsume: (id: string) => void;
   onQuickDelete: (id: string) => void;
   onQuickUpdateEmoji: (id: string) => void;
   onQuickUpdateExpiry: (id: string) => void;
@@ -31,6 +32,7 @@ export function IngredientsTableAccordion({
   onToggle,
   onItemEdit,
   onQuickAdd,
+  onQuickConsume,
   onQuickDelete,
   onQuickUpdateEmoji,
   onQuickUpdateExpiry,
@@ -113,6 +115,7 @@ export function IngredientsTableAccordion({
               onQuickUpdateStorage={() => onQuickUpdateStorage(String(item.id))}
               onQuickUpdateMemo={() => onQuickUpdateMemo(String(item.id))}
               onQuickAdd={() => onQuickAdd(String(item.id))}
+              onQuickConsume={() => onQuickConsume(String(item.id))}
               onQuickDelete={() => onQuickDelete(String(item.id))}
               onViewDetail={() => onViewDetail(String(item.id))}
               isLast={index === items.length - 1}
@@ -120,7 +123,7 @@ export function IngredientsTableAccordion({
           ))}
         </View>
       ) : (
-        <EmptyStateUI title="재료가 없어요" />
+        <EmptyStateUI title="재료가 없어요" description="재료를 추가해주세요" />
       )}
     </Accordion>
   );
@@ -141,12 +144,11 @@ const createStyles = ({
     headerRow: {
       flexDirection: 'row',
       borderBottomWidth: 1,
-      // paddingVertical: spacing.sm,
       paddingHorizontal: spacing.xs,
     },
     cell: {
       justifyContent: 'center',
-      paddingHorizontal: spacing.xs,
+      paddingHorizontal: spacing.sm,
       paddingVertical: spacing.sm,
     },
     emojiCell: {

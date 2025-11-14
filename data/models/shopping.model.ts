@@ -13,6 +13,7 @@ export interface ShoppingItem {
   memo: string | null; // 메모
 
   created_date_time: string | null; // 생성 일시 (ISO)
-  last_modifed_date_time: string | null; // 수정 일시 (ISO)
+  last_modified_date_time: string | null; // 수정 일시 (ISO)
   deleted_date_time: string | null; // 삭제 일시 (ISO)
+  purchased_date_time: string | null; // 구매 일시 (ISO)
 }

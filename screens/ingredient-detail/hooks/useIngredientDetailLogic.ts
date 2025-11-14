@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { BackHandler } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useCallback, useEffect, useRef } from 'react';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
 import { useDialog } from '@/contexts/DialogContext';
 import { useToast } from '@/components/ui';
@@ -16,11 +15,19 @@ export function useIngredientDetailLogic() {
   const processedEffectRef = useRef<typeof effect>(null);
 
   // 식재료 데이터 로드
-  useEffect(() => {
-    if (id) {
-      dispatch({ type: 'LOAD_INGREDIENT', payload: id as string });
-    }
-  }, [id, dispatch]);
+  // useEffect(() => {
+  //   if (id) {
+  //     dispatch({ type: 'LOAD_INGREDIENT', payload: id as string });
+  //   }
+  // }, [id, dispatch]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (id) {
+        dispatch({ type: 'LOAD_INGREDIENT', payload: id as string });
+      }
+    }, [id, dispatch]),
+  );
 
   // Effect 처리
   useEffect(() => {

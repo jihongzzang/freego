@@ -21,5 +21,5 @@ export interface Ingredient {
   consumed_date_time: string | null; // 소비 일시 (ISO) (optional)
 
   created_date_time: string | null; // 생성 일시 (ISO)
-  last_modifed_date_time: string | null; // 수정 일시 (ISO) (optional)
+  last_modified_date_time: string | null; // 수정 일시 (ISO) (optional)
 }

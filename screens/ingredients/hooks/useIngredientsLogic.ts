@@ -98,6 +98,10 @@ export function useIngredientsLogic() {
     dispatch({ type: 'DELETE_INGREDIENT', payload: id });
   }
 
+  function handleQuickConsume(id: string) {
+    dispatch({ type: 'CONSUME_INGREDIENT', payload: id });
+  }
+
   function handleQuickAdd(id: string) {
     dispatch({ type: 'ADD_TO_SHOPPING_LIST_INGREDIENT', payload: id });
   }
@@ -387,5 +391,6 @@ export function useIngredientsLogic() {
     handleNavigateToAdd,
     handleQuickDelete,
     handleQuickAdd,
+    handleQuickConsume,
   };
 }

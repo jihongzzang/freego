@@ -20,7 +20,6 @@ export const ingredientRepository = {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       const ingredients = data ? JSON.parse(data) : [];
       const result = ingredients.filter((item: Ingredient) => !item.deleted_date_time && !item.consumed_date_time);
-      // console.log('😀 식재료 가져오기', JSON.stringify(result, null, 2));
       return result;
     } catch (error) {
       console.error('Error reading ingredients:', error);
@@ -35,7 +34,6 @@ export const ingredientRepository = {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       const result = data ? JSON.parse(data) : [];
-      // console.log('💙 식재료 데이터 가져오기', JSON.stringify(result, null, 2));
       return result;
     } catch (error) {
       console.error('Error reading all ingredients:', error);
@@ -66,7 +64,6 @@ export const ingredientRepository = {
         ...ingredient,
         created_date_time: new Date().toISOString(),
       };
-      console.log('🩵 단일 재료 추가', JSON.stringify(newIngredient, null, 2));
       ingredients.push(newIngredient);
       await this.saveIngredients(ingredients);
       return newIngredient;
@@ -86,7 +83,7 @@ export const ingredientRepository = {
       | 'created_date_time'
       | 'purchased_date_time'
       | 'expired_date_time'
-      | 'last_modifed_date_time'
+      | 'last_modified_date_time'
       | 'deleted_date_time'
       | 'consumed_date_time'
     >[],
@@ -100,10 +97,9 @@ export const ingredientRepository = {
         expired_date_time: null,
         consumed_date_time: null,
         deleted_date_time: null,
-        last_modifed_date_time: null,
+        last_modified_date_time: null,
         created_date_time: new Date().toISOString(),
       }));
-      console.log('💜 여러 재료 추가', JSON.stringify(newIngredients, null, 2));
       ingredients.push(...newIngredients);
       await this.saveIngredients(ingredients);
       return newIngredients;
@@ -124,9 +120,8 @@ export const ingredientRepository = {
         ingredients[index] = {
           ...ingredients[index],
           ...updates,
-          last_modifed_date_time: new Date().toISOString(),
+          last_modified_date_time: new Date().toISOString(),
         };
-        console.log('🤎 재료 업데이트', JSON.stringify(ingredients, null, 2));
         await this.saveIngredients(ingredients);
         return true;
       }
@@ -150,7 +145,6 @@ export const ingredientRepository = {
           ...ingredients[index],
           deleted_date_time: new Date().toISOString(),
         };
-        console.log('🖤 재료 삭제', JSON.stringify(ingredients, null, 2));
         await this.saveIngredients(ingredients);
         return true;
       }
@@ -175,7 +169,6 @@ export const ingredientRepository = {
           quantity: 0,
           consumed_date_time: new Date().toISOString(),
         };
-        console.log('💛 재료 소비', JSON.stringify(ingredients, null, 2));
         await this.saveIngredients(ingredients);
         return true;
       }

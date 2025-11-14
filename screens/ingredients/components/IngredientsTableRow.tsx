@@ -11,6 +11,7 @@ interface IngredientsTableRowProps {
   item: Ingredient;
   onEdit?: () => void;
   onQuickAdd?: () => void;
+  onQuickConsume?: () => void;
   onQuickDelete?: () => void;
   onQuickUpdateEmoji?: () => void;
   onQuickUpdateExpiry?: () => void;
@@ -25,6 +26,7 @@ export function IngredientsTableRow({
   item,
   onEdit,
   onQuickAdd,
+  onQuickConsume,
   onQuickDelete,
   onQuickUpdateEmoji,
   onQuickUpdateExpiry,
@@ -90,6 +92,9 @@ export function IngredientsTableRow({
             case 'view-detail':
               onViewDetail?.();
               break;
+            case 'consume':
+              onQuickConsume?.();
+              break;
             case 'delete':
               onQuickDelete?.();
               break;
@@ -98,7 +103,7 @@ export function IngredientsTableRow({
         actions={[
           {
             id: 'add-to-shopping',
-            title: '장보기 항목에 추가',
+            title: '장보기 항목에 추가하기',
             image: Platform.select({
               ios: 'cart',
               android: undefined,
@@ -112,20 +117,20 @@ export function IngredientsTableRow({
               ios: 'square.and.pencil',
               android: undefined,
             }),
-            imageColor: colors.blue500,
+            imageColor: colors.blue600,
           },
           {
-            id: 'view-detail',
-            title: '상세로 이동',
+            id: 'consume',
+            title: '소모하기',
             image: Platform.select({
-              ios: 'chevron.right',
+              ios: 'checkmark.circle',
               android: undefined,
             }),
-            imageColor: colors.grey600,
+            imageColor: colors.yellow600,
           },
           {
             id: 'delete',
-            title: '재료 삭제',
+            title: '삭제하기',
             image: Platform.select({
               ios: 'trash',
               android: undefined,
@@ -133,7 +138,16 @@ export function IngredientsTableRow({
             attributes: {
               destructive: true,
             },
-            imageColor: colors.red500,
+            imageColor: colors.red600,
+          },
+          {
+            id: 'view-detail',
+            title: '상세가기',
+            image: Platform.select({
+              ios: 'chevron.right',
+              android: undefined,
+            }),
+            imageColor: colors.grey600,
           },
         ]}
       >
@@ -247,7 +261,7 @@ const createStyles = ({ spacing, isLast }: { spacing: typeof import('@/lib/theme
     },
     cell: {
       justifyContent: 'center',
-      paddingHorizontal: spacing.xs,
+      paddingHorizontal: spacing.sm,
       alignSelf: 'stretch',
     },
     emojiCell: {

@@ -13,13 +13,13 @@ const STORAGE_KEY = '@shopping_list';
  */
 export const shoppingRepository = {
   /**
-   * 모든 장보기 아이템 가져오기 (삭제/구매되지 않은 것만)
+   * 모든 장보기 아이템 가져오기 (삭제되지 않은 것만, 구매 완료 포함)
    */
   async getShoppingList(): Promise<ShoppingItem[]> {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       const list = data ? JSON.parse(data) : [];
-      return list.filter((item: ShoppingItem) => !item.deleted_date_time && !item.is_purchased);
+      return list.filter((item: ShoppingItem) => !item.deleted_date_time);
     } catch (error) {
       console.error('Error reading shopping list:', error);
       return [];
@@ -55,16 +55,18 @@ export const shoppingRepository = {
    * 장보기 아이템 추가
    */
   async addToShoppingList(
-    item: Omit<ShoppingItem, 'id' | 'created_date_time' | 'is_purchased'>,
+    item: Omit<ShoppingItem, 'id' | 'created_date_time' | 'is_purchased' | 'purchased_date_time'>,
   ): Promise<ShoppingItem> {
     try {
       const shoppingList = await this.getAllShoppingItemsRaw();
       const newItem: ShoppingItem = {
-        ...item,
         id: generateId(),
+        ...item,
         is_purchased: false,
+        purchased_date_time: null,
         created_date_time: new Date().toISOString(),
       };
+      console.log('🤎 장보기 아이템 추가', JSON.stringify(newItem, null, 2));
       shoppingList.push(newItem);
       await this.saveShoppingList(shoppingList);
       return newItem;
@@ -86,8 +88,9 @@ export const shoppingRepository = {
         shoppingList[index] = {
           ...shoppingList[index],
           ...updates,
-          last_modifed_date_time: new Date().toISOString(),
+          last_modified_date_time: new Date().toISOString(),
         };
+        console.log('🤎 장보기 아이템 업데이트', JSON.stringify(shoppingList[index], null, 2));
         await this.saveShoppingList(shoppingList);
         return true;
       }
@@ -111,6 +114,7 @@ export const shoppingRepository = {
           ...shoppingList[index],
           deleted_date_time: new Date().toISOString(),
         };
+        console.log('🤎 장보기 아이템 삭제', JSON.stringify(shoppingList[index], null, 2));
         await this.saveShoppingList(shoppingList);
         return true;
       }

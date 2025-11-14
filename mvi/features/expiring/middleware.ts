@@ -94,7 +94,7 @@ export const expiringMiddleware: Middleware<ExpiringState, ExpiringIntent, Expir
           category: ingredient.category,
           emoji: ingredient.emoji,
           memo: null,
-          last_modifed_date_time: null,
+          last_modified_date_time: null,
           deleted_date_time: null,
         });
 

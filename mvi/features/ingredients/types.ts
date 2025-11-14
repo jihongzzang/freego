@@ -30,6 +30,7 @@ export type IngredientsIntent =
   | { type: 'NAVIGATE_TO_DETAIL_EDIT'; payload: string }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: string }
   | { type: 'DELETE_INGREDIENT'; payload: string }
+  | { type: 'CONSUME_INGREDIENT'; payload: string }
   | { type: 'NAVIGATE_TO_ADD' }
   | { type: 'BULK_ADD_INGREDIENTS'; payload: BulkAddIngredientsPayload[] }
   | { type: 'UPDATE_INGREDIENT_EXPIRY'; payload: { id: string; expired_date_time: string } }

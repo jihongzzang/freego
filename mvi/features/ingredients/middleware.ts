@@ -47,12 +47,9 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
           category: ingredient.category,
           emoji: ingredient.emoji,
           memo: null,
-          last_modifed_date_time: null,
+          last_modified_date_time: null,
           deleted_date_time: null,
         });
-
-        // 식재료 삭제
-        await ingredientService.deleteIngredient(intent.payload);
 
         // 삭제 후 다시 로드
         const data = await ingredientService.getIngredients();
@@ -100,6 +97,44 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
       } catch (error) {
         return {
           effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_DELETE_FAILED)],
+        };
+      }
+    }
+
+    case 'CONSUME_INGREDIENT': {
+      try {
+        const ingredient = state.ingredients.find((item) => item.id === intent.payload);
+
+        if (!ingredient) {
+          return {
+            effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_ITEM_NOT_FOUND)],
+          };
+        }
+
+        await ingredientService.consumeIngredient(intent.payload);
+
+        await shoppingService.addToShoppingList({
+          name: ingredient.name,
+          category: ingredient.category,
+          emoji: ingredient.emoji,
+          memo: null,
+          last_modified_date_time: null,
+          deleted_date_time: null,
+        });
+        // 소비 후 다시 로드
+        const data = await ingredientService.getIngredients();
+        const ingredients = enrichIngredients(data);
+
+        return {
+          state: {
+            ...state,
+            ingredients,
+          },
+          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_CONSUME_INGREDIENT)],
+        };
+      } catch (error) {
+        return {
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_CONSUME_FAILED)],
         };
       }
     }
