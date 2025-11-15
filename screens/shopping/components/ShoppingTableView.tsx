@@ -154,14 +154,17 @@ export function ShoppingTableView({
             <Accordion
               title={dateKey}
               badge={
-                <Text style={[typography.styles.t7Bold, { color: colors.textSecondary }]}>
-                  {dateItems.length}
-                </Text>
+                <Text style={[typography.styles.t7Bold, { color: colors.textSecondary }]}>{dateItems.length}</Text>
               }
               rightAction={
                 onDeleteDateItems ? (
                   <TouchableOpacity
-                    onPress={() => onDeleteDateItems(dateKey, dateItems.map((item) => item.id))}
+                    onPress={() =>
+                      onDeleteDateItems(
+                        dateKey,
+                        dateItems.map((item) => item.id),
+                      )
+                    }
                     activeOpacity={0.7}
                   >
                     <Trash2 size={18} color={colors.red500} />
@@ -199,9 +202,7 @@ export function ShoppingTableView({
                       onAddToStorage ? () => onAddToStorage(String(item.id), item.name, item.category) : undefined
                     }
                     onEmojiPress={onEmojiPress ? () => onEmojiPress(String(item.id)) : undefined}
-                    onCancelPurchase={
-                      onCancelPurchase ? () => onCancelPurchase(String(item.id), item.name) : undefined
-                    }
+                    onCancelPurchase={onCancelPurchase ? () => onCancelPurchase(String(item.id), item.name) : undefined}
                     onRepurchase={onRepurchase ? () => onRepurchase(String(item.id), item.name) : undefined}
                     hideCheckbox={isPurchasedView}
                   />
@@ -220,15 +221,14 @@ export function ShoppingTableView({
               { backgroundColor: isDark ? colors.grey900 : colors.surface, borderColor: colors.border },
             ]}
           >
-            {!isPurchasedView && (
-              <View
-                style={[styles.cell, styles.checkboxCell, { borderRightWidth: 1, borderRightColor: colors.border }]}
-              >
-                <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>완료</Text>
-              </View>
-            )}
-            <View style={[styles.cell, styles.nameCell]}>
+            <View style={[styles.cell, styles.checkboxCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>완료</Text>
+            </View>
+            <View style={[styles.cell, styles.nameCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
+            </View>
+            <View style={[styles.cell, styles.memoCell]}>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>메모</Text>
             </View>
           </View>
 
@@ -323,5 +323,10 @@ const createStyles = ({
     nameCell: {
       flex: 1,
       minWidth: 100,
+    },
+
+    memoCell: {
+      width: 40,
+      alignItems: 'center',
     },
   });

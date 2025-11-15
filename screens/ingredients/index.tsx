@@ -146,7 +146,7 @@ export default function IngredientsTableScreen() {
               <ScrollView
                 contentContainerStyle={{
                   paddingBottom: insets.bottom + 180,
-                  paddingHorizontal: spacing.lg,
+                  paddingHorizontal: spacing.sm,
                   paddingTop: totalHeaderHeight + spacing.lg,
                 }}
                 showsVerticalScrollIndicator={false}

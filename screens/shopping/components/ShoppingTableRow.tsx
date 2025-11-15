@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { Check } from 'lucide-react-native';
+import { Check, MessageSquare, MessageSquareDashed, StickyNote } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { useMemo } from 'react';
 import { MenuView } from '@react-native-menu/menu';
@@ -71,140 +71,133 @@ export function ShoppingTableRow({
 
       {/* Name + Memo Cell - With MenuView */}
       <MenuView
-          style={{ flex: 1 }}
-          onPressAction={({ nativeEvent }) => {
-            switch (nativeEvent.event) {
-              case 'toggle':
-                onToggle?.();
-                break;
-              case 'add-to-storage':
-                onAddToStorage?.();
-                break;
-              case 'emoji':
-                onEmojiPress?.();
-                break;
-              case 'memo':
-                onMemoPress?.();
-                break;
-              case 'cancel-purchase':
-                onCancelPurchase?.();
-                break;
-              case 'repurchase':
-                onRepurchase?.();
-                break;
-              case 'delete':
-                onDelete?.();
-                break;
-            }
-          }}
-          actions={
-            isPurchased
-              ? [
-                  {
-                    id: 'cancel-purchase',
-                    title: '구매완료 취소',
-                    image: Platform.select({
-                      ios: 'arrow.uturn.backward',
-                      android: undefined,
-                    }),
-                    imageColor: colors.orange600,
-                  },
-                  {
-                    id: 'repurchase',
-                    title: '재구매',
-                    image: Platform.select({
-                      ios: 'arrow.clockwise',
-                      android: undefined,
-                    }),
-                    imageColor: colors.blue600,
-                  },
-                  {
-                    id: 'delete',
-                    title: '삭제하기',
-                    image: Platform.select({
-                      ios: 'trash',
-                      android: undefined,
-                    }),
-                    attributes: {
-                      destructive: true,
-                    },
-                    imageColor: colors.red600,
-                  },
-                ]
-              : [
-                  {
-                    id: 'add-to-storage',
-                    title: '냉장고에 넣기',
-                    image: Platform.select({
-                      ios: 'refrigerator',
-                      android: undefined,
-                    }),
-                    imageColor: colors.blue600,
-                  },
-                  {
-                    id: 'emoji',
-                    title: '이모지 수정하기',
-                    image: Platform.select({
-                      ios: 'face.smiling',
-                      android: undefined,
-                    }),
-                    imageColor: colors.orange600,
-                  },
-                  {
-                    id: 'memo',
-                    title: '메모 수정하기',
-                    image: Platform.select({
-                      ios: 'text.bubble',
-                      android: undefined,
-                    }),
-                    imageColor: colors.primary,
-                  },
-                  {
-                    id: 'delete',
-                    title: '삭제하기',
-                    image: Platform.select({
-                      ios: 'trash',
-                      android: undefined,
-                    }),
-                    attributes: {
-                      destructive: true,
-                    },
-                    imageColor: colors.red600,
-                  },
-                ]
+        style={{ flex: 1 }}
+        onPressAction={({ nativeEvent }) => {
+          switch (nativeEvent.event) {
+            case 'toggle':
+              onToggle?.();
+              break;
+            case 'add-to-storage':
+              onAddToStorage?.();
+              break;
+            case 'emoji':
+              onEmojiPress?.();
+              break;
+            case 'cancel-purchase':
+              onCancelPurchase?.();
+              break;
+            case 'repurchase':
+              onRepurchase?.();
+              break;
+            case 'delete':
+              onDelete?.();
+              break;
           }
-        >
-          <View style={[styles.cell, styles.nameCell]}>
-            <Text
-              style={[
-                typography.styles.t7Semibold,
+        }}
+        actions={
+          isPurchased
+            ? [
                 {
-                  color: colors.text,
+                  id: 'cancel-purchase',
+                  title: '구매완료 취소',
+                  image: Platform.select({
+                    ios: 'arrow.uturn.backward',
+                    android: undefined,
+                  }),
+                  imageColor: colors.orange600,
                 },
-              ]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {name}
-            </Text>
-            {memo && (
-              <Text
-                style={[
-                  typography.styles.t7,
-                  {
-                    color: colors.textSecondary,
-                    fontSize: 11,
-                    marginTop: 2,
+                {
+                  id: 'repurchase',
+                  title: '재구매',
+                  image: Platform.select({
+                    ios: 'arrow.clockwise',
+                    android: undefined,
+                  }),
+                  imageColor: colors.blue600,
+                },
+                {
+                  id: 'delete',
+                  title: '삭제하기',
+                  image: Platform.select({
+                    ios: 'trash',
+                    android: undefined,
+                  }),
+                  attributes: {
+                    destructive: true,
                   },
-                ]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {memo}
-              </Text>
-            )}
-          </View>
-        </MenuView>
+                  imageColor: colors.red600,
+                },
+              ]
+            : [
+                {
+                  id: 'add-to-storage',
+                  title: '냉장고에 넣기',
+                  image: Platform.select({
+                    ios: 'refrigerator',
+                    android: undefined,
+                  }),
+                  imageColor: colors.blue600,
+                },
+                {
+                  id: 'emoji',
+                  title: '이모지 수정하기',
+                  image: Platform.select({
+                    ios: 'face.smiling',
+                    android: undefined,
+                  }),
+                  imageColor: colors.orange600,
+                },
+                {
+                  id: 'delete',
+                  title: '삭제하기',
+                  image: Platform.select({
+                    ios: 'trash',
+                    android: undefined,
+                  }),
+                  attributes: {
+                    destructive: true,
+                  },
+                  imageColor: colors.red600,
+                },
+              ]
+        }
+      >
+        <View
+          style={[
+            styles.cell,
+            styles.nameCell,
+            !isPurchased ? { borderRightWidth: 1, borderRightColor: colors.border } : {},
+          ]}
+        >
+          <Text
+            style={[
+              typography.styles.t7Semibold,
+              {
+                color: colors.text,
+              },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {name}
+          </Text>
+        </View>
+      </MenuView>
+      {!isPurchased && (
+        <TouchableOpacity
+          style={[styles.cell, styles.memoCell]}
+          onPress={(e) => {
+            e.stopPropagation();
+            onMemoPress?.();
+          }}
+        >
+          {memo ? (
+            <MessageSquare size={16} fill={colors.green500} color={colors.green500} />
+          ) : (
+            <MessageSquareDashed size={16} color={colors.green500} />
+          )}
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -239,5 +232,9 @@ const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spaci
       borderWidth: 1,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    memoCell: {
+      width: 40,
+      alignItems: 'center',
     },
   });

@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { MessageSquare } from 'lucide-react-native';
+import { MessageSquare, MessageSquareDashed } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { Ingredient } from '@/mvi/features/ingredients';
 import { getStorageLocationIcon, getStorageLocationLabel } from '@/utils/storageLocation';
@@ -164,6 +164,28 @@ export function IngredientsTableRow({
         </View>
       </MenuView>
 
+      {/* Expiry Date Cell - Clickable */}
+      <TouchableOpacity
+        style={[styles.cell, styles.expiryCell, { borderRightWidth: 1, borderRightColor: colors.border }]}
+        onPress={(e) => {
+          e.stopPropagation();
+          onQuickUpdateExpiry?.();
+        }}
+        activeOpacity={0.7}
+      >
+        <Text
+          style={[
+            typography.styles.t7,
+            {
+              color: ddayColor,
+            },
+          ]}
+          numberOfLines={1}
+        >
+          {dday}
+        </Text>
+      </TouchableOpacity>
+
       {/* Quantity Cell - Clickable */}
       <TouchableOpacity
         style={[styles.cell, styles.quantityCell, { borderRightWidth: 1, borderRightColor: colors.border }]}
@@ -207,28 +229,6 @@ export function IngredientsTableRow({
         </Text>
       </TouchableOpacity>
 
-      {/* Expiry Date Cell - Clickable */}
-      <TouchableOpacity
-        style={[styles.cell, styles.expiryCell, { borderRightWidth: 1, borderRightColor: colors.border }]}
-        onPress={(e) => {
-          e.stopPropagation();
-          onQuickUpdateExpiry?.();
-        }}
-        activeOpacity={0.7}
-      >
-        <Text
-          style={[
-            typography.styles.t7,
-            {
-              color: ddayColor,
-            },
-          ]}
-          numberOfLines={1}
-        >
-          {dday}
-        </Text>
-      </TouchableOpacity>
-
       {/* Memo Cell */}
       <TouchableOpacity
         style={[styles.cell, styles.memoCell]}
@@ -237,11 +237,11 @@ export function IngredientsTableRow({
           onQuickUpdateMemo?.();
         }}
       >
-        <MessageSquare
-          size={16}
-          fill={item.memo ? colors.green500 : colors.surface}
-          color={item.memo ? colors.green500 : colors.green500}
-        />
+        {item.memo ? (
+          <MessageSquare size={16} fill={colors.green500} color={colors.green500} />
+        ) : (
+          <MessageSquareDashed size={16} color={colors.green500} />
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -275,12 +275,12 @@ const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spaci
     },
 
     quantityCell: {
-      width: 60,
+      width: 40,
       alignItems: 'center',
     },
 
     storageCell: {
-      width: 60,
+      width: 40,
       alignItems: 'center',
     },
 

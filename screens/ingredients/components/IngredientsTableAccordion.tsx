@@ -75,6 +75,11 @@ export function IngredientsTableAccordion({
             <View style={[styles.cell, styles.nameCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
             </View>
+            <View style={[styles.cell, styles.expiryCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
+                유통기한
+              </Text>
+            </View>
             <View style={[styles.cell, styles.quantityCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
                 수량
@@ -85,11 +90,7 @@ export function IngredientsTableAccordion({
                 보관
               </Text>
             </View>
-            <View style={[styles.cell, styles.expiryCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
-              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
-                유통기한
-              </Text>
-            </View>
+
             <View style={[styles.cell, styles.memoCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
                 메모
@@ -161,11 +162,11 @@ const createStyles = ({
     },
 
     quantityCell: {
-      width: 60,
+      width: 40,
     },
 
     storageCell: {
-      width: 60,
+      width: 40,
     },
 
     expiryCell: {

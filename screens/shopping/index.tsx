@@ -182,7 +182,7 @@ export default function ShoppingListTableScreen() {
               <ScrollView
                 contentContainerStyle={{
                   paddingBottom: insets.bottom + 80,
-                  paddingHorizontal: spacing.lg,
+                  paddingHorizontal: spacing.sm,
                   paddingTop: totalHeaderHeight + spacing.lg,
                 }}
                 showsVerticalScrollIndicator={false}
