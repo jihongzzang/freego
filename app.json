@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Frigo Dev",
-    "slug": "frigo-app-dev",
+    "name": "Freego Dev",
+    "slug": "freego-app-dev",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "frigo-dev",
+    "scheme": "freego-dev",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "android": {
