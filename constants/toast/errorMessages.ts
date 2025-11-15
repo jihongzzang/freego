@@ -22,6 +22,7 @@ const ERROR_MESSAGES = {
   ERROR_STORAGE_UPDATE_FAILED: '보관위치 수정에 실패했어요.',
   ERROR_INGREDIENT_UPDATE_FAILED: '재료 수정에 실패했어요.',
   ERROR_MEMO_UPDATE_FAILED: '메모 수정에 실패했어요.',
+  ERROR_NAME_UPDATE_FAILED: '이름 수정에 실패했어요.',
 
   ERROR_STARTER_PACKAGE_ADD_FAILED: '스타터 패키지 추가 중 오류가 발생했어요.',
 

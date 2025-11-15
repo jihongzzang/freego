@@ -12,11 +12,11 @@ interface IngredientsTableAccordionProps {
   items: Ingredient[];
   isExpanded: boolean;
   onToggle: () => void;
-  onItemEdit: (id: string) => void;
   onQuickAdd: (id: string) => void;
   onQuickConsume: (id: string) => void;
   onQuickDelete: (id: string) => void;
   onQuickUpdateEmoji: (id: string) => void;
+  onQuickUpdateName: (id: string) => void;
   onQuickUpdateExpiry: (id: string) => void;
   onQuickUpdateQuantity: (id: string) => void;
   onQuickUpdateStorage: (id: string) => void;
@@ -30,11 +30,11 @@ export function IngredientsTableAccordion({
   items,
   isExpanded,
   onToggle,
-  onItemEdit,
   onQuickAdd,
   onQuickConsume,
   onQuickDelete,
   onQuickUpdateEmoji,
+  onQuickUpdateName,
   onQuickUpdateExpiry,
   onQuickUpdateQuantity,
   onQuickUpdateStorage,
@@ -99,12 +99,12 @@ export function IngredientsTableAccordion({
           </View>
 
           {/* Data Rows */}
-          {items.map((item, index) => (
+          {items.map((item) => (
             <IngredientsTableRow
               key={item.id}
               item={item}
-              onEdit={() => onItemEdit(String(item.id))}
               onQuickUpdateEmoji={() => onQuickUpdateEmoji(String(item.id))}
+              onQuickUpdateName={() => onQuickUpdateName(String(item.id))}
               onQuickUpdateExpiry={() => onQuickUpdateExpiry(String(item.id))}
               onQuickUpdateQuantity={() => onQuickUpdateQuantity(String(item.id))}
               onQuickUpdateStorage={() => onQuickUpdateStorage(String(item.id))}

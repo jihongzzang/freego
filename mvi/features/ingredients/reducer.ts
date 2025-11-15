@@ -8,10 +8,7 @@ import { Reducer } from '@/mvi/base';
 import { IngredientsState, IngredientsIntent } from './types';
 import { handleLoadIngredientsReducer } from '@/mvi/shared';
 
-export const ingredientsReducer: Reducer<IngredientsState, IngredientsIntent> = (
-  state,
-  intent,
-): IngredientsState => {
+export const ingredientsReducer: Reducer<IngredientsState, IngredientsIntent> = (state, intent): IngredientsState => {
   // 공통 로딩 로직 처리
   const commonState = handleLoadIngredientsReducer(state, intent);
   if (commonState !== state) {
@@ -25,7 +22,6 @@ export const ingredientsReducer: Reducer<IngredientsState, IngredientsIntent> = 
     case 'ADD_TO_SHOPPING_LIST_INGREDIENT':
     case 'NAVIGATE_TO_ADD':
     case 'NAVIGATE_TO_DETAIL':
-    case 'NAVIGATE_TO_DETAIL_EDIT':
       return state;
 
     default:

@@ -116,12 +116,14 @@ export const ingredientRepository = {
     try {
       const ingredients = await this.getAllIngredientsRaw();
       const index = ingredients.findIndex((item) => item.id === id);
+
       if (index !== -1) {
         ingredients[index] = {
           ...ingredients[index],
           ...updates,
           last_modified_date_time: new Date().toISOString(),
         };
+        console.log(ingredients);
         await this.saveIngredients(ingredients);
         return true;
       }

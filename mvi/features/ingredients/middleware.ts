@@ -69,11 +69,6 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
       }
     }
 
-    case 'NAVIGATE_TO_DETAIL_EDIT':
-      return {
-        effects: [createNavigateEffect(`/ingredient-edit/${intent.payload}`)],
-      };
-
     case 'NAVIGATE_TO_DETAIL':
       return {
         effects: [createNavigateEffect(`/ingredient/${intent.payload}`)],
@@ -135,6 +130,30 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
       } catch (error) {
         return {
           effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_CONSUME_FAILED)],
+        };
+      }
+    }
+
+    case 'UPDATE_INGREDIENT_NAME': {
+      try {
+        await ingredientService.updateIngredient(intent.payload.id, {
+          name: intent.payload.name,
+        });
+
+        // 업데이트 후 다시 로드
+        const data = await ingredientService.getIngredients();
+        const ingredients = enrichIngredients(data);
+
+        return {
+          state: {
+            ...state,
+            ingredients,
+          },
+          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_NAME_UPDATE)],
+        };
+      } catch (error) {
+        return {
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_NAME_UPDATE_FAILED)],
         };
       }
     }

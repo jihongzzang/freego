@@ -40,6 +40,11 @@ export function useIngredientsLogic() {
   const [selectedQuantityIngredientId, setSelectedQuantityIngredientId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<string>('');
 
+  // QuickUpdateName 로컬 상태
+  const [isNameUpdateVisible, setIsNameUpdateVisible] = useState(false);
+  const [selectedNameIngredientId, setSelectedNameIngredientId] = useState<string | null>(null);
+  const [name, setName] = useState<string>('');
+
   // QuickUpdateStorge 로컬 상태
   const [isStorageUpdateVisible, setIsStorageUpdateVisible] = useState(false);
   const [selectedStorageIngredientId, setSelectedStorageIngredientId] = useState<string | null>(null);
@@ -84,10 +89,6 @@ export function useIngredientsLogic() {
 
   function handleNavigateToDetail(id: string) {
     dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: id });
-  }
-
-  function handleNavigateToEdit(id: string) {
-    dispatch({ type: 'NAVIGATE_TO_DETAIL_EDIT', payload: id });
   }
 
   function handleNavigateToAdd() {
@@ -220,6 +221,39 @@ export function useIngredientsLogic() {
         },
       });
       handleQuickUpdateQuantityClose();
+    }
+  }
+
+  // QuickUpdateName 핸들러
+  function handleQuickUpdateNameOpen(id: string) {
+    const ingredient = ingredients.find((ing) => ing.id === id);
+    if (ingredient) {
+      setSelectedNameIngredientId(id);
+      setName(ingredient.name);
+      setIsNameUpdateVisible(true);
+    }
+  }
+
+  function handleQuickUpdateNameClose() {
+    setIsNameUpdateVisible(false);
+    setSelectedNameIngredientId(null);
+    setName('');
+  }
+
+  function handleNameChange(name: string) {
+    setName(name);
+  }
+
+  function handleNameConfirm() {
+    if (selectedNameIngredientId !== null) {
+      dispatch({
+        type: 'UPDATE_INGREDIENT_NAME',
+        payload: {
+          id: selectedNameIngredientId,
+          name: name,
+        },
+      });
+      handleQuickUpdateNameClose();
     }
   }
 
@@ -377,6 +411,14 @@ export function useIngredientsLogic() {
       handleDateChange: handleExpiryDateChange,
       handleConfirm: handleExpiryDateConfirm,
     },
+    nameUpdate: {
+      isVisible: isNameUpdateVisible,
+      name,
+      open: handleQuickUpdateNameOpen,
+      close: handleQuickUpdateNameClose,
+      handleNameChange,
+      handleConfirm: handleNameConfirm,
+    },
     memoUpdate: {
       isVisible: isMemoUpdateVisible,
       memo,
@@ -386,7 +428,6 @@ export function useIngredientsLogic() {
       handleConfirm: handleMemoConfirm,
     },
     handleNavigateToDetail,
-    handleNavigateToEdit,
     handleNavigateToAdd,
     handleQuickDelete,
     handleQuickAdd,

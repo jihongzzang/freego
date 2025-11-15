@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { MessageSquare, StickyNote } from 'lucide-react-native';
+import { StickyNote } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { Ingredient } from '@/mvi/features/ingredients';
 import { getStorageLocationIcon } from '@/utils/storageLocation';
@@ -9,11 +9,11 @@ import { MenuView } from '@react-native-menu/menu';
 
 interface IngredientsTableRowProps {
   item: Ingredient;
-  onEdit?: () => void;
   onQuickAdd?: () => void;
   onQuickConsume?: () => void;
   onQuickDelete?: () => void;
   onQuickUpdateEmoji?: () => void;
+  onQuickUpdateName?: () => void;
   onQuickUpdateExpiry?: () => void;
   onQuickUpdateQuantity?: () => void;
   onQuickUpdateStorage?: () => void;
@@ -23,11 +23,11 @@ interface IngredientsTableRowProps {
 
 export function IngredientsTableRow({
   item,
-  onEdit,
   onQuickAdd,
   onQuickConsume,
   onQuickDelete,
   onQuickUpdateEmoji,
+  onQuickUpdateName,
   onQuickUpdateExpiry,
   onQuickUpdateQuantity,
   onQuickUpdateStorage,
@@ -83,8 +83,8 @@ export function IngredientsTableRow({
             case 'add-to-shopping':
               onQuickAdd?.();
               break;
-            case 'edit':
-              onEdit?.();
+            case 'nameEdit':
+              onQuickUpdateName?.();
               break;
             case 'view-detail':
               onViewDetail?.();
@@ -99,17 +99,8 @@ export function IngredientsTableRow({
         }}
         actions={[
           {
-            id: 'add-to-shopping',
-            title: '장보기 항목에 추가하기',
-            image: Platform.select({
-              ios: 'cart',
-              android: undefined,
-            }),
-            imageColor: colors.primary,
-          },
-          {
-            id: 'edit',
-            title: '수정하기',
+            id: 'nameEdit',
+            title: '이름수정',
             image: Platform.select({
               ios: 'square.and.pencil',
               android: undefined,
@@ -124,6 +115,15 @@ export function IngredientsTableRow({
               android: undefined,
             }),
             imageColor: colors.yellow600,
+          },
+          {
+            id: 'add-to-shopping',
+            title: '장보기 항목에 추가하기',
+            image: Platform.select({
+              ios: 'cart',
+              android: undefined,
+            }),
+            imageColor: colors.primary,
           },
           {
             id: 'delete',

@@ -7,6 +7,7 @@ const SUCCESS_MESSAGES = {
   SUCCESS_ADD_SHOPPING_LIST_ITEM: '장보기 항목에 추가됐어요.',
   SUCCESS_DELETE_SHOPPING_LIST_ITEM: '장보기 항목이 삭제됐어요.',
 
+  SUCCESS_NAME_UPDATE: '이름이 수정됐어요.',
   SUCCESS_EXPIRY_DATE_UPDATE: '유통기한이 수정됐어요.',
   SUCCESS_QUANTITY_UPDATE: '수량이 수정됐어요.',
   SUCCESS_EMOJI_UPDATE: '이모지가 수정됐어요.',

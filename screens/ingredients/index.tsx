@@ -19,6 +19,7 @@ import { StorageLocation } from '@/data/enums/storage_location';
 import SelectStorageBottomSheet from '@/components/SelectStorageBottomSheet';
 import MemoBottomSheet from '@/components/MemoBottomSheet';
 import EmojiBottomSheet from '@/components/EmojiBottomSheet';
+import NameBottomSheet from '@/components/NameBottomSheet';
 
 export const TAB_BAR_HEIGHT = 48;
 
@@ -40,9 +41,9 @@ export default function IngredientsTableScreen() {
     quantityUpdate,
     storageUpdate,
     expiryUpdate,
+    nameUpdate,
     memoUpdate,
     handleNavigateToDetail,
-    handleNavigateToEdit,
     handleNavigateToAdd,
     handleQuickDelete,
     handleQuickAdd,
@@ -176,8 +177,8 @@ export default function IngredientsTableScreen() {
                               items={categoryItems}
                               isExpanded={isExpanded}
                               onToggle={() => toggleCategory(catId)}
-                              onItemEdit={handleNavigateToEdit}
                               onQuickUpdateEmoji={emojiUpdate.open}
+                              onQuickUpdateName={nameUpdate.open}
                               onQuickUpdateExpiry={expiryUpdate.open}
                               onQuickUpdateQuantity={quantityUpdate.open}
                               onQuickUpdateStorage={storageUpdate.open}
@@ -208,8 +209,8 @@ export default function IngredientsTableScreen() {
                               items={storageItems}
                               isExpanded={isExpanded}
                               onToggle={() => toggleStorage(storageId)}
-                              onItemEdit={handleNavigateToEdit}
                               onQuickUpdateEmoji={emojiUpdate.open}
+                              onQuickUpdateName={nameUpdate.open}
                               onQuickUpdateExpiry={expiryUpdate.open}
                               onQuickUpdateQuantity={quantityUpdate.open}
                               onQuickUpdateStorage={storageUpdate.open}
@@ -258,6 +259,15 @@ export default function IngredientsTableScreen() {
         selectedTemplates={bulkAdd.selectedTemplates}
         onTemplateToggle={bulkAdd.handleTemplateToggle}
         onConfirm={bulkAdd.handleConfirm}
+      />
+
+      <NameBottomSheet
+        visible={nameUpdate.isVisible}
+        title="이름 수정"
+        name={nameUpdate.name}
+        onClose={nameUpdate.close}
+        onNameChange={nameUpdate.handleNameChange}
+        onConfirm={nameUpdate.handleConfirm}
       />
 
       <EmojiBottomSheet
