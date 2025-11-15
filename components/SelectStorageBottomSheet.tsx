@@ -7,11 +7,19 @@ import { getStorageLocationIcon } from '@/utils/storageLocation/getStorageLocati
 
 interface SelectStorageBottomSheetProps {
   visible: boolean;
+  title: string;
+  description?: string;
   onClose: () => void;
   onSelect: (storageLocation: StorageLocation) => void;
 }
 
-export default function SelectStorageBottomSheet({ visible, onClose, onSelect }: SelectStorageBottomSheetProps) {
+export default function SelectStorageBottomSheet({
+  visible,
+  title,
+  description,
+  onClose,
+  onSelect,
+}: SelectStorageBottomSheetProps) {
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const handleSelect = (storageLocation: StorageLocation) => {
@@ -22,11 +30,13 @@ export default function SelectStorageBottomSheet({ visible, onClose, onSelect }:
   const storageLocations = makeStorageList({ lang: 'kr' });
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} title="냉장고에 넣기" maxHeight={260}>
+    <BottomSheet visible={visible} onClose={onClose} title={title} maxHeight={260}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary, marginBottom: 12 }]}>
-          냉장고에 넣기전 보관위치를 설정해 주세요.
-        </Text>
+        {description && (
+          <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary, marginBottom: 12 }]}>
+            {description}
+          </Text>
+        )}
         <View style={styles.grid}>
           {storageLocations.map((location) => (
             <TouchableOpacity

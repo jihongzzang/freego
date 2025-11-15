@@ -8,15 +8,13 @@ interface MakeCategoryListOptions {
 }
 
 export function makeCategoryList({ includeAllCategory = false, lang = 'kr' }: MakeCategoryListOptions) {
-  const categories = Object.values(Category)
-    .filter((v) => typeof v === 'number')
-    .map((category) => ({
-      id: category as Category,
-      label: getCategoryLabel({ category: category as Category, lang }),
-    }));
+  const categories = Object.values(Category).map((category) => ({
+    id: category as Category,
+    label: getCategoryLabel({ category: category as Category, lang }),
+  }));
 
-  if (includeAllCategory) {
-    return [{ id: 0, label: lang === 'kr' ? '전체' : 'All' }, ...categories];
+  if (!includeAllCategory) {
+    return categories.slice(1);
   }
 
   return categories;

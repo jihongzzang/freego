@@ -5,14 +5,14 @@ import { Category } from '@/data/enums/category';
 import { getTemplatesByCategory, type IngredientTemplate } from '@/constants/ingredientTemplates';
 import { getCategoryIcon } from '@/utils/category';
 import { makeCategoryList } from '@/utils/category/makeCategoryList';
-import { useMemo } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import { Button, Chip } from './ui';
 
 interface BulkAddBottomSheetProps {
   visible: boolean;
   onClose: () => void;
-  selectedCategoryId: Category | 0;
-  onCategoryChange: (categoryId: Category | 0) => void;
+  selectedCategoryId: Category;
+  onCategoryChange: (categoryId: Category) => void;
   selectedTemplates: IngredientTemplate[];
   onTemplateToggle: (template: IngredientTemplate) => void;
   onConfirm: () => void;
@@ -34,11 +34,34 @@ export default function BulkAddBottomSheet({
   const GAP = spacing.sm;
   const ITEM_WIDTH = (screenWidth - H_PADDING - GAP * 2 - 20) / 3; // 3열 균등 분할
 
-  const categories = useMemo(() => makeCategoryList({ includeAllCategory: true, lang: 'kr' }), []);
+  const categoryScrollRef = useRef<ScrollView>(null);
+  const chipRefs = useRef<{ [key: string]: View | null }>({});
+
+  const categories = useMemo(() => makeCategoryList({ includeAllCategory: false, lang: 'kr' }).slice(0, -1), []);
 
   const filteredTemplates = useMemo(() => {
-    return getTemplatesByCategory(selectedCategoryId === 0 ? null : selectedCategoryId);
+    if (selectedCategoryId === Category.ALL || selectedCategoryId === Category.OTHER) {
+      return getTemplatesByCategory(Category.VEGETABLE);
+    }
+
+    return getTemplatesByCategory(selectedCategoryId);
   }, [selectedCategoryId]);
+
+  // BottomSheet가 열릴 때 선택된 카테고리로 스크롤
+  useEffect(() => {
+    if (visible && categoryScrollRef.current && chipRefs.current[selectedCategoryId]) {
+      // 약간의 딜레이를 주어 렌더링 완료 후 스크롤
+      setTimeout(() => {
+        chipRefs.current[selectedCategoryId]?.measureLayout(
+          categoryScrollRef.current as any,
+          (x: number) => {
+            categoryScrollRef.current?.scrollTo({ x: Math.max(0, x - 20), animated: true });
+          },
+          () => {},
+        );
+      }, 100);
+    }
+  }, [visible, selectedCategoryId]);
 
   function isTemplateSelected(template: IngredientTemplate) {
     return selectedTemplates.some((t) => t.id === template.id);
@@ -53,17 +76,29 @@ export default function BulkAddBottomSheet({
           style={{ flex: 1 }}
           contentContainerStyle={{ padding: spacing.xl, paddingTop: 12, gap: spacing.lg }}
         >
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
+          <ScrollView
+            ref={categoryScrollRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: spacing.sm }}
+          >
             {categories.map((cat) => (
-              <Chip
+              <View
                 key={cat.id}
-                label={cat.label}
-                onPress={() => onCategoryChange(cat.id)}
-                variant={selectedCategoryId === cat.id ? 'primary' : 'secondary'}
-                color={selectedCategoryId === cat.id ? 'green' : 'grey'}
-                size="xlarge"
-                leftIcon={cat.id !== 0 && getCategoryIcon(cat.id, 16)}
-              />
+                ref={(el) => {
+                  chipRefs.current[cat.id] = el;
+                }}
+                collapsable={false}
+              >
+                <Chip
+                  label={cat.label}
+                  onPress={() => onCategoryChange(cat.id)}
+                  variant={selectedCategoryId === cat.id ? 'primary' : 'secondary'}
+                  color={selectedCategoryId === cat.id ? 'green' : 'grey'}
+                  size="xlarge"
+                  leftIcon={cat.id !== Category.ALL && getCategoryIcon(cat.id, 16)}
+                />
+              </View>
             ))}
           </ScrollView>
 

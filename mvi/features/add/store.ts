@@ -17,15 +17,18 @@ const initialState: AddState = {
   form: {
     name: '',
     category: Category.VEGETABLE,
-    quantity: undefined,
-    unit: undefined,
-    purchased_date: undefined,
-    expiry_date: undefined,
-    storage_location: undefined,
-    memo: undefined,
+    emoji: null,
+    quantity: null,
+    unit: null,
+    purchased_date_time: null,
+    expired_date_time: null,
+    storage_location: null,
+    memo: null,
   },
   isSubmitting: false,
-  errors: {},
+  errors: {
+    name: '',
+  },
 };
 
 /**

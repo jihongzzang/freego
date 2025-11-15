@@ -19,39 +19,6 @@ export const ingredientDetailReducer: Reducer<IngredientDetailState, IngredientD
         error: null,
       };
 
-    case 'SET_EDITING':
-      // 편집 모드를 종료할 때(false) editForm을 원본 ingredient 데이터로 초기화
-      if (!intent.payload && state.ingredient) {
-        return {
-          ...state,
-          isEditing: false,
-          editForm: {
-            name: state.ingredient.name,
-            emoji: state.ingredient.emoji,
-            category: state.ingredient.category,
-            quantity: state.ingredient.quantity?.toString() || '',
-            unit: state.ingredient.unit,
-            purchased_date: state.ingredient.purchased_date,
-            expiry_date: state.ingredient.expiry_date,
-            storage_location: state.ingredient.storage_location,
-            memo: state.ingredient.memo || '',
-          },
-        };
-      }
-      return {
-        ...state,
-        isEditing: intent.payload,
-      };
-
-    case 'UPDATE_FORM_FIELD':
-      return {
-        ...state,
-        editForm: {
-          ...state.editForm,
-          [intent.payload.field]: intent.payload.value,
-        },
-      };
-
     default:
       return state;
   }

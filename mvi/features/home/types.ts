@@ -2,48 +2,36 @@
  * Home Screen MVI Types
  */
 
-import { Intent, State, Effect } from '@/mvi/base';
-import { Ingredient as StoredIngredient } from '@/data/models/ingredient.model';
-import { StatusType } from '@/data/enums/status';
+import {
+  IngredientListState,
+  LoadIngredientsIntent,
+  CommonEffect,
+  BulkAddIngredientsPayload,
+  EnrichedIngredient,
+} from '@/mvi/shared';
 
 /**
- * Ingredient with status
+ * Ingredient 타입 re-export (하위 호환성)
  */
-export interface Ingredient extends StoredIngredient {
-  status: StatusType;
-  daysRemaining: number | null;
-}
+export type Ingredient = EnrichedIngredient;
 
 /**
  * Home State
  */
-export interface HomeState extends State {
-  ingredients: Ingredient[];
-  loading: boolean;
-  error: string | null;
-}
+export interface HomeState extends IngredientListState {}
 
 /**
  * Home Intent (사용자 액션)
  */
 export type HomeIntent =
-  | { type: 'LOAD_INGREDIENTS' }
-  | { type: 'LOAD_INGREDIENTS_SUCCESS'; payload: Ingredient[] }
-  | { type: 'LOAD_INGREDIENTS_ERROR'; payload: string }
-  | { type: 'UPDATE_EXPIRY_DATE'; payload: { id: number; expiryDate: string } }
-  | { type: 'NAVIGATE_TO_ADD'; payload?: number }
-  | { type: 'NAVIGATE_TO_EXPIRING' }
-  | { type: 'NAVIGATE_TO_DETAIL'; payload: number };
+  | LoadIngredientsIntent
+  | { type: 'UPDATE_EXPIRY_DATE'; payload: { id: string; expired_date_time: string } }
+  | { type: 'BULK_ADD_INGREDIENTS'; payload: BulkAddIngredientsPayload[] }
+  | { type: 'NAVIGATE_TO_ADD'; payload: string | null }
+  // | { type: 'NAVIGATE_TO_EXPIRING' }
+  | { type: 'NAVIGATE_TO_DETAIL'; payload: string };
 
 /**
  * Home Effect (부수 효과)
  */
-export type HomeEffect =
-  | { type: 'NAVIGATE'; payload: string }
-  | {
-      type: 'SHOW_TOAST';
-      payload: {
-        message: string;
-        variant: 'success' | 'error' | 'info' | 'warning';
-      };
-    };
+export type HomeEffect = CommonEffect;

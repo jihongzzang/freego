@@ -6,16 +6,16 @@ import { getStatusColor, getCalculateStatus } from '@/utils/status';
 import Badge from '@/components/ui/Badge';
 import { useMemo } from 'react';
 import { Ingredient } from '@/mvi/features/expiring/types';
-import { getDaysRemaining } from '@/utils/time';
+import { getDaysRemaining, toLocalDate } from '@/utils/time';
 
 interface ExpiringItemProps {
   item: Ingredient;
   onPress: () => void;
-  onQuickDeduct: () => void;
+  onQuickAdd: () => void;
   onQuickDelete: () => void;
 }
 
-export function ExpiringItem({ item, onPress, onQuickDeduct, onQuickDelete }: ExpiringItemProps) {
+export function ExpiringItem({ item, onPress, onQuickAdd, onQuickDelete }: ExpiringItemProps) {
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
@@ -32,10 +32,10 @@ export function ExpiringItem({ item, onPress, onQuickDeduct, onQuickDelete }: Ex
             <Badge
               dot
               variant="primary"
-              style={{ backgroundColor: getStatusColor(getCalculateStatus(item.expiry_date)) }}
+              style={{ backgroundColor: getStatusColor(getCalculateStatus(item.expired_date_time)) }}
             />
           </View>
-          {item.expiry_date ? (
+          {item.expired_date_time ? (
             <Text
               style={[
                 typography.styles.t7,
@@ -45,7 +45,7 @@ export function ExpiringItem({ item, onPress, onQuickDeduct, onQuickDelete }: Ex
                 },
               ]}
             >
-              유통기한: {item.expiry_date}
+              유통기한: {toLocalDate(item.expired_date_time)}
               {item.daysRemaining !== null && ` (${getDaysRemaining(item.daysRemaining)})`}
             </Text>
           ) : (
@@ -67,7 +67,7 @@ export function ExpiringItem({ item, onPress, onQuickDeduct, onQuickDelete }: Ex
         style={[styles.quickButton, { borderRadius: borderRadius.lg }]}
         onPress={(e) => {
           e.stopPropagation();
-          onQuickDeduct();
+          onQuickAdd();
         }}
       >
         <ShoppingCart size={20} color={colors.teal500} />

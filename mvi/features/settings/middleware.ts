@@ -5,6 +5,9 @@
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { SettingsState, SettingsIntent, SettingsEffect } from './types';
 import { saveNotificationDays, getNotificationDays } from '@/services/notification.service';
+import { createErrorEffect, createSuccessEffect } from '@/mvi/shared';
+import ERROR_MESSAGES from '@/constants/toast/errorMessages';
+import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
 
 export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, SettingsEffect> = async (
   state,
@@ -26,16 +29,37 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
       await saveNotificationDays(intent.payload);
 
       return {
-        effects: [
-          {
-            type: 'SHOW_TOAST',
-            payload: {
-              message: `알림 주기가 ${intent.payload}일로 변경됐어요.`,
-              variant: 'success',
-            },
-          },
-        ],
+        effects: [createSuccessEffect(`알림 주기가 ${intent.payload}일로 변경됐어요.`)],
       };
+
+    case 'DELETE_ALL_DATA': {
+      try {
+        const { ingredientService } = await import('@/services/ingredient.service');
+        const { shoppingService } = await import('@/services/shopping.service');
+        const { achievementService } = await import('@/services/achievement.service');
+
+        await ingredientService.clearAll();
+        await shoppingService.clearAll();
+        await achievementService.resetAll();
+
+        return {
+          state: {
+            ...state,
+            isClearing: false,
+          },
+          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_DELETE_DATA)],
+        };
+      } catch (error) {
+        console.error('Error deleting all data:', error);
+        return {
+          state: {
+            ...state,
+            isClearing: false,
+          },
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_DELETE_DATA_FAILED)],
+        };
+      }
+    }
 
     default:
       return {};

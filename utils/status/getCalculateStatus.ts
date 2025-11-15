@@ -1,6 +1,6 @@
 import { StatusType } from '@/data/enums/status';
 
-export function getCalculateStatus(expiryDate?: string | null): StatusType {
+export function getCalculateStatus(expiryDate: string | null): StatusType {
   if (!expiryDate) return 'not_set';
 
   const today = new Date();
@@ -10,8 +10,6 @@ export function getCalculateStatus(expiryDate?: string | null): StatusType {
   expiry.setHours(0, 0, 0, 0);
 
   const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-  console.log(`hello ${diffDays}`);
 
   if (diffDays < 0) return 'expired';
 

@@ -5,15 +5,16 @@ import { makeCategoryList } from '@/utils/category/makeCategoryList';
 import { getCategoryIcon } from '@/utils/category';
 import { useMemo } from 'react';
 import { Button, Chip } from './ui';
+import { Category } from '@/data/enums/category';
 
 interface AddShoppingListBottomSheetProps {
   visible: boolean;
   onClose: () => void;
   name: string;
-  category: number;
+  category: Category;
   memo: string;
   onNameChange: (text: string) => void;
-  onCategoryChange: (categoryId: number) => void;
+  onCategoryChange: (categoryId: Category) => void;
   onMemoChange: (text: string) => void;
   onSubmit: () => void;
 }
@@ -71,7 +72,7 @@ export default function AddShoppingListBottomSheet({
                     variant={category === cat.id ? 'primary' : 'secondary'}
                     color={category === cat.id ? 'green' : 'grey'}
                     size="xlarge"
-                    leftIcon={cat.id !== 0 && getCategoryIcon(cat.id, 16)}
+                    leftIcon={cat.id !== Category.ALL && getCategoryIcon(cat.id, 16)}
                   />
                 ))}
               </ScrollView>

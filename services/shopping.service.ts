@@ -1,60 +1,34 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ShoppingItem } from '@/data/models/shopping.model';
-import { generateId } from './utils/generateId';
-
-/**
- * AsyncStorage 키 상수
- */
-const STORAGE_KEY = '@shopping_list';
+import { shoppingRepository } from '@/data/repositories/shopping.repository';
+import { achievementService } from './achievement.service';
 
 /**
  * 장보기 리스트 관련 서비스
+ * 비즈니스 로직을 처리하고 repository에 위임
  */
 export const shoppingService = {
   async getShoppingList(): Promise<ShoppingItem[]> {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
-      const list = data ? JSON.parse(data) : [];
-      return list.filter((item: ShoppingItem) => !item.deleted_at);
-    } catch (error) {
-      console.error('Error reading shopping list:', error);
-      return [];
-    }
+    return shoppingRepository.getShoppingList();
   },
 
-  async addToShoppingList(item: Omit<ShoppingItem, 'id' | 'created_at' | 'is_purchased'>): Promise<void> {
+  async addToShoppingList(
+    item: Omit<ShoppingItem, 'id' | 'created_date_time' | 'is_purchased' | 'purchased_date_time'>,
+  ): Promise<void> {
     try {
-      const shoppingList = await this.getShoppingList();
-      const existing = shoppingList.find((i) => i.name === item.name && i.category === item.category);
-
-      if (!existing) {
-        const newItem: ShoppingItem = {
-          ...item,
-          id: generateId(),
-          is_purchased: false,
-          created_at: new Date().toISOString(),
-        };
-        shoppingList.push(newItem);
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shoppingList));
-      }
+      await shoppingRepository.addToShoppingList(item);
     } catch (error) {
       console.error('Error adding to shopping list:', error);
       throw error;
     }
   },
 
-  async updateShoppingItem(id: number, updates: Partial<ShoppingItem>): Promise<void> {
+  async updateShoppingItem(id: string, updates: Partial<ShoppingItem>): Promise<void> {
     try {
-      const shoppingList = await this.getShoppingList();
-      const index = shoppingList.findIndex((item) => item.id === id);
+      await shoppingRepository.updateShoppingItem(id, updates);
 
-      if (index !== -1) {
-        shoppingList[index] = {
-          ...shoppingList[index],
-          ...updates,
-          updated_at: new Date().toISOString(),
-        };
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shoppingList));
+      // 장보기 완료 시 업적 업데이트
+      if (updates.is_purchased === true) {
+        await achievementService.onShoppingCompleted();
       }
     } catch (error) {
       console.error('Error updating shopping item:', error);
@@ -62,17 +36,9 @@ export const shoppingService = {
     }
   },
 
-  async deleteShoppingItem(id: number): Promise<void> {
+  async deleteShoppingItem(id: string): Promise<void> {
     try {
-      const shoppingList = await this.getShoppingList();
-      const index = shoppingList.findIndex((item) => item.id === id);
-      if (index !== -1) {
-        shoppingList[index] = {
-          ...shoppingList[index],
-          deleted_at: new Date().toISOString(), // 삭제 시각 기록
-        };
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shoppingList));
-      }
+      await shoppingRepository.deleteShoppingItem(id);
     } catch (error) {
       console.error('Error deleting shopping item:', error);
       throw error;
@@ -80,11 +46,6 @@ export const shoppingService = {
   },
 
   async clearAll(): Promise<void> {
-    try {
-      await AsyncStorage.removeItem(STORAGE_KEY);
-    } catch (error) {
-      console.error('Error clearing storage:', error);
-      throw error;
-    }
+    return shoppingRepository.clearAll();
   },
 };

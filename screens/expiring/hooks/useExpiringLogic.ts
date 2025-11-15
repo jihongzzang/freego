@@ -42,15 +42,15 @@ export function useExpiringLogic() {
     dispatch({ type: 'NAVIGATE_BACK' });
   };
 
-  const handleNavigateToDetail = (id: number) => {
-    dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: id.toString() });
+  const handleNavigateToDetail = (id: string) => {
+    dispatch({ type: 'NAVIGATE_TO_DETAIL', payload: id });
   };
 
-  const handleQuickDeduct = (id: number) => {
-    dispatch({ type: 'DEDUCT_INGREDIENT', payload: id });
+  const handleQuickAdd = (id: string) => {
+    dispatch({ type: 'ADD_TO_SHOPPING_LIST_INGREDIENT', payload: id });
   };
 
-  const handleQuickDelete = (id: number) => {
+  const handleQuickDelete = (id: string) => {
     dispatch({ type: 'DELETE_INGREDIENT', payload: id });
   };
 
@@ -59,7 +59,7 @@ export function useExpiringLogic() {
     loading: state.loading,
     handleNavigateBack,
     handleNavigateToDetail,
-    handleQuickDeduct,
+    handleQuickAdd,
     handleQuickDelete,
   };
 }

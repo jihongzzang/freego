@@ -1,7 +1,7 @@
 /**
  * 남은 일수 계산
  */
-export function getCalculateDaysRemaining(expiryDate: string | null | undefined): number | null {
+export function getCalculateDaysRemaining(expiryDate: string | null): number | null {
   if (!expiryDate) return null;
 
   const today = new Date();

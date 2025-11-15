@@ -10,7 +10,7 @@ interface HeaderProps {
   rightComponent?: React.ReactNode;
 }
 
-const HEADER_CONTENT_HEIGHT = 56;
+export const HEADER_HEIGHT = 44;
 
 export default function Header({ title, onBackPress, rightComponent }: HeaderProps) {
   const { colors, typography, borderRadius } = useTheme();
@@ -23,7 +23,7 @@ export default function Header({ title, onBackPress, rightComponent }: HeaderPro
         {
           backgroundColor: colors.surface,
           paddingTop: insets.top,
-          height: insets.top + HEADER_CONTENT_HEIGHT,
+          height: insets.top + HEADER_HEIGHT,
         },
       ]}
     >
@@ -35,7 +35,7 @@ export default function Header({ title, onBackPress, rightComponent }: HeaderPro
         )}
 
         <View style={styles.titleContainer}>
-          <Text style={[typography.styles.st5Semibold, { color: colors.text }]} numberOfLines={1}>
+          <Text style={[typography.styles.t4Bold, { color: colors.text }]} numberOfLines={1}>
             {title}
           </Text>
         </View>
@@ -48,7 +48,7 @@ export default function Header({ title, onBackPress, rightComponent }: HeaderPro
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     justifyContent: 'center',
   },
   headerContent: {
@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 24,
+    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { Ingredient } from '@/mvi/features/ingredients';
 import { Category } from '@/data/enums/category';
 import { StorageLocation } from '@/data/enums/storage_location';
@@ -10,7 +10,7 @@ type StorageLocationOrUnset = StorageLocation | 'unset';
 
 export function useIngredientsData(ingredients: Ingredient[]) {
   const categoryOrder: Category[] = makeCategoryList({ includeAllCategory: false }).map((cat) => cat.id);
-  const storageOrder: StorageLocationOrUnset[] = [...makeStorageList({ lang: 'kr' }).map((loc) => loc.id), 'unset'];
+  const storageOrder: StorageLocationOrUnset[] = [...makeStorageList().map((loc) => loc.id)];
 
   // 아코디언 상태 관리
   const [collapsedCategories, setCollapsedCategories] = useState<Set<Category>>(new Set(categoryOrder));
@@ -45,8 +45,8 @@ export function useIngredientsData(ingredients: Ingredient[]) {
     return grouped;
   }, [ingredients]);
 
-  // 카테고리 접기/펼치기 토글
-  function toggleCategory(category: Category) {
+  // 카테고리 접기/펼치기 토글 (메모이제이션)
+  const toggleCategory = useCallback((category: Category) => {
     setCollapsedCategories((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(category)) {
@@ -56,10 +56,10 @@ export function useIngredientsData(ingredients: Ingredient[]) {
       }
       return newSet;
     });
-  }
+  }, []);
 
-  // 보관위치 접기/펼치기 토글
-  function toggleStorage(storage: StorageLocationOrUnset) {
+  // 보관위치 접기/펼치기 토글 (메모이제이션)
+  const toggleStorage = useCallback((storage: StorageLocationOrUnset) => {
     setCollapsedStorages((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(storage)) {
@@ -69,7 +69,7 @@ export function useIngredientsData(ingredients: Ingredient[]) {
       }
       return newSet;
     });
-  }
+  }, []);
 
   return {
     categoryOrder,

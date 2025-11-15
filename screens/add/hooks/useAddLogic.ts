@@ -8,7 +8,6 @@ import type { AddFormData } from '@/mvi/features/add';
 import { useUnitPicker } from '@/hooks/useUnitPicker';
 import { useExpiryDatePicker } from '@/hooks/useExpiryDatePicker';
 import { usePurchaseDatePicker } from '@/hooks/usePurchateDatePicker';
-import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 
 export function useAddLogic() {
   const router = useRouter();
@@ -16,7 +15,6 @@ export function useAddLogic() {
   const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createAddStore);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = useState(false);
-  const [selectedEmoji, setSelectedEmoji] = useState<IngredientTemplate | null>(null);
 
   const handleFieldChange = (field: keyof AddFormData, value: any) => {
     dispatch({ type: 'UPDATE_FIELD', payload: { field, value } });
@@ -27,11 +25,11 @@ export function useAddLogic() {
   });
 
   const expiryDatePicker = useExpiryDatePicker({
-    onDateConfirm: (formattedDate) => handleFieldChange('expiry_date', formattedDate),
+    onDateConfirm: (formattedDate) => handleFieldChange('expired_date_time', formattedDate),
   });
 
   const purchaseDatePicker = usePurchaseDatePicker({
-    onDateConfirm: (formattedDate) => handleFieldChange('purchased_date', formattedDate),
+    onDateConfirm: (formattedDate) => handleFieldChange('purchased_date_time', formattedDate),
   });
 
   // Effect 처리
@@ -46,10 +44,6 @@ export function useAddLogic() {
         });
         break;
 
-      case 'NAVIGATE_HOME':
-        router.push('/(tabs)');
-        break;
-
       case 'NAVIGATE_BACK':
         router.back();
         break;
@@ -60,7 +54,7 @@ export function useAddLogic() {
   // URL 파라미터로 전달된 카테고리를 초기값으로 설정
   useEffect(() => {
     if (category) {
-      handleFieldChange('category', Number(category));
+      handleFieldChange('category', category);
     }
   }, [category]);
 
@@ -71,12 +65,11 @@ export function useAddLogic() {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
-    handleFieldChange('expiry_date', formattedDate);
+    handleFieldChange('expired_date_time', formattedDate);
   };
 
-  const handleEmojiSelect = (template: IngredientTemplate) => {
-    setSelectedEmoji(template);
-    handleFieldChange('emoji', template.emoji);
+  const handleEmojiSelect = (emoji: string) => {
+    handleFieldChange('emoji', emoji);
     setIsEmojiPickerVisible(false);
   };
 
@@ -92,7 +85,6 @@ export function useAddLogic() {
     state,
     isEmojiPickerVisible,
     setIsEmojiPickerVisible,
-    selectedEmoji,
     unitPicker,
     expiryDatePicker,
     purchaseDatePicker,

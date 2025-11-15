@@ -27,7 +27,7 @@ export function useOnboardingLogic(width: number, stepsLength: number) {
           try {
             await Notifications.requestPermissionsAsync();
           } catch (error) {
-            console.log('Notification permission request failed (expected in Expo Go):', error);
+            // console.log('Notification permission request failed (expected in Expo Go):', error);
           }
         })();
         break;

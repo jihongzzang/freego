@@ -2146,13 +2146,41 @@ export function getTemplatesByCategory(category: Category | null): IngredientTem
   return ingredientTemplates.filter((item) => item.category === category);
 }
 
-export const categoryDefaultEmojis: Record<Category, string> = {
-  [Category.VEGETABLE]: '🥬',
-  [Category.FRUIT]: '🍎',
-  [Category.MEAT]: '🥩',
-  [Category.SEAFOOD]: '🐟',
-  [Category.DAIRY]: '🥛',
-  [Category.PROCESSED]: '🍽️',
-  [Category.SEASONING]: '🧂',
-  [Category.OTHER]: '🍴',
+/**
+ * 각 카테고리별 이모지 후보 목록 (5개씩)
+ */
+export const categoryEmojiOptions: Record<Category, string[]> = {
+  [Category.ALL]: ['📦', '🗂️', '📋', '🏪', '🛒'],
+  [Category.VEGETABLE]: ['🥬', '🥦', '🥕', '🌽', '🍆'],
+  [Category.FRUIT]: ['🍎', '🍊', '🍇', '🍓', '🍌'],
+  [Category.MEAT]: ['🥩', '🍖', '🥓', '🍗', '🦴'],
+  [Category.SEAFOOD]: ['🐟', '🦐', '🦀', '🐙', '🦑'],
+  [Category.DAIRY]: ['🥛', '🧀', '🧈', '🍼', '🥚'],
+  [Category.PROCESSED]: ['🍽️', '🥫', '🍱', '🥡', '🍜'],
+  [Category.SEASONING]: ['🧂', '🧄', '🌶️', '🫚', '🧉'],
+  [Category.OTHER]: ['🍴', '🔪', '🥄', '🍽️', '🥢'],
 };
+
+/**
+ * 카테고리별 기본 이모지 (첫 번째 옵션)
+ */
+export const categoryDefaultEmojis: Record<Category, string> = {
+  [Category.ALL]: categoryEmojiOptions[Category.ALL][0],
+  [Category.VEGETABLE]: categoryEmojiOptions[Category.VEGETABLE][0],
+  [Category.FRUIT]: categoryEmojiOptions[Category.FRUIT][0],
+  [Category.MEAT]: categoryEmojiOptions[Category.MEAT][0],
+  [Category.SEAFOOD]: categoryEmojiOptions[Category.SEAFOOD][0],
+  [Category.DAIRY]: categoryEmojiOptions[Category.DAIRY][0],
+  [Category.PROCESSED]: categoryEmojiOptions[Category.PROCESSED][0],
+  [Category.SEASONING]: categoryEmojiOptions[Category.SEASONING][0],
+  [Category.OTHER]: categoryEmojiOptions[Category.OTHER][0],
+};
+
+/**
+ * 카테고리에 해당하는 랜덤 이모지 반환
+ */
+export function getRandomEmojiForCategory(category: Category): string {
+  const emojis = categoryEmojiOptions[category];
+  const randomIndex = Math.floor(Math.random() * emojis.length);
+  return emojis[randomIndex];
+}

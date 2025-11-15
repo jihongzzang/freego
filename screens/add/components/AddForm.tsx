@@ -1,19 +1,17 @@
 import { View, StyleSheet } from 'react-native';
 import { AddFormData } from '@/mvi/features/add';
-import { type IngredientTemplate } from '@/constants/ingredientTemplates';
-import { BasicInfoSection } from '../../ingredient-detail/components/EditForm/BasicInfoSection';
-import { CategorySection } from '../../ingredient-detail/components/EditForm/CategorySection';
-import { QuantitySection } from '../../ingredient-detail/components/EditForm/QuantitySection';
-import { DateSection } from '../../ingredient-detail/components/EditForm/DateSection';
-import { StorageSection } from '../../ingredient-detail/components/EditForm/StorageSection';
-import { MemoSection } from '@/screens/ingredient-detail/components/EditForm/MemoSection';
+import { BasicInfoSection } from '../../ingredient-edit/components/EditForm/BasicInfoSection';
+import { CategorySection } from '../../ingredient-edit/components/EditForm/CategorySection';
+import { QuantitySection } from '../../ingredient-edit/components/EditForm/QuantitySection';
+import { DateSection } from '../../ingredient-edit/components/EditForm/DateSection';
+import { StorageSection } from '../../ingredient-edit/components/EditForm/StorageSection';
+import { MemoSection } from '@/screens/ingredient-edit/components/EditForm/MemoSection';
 import { useTheme } from '@/lib/theme';
 import { useMemo } from 'react';
 
 interface AddFormProps {
   formData: AddFormData;
   errors: Partial<Record<keyof AddFormData, string>>;
-  selectedEmoji: IngredientTemplate | null;
   onFieldChange: (field: keyof AddFormData, value: string) => void;
   onEmojiPress: () => void;
   onUnitPress: () => void;
@@ -24,7 +22,6 @@ interface AddFormProps {
 
 export function AddForm({
   formData,
-  selectedEmoji,
   onFieldChange,
   onEmojiPress,
   onUnitPress,
@@ -41,21 +38,20 @@ export function AddForm({
       <CategorySection selectedCategory={formData.category} onCategoryChange={onFieldChange as any} />
       <BasicInfoSection
         formData={formData as any}
-        selectedEmoji={selectedEmoji}
+        selectedEmoji={formData.emoji}
         onFieldChange={onFieldChange as any}
         onEmojiPress={onEmojiPress}
       />
       <StorageSection storageLocation={formData.storage_location} onFieldChange={onFieldChange as any} />
       <DateSection
         isEdit={false}
-        purchaseDate={formData.purchased_date}
-        expiryDate={formData.expiry_date || ''}
+        purchaseDate={formData.purchased_date_time}
+        expiryDate={formData.expired_date_time}
         onFieldChange={onFieldChange as any}
         onPurchaseDatePress={onPurchaseDatePress}
         onExpiryDatePress={onExpiryDatePress}
         onQuickSelect={onQuickSelect}
       />
-
       <QuantitySection
         quantity={formData.quantity}
         unit={formData.unit}

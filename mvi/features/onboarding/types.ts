@@ -3,6 +3,7 @@
  */
 
 import { Intent, State, Effect } from '@/mvi/base';
+import { CommonEffect } from '@/mvi/shared';
 
 /**
  * Onboarding Step
@@ -40,13 +41,7 @@ export type OnboardingIntent =
  * Onboarding Effect (부수 효과)
  */
 export type OnboardingEffect =
+  | CommonEffect
   | { type: 'NAVIGATE_TO_HOME' }
   | { type: 'REQUEST_NOTIFICATION_PERMISSION' }
-  | { type: 'ADD_PACKAGE'; payload: string }
-  | {
-      type: 'SHOW_TOAST';
-      payload: {
-        message: string;
-        variant: 'success' | 'info' | 'warning' | 'error';
-      };
-    };
+  | { type: 'ADD_PACKAGE'; payload: string };

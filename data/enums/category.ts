@@ -1,10 +1,11 @@
 export enum Category {
-  VEGETABLE = 1, // 채소
-  FRUIT = 2, // 과일
-  MEAT = 3, // 육류
-  SEAFOOD = 4, // 해산물
-  DAIRY = 5, // 유제품
-  PROCESSED = 6, // 가공식품
-  SEASONING = 7, // 조미료
-  OTHER = 8, // 기타
+  ALL = 'ALL', // 전체 (클라이언트 전용)
+  VEGETABLE = 'VEGETABLE', // 채소
+  FRUIT = 'FRUIT', // 과일
+  MEAT = 'MEAT', // 육류
+  SEAFOOD = 'SEAFOOD', // 해산물
+  DAIRY = 'DAIRY', // 유제품
+  PROCESSED = 'PROCESSED_FOOD', // 가공식품
+  SEASONING = 'SEASONING', // 조미료
+  OTHER = 'OTHER', // 기타
 }

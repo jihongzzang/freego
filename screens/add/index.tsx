@@ -5,7 +5,7 @@ import { useTheme } from '@/lib/theme';
 import Header from '@/components/ui/Header';
 import SelectUnitBottomSheet from '@/components/SelectUnitBottomSheet';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
-import AddEmojiBottomSheet from '@/components/AddEmojiBottomSheet';
+import EmojiBottomSheet from '@/components/EmojiBottomSheet';
 import { useAddLogic } from './hooks/useAddLogic';
 import { AddForm } from './components/AddForm';
 import { SubmitButton } from './components/SubmitButton';
@@ -17,7 +17,6 @@ export default function AddIngredientScreen() {
     state,
     isEmojiPickerVisible,
     setIsEmojiPickerVisible,
-    selectedEmoji,
     unitPicker,
     expiryDatePicker,
     purchaseDatePicker,
@@ -48,12 +47,11 @@ export default function AddIngredientScreen() {
           <AddForm
             formData={state.form}
             errors={state.errors}
-            selectedEmoji={selectedEmoji}
             onFieldChange={handleFieldChange}
             onEmojiPress={() => setIsEmojiPickerVisible(true)}
             onUnitPress={unitPicker.open}
-            onPurchaseDatePress={() => purchaseDatePicker.open(state.form.purchased_date || new Date())}
-            onExpiryDatePress={() => expiryDatePicker.open(state.form.expiry_date || new Date())}
+            onPurchaseDatePress={() => purchaseDatePicker.open(state.form.purchased_date_time || new Date())}
+            onExpiryDatePress={() => expiryDatePicker.open(state.form.expired_date_time || new Date())}
             onQuickSelect={handleQuickSelect}
           />
         </KeyboardAwareScrollView>
@@ -85,12 +83,11 @@ export default function AddIngredientScreen() {
         onUnitSelect={unitPicker.handleUnitSelect}
       />
 
-      <AddEmojiBottomSheet
+      <EmojiBottomSheet
         visible={isEmojiPickerVisible}
+        title="이모지 선택"
         onClose={() => setIsEmojiPickerVisible(false)}
-        selectedCategoryId={state.form.category}
-        selectedTemplates={selectedEmoji ? [selectedEmoji] : []}
-        onTemplateToggle={handleEmojiSelect}
+        onSelect={handleEmojiSelect}
       />
     </View>
   );

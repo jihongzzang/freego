@@ -6,20 +6,21 @@ import { State } from '@/mvi/base';
 import { Category } from '@/data/enums/category';
 import { StorageLocation } from '@/data/enums/storage_location';
 import { Unit } from '@/data/enums/unit';
+import { CommonEffect } from '@/mvi/shared';
 
 /**
  * Add Form State
  */
 export interface AddFormData {
   name: string;
-  emoji?: string;
+  emoji: string | null;
   category: Category;
-  quantity?: string;
-  unit?: Unit;
-  purchased_date?: string;
-  expiry_date?: string;
-  storage_location?: StorageLocation;
-  memo?: string;
+  quantity: string | null;
+  unit: Unit | null;
+  purchased_date_time: string | null;
+  expired_date_time: string | null;
+  storage_location: StorageLocation | null;
+  memo: string | null;
 }
 
 /**
@@ -27,7 +28,7 @@ export interface AddFormData {
  */
 export interface ValidationErrors {
   name?: string;
-  expiry_date?: string;
+  quantity?: string;
 }
 
 /**
@@ -54,13 +55,4 @@ export type AddIntent =
 /**
  * Add Effect (부수 효과)
  */
-export type AddEffect =
-  | {
-      type: 'SHOW_TOAST';
-      payload: {
-        message: string;
-        variant: 'success' | 'error' | 'info' | 'warning';
-      };
-    }
-  | { type: 'NAVIGATE_HOME' }
-  | { type: 'NAVIGATE_BACK' };
+export type AddEffect = CommonEffect;

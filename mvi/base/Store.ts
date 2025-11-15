@@ -37,6 +37,7 @@ export class Store<S extends State, I extends Intent, E extends Effect> {
    */
   async dispatch(intent: I): Promise<void> {
     // 1. Middleware 실행 (비동기 작업)
+    let middlewareHandledState = false;
     for (const middleware of this.middlewares) {
       try {
         const result = await middleware(this.state, intent);
@@ -44,6 +45,7 @@ export class Store<S extends State, I extends Intent, E extends Effect> {
         // Middleware에서 상태 변경이 있으면 적용
         if (result.state) {
           this.setState(result.state);
+          middlewareHandledState = true;
         }
 
         // Effect가 있으면 발행
@@ -56,8 +58,13 @@ export class Store<S extends State, I extends Intent, E extends Effect> {
     }
 
     // 2. Reducer 실행 (동기 작업)
-    const newState = this.reducer(this.state, intent);
-    this.setState(newState);
+    // Middleware가 state를 처리하지 않은 경우에만 reducer 실행
+    if (!middlewareHandledState) {
+      const newState = this.reducer(this.state, intent);
+      this.setState(newState);
+    } else {
+      //
+    }
   }
 
   /**

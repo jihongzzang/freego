@@ -11,7 +11,7 @@ import { ExpiringItem } from './components/ExpiringItem';
 export default function ExpiringScreen() {
   const { colors, spacing } = useTheme();
 
-  const { ingredients, loading, handleNavigateBack, handleNavigateToDetail, handleQuickDeduct, handleQuickDelete } =
+  const { ingredients, loading, handleNavigateBack, handleNavigateToDetail, handleQuickAdd, handleQuickDelete } =
     useExpiringLogic();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
@@ -36,7 +36,7 @@ export default function ExpiringScreen() {
                 key={item.id}
                 item={item}
                 onPress={() => handleNavigateToDetail(item.id)}
-                onQuickDeduct={() => handleQuickDeduct(item.id)}
+                onQuickAdd={() => handleQuickAdd(item.id)}
                 onQuickDelete={() => handleQuickDelete(item.id)}
               />
             ))}

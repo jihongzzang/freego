@@ -130,6 +130,7 @@ export function Toast({
           opacity,
         },
       ]}
+      pointerEvents="box-none"
     >
       <View
         style={[
@@ -163,15 +164,16 @@ const createStyles = ({
       position: 'absolute',
       left: 0,
       right: 0,
-      zIndex: 9999,
+      zIndex: 999999,
+      elevation: 999999,
       alignItems: 'center',
       paddingHorizontal: spacing.lg,
     },
     topPosition: {
-      top: Platform.OS === 'ios' ? 60 : 20,
+      top: Platform.OS === 'ios' ? 100 : 60,
     },
     bottomPosition: {
-      bottom: Platform.OS === 'ios' ? 100 : 80,
+      bottom: Platform.OS === 'ios' ? 140 : 120,
     },
     toast: {
       width: width - spacing.lg * 2,

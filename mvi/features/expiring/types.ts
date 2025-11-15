@@ -2,45 +2,29 @@
  * Expiring Screen MVI Types
  */
 
-import { Intent, State, Effect } from '@/mvi/base';
-import { Ingredient as StoredIngredient } from '@/data/models/ingredient.model';
-import { StatusType } from '@/data/enums/status';
+import { IngredientListState, LoadIngredientsIntent, CommonEffect, EnrichedIngredient } from '@/mvi/shared';
 
-export interface Ingredient extends StoredIngredient {
-  status: StatusType;
-  daysRemaining: number | null;
-}
+/**
+ * Ingredient 타입 re-export (하위 호환성)
+ */
+export type Ingredient = EnrichedIngredient;
 
 /**
  * Expiring State
  */
-export interface ExpiringState extends State {
-  ingredients: Ingredient[];
-  loading: boolean;
-  error: string | null;
-}
+export interface ExpiringState extends IngredientListState {}
 
 /**
  * Expiring Intent (사용자 액션)
  */
 export type ExpiringIntent =
-  | { type: 'LOAD_INGREDIENTS' }
-  | { type: 'LOAD_INGREDIENTS_SUCCESS'; payload: Ingredient[] }
-  | { type: 'LOAD_INGREDIENTS_ERROR'; payload: string }
-  | { type: 'DELETE_INGREDIENT'; payload: number }
-  | { type: 'DEDUCT_INGREDIENT'; payload: number }
+  | LoadIngredientsIntent
+  | { type: 'DELETE_INGREDIENT'; payload: string }
+  | { type: 'ADD_TO_SHOPPING_LIST_INGREDIENT'; payload: string }
   | { type: 'NAVIGATE_TO_DETAIL'; payload: string }
   | { type: 'NAVIGATE_BACK' };
 
 /**
  * Expiring Effect (부수 효과)
  */
-export type ExpiringEffect =
-  | { type: 'NAVIGATE'; payload: string }
-  | {
-      type: 'SHOW_TOAST';
-      payload: {
-        message: string;
-        variant: 'success' | 'error' | 'info' | 'warning';
-      };
-    };
+export type ExpiringEffect = CommonEffect;

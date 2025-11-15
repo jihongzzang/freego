@@ -186,7 +186,7 @@ export const Colors: Record<'light' | 'dark', ColorPalette> = {
     textTertiary: '#9CA3AF',
     textDisabled: '#AFB7C0',
 
-    border: '#F2F4F6',
+    border: '#E5E8EB',
     borderFocus: '#02A262',
     borderError: '#f66571',
     borderSuccess: '#15C67F',

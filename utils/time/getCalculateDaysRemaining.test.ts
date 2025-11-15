@@ -51,11 +51,6 @@ describe('getCalculateDaysRemaining', () => {
       expect(result).toBeNull();
     });
 
-    it('undefined를 전달하면 null을 반환해야 함', () => {
-      const result = getCalculateDaysRemaining(undefined);
-      expect(result).toBeNull();
-    });
-
     it('빈 문자열을 전달하면 null을 반환해야 함', () => {
       const result = getCalculateDaysRemaining('');
       expect(result).toBeNull();

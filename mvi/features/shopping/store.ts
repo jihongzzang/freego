@@ -8,18 +8,21 @@ import { Store } from '@/mvi/base';
 import { ShoppingState, ShoppingIntent, ShoppingEffect } from './types';
 import { shoppingReducer } from './reducer';
 import { shoppingMiddleware } from './middleware';
+import { Category } from '@/data/enums/category';
 
 /**
  * 초기 상태
  */
 const initialState: ShoppingState = {
   shoppingList: [],
+  selectedIds: new Set<string>(),
   loading: false,
   error: null,
   isAddingItem: false,
   addForm: {
     name: '',
-    category: 1,
+    category: Category.VEGETABLE,
+    emoji: null,
   },
 };
 

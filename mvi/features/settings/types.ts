@@ -3,6 +3,7 @@
  */
 
 import { Intent, State, Effect } from '@/mvi/base';
+import { CommonEffect } from '@/mvi/shared';
 
 /**
  * Settings State
@@ -17,15 +18,10 @@ export interface SettingsState extends State {
  */
 export type SettingsIntent =
   | { type: 'LOAD_NOTIFICATION_DAYS' }
-  | { type: 'SET_NOTIFICATION_DAYS'; payload: number };
+  | { type: 'SET_NOTIFICATION_DAYS'; payload: number }
+  | { type: 'DELETE_ALL_DATA' };
 
 /**
  * Settings Effect
  */
-export type SettingsEffect = {
-  type: 'SHOW_TOAST';
-  payload: {
-    message: string;
-    variant: 'success' | 'error' | 'info' | 'warning';
-  };
-};
+export type SettingsEffect = CommonEffect;
