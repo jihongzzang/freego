@@ -3,13 +3,12 @@ import { useMemo } from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useTheme } from '@/lib/theme';
 import Header from '@/components/ui/Header';
-import FloatingButton from '@/components/ui/FloatingButton';
 import SelectUnitBottomSheet from '@/components/SelectUnitBottomSheet';
 import SelectDateBottomSheet from '@/components/SelectDateBottomSheet';
 import EmojiBottomSheet from '@/components/EmojiBottomSheet';
 import { useIngredientEditLogic } from './hooks/useIngredientEditLogic';
 import { EditForm } from '@/screens/ingredient-edit/components/EditForm';
-import { Save } from 'lucide-react-native';
+import { SubmitButton } from './components/SubmitButton';
 
 export default function IngredientEditScreen() {
   const { colors, typography, spacing } = useTheme();
@@ -39,9 +38,10 @@ export default function IngredientEditScreen() {
   }
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header title="" onBackPress={handleBackPress} />
+
         <KeyboardAwareScrollView
           style={styles.content}
           contentContainerStyle={{ paddingBottom: 200 }}
@@ -62,7 +62,7 @@ export default function IngredientEditScreen() {
             onQuickSelect={handleQuickSelect}
           />
         </KeyboardAwareScrollView>
-        <FloatingButton onPress={handleUpdate} icon={<Save size={24} color="#FFFFFF" />} hasTabBar={false} />
+        <SubmitButton onSubmit={handleUpdate} />
       </View>
 
       <SelectDateBottomSheet
@@ -96,7 +96,7 @@ export default function IngredientEditScreen() {
         onClose={() => setIsEmojiPickerVisible(false)}
         onSelect={handleEmojiSelect}
       />
-    </>
+    </View>
   );
 }
 

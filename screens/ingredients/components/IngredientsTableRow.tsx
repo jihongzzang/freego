@@ -100,7 +100,7 @@ export function IngredientsTableRow({
         actions={[
           {
             id: 'nameEdit',
-            title: '이름수정',
+            title: '이름 수정하기',
             image: Platform.select({
               ios: 'square.and.pencil',
               android: undefined,

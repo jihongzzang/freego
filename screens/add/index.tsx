@@ -1,6 +1,6 @@
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useMemo } from 'react';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useTheme } from '@/lib/theme';
 import Header from '@/components/ui/Header';
 import SelectUnitBottomSheet from '@/components/SelectUnitBottomSheet';
@@ -9,9 +9,11 @@ import EmojiBottomSheet from '@/components/EmojiBottomSheet';
 import { useAddLogic } from './hooks/useAddLogic';
 import { AddForm } from './components/AddForm';
 import { SubmitButton } from './components/SubmitButton';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AddIngredientScreen() {
   const { colors, spacing } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const {
     state,
@@ -33,16 +35,13 @@ export default function AddIngredientScreen() {
     <View style={{ flex: 1 }}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Header title="" onBackPress={handleBackPress} />
+
         <KeyboardAwareScrollView
           style={styles.content}
-          contentContainerStyle={{ paddingBottom: spacing.xxxl }}
+          contentContainerStyle={{ paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          enableOnAndroid={true}
-          enableAutomaticScroll
-          extraScrollHeight={Platform.OS === 'ios' ? 0 : 80}
-          extraHeight={150}
-          enableResetScrollToCoords={false}
+          bottomOffset={180}
         >
           <AddForm
             formData={state.form}

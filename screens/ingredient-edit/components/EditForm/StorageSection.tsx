@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import { EditFormData } from '@/mvi/features/ingredient-edit';
 import { getStorageLocationIcon } from '@/utils/storageLocation';
@@ -12,7 +12,7 @@ interface StorageSectionProps {
 }
 
 export function StorageSection({ storageLocation, onFieldChange }: StorageSectionProps) {
-  const { colors, typography, isDark, borderRadius } = useTheme();
+  const { colors, typography } = useTheme();
 
   return (
     <View style={styles.container}>

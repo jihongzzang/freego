@@ -40,7 +40,6 @@ export default function NameBottomSheet({
             onChangeText={onNameChange}
             placeholder="이름을 입력하세요"
             placeholderTextColor={colors.textTertiary}
-            keyboardType="default"
             autoFocus
           />
         </View>
@@ -56,7 +55,7 @@ export default function NameBottomSheet({
           ]}
         >
           <Button size="large" variant="primary" onPress={onConfirm} disabled={!name}>
-            확인
+            저장
           </Button>
         </View>
       </View>
@@ -77,7 +76,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderWidth: 1,
-    minHeight: 56,
+    minHeight: 50,
   },
   confirmButtonContainer: {
     paddingHorizontal: 20,

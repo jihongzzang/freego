@@ -4,7 +4,7 @@
 
 ## 📄 현재 문서
 
-### 최신 버전: v1.0 (2025-01-15)
+### 최신 버전: v1.0 (2025-11-16)
 
 - **개인정보처리방침**: [privacy-policy.html](privacy-policy.html)
 - **이용약관**: [terms-of-service.html](terms-of-service.html)

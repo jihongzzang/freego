@@ -52,6 +52,7 @@ interface ShoppingTableViewProps {
   onMemoPress?: (id: string, currentMemo: string | null) => void;
   onAddToStorage?: (id: string, name: string, category: Category) => void;
   onEmojiPress?: (id: string) => void;
+  onNamePress?: (id: string, currentName: string) => void;
   onCancelPurchase?: (id: string, name: string) => void;
   onRepurchase?: (id: string, name: string) => void;
   onDeleteDateItems?: (dateKey: string, itemIds: string[]) => void;
@@ -69,6 +70,7 @@ export function ShoppingTableView({
   onMemoPress,
   onAddToStorage,
   onEmojiPress,
+  onNamePress,
   onCancelPurchase,
   onRepurchase,
   onDeleteDateItems,
@@ -248,6 +250,7 @@ export function ShoppingTableView({
                 onAddToStorage ? () => onAddToStorage(String(item.id), item.name, item.category) : undefined
               }
               onEmojiPress={onEmojiPress ? () => onEmojiPress(String(item.id)) : undefined}
+              onNamePress={onNamePress ? () => onNamePress(String(item.id), item.name) : undefined}
               hideCheckbox={isPurchasedView}
             />
           ))}

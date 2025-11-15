@@ -43,6 +43,7 @@ export type ShoppingIntent =
   | { type: 'ADD_SELECTED_TO_STORAGE' }
   | { type: 'SUBMIT_ADD_ITEM'; payload: { name: string; category: Category; memo?: string; emoji: string } }
   | { type: 'UPDATE_MEMO'; payload: { id: string; memo?: string } }
+  | { type: 'UPDATE_NAME'; payload: { id: string; name: string } }
   | { type: 'UPDATE_EMOJI'; payload: { id: string; emoji: string } }
   | { type: 'CANCEL_PURCHASE'; payload: { id: string; name: string } }
   | { type: 'REPURCHASE'; payload: { id: string; name: string } };

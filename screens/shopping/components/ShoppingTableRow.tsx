@@ -15,6 +15,7 @@ interface ShoppingTableRowProps {
   onDelete?: () => void;
   onAddToStorage?: () => void;
   onEmojiPress?: () => void;
+  onNamePress?: () => void;
   onCancelPurchase?: () => void;
   onRepurchase?: () => void;
   hideCheckbox?: boolean;
@@ -30,6 +31,7 @@ export function ShoppingTableRow({
   onDelete,
   onAddToStorage,
   onEmojiPress,
+  onNamePress,
   onCancelPurchase,
   onRepurchase,
   hideCheckbox = false,
@@ -83,6 +85,9 @@ export function ShoppingTableRow({
             case 'emoji':
               onEmojiPress?.();
               break;
+            case 'name':
+              onNamePress?.();
+              break;
             case 'cancel-purchase':
               onCancelPurchase?.();
               break;
@@ -98,15 +103,6 @@ export function ShoppingTableRow({
           isPurchased
             ? [
                 {
-                  id: 'cancel-purchase',
-                  title: '구매완료 취소',
-                  image: Platform.select({
-                    ios: 'arrow.uturn.backward',
-                    android: undefined,
-                  }),
-                  imageColor: colors.orange600,
-                },
-                {
                   id: 'repurchase',
                   title: '재구매',
                   image: Platform.select({
@@ -114,6 +110,15 @@ export function ShoppingTableRow({
                     android: undefined,
                   }),
                   imageColor: colors.blue600,
+                },
+                {
+                  id: 'cancel-purchase',
+                  title: '구매완료 취소',
+                  image: Platform.select({
+                    ios: 'arrow.uturn.backward',
+                    android: undefined,
+                  }),
+                  imageColor: colors.orange600,
                 },
                 {
                   id: 'delete',
@@ -137,6 +142,15 @@ export function ShoppingTableRow({
                     android: undefined,
                   }),
                   imageColor: colors.blue600,
+                },
+                {
+                  id: 'name',
+                  title: '이름 수정하기',
+                  image: Platform.select({
+                    ios: 'square.and.pencil',
+                    android: undefined,
+                  }),
+                  imageColor: colors.primary,
                 },
                 {
                   id: 'emoji',

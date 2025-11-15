@@ -14,6 +14,7 @@ import { useFonts } from '@/hooks/useFonts';
 import { ThemeProvider, useTheme } from '@/lib/theme';
 import { DialogProvider } from '@/contexts/DialogContext';
 import { ToastProvider } from '@/components/ui';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 export const unstable_settings = {
   initialRouteName: 'index',
@@ -50,12 +51,14 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider>
-      <ToastProvider>
-        <DialogProvider>
-          <RootStack />
-        </DialogProvider>
-      </ToastProvider>
-    </ThemeProvider>
+    <KeyboardProvider>
+      <ThemeProvider>
+        <ToastProvider>
+          <DialogProvider>
+            <RootStack />
+          </DialogProvider>
+        </ToastProvider>
+      </ThemeProvider>
+    </KeyboardProvider>
   );
 }

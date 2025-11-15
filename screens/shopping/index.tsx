@@ -5,6 +5,7 @@ import { useTheme } from '@/lib/theme';
 import Header, { HEADER_HEIGHT } from '@/components/ui/Header';
 import AddShoppingListBottomSheet from '@/components/AddShoppingListBottomSheet';
 import MemoBottomSheet from '@/components/MemoBottomSheet';
+import NameBottomSheet from '@/components/NameBottomSheet';
 import SelectStorageBottomSheet from '@/components/SelectStorageBottomSheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FloatingButton from '@/components/ui/FloatingButton';
@@ -49,6 +50,12 @@ export default function ShoppingListTableScreen() {
     editingEmojiId,
     handleEmojiClose,
     handleEmojiSubmit,
+    handleNamePress,
+    editingNameId,
+    editingName,
+    handleNameClose,
+    handleNameChange,
+    handleNameSubmit,
     handleCancelPurchase,
     handleRepurchase,
     handleDeleteDateItems,
@@ -211,6 +218,7 @@ export default function ShoppingListTableScreen() {
                     onMemoPress={handleMemoPress}
                     onAddToStorage={handleAddToStorage}
                     onEmojiPress={handleEmojiPress}
+                    onNamePress={handleNamePress}
                     onCancelPurchase={handleCancelPurchase}
                     onRepurchase={handleRepurchase}
                     onDeleteDateItems={handleDeleteDateItems}
@@ -264,9 +272,17 @@ export default function ShoppingListTableScreen() {
         onMemoChange={handleMemoChange}
         onSubmit={handleMemoSubmit}
       />
+      <NameBottomSheet
+        visible={editingNameId !== null}
+        onClose={handleNameClose}
+        title="이름 수정"
+        name={editingName}
+        onNameChange={handleNameChange}
+        onConfirm={handleNameSubmit}
+      />
       <EmojiBottomSheet
         visible={editingEmojiId !== null}
-        title="이모지 선택"
+        title="이모지 수정"
         onClose={handleEmojiClose}
         onSelect={handleEmojiSubmit}
       />

@@ -35,6 +35,10 @@ export function useShoppingLogic() {
   // Emoji Update State
   const [editingEmojiId, setEditingEmojiId] = useState<string | null>(null);
 
+  // Name Update State
+  const [editingNameId, setEditingNameId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
+
   // 화면 포커스 시 데이터 로드
   useFocusEffect(
     useCallback(() => {
@@ -250,6 +254,35 @@ export function useShoppingLogic() {
     handleEmojiClose();
   }
 
+  // Name Update Handlers
+  function handleNamePress(id: string, currentName: string) {
+    setEditingNameId(id);
+    setEditingName(currentName);
+  }
+
+  function handleNameClose() {
+    setEditingNameId(null);
+    setEditingName('');
+  }
+
+  function handleNameChange(text: string) {
+    setEditingName(text);
+  }
+
+  function handleNameSubmit() {
+    if (!editingNameId) return;
+
+    dispatch({
+      type: 'UPDATE_NAME',
+      payload: {
+        id: editingNameId,
+        name: editingName,
+      },
+    });
+
+    handleNameClose();
+  }
+
   // Cancel Purchase Handler
   function handleCancelPurchase(id: string, name: string) {
     dispatch({
@@ -361,6 +394,12 @@ export function useShoppingLogic() {
     editingEmojiId,
     handleEmojiClose,
     handleEmojiSubmit,
+    handleNamePress,
+    editingNameId,
+    editingName,
+    handleNameClose,
+    handleNameChange,
+    handleNameSubmit,
     handleCancelPurchase,
     handleRepurchase,
     handleDeleteDateItems,

@@ -29,7 +29,7 @@ export function SubmitButton({ onSubmit, disabled }: SubmitButtonProps) {
   return (
     <Animated.View style={[styles.container, { paddingBottom: insets.bottom }, buttonAnimatedStyle]}>
       <Button variant="primary" size="large" onPress={onSubmit} disabled={disabled}>
-        등록하기
+        수정하기
       </Button>
     </Animated.View>
   );

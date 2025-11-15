@@ -270,6 +270,28 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
       }
     }
 
+    case 'UPDATE_NAME': {
+      try {
+        await shoppingService.updateShoppingItem(intent.payload.id, {
+          name: intent.payload.name,
+        });
+
+        const items = await shoppingService.getShoppingList();
+        return {
+          state: {
+            ...state,
+            shoppingList: items,
+          },
+          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_NAME_UPDATE)],
+        };
+      } catch (error) {
+        console.error('Error updating memo:', error);
+        return {
+          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_NAME_UPDATE_FAILED)],
+        };
+      }
+    }
+
     case 'UPDATE_EMOJI': {
       try {
         await shoppingService.updateShoppingItem(intent.payload.id, {
