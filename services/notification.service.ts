@@ -81,6 +81,13 @@ export async function checkExpiryAndNotify(): Promise<void> {
       return daysRemaining !== null && daysRemaining >= 0 && daysRemaining <= notificationDays;
     });
 
+    // 기존 알림 모두 취소 (중복 방지)
+    try {
+      await Notifications.cancelAllScheduledNotificationsAsync();
+    } catch (cancelError) {
+      //
+    }
+
     if (expiringIngredients.length > 0) {
       const message =
         expiringIngredients.length === 1
@@ -120,13 +127,6 @@ export async function checkExpiryAndNotify(): Promise<void> {
           trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: triggerDate },
         });
       } catch (notificationError) {
-        //
-      }
-    } else {
-      // 임박한 재료가 없으면 예약된 알림 모두 취소
-      try {
-        await Notifications.cancelAllScheduledNotificationsAsync();
-      } catch (cancelError) {
         //
       }
     }
