@@ -1,13 +1,15 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import { Achievement } from '@/data/models/achievement.model';
+import { Button, Chip } from './ui';
 
 interface AchievementCardProps {
   achievement: Achievement;
   onClaimBadge?: (achievement: Achievement) => void;
+  onViewBadge?: (achievement: Achievement) => void;
 }
 
-export default function AchievementCard({ achievement, onClaimBadge }: AchievementCardProps) {
+export default function AchievementCard({ achievement, onClaimBadge, onViewBadge }: AchievementCardProps) {
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const progress = achievement.target > 0 ? (achievement.current / achievement.target) * 100 : 0;
@@ -51,36 +53,11 @@ export default function AchievementCard({ achievement, onClaimBadge }: Achieveme
             {achievement.description}
           </Text>
         </View>
-        {achievement.completed && achievement.claimed && (
-          <View
-            style={[
-              styles.badge,
-              {
-                backgroundColor: colors.primary,
-                borderRadius: borderRadius.full,
-                paddingHorizontal: spacing.sm,
-                paddingVertical: spacing.xs,
-              },
-            ]}
-          >
-            <Text style={[typography.styles.t7Semibold, { color: colors.white }]}>완료</Text>
-          </View>
-        )}
+        {achievement.completed && achievement.claimed && <Chip label="완료" variant="secondary" size="xlarge" />}
         {achievement.completed && !achievement.claimed && (
-          <TouchableOpacity
-            style={[
-              styles.claimButton,
-              {
-                backgroundColor: colors.primary,
-                borderRadius: borderRadius.md,
-                paddingHorizontal: spacing.md,
-                paddingVertical: spacing.sm,
-              },
-            ]}
-            onPress={() => onClaimBadge?.(achievement)}
-          >
+          <Button size="small" onPress={() => onClaimBadge?.(achievement)}>
             <Text style={[typography.styles.t7Semibold, { color: colors.white }]}>뱃지 받기</Text>
-          </TouchableOpacity>
+          </Button>
         )}
       </View>
 
@@ -122,6 +99,29 @@ export default function AchievementCard({ achievement, onClaimBadge }: Achieveme
         </View>
       )}
 
+      {/* 뱃지 보기 버튼 */}
+      {achievement.completed && achievement.claimed && onViewBadge && (
+        <Button
+          size="medium"
+          variant="primary"
+          style={{ marginTop: spacing.md }}
+          // style={[
+          //   styles.viewBadgeButton,
+          //   {
+          //     backgroundColor: isDark ? colors.grey800 : colors.grey100,
+          //     borderRadius: borderRadius.md,
+          //     paddingHorizontal: spacing.md,
+          //     paddingVertical: spacing.sm,
+          //     marginTop: spacing.md,
+          //     alignItems: 'center',
+          //   },
+          // ]}
+          onPress={() => onViewBadge(achievement)}
+        >
+          <Text style={[typography.styles.t5Semibold, { color: colors.white }]}>뱃지 보기</Text>
+        </Button>
+      )}
+
       {/* 완료 날짜 */}
       {achievement.completed && achievement.completed_date_time && (
         <Text
@@ -157,6 +157,9 @@ const styles = StyleSheet.create({
   },
   claimButton: {
     alignSelf: 'flex-start',
+  },
+  viewBadgeButton: {
+    width: '100%',
   },
   progressBar: {
     width: '100%',

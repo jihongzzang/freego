@@ -47,6 +47,12 @@ export default function AchievementScreen() {
     });
   };
 
+  // 뱃지 보기 핸들러
+  const handleViewBadge = (achievement: Achievement) => {
+    setSelectedAchievement(achievement);
+    setShowBadgeModal(true);
+  };
+
   const handleCloseBadgeModal = () => {
     setShowBadgeModal(false);
     setTimeout(() => {
@@ -135,6 +141,7 @@ export default function AchievementScreen() {
                     key={achievement.id}
                     achievement={achievement}
                     onClaimBadge={handleClaimBadge}
+                    onViewBadge={handleViewBadge}
                   />
                 ))}
               </View>
@@ -144,11 +151,7 @@ export default function AchievementScreen() {
       </View>
 
       {/* 뱃지 모달 */}
-      <BadgeModal
-        visible={showBadgeModal}
-        achievement={selectedAchievement}
-        onClose={handleCloseBadgeModal}
-      />
+      <BadgeModal visible={showBadgeModal} achievement={selectedAchievement} onClose={handleCloseBadgeModal} />
     </View>
   );
 }

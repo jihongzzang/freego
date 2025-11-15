@@ -19,7 +19,10 @@ export interface SettingsState extends State {
 export type SettingsIntent =
   | { type: 'LOAD_NOTIFICATION_DAYS' }
   | { type: 'SET_NOTIFICATION_DAYS'; payload: number }
-  | { type: 'DELETE_ALL_DATA' };
+  | { type: 'DELETE_ALL_DATA' }
+  | { type: 'OPEN_PRIVACY_POLICY' }
+  | { type: 'OPEN_TERMS_OF_SERVICE' }
+  | { type: 'RATE_APP' };
 
 /**
  * Settings Effect

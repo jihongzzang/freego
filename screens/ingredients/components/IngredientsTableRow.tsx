@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { MessageSquare, MessageSquareDashed } from 'lucide-react-native';
+import { MessageSquare, StickyNote } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { Ingredient } from '@/mvi/features/ingredients';
-import { getStorageLocationIcon, getStorageLocationLabel } from '@/utils/storageLocation';
+import { getStorageLocationIcon } from '@/utils/storageLocation';
 import { calculateDday, getDdayColor } from '@/utils/date/calculateDday';
 import { useMemo } from 'react';
 import { MenuView } from '@react-native-menu/menu';
@@ -238,9 +238,9 @@ export function IngredientsTableRow({
         }}
       >
         {item.memo ? (
-          <MessageSquare size={16} fill={colors.green500} color={colors.green500} />
+          <StickyNote size={16} color={colors.green600} />
         ) : (
-          <MessageSquareDashed size={16} color={colors.green500} />
+          <StickyNote size={16} color={colors.textTertiary} />
         )}
       </TouchableOpacity>
     </View>

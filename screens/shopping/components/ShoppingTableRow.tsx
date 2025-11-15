@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { Check, MessageSquare, MessageSquareDashed, StickyNote } from 'lucide-react-native';
+import { Check, MessageSquare, StickyNote } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { useMemo } from 'react';
 import { MenuView } from '@react-native-menu/menu';
@@ -192,9 +192,9 @@ export function ShoppingTableRow({
           }}
         >
           {memo ? (
-            <MessageSquare size={16} fill={colors.green500} color={colors.green500} />
+            <StickyNote size={16} color={colors.green600} />
           ) : (
-            <MessageSquareDashed size={16} color={colors.green500} />
+            <StickyNote size={16} color={colors.textTertiary} />
           )}
         </TouchableOpacity>
       )}

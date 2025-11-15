@@ -25,6 +25,9 @@ export default function SettingsScreen() {
     resetThemeToSystem,
     sendFeedback,
     handleDeleteAllData,
+    openPrivacyPolicy,
+    openTermsOfService,
+    rateApp,
   } = useSettingsLogic();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
@@ -53,7 +56,11 @@ export default function SettingsScreen() {
         />
         <DataManagement onDeleteAllData={handleDeleteAllData} />
         <FeedbackSection onSendFeedback={sendFeedback} />
-        <AppInfo />
+        <AppInfo
+          onOpenPrivacyPolicy={openPrivacyPolicy}
+          onOpenTermsOfService={openTermsOfService}
+          onRateApp={rateApp}
+        />
         <View style={styles.footer}>
           <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>프리고 앱</Text>
         </View>

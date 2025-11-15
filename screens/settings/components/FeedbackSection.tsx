@@ -20,13 +20,13 @@ export function FeedbackSection({ onSendFeedback }: FeedbackSectionProps) {
         <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>개발자에게 피드백</Text>
       </View>
 
-      <Card variant="elevated" padding="large">
-        <TouchableOpacity style={styles.feedbackButton} onPress={onSendFeedback} activeOpacity={0.7}>
+      <Card variant="elevated" padding="large" onPress={onSendFeedback}>
+        <TouchableOpacity style={styles.feedbackButton} activeOpacity={0.7}>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>의견 보내기</Text>
         </TouchableOpacity>
 
         <Text style={[typography.styles.t6, { color: colors.textSecondary, marginBottom: 12 }]}>
-          사용하면서 불편했던 점이나, 개선했으면 하는 부분이 있으신가요?{'\n'}
+          사용하면서 불편했던 점이나,{'\n'}개선했으면 하는 부분이 있으신가요?{'\n'}
           여러분의 소중한 의견을 기다리고 있어요.
         </Text>
       </Card>

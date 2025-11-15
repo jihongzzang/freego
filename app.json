@@ -8,6 +8,7 @@
     "scheme": "freego-dev",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "privacy": "https://jihongzzang.github.io/freego/privacy-policy.html",
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"

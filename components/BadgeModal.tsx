@@ -2,6 +2,7 @@ import { Modal, View, Text, Image, StyleSheet, TouchableOpacity, Animated } from
 import { useEffect, useRef } from 'react';
 import { useTheme } from '@/lib/theme';
 import { Achievement } from '@/data/models/achievement.model';
+import { Button } from './ui';
 
 interface BadgeModalProps {
   visible: boolean;
@@ -41,11 +42,7 @@ export default function BadgeModal({ visible, achievement, onClose }: BadgeModal
 
   return (
     <Modal transparent visible={visible} animationType="none" onRequestClose={onClose}>
-      <TouchableOpacity
-        style={styles.overlay}
-        activeOpacity={1}
-        onPress={onClose}
-      >
+      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
         <Animated.View
           style={[
             styles.container,
@@ -59,7 +56,7 @@ export default function BadgeModal({ visible, achievement, onClose }: BadgeModal
           ]}
         >
           {/* 축하 텍스트 */}
-          <Text style={[typography.styles.t1Bold, { color: colors.text, textAlign: 'center' }]}>
+          <Text style={[typography.styles.t3Semibold, { color: colors.textSecondary, textAlign: 'center' }]}>
             축하합니다! 🎉
           </Text>
 
@@ -69,35 +66,26 @@ export default function BadgeModal({ visible, achievement, onClose }: BadgeModal
           </View>
 
           {/* 업적 정보 */}
-          <Text style={[typography.styles.t3Semibold, { color: colors.text, textAlign: 'center' }]}>
+          <Text style={[typography.styles.t3Semibold, { color: colors.textSecondary, textAlign: 'center' }]}>
             {achievement.title}
           </Text>
           <Text
-            style={[
-              typography.styles.t6,
-              { color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs },
-            ]}
+            style={[typography.styles.t6, { color: colors.textTertiary, textAlign: 'center', marginTop: spacing.xs }]}
           >
             {achievement.description}
           </Text>
 
           {/* 닫기 버튼 */}
-          <TouchableOpacity
-            style={[
-              styles.closeButton,
-              {
-                backgroundColor: colors.primary,
-                borderRadius: borderRadius.md,
-                paddingVertical: spacing.md,
-                marginTop: spacing.xl,
-              },
-            ]}
+          <Button
+            size="large"
+            fullWidth
+            style={{
+              marginTop: spacing.xl,
+            }}
             onPress={onClose}
           >
-            <Text style={[typography.styles.t5Semibold, { color: colors.white, textAlign: 'center' }]}>
-              확인
-            </Text>
-          </TouchableOpacity>
+            확인
+          </Button>
         </Animated.View>
       </TouchableOpacity>
     </Modal>

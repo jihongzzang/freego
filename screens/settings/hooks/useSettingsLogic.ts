@@ -93,8 +93,8 @@ export function useSettingsLogic() {
   }
 
   async function sendFeedback() {
-    const email = 'support@fridge.app';
-    const subject = '냉장고 관리 앱 피드백';
+    const email = 'jujihong2@gmail.com';
+    const subject = '프리고 앱 피드백';
     const body = '안녕하세요,\n\n피드백 내용을 입력해주세요:\n\n';
 
     const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -123,6 +123,18 @@ export function useSettingsLogic() {
     });
   }
 
+  function openPrivacyPolicy() {
+    dispatch({ type: 'OPEN_PRIVACY_POLICY' });
+  }
+
+  function openTermsOfService() {
+    dispatch({ type: 'OPEN_TERMS_OF_SERVICE' });
+  }
+
+  function rateApp() {
+    dispatch({ type: 'RATE_APP' });
+  }
+
   return {
     isDark,
     themePreference,
@@ -134,5 +146,8 @@ export function useSettingsLogic() {
     resetThemeToSystem,
     sendFeedback,
     handleDeleteAllData,
+    openPrivacyPolicy,
+    openTermsOfService,
+    rateApp,
   };
 }
