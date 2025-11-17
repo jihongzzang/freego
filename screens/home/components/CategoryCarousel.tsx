@@ -3,7 +3,7 @@ import { ColorPalette, useTheme } from '@/lib/theme';
 import { Category } from '@/data/enums/category';
 import { makeCategoryList } from '@/utils/category/makeCategoryList';
 import Chip from '@/components/ui/Chip';
-import { useMemo, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useMemo, useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 
 interface CategoryCarouselProps {
   isIncludeAllCategory: boolean;
@@ -44,6 +44,11 @@ export const CategoryCarousel = forwardRef<CategoryCarouselRef, CategoryCarousel
     useImperativeHandle(ref, () => ({
       scrollToCategory,
     }));
+
+    // 선택된 카테고리로 자동 스크롤
+    useEffect(() => {
+      scrollToCategory(selectedCategoryId);
+    }, [selectedCategoryId]);
 
     return (
       <View style={styles.container}>

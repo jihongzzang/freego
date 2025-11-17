@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { BackHandler } from 'react-native';
+import { Keyboard } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
 import { useToast } from '@/components/ui';
@@ -53,6 +53,9 @@ export function useIngredientEditLogic() {
           message: effect.payload.message,
           type: effect.payload.variant,
         });
+        if (effect.payload.variant === 'success') {
+          Keyboard.dismiss();
+        }
         break;
 
       case 'NAVIGATE_BACK':

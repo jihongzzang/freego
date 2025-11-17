@@ -9,11 +9,9 @@ import EmojiBottomSheet from '@/components/EmojiBottomSheet';
 import { useAddLogic } from './hooks/useAddLogic';
 import { AddForm } from './components/AddForm';
 import { SubmitButton } from './components/SubmitButton';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AddIngredientScreen() {
   const { colors, spacing } = useTheme();
-  const insets = useSafeAreaInsets();
 
   const {
     state,

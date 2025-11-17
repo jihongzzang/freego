@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Keyboard } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useRouter } from '@/hooks/useRouter';
 import { useToast } from '@/components/ui';
@@ -42,6 +43,10 @@ export function useAddLogic() {
           message: effect.payload.message,
           type: effect.payload.variant,
         });
+        // 성공 토스트일 때만 키보드 닫기
+        if (effect.payload.variant === 'success') {
+          Keyboard.dismiss();
+        }
         break;
 
       case 'NAVIGATE_BACK':

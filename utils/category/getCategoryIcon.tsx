@@ -1,4 +1,4 @@
-import { Carrot, Apple, Beef, Milk, Package, Fish, Cookie, Soup } from 'lucide-react-native';
+import { Carrot, Apple, Beef, Milk, Package, Fish, Cookie, FlaskConical, Sparkle } from 'lucide-react-native';
 import { getCategoryColor } from './getCategoryColor';
 import { Category } from '@/data/enums/category';
 
@@ -19,7 +19,7 @@ export function getCategoryIcon(category: Category, size: number = 16, customCol
     case Category.PROCESSED:
       return <Cookie size={size} color={color} />;
     case Category.SEASONING:
-      return <Soup size={size} color={color} />;
+      return <FlaskConical size={size} color={color} />;
     case Category.OTHER:
       return <Package size={size} color={color} />;
     default:

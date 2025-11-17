@@ -285,7 +285,7 @@ const createStyles = ({ spacing }: { spacing: typeof import('@/lib/theme').spaci
     },
 
     expiryCell: {
-      width: 60,
+      width: 62,
       alignItems: 'center',
     },
 

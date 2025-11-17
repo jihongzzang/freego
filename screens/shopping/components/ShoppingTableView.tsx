@@ -177,16 +177,11 @@ export function ShoppingTableView({
             >
               <View style={styles.tableWrapper}>
                 {/* Header */}
-                <View
-                  style={[
-                    styles.headerRow,
-                    { backgroundColor: isDark ? colors.grey900 : colors.surface, borderColor: colors.border },
-                  ]}
-                >
+                {/* <View style={styles.headerRow}>
                   <View style={[styles.cell, styles.nameCell]}>
                     <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
                   </View>
-                </View>
+                </View> */}
 
                 {/* Data Rows */}
                 {dateItems.map((item) => (
@@ -217,16 +212,11 @@ export function ShoppingTableView({
         // 구매 예정 탭: 일반 리스트
         <View style={styles.tableWrapper}>
           {/* Header */}
-          <View
-            style={[
-              styles.headerRow,
-              { backgroundColor: isDark ? colors.grey900 : colors.surface, borderColor: colors.border },
-            ]}
-          >
-            <View style={[styles.cell, styles.checkboxCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+          <View style={styles.headerRow}>
+            <View style={[styles.cell, styles.checkboxCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>완료</Text>
             </View>
-            <View style={[styles.cell, styles.nameCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+            <View style={[styles.cell, styles.nameCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
             </View>
             <View style={[styles.cell, styles.memoCell]}>
@@ -307,9 +297,6 @@ const createStyles = ({
     headerRow: {
       flexDirection: 'row',
       paddingHorizontal: spacing.xs,
-      marginBottom: spacing.xs,
-      borderRadius: spacing.sm,
-      borderWidth: 1,
     },
 
     cell: {

@@ -60,32 +60,24 @@ export function IngredientsTableAccordion({
       {items.length > 0 ? (
         <View style={styles.tableWrapper}>
           {/* Header */}
-          <View
-            style={[
-              styles.headerRow,
-              {
-                backgroundColor: isDark ? colors.grey900 : colors.surface,
-                borderColor: colors.border,
-              },
-            ]}
-          >
-            <View style={[styles.cell, styles.emojiCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+          <View style={[styles.headerRow]}>
+            <View style={[styles.cell, styles.emojiCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}> </Text>
             </View>
-            <View style={[styles.cell, styles.nameCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+            <View style={[styles.cell, styles.nameCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
             </View>
-            <View style={[styles.cell, styles.expiryCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+            <View style={[styles.cell, styles.expiryCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
                 유통기한
               </Text>
             </View>
-            <View style={[styles.cell, styles.quantityCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+            <View style={[styles.cell, styles.quantityCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
                 수량
               </Text>
             </View>
-            <View style={[styles.cell, styles.storageCell, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+            <View style={[styles.cell, styles.storageCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
                 보관
               </Text>
@@ -140,9 +132,6 @@ const createStyles = ({
     headerRow: {
       flexDirection: 'row',
       paddingHorizontal: spacing.xs,
-      marginBottom: spacing.xs,
-      borderRadius: spacing.sm,
-      borderWidth: 1,
     },
 
     cell: {
@@ -170,7 +159,7 @@ const createStyles = ({
     },
 
     expiryCell: {
-      width: 60,
+      width: 62,
       alignItems: 'center',
     },
 
