@@ -9,12 +9,17 @@ configureReanimatedLogger({
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
+import { useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useFonts } from '@/hooks/useFonts';
 import { ThemeProvider, useTheme } from '@/lib/theme';
 import { DialogProvider } from '@/contexts/DialogContext';
 import { ToastProvider } from '@/components/ui';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+
+// 스플래시 화면 자동 숨김 방지
+SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
   initialRouteName: 'index',
@@ -45,6 +50,17 @@ function RootStack() {
 export default function RootLayout() {
   useFrameworkReady();
   const fontsLoaded = useFonts();
+
+  // 폰트 로드 후 최소 1초 대기 후 스플래시 화면 숨김
+  useEffect(() => {
+    if (fontsLoaded) {
+      const timer = setTimeout(() => {
+        SplashScreen.hideAsync();
+      }, 1000); // 1초 대기 (원하는 시간으로 조절)
+
+      return () => clearTimeout(timer);
+    }
+  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;

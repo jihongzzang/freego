@@ -59,7 +59,7 @@ export default function IngredientsTableScreen() {
     collapsedStorages,
     toggleCategory,
     toggleStorage,
-  } = useIngredientsData(ingredients);
+  } = useIngredientsData(ingredients, loading);
 
   const [index, setIndex] = useState(0);
   const [routes] = useState<Route[]>([

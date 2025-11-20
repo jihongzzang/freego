@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import { ChevronDown } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
@@ -26,6 +26,11 @@ export default function Accordion({
 }: AccordionProps) {
   const { colors, typography } = useTheme();
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+
+  // defaultExpanded prop이 변경되면 내부 상태도 업데이트
+  useEffect(() => {
+    setIsExpanded(defaultExpanded);
+  }, [defaultExpanded]);
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);

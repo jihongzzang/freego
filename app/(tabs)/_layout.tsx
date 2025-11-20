@@ -80,7 +80,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '홈',
+          title: '재료관리',
           sceneStyle: { backgroundColor: colors.background },
           tabBarLabel: ({ focused }) => (
             <Text
@@ -97,18 +97,22 @@ export default function TabLayout() {
                 },
               ]}
             >
-              내 냉장고
+              재료관리
             </Text>
           ),
           tabBarIcon: ({ focused }) => (
-            <Refrigerator
+            // <Refrigerator
+            //   size={24}
+            //   color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
+            // />
+            <ClipboardList
               size={24}
               color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
             />
           ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="ingredients"
         options={{
           title: '재료 관리',
@@ -138,7 +142,7 @@ export default function TabLayout() {
             />
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="shopping"
         options={{
