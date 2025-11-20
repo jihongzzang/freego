@@ -76,25 +76,60 @@ export function useShoppingLogic() {
 
             // 결과에 따라 토스트 표시
             if (result && result.success) {
-              // count가 있으면 냉장고 추가, 없으면 삭제
-              if (result.count) {
-                showToast({
-                  message: `${result.count}개 항목이 냉장고에 추가됐어요.`,
-                  type: 'success',
-                });
-              } else {
-                showToast({
-                  message: SUCCESS_MESSAGES.SUCCESS_DELETE_SHOPPING_LIST_ITEM,
-                  type: 'success',
-                });
+              // actionType으로 명확하게 구분
+              switch (effect.payload.actionType) {
+                case 'add_to_storage':
+                  showToast({
+                    message: `${result.count}개 항목이 냉장고에 추가됐어요.`,
+                    type: 'success',
+                  });
+                  break;
+                case 'delete':
+                  showToast({
+                    message: SUCCESS_MESSAGES.SUCCESS_DELETE_SHOPPING_LIST_ITEM,
+                    type: 'success',
+                  });
+                  break;
+                case 'cancel_purchase':
+                  showToast({
+                    message: '구매완료가 취소되었어요.',
+                    type: 'success',
+                  });
+                  break;
+                default:
+                  // actionType이 없는 경우 기본 성공 메시지
+                  showToast({
+                    message: SUCCESS_MESSAGES.SUCCESS_DELETE_SHOPPING_LIST_ITEM,
+                    type: 'success',
+                  });
               }
             } else if (result && result.success === false) {
-              showToast({
-                message: effect.payload.isDanger
-                  ? ERROR_MESSAGES.ERROR_SHOPPING_ITEM_DELETE_FAILED
-                  : ERROR_MESSAGES.ERROR_INGREDIENT_CREATE_ERROR,
-                type: 'error',
-              });
+              // actionType으로 에러 메시지도 구분
+              switch (effect.payload.actionType) {
+                case 'add_to_storage':
+                  showToast({
+                    message: ERROR_MESSAGES.ERROR_INGREDIENT_CREATE_ERROR,
+                    type: 'error',
+                  });
+                  break;
+                case 'delete':
+                  showToast({
+                    message: ERROR_MESSAGES.ERROR_SHOPPING_ITEM_DELETE_FAILED,
+                    type: 'error',
+                  });
+                  break;
+                case 'cancel_purchase':
+                  showToast({
+                    message: '구매완료 취소에 실패했어요.',
+                    type: 'error',
+                  });
+                  break;
+                default:
+                  showToast({
+                    message: ERROR_MESSAGES.ERROR_SHOPPING_ITEM_DELETE_FAILED,
+                    type: 'error',
+                  });
+              }
             }
           },
           onCancel: undefined,

@@ -74,6 +74,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
                 }
               },
               isDanger: true,
+              actionType: 'delete',
             },
           },
         ],
@@ -131,6 +132,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
                 }
               },
               isDanger: true,
+              actionType: 'delete',
             },
           },
         ],
@@ -242,6 +244,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
                 }
               },
               isDanger: false,
+              actionType: 'add_to_storage',
             },
           },
         ],
@@ -335,6 +338,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
                 }
               },
               isDanger: false,
+              actionType: 'cancel_purchase',
             },
           },
         ],
@@ -401,6 +405,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
                 }
               },
               isDanger: true,
+              actionType: 'delete',
             },
           },
         ],

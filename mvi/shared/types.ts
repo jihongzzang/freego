@@ -44,6 +44,7 @@ export interface ConfirmPayload {
   message: string;
   onConfirm: () => Promise<{ success: boolean; count?: number; ingredientName?: string }>;
   isDanger?: boolean;
+  actionType?: 'delete' | 'add_to_storage' | 'cancel_purchase' | 'other';
 }
 
 /**
