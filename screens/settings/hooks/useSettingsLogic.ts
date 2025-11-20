@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Platform, Linking } from 'react-native';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { Platform, Linking, AppState } from 'react-native';
 import * as Notifications from 'expo-notifications';
+import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/contexts/DialogContext';
 import { useMVIStore } from '@/mvi/base';
@@ -19,12 +20,34 @@ export function useSettingsLogic() {
 
   // Notification permission state
   const [hasNotificationPermission, setHasNotificationPermission] = useState(false);
+  const appState = useRef(AppState.currentState);
 
-  // Load notification days and check permission on mount
+  // Load notification days on mount
   useEffect(() => {
     dispatch({ type: 'LOAD_NOTIFICATION_DAYS' });
-    checkNotificationPermission();
   }, [dispatch]);
+
+  // Check notification permission on every screen focus
+  useFocusEffect(
+    useCallback(() => {
+      checkNotificationPermission();
+    }, []),
+  );
+
+  // Check notification permission when app comes to foreground
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+        // App has come to foreground
+        checkNotificationPermission();
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   // Handle effects
   useEffect(() => {
@@ -43,7 +66,18 @@ export function useSettingsLogic() {
   async function checkNotificationPermission() {
     try {
       const settings = await Notifications.getPermissionsAsync();
-      setHasNotificationPermission((settings as any).granted);
+      const granted = (settings as any).granted;
+
+      // 권한 상태가 변경되었을 때만 알림 체크 로직 실행
+      if (hasNotificationPermission !== granted) {
+        setHasNotificationPermission(granted);
+
+        // 권한이 허용되었을 때만 알림 스케줄링
+        if (granted) {
+          const { checkExpiryAndNotify } = await import('@/services/notification.service');
+          await checkExpiryAndNotify();
+        }
+      }
     } catch (error) {
       // console.log('Failed to check notification permission (expected in Expo Go):', error);
       setHasNotificationPermission(false);
@@ -53,9 +87,14 @@ export function useSettingsLogic() {
   async function requestNotificationPermission() {
     try {
       const settings = await Notifications.requestPermissionsAsync();
-      setHasNotificationPermission((settings as any).granted);
+      const granted = (settings as any).granted;
+      setHasNotificationPermission(granted);
 
-      if (!(settings as any).granted) {
+      if (granted) {
+        // 권한 허용 시 즉시 알림 스케줄링
+        const { checkExpiryAndNotify } = await import('@/services/notification.service');
+        await checkExpiryAndNotify();
+      } else {
         confirm({
           title: '알림 권한 필요',
           message: '설정에서 알림 권한을 허용해주세요.',
@@ -73,7 +112,7 @@ export function useSettingsLogic() {
     } catch (error) {
       // console.log('Failed to request notification permission (expected in Expo Go):', error);
       showToast({
-        message: 'Expo Go에서는 알림 권한을 요청할 수 없어요. Development build를 사용해주세요.',
+        message: '알림 권한을 요청할 수 없어요.',
         type: 'warning',
       });
     }

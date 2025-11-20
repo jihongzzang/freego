@@ -12,7 +12,7 @@ export function useIngredientsData(ingredients: Ingredient[], loading: boolean =
   const categoryOrder: Category[] = makeCategoryList({ includeAllCategory: false }).map((cat) => cat.id);
   const storageOrder: StorageLocationOrUnset[] = [...makeStorageList().map((loc) => loc.id)];
 
-  // 카테고리별로 재료 그룹화
+  // 카테고리별로 재료 그룹화 및 유통기한 순 정렬
   const groupedByCategory = useMemo(() => {
     const grouped: Record<Category, Ingredient[]> = {} as Record<Category, Ingredient[]>;
 
@@ -23,10 +23,38 @@ export function useIngredientsData(ingredients: Ingredient[], loading: boolean =
       grouped[item.category].push(item);
     });
 
+    // 각 카테고리 내에서 3단계 우선순위로 정렬
+    Object.keys(grouped).forEach((category) => {
+      grouped[category as Category].sort((a, b) => {
+        const hasExpiredA = !!a.expired_date_time;
+        const hasExpiredB = !!b.expired_date_time;
+
+        // 1순위: 유통기한이 있는 재료 (오름차순 - 임박한 것이 먼저)
+        if (hasExpiredA && hasExpiredB) {
+          return new Date(a.expired_date_time!).getTime() - new Date(b.expired_date_time!).getTime();
+        }
+        if (hasExpiredA && !hasExpiredB) return -1;
+        if (!hasExpiredA && hasExpiredB) return 1;
+
+        // 2순위: 유통기한 없고 수정된 재료 (수정일 내림차순 - 최근 수정이 먼저)
+        const hasModifiedA = !!a.last_modified_date_time;
+        const hasModifiedB = !!b.last_modified_date_time;
+
+        if (hasModifiedA && hasModifiedB) {
+          return new Date(b.last_modified_date_time!).getTime() - new Date(a.last_modified_date_time!).getTime();
+        }
+        if (hasModifiedA && !hasModifiedB) return -1;
+        if (!hasModifiedA && hasModifiedB) return 1;
+
+        // 3순위: 수정되지 않은 재료 (생성일 내림차순 - 최근 생성이 먼저)
+        return new Date(b.created_date_time!).getTime() - new Date(a.created_date_time!).getTime();
+      });
+    });
+
     return grouped;
   }, [ingredients]);
 
-  // 보관위치별로 재료 그룹화
+  // 보관위치별로 재료 그룹화 및 유통기한 순 정렬
   const groupedByStorage = useMemo(() => {
     const grouped: Record<StorageLocationOrUnset, Ingredient[]> = {} as Record<StorageLocationOrUnset, Ingredient[]>;
 
@@ -36,6 +64,34 @@ export function useIngredientsData(ingredients: Ingredient[], loading: boolean =
         grouped[location] = [];
       }
       grouped[location].push(item);
+    });
+
+    // 각 보관위치 내에서 3단계 우선순위로 정렬
+    Object.keys(grouped).forEach((storage) => {
+      grouped[storage as StorageLocationOrUnset].sort((a, b) => {
+        const hasExpiredA = !!a.expired_date_time;
+        const hasExpiredB = !!b.expired_date_time;
+
+        // 1순위: 유통기한이 있는 재료 (오름차순 - 임박한 것이 먼저)
+        if (hasExpiredA && hasExpiredB) {
+          return new Date(a.expired_date_time!).getTime() - new Date(b.expired_date_time!).getTime();
+        }
+        if (hasExpiredA && !hasExpiredB) return -1;
+        if (!hasExpiredA && hasExpiredB) return 1;
+
+        // 2순위: 유통기한 없고 수정된 재료 (수정일 내림차순 - 최근 수정이 먼저)
+        const hasModifiedA = !!a.last_modified_date_time;
+        const hasModifiedB = !!b.last_modified_date_time;
+
+        if (hasModifiedA && hasModifiedB) {
+          return new Date(b.last_modified_date_time!).getTime() - new Date(a.last_modified_date_time!).getTime();
+        }
+        if (hasModifiedA && !hasModifiedB) return -1;
+        if (!hasModifiedA && hasModifiedB) return 1;
+
+        // 3순위: 수정되지 않은 재료 (생성일 내림차순 - 최근 생성이 먼저)
+        return new Date(b.created_date_time!).getTime() - new Date(a.created_date_time!).getTime();
+      });
     });
 
     return grouped;
