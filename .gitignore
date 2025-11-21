@@ -48,3 +48,5 @@ yarn-error.*
 coverage/
 *.lcov
 .nyc_output
+
+docs/i18n-plan.md
