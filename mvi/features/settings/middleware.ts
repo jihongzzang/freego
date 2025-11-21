@@ -11,6 +11,9 @@ import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
 import * as WebBrowser from 'expo-web-browser';
 import * as StoreReview from 'expo-store-review';
 import { LEGAL_URLS } from '@/constants/legal';
+import { ingredientService } from '@/services/ingredient.service';
+import { shoppingService } from '@/services/shopping.service';
+import { achievementService } from '@/services/achievement.service';
 
 export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, SettingsEffect> = async (
   state,
@@ -37,10 +40,6 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
 
     case 'DELETE_ALL_DATA': {
       try {
-        const { ingredientService } = await import('@/services/ingredient.service');
-        const { shoppingService } = await import('@/services/shopping.service');
-        const { achievementService } = await import('@/services/achievement.service');
-
         await ingredientService.clearAll();
         await shoppingService.clearAll();
         await achievementService.resetAll();

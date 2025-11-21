@@ -7,6 +7,7 @@
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { ShoppingState, ShoppingIntent, ShoppingEffect } from './types';
 import { shoppingService } from '@/services/shopping.service';
+import { ingredientService } from '@/services/ingredient.service';
 import { createErrorEffect, createInfoEffect, createSuccessEffect, createWarningEffect } from '@/mvi/shared';
 import ERROR_MESSAGES from '@/constants/toast/errorMessages';
 import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
@@ -141,7 +142,6 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
     case 'ADD_ITEM_TO_STORAGE': {
       try {
-        const { ingredientService } = await import('@/services/ingredient.service');
         const todayMidnight = new Date();
         todayMidnight.setHours(0, 0, 0, 0);
         const todayIso = todayMidnight.toISOString();
@@ -207,7 +207,6 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
               message: `${selectedCount}개의 항목을 냉장고에 추가할까요?`,
               onConfirm: async () => {
                 try {
-                  const { ingredientService } = await import('@/services/ingredient.service');
                   const todayMidnight = new Date();
                   todayMidnight.setHours(0, 0, 0, 0);
                   const todayIso = todayMidnight.toISOString();
