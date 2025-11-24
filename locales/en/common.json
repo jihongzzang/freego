@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "Fridge Manager",
-    "footer": "Frigo App"
+    "footer": "Freego App"
   },
   "onboarding": {
     "skip": "Skip",
@@ -213,7 +213,7 @@
       "title": "Developer Feedback",
       "send": "Send Feedback",
       "description": "Had any inconveniences or\nsuggestions for improvement?\nWe'd love to hear from you.",
-      "emailSubject": "Frigo App Feedback",
+      "emailSubject": "Freego App Feedback",
       "emailBody": "Hello,\n\nPlease enter your feedback:\n\n"
     }
   },
