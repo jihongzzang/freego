@@ -2,6 +2,7 @@ import { View, StyleSheet, TextInput } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import BottomSheet from '@/components/ui/BottomSheet';
 import { Button } from './ui';
+import { useTranslation } from 'react-i18next';
 
 interface QuantityBottomSheetProps {
   visible: boolean;
@@ -20,6 +21,7 @@ export default function QuantityBottomSheet({
   onQuantityChange,
   onConfirm,
 }: QuantityBottomSheetProps) {
+  const { t } = useTranslation();
   const { colors, typography, isDark, spacing } = useTheme();
 
   return (
@@ -38,7 +40,7 @@ export default function QuantityBottomSheet({
             ]}
             value={quantity}
             onChangeText={onQuantityChange}
-            placeholder="수량을 입력하세요"
+            placeholder={t('bottomSheet.quantityPlaceholder')}
             placeholderTextColor={colors.textTertiary}
             keyboardType="numeric"
             autoFocus
@@ -56,7 +58,7 @@ export default function QuantityBottomSheet({
           ]}
         >
           <Button size="large" variant="primary" onPress={onConfirm}>
-            확인
+            {t('common.confirm')}
           </Button>
         </View>
       </View>

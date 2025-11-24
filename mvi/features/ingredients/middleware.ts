@@ -15,8 +15,7 @@ import {
   createErrorEffect,
   createNavigateEffect,
 } from '@/mvi/shared';
-import ERROR_MESSAGES from '@/constants/toast/errorMessages';
-import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
+import i18n from '@/locales';
 
 /**
  * Ingredients Middleware
@@ -37,7 +36,7 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
 
         if (!ingredient) {
           return {
-            effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_ITEM_NOT_FOUND)],
+            effects: [createErrorEffect(i18n.t('ingredients.messages.notFound'))],
           };
         }
 
@@ -60,11 +59,11 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_ADD_SHOPPING_LIST_ITEM)],
+          effects: [createSuccessEffect(i18n.t('ingredients.messages.addedToShoppingList'))],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_SHOPPING_ITEM_ADD_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredients.messages.shoppingAddFailed'))],
         };
       }
     }
@@ -87,11 +86,11 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_DELETE_INGREDIENT)],
+          effects: [createSuccessEffect(i18n.t('ingredients.messages.deleted'))],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_DELETE_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredients.messages.deleteFailed'))],
         };
       }
     }
@@ -102,7 +101,7 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
 
         if (!ingredient) {
           return {
-            effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_ITEM_NOT_FOUND)],
+            effects: [createErrorEffect(i18n.t('ingredients.messages.notFound'))],
           };
         }
 
@@ -125,11 +124,11 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_CONSUME_INGREDIENT)],
+          effects: [createSuccessEffect(i18n.t('ingredients.messages.consumed'))],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_CONSUME_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredients.messages.consumeFailed'))],
         };
       }
     }
@@ -149,11 +148,11 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_NAME_UPDATE)],
+          effects: [createSuccessEffect(i18n.t('ingredients.messages.nameUpdated'))],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_NAME_UPDATE_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredients.messages.nameUpdateFailed'))],
         };
       }
     }
@@ -173,11 +172,11 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_EMOJI_UPDATE)],
+          effects: [createSuccessEffect(i18n.t('ingredients.messages.emojiUpdated'))],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_EMOJI_UPDATE_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredients.messages.emojiUpdateFailed'))],
         };
       }
     }
@@ -197,11 +196,11 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_QUANTITY_UPDATE)],
+          effects: [createSuccessEffect(i18n.t('ingredients.messages.quantityUpdated'))],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_QUANTITY_UPDATE_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredients.messages.quantityUpdateFailed'))],
         };
       }
     }
@@ -221,11 +220,11 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_STORAGE_UPDATE)],
+          effects: [createSuccessEffect(i18n.t('ingredients.messages.storageUpdated'))],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_STORAGE_UPDATE_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredients.messages.storageUpdateFailed'))],
         };
       }
     }
@@ -245,11 +244,11 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_EXPIRY_DATE_UPDATE)],
+          effects: [createSuccessEffect(i18n.t('ingredients.messages.expiryUpdated'))],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_EXPIRY_DATE_UPDATE_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredients.messages.expiryUpdateFailed'))],
         };
       }
     }
@@ -269,11 +268,11 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_MEMO_UPDATE)],
+          effects: [createSuccessEffect(i18n.t('ingredients.messages.memoUpdated'))],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_MEMO_UPDATE_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredients.messages.memoUpdateFailed'))],
         };
       }
     }
@@ -291,12 +290,12 @@ export const ingredientsMiddleware: Middleware<IngredientsState, IngredientsInte
             ...state,
             ingredients,
           },
-          effects: [createSuccessEffect(`${intent.payload.length}개의 재료가 추가됐어요.`)],
+          effects: [createSuccessEffect(i18n.t('ingredients.messages.bulkAddSuccess', { count: intent.payload.length }))],
         };
       } catch (error) {
         console.error('Error adding templates:', error);
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_CREATE_ERROR)],
+          effects: [createErrorEffect(i18n.t('ingredients.messages.bulkAddFailed'))],
         };
       }
     }

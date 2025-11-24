@@ -7,8 +7,10 @@ import FloatingButton from '@/components/ui/FloatingButton';
 import { useIngredientDetailLogic } from './hooks/useIngredientDetailLogic';
 import { DetailView } from './components/DetailView';
 import { ActionButtons } from './components/ActionButtons';
+import { useTranslation } from 'react-i18next';
 
 export default function IngredientDetailScreen() {
+  const { t } = useTranslation();
   const { colors, typography, spacing } = useTheme();
 
   const { state, handleDelete, handleConsume, handleBackPress, handleEdit } = useIngredientDetailLogic();
@@ -18,7 +20,7 @@ export default function IngredientDetailScreen() {
   if (!state.ingredient) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[typography.styles.t6, { color: colors.text }]}>로딩 중이에요...</Text>
+        <Text style={[typography.styles.t6, { color: colors.text }]}>{t('common.loading')}</Text>
       </View>
     );
   }

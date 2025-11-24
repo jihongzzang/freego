@@ -9,8 +9,10 @@ import EmojiBottomSheet from '@/components/EmojiBottomSheet';
 import { useAddLogic } from './hooks/useAddLogic';
 import { AddForm } from './components/AddForm';
 import { SubmitButton } from './components/SubmitButton';
+import { useTranslation } from 'react-i18next';
 
 export default function AddIngredientScreen() {
+  const { t } = useTranslation();
   const { colors, spacing } = useTheme();
 
   const {
@@ -58,7 +60,7 @@ export default function AddIngredientScreen() {
       <SelectDateBottomSheet
         visible={purchaseDatePicker.visible}
         onClose={purchaseDatePicker.close}
-        title="구매일 선택"
+        title={t('ingredientAdd.selectPurchaseDate')}
         selectedDate={purchaseDatePicker.selectedDate}
         onDateChange={purchaseDatePicker.handleDateChange}
         onConfirm={purchaseDatePicker.handleConfirm}
@@ -67,7 +69,7 @@ export default function AddIngredientScreen() {
       <SelectDateBottomSheet
         visible={expiryDatePicker.visible}
         onClose={expiryDatePicker.close}
-        title="유통기한 선택"
+        title={t('ingredientAdd.selectExpiryDate')}
         selectedDate={expiryDatePicker.selectedDate}
         onDateChange={expiryDatePicker.handleDateChange}
         onConfirm={expiryDatePicker.handleConfirm}
@@ -82,7 +84,7 @@ export default function AddIngredientScreen() {
 
       <EmojiBottomSheet
         visible={isEmojiPickerVisible}
-        title="이모지 선택"
+        title={t('ingredientAdd.selectEmoji')}
         onClose={() => setIsEmojiPickerVisible(false)}
         onSelect={handleEmojiSelect}
       />

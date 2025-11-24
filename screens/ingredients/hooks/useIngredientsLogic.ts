@@ -9,11 +9,12 @@ import { type IngredientTemplate } from '@/constants/ingredientTemplates';
 import { Category } from '@/data/enums/category';
 import { Unit } from '@/data/enums/unit';
 import { StorageLocation } from '@/data/enums/storage_location';
-import ERROR_MESSAGES from '@/constants/toast/errorMessages';
+import { useTranslation } from 'react-i18next';
 
 export type ViewMode = 'category' | 'storage';
 
 export function useIngredientsLogic() {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createIngredientsStore);
@@ -197,7 +198,7 @@ export function useIngredientsLogic() {
           // 숫자가 아닌 경우
           if (isNaN(Number(trimmedQuantity))) {
             showToast({
-              message: ERROR_MESSAGES.ERROR_INVALID_INGREDIENT_QUANTITY,
+              message: t('ingredientEdit.invalidQuantity'),
               type: 'error',
             });
             return;
@@ -205,7 +206,7 @@ export function useIngredientsLogic() {
           // 0 이하인 경우 (0 포함, 음수 포함)
           else if (Number(trimmedQuantity) <= 0) {
             showToast({
-              message: ERROR_MESSAGES.ERROR_INGREDIENT_QUANTITY_MUST_BE_GREATER_THAN_ZERO,
+              message: t('ingredientEdit.quantityMustBePositive'),
               type: 'error',
             });
             return;
@@ -349,7 +350,7 @@ export function useIngredientsLogic() {
     }
 
     const ingredientsToAdd = selectedTemplates.map((template) => ({
-      name: template.krLabel,
+      name: i18n.language === 'ko' ? template.krLabel : template.enLabel,
       category: template.category as Category,
       emoji: template.emoji,
       storage_location: null,

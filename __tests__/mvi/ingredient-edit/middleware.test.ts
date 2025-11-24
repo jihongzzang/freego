@@ -9,6 +9,7 @@ import { Category } from '@/data/enums/category';
 import { StorageLocation } from '@/data/enums/storage_location';
 import { Unit } from '@/data/enums/unit';
 import { Ingredient } from '@/data/models/ingredient.model';
+import i18n from '@/locales';
 
 jest.mock('@/services/ingredient.service', () => ({
   ingredientService: {
@@ -134,7 +135,7 @@ describe('ingredientEditMiddleware', () => {
       const result = await ingredientEditMiddleware(state, intent);
 
       expect(result.state?.loading).toBe(false);
-      expect(result.state?.error).toBe('식재료를 찾을 수 없어요.');
+      expect(result.state?.error).toBe(i18n.t('ingredientEdit.notFound'));
     });
 
     it('로드 실패 시 에러 토스트를 표시한다', async () => {
@@ -169,7 +170,7 @@ describe('ingredientEditMiddleware', () => {
 
       const result = await ingredientEditMiddleware(state, intent);
 
-      expect(result.state?.error).toBe('데이터 로드 실패');
+      expect(result.state?.error).toBe(i18n.t('ingredientEdit.loadFailed'));
     });
   });
 

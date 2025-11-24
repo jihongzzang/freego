@@ -6,6 +6,7 @@ import { ColorPalette, useTheme } from '@/lib/theme';
 import type { OnboardingStep } from '../hooks/useOnboardingSteps';
 import { useMemo } from 'react';
 import { Button } from '@/components/ui';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -26,6 +27,7 @@ export function OnboardingCarousel({
   onNext,
   onSkip,
 }: OnboardingCarouselProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing, borderRadius, shadows } = useTheme();
 
   const insets = useSafeAreaInsets();
@@ -43,7 +45,7 @@ export function OnboardingCarousel({
     <View style={[styles.content, { backgroundColor: colors.surface }]}>
       {currentStep < steps.length - 1 && (
         <TouchableOpacity style={[styles.skipButton, { top: insets.top + 10 }]} onPress={onSkip}>
-          <Text style={[typography.styles.t5Semibold, styles.skipText]}>건너뛰기</Text>
+          <Text style={[typography.styles.t5Semibold, styles.skipText]}>{t('onboarding.skip')}</Text>
         </TouchableOpacity>
       )}
 
@@ -87,7 +89,7 @@ export function OnboardingCarousel({
           style={styles.nextButton}
           textStyle={{ color: colors.white }}
         >
-          {currentStep < steps.length - 1 ? '다음' : '시작하기'}
+          {currentStep < steps.length - 1 ? t('onboarding.next') : t('onboarding.start')}
         </Button>
       </View>
     </View>

@@ -7,6 +7,7 @@ import { AchievementState, AchievementIntent } from '@/mvi/features/achievement/
 import { achievementService } from '@/services/achievement.service';
 import { Achievement, Statistics } from '@/data/models/achievement.model';
 import { AchievementType } from '@/data/enums/achievement-type';
+import i18n from '@/locales';
 
 jest.mock('@/services/achievement.service', () => ({
   achievementService: {
@@ -122,7 +123,7 @@ describe('achievementMiddleware', () => {
 
       const result = await achievementMiddleware(state, intent);
 
-      expect(result.state?.error).toBe('업적 로드 실패');
+      expect(result.state?.error).toBe(i18n.t('achievement.messages.loadFailed'));
     });
   });
 

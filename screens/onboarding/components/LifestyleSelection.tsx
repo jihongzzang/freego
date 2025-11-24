@@ -1,10 +1,11 @@
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ColorPalette, useTheme } from '@/lib/theme';
-import { LIFESTYLE_PACKAGES } from '@/constants/starterPackages';
+import { getLifestylePackages, SupportedLang } from '@/constants/starterPackages';
 import { useMemo } from 'react';
 import { Card } from '@/components/ui';
 import { ChevronRight } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 
 interface LifestyleSelectionProps {
   onSelectLifestyle: (lifestyleId: string) => void;
@@ -12,9 +13,13 @@ interface LifestyleSelectionProps {
 }
 
 export function LifestyleSelection({ onSelectLifestyle, onSkip }: LifestyleSelectionProps) {
+  const { t, i18n } = useTranslation();
   const { colors, typography, spacing, borderRadius, shadows, isDark } = useTheme();
 
   const insets = useSafeAreaInsets();
+
+  const lang = (i18n.language === 'ko' ? 'ko' : 'en') as SupportedLang;
+  const lifestylePackages = getLifestylePackages(lang);
 
   const styles = useMemo(
     () => createStyles({ colors, spacing, borderRadius, shadows }),
@@ -26,10 +31,10 @@ export function LifestyleSelection({ onSelectLifestyle, onSkip }: LifestyleSelec
       <View style={[styles.packageChoiceContainer, { paddingTop: insets.top }]}>
         <View style={styles.headerSection}>
           <Text style={[typography.styles.t1Bold, styles.packageTitle, { color: colors.text }]}>
-            "나의 라이프스타일은?"
+            {t('onboarding.lifestyle.title')}
           </Text>
           <Text style={[typography.styles.t4, styles.packageDescription, { color: colors.textSecondary }]}>
-            "맞춤형 재료 리스트를 만들어드려요"
+            {t('onboarding.lifestyle.description')}
           </Text>
         </View>
 
@@ -39,7 +44,7 @@ export function LifestyleSelection({ onSelectLifestyle, onSkip }: LifestyleSelec
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.lifestyleList}>
-            {LIFESTYLE_PACKAGES.map((lifestyle) => (
+            {lifestylePackages.map((lifestyle) => (
               <Card
                 key={lifestyle.id}
                 variant="elevated"
@@ -58,10 +63,10 @@ export function LifestyleSelection({ onSelectLifestyle, onSkip }: LifestyleSelec
                   </View>
                   <View style={styles.lifestyleInfo}>
                     <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>
-                      {lifestyle.krLabel}
+                      {t(`onboarding.lifestyles.${lifestyle.id}.label`)}
                     </Text>
                     <Text style={[typography.styles.t6, { color: colors.textTertiary }]} numberOfLines={2}>
-                      {lifestyle.description}
+                      {t(`onboarding.lifestyles.${lifestyle.id}.description`)}
                     </Text>
                   </View>
                 </View>
@@ -73,7 +78,9 @@ export function LifestyleSelection({ onSelectLifestyle, onSkip }: LifestyleSelec
           </View>
 
           <TouchableOpacity style={styles.skipPackageButton} onPress={onSkip} activeOpacity={0.8}>
-            <Text style={[typography.styles.t5Semibold, styles.skipPackageText]}>건너뛰고 직접 등록할게요</Text>
+            <Text style={[typography.styles.t5Semibold, styles.skipPackageText]}>
+              {t('onboarding.lifestyle.skipButton')}
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </View>

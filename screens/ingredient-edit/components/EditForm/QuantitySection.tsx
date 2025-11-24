@@ -5,6 +5,7 @@ import { EditFormData } from '@/mvi/features/ingredient-edit';
 import { Unit } from '@/data/enums/unit';
 import { getUnitLabel } from '@/utils/unit';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface QuantitySectionProps {
   quantity: string | null;
@@ -14,14 +15,16 @@ interface QuantitySectionProps {
 }
 
 export function QuantitySection({ quantity, unit, onFieldChange, onUnitPress }: QuantitySectionProps) {
+  const { t, i18n } = useTranslation();
   const { colors, typography, spacing, borderRadius } = useTheme();
+  const lang = i18n.language === 'ko' ? 'kr' : 'en';
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
   return (
     <View style={styles.row}>
       <View style={[styles.inputGroup, { flex: 1 }]}>
-        <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>수량</Text>
+        <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{t('ingredientForm.quantity')}</Text>
         <TextInput
           style={[
             styles.input,
@@ -36,12 +39,12 @@ export function QuantitySection({ quantity, unit, onFieldChange, onUnitPress }: 
           value={quantity || ''}
           onChangeText={(text) => onFieldChange('quantity', text)}
           keyboardType="numeric"
-          placeholder="입력"
+          placeholder={t('ingredientForm.quantityPlaceholder')}
           placeholderTextColor={colors.textTertiary}
         />
       </View>
       <View style={[styles.inputGroup, { flex: 1, marginLeft: 12 }]}>
-        <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>단위</Text>
+        <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{t('ingredientForm.unit')}</Text>
         <TouchableOpacity
           style={[
             styles.input,
@@ -64,7 +67,7 @@ export function QuantitySection({ quantity, unit, onFieldChange, onUnitPress }: 
               },
             ]}
           >
-            {unit ? getUnitLabel({ unit }) : '선택'}
+            {unit ? getUnitLabel({ unit, lang }) : t('ingredientForm.unitPlaceholder')}
           </Text>
           <Ionicons name="chevron-down" size={20} color={colors.textTertiary} />
         </TouchableOpacity>

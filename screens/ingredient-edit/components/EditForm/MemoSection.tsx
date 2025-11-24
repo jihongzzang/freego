@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { useTheme } from '@/lib/theme';
 import { EditFormData } from '@/mvi/features/ingredient-edit';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface MemoSectionProps {
   memo: string;
@@ -9,13 +10,14 @@ interface MemoSectionProps {
 }
 
 export function MemoSection({ memo, onFieldChange }: MemoSectionProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing, borderRadius } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
   return (
     <View style={styles.container}>
-      <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>메모</Text>
+      <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{t('ingredientForm.memo')}</Text>
       <TextInput
         style={[
           styles.input,
@@ -30,7 +32,7 @@ export function MemoSection({ memo, onFieldChange }: MemoSectionProps) {
         ]}
         value={memo}
         onChangeText={(text) => onFieldChange('memo', text)}
-        placeholder="메모를 입력하세요"
+        placeholder={t('ingredientForm.memoPlaceholder')}
         placeholderTextColor={colors.textTertiary}
         multiline
         numberOfLines={4}

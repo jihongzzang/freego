@@ -6,20 +6,22 @@ import { Category } from '@/data/enums/category';
 import { useMemo } from 'react';
 import { ShoppingTableRow } from './ShoppingTableRow';
 import Accordion from '@/components/ui/Accordion';
+import { useTranslation } from 'react-i18next';
 
-// 날짜를 "YYYY-MM-DD" 형식으로 변환
-function formatDateKey(dateString: string | null): string {
-  if (!dateString) return '날짜 미상';
+// 날짜를 현재 언어에 맞게 포맷
+function formatDateKey(dateString: string | null, unknownDateLabel: string, locale: string): string {
+  if (!dateString) return unknownDateLabel;
   const date = new Date(dateString);
-  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+  const localeCode = locale === 'ko' ? 'ko-KR' : 'en-US';
+  return date.toLocaleDateString(localeCode, { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 // 날짜별로 아이템 그룹화
-function groupByPurchasedDate(items: ShoppingListItem[]): Record<string, ShoppingListItem[]> {
+function groupByPurchasedDate(items: ShoppingListItem[], unknownDateLabel: string, locale: string): Record<string, ShoppingListItem[]> {
   const grouped: Record<string, ShoppingListItem[]> = {};
 
   items.forEach((item) => {
-    const dateKey = formatDateKey(item.purchased_date_time);
+    const dateKey = formatDateKey(item.purchased_date_time, unknownDateLabel, locale);
     if (!grouped[dateKey]) {
       grouped[dateKey] = [];
     }
@@ -28,8 +30,8 @@ function groupByPurchasedDate(items: ShoppingListItem[]): Record<string, Shoppin
 
   // 날짜순으로 정렬 (최신순)
   const sortedKeys = Object.keys(grouped).sort((a, b) => {
-    if (a === '날짜 미상') return 1;
-    if (b === '날짜 미상') return -1;
+    if (a === unknownDateLabel) return 1;
+    if (b === unknownDateLabel) return -1;
     return new Date(b).getTime() - new Date(a).getTime();
   });
 
@@ -76,7 +78,8 @@ export function ShoppingTableView({
   onDeleteDateItems,
   isPurchasedView = false,
 }: ShoppingTableViewProps) {
-  const { colors, typography, spacing, borderRadius, isDark } = useTheme();
+  const { t, i18n } = useTranslation();
+  const { colors, typography, spacing, borderRadius } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
 
@@ -86,7 +89,8 @@ export function ShoppingTableView({
   if (items.length === 0) return null;
 
   // 구매 완료 탭일 경우 날짜별로 그룹화
-  const groupedItems = isPurchasedView ? groupByPurchasedDate(items) : null;
+  const unknownDateLabel = t('common.unknownDate');
+  const groupedItems = isPurchasedView ? groupByPurchasedDate(items, unknownDateLabel, i18n.language) : null;
 
   return (
     <View style={styles.container}>
@@ -106,7 +110,7 @@ export function ShoppingTableView({
               activeOpacity={0.7}
             >
               <Text style={[typography.styles.t7Medium, { color: colors.white }]}>
-                {allSelected ? '전체 해제' : '전체 선택'}
+                {allSelected ? t('shopping.actions.deselectAll') : t('shopping.actions.selectAll')}
               </Text>
             </TouchableOpacity>
             {selectedCount > 0 && (
@@ -124,7 +128,7 @@ export function ShoppingTableView({
               >
                 <Package size={14} color={colors.white} />
                 <Text style={[typography.styles.t7Medium, { color: colors.white }]}>
-                  냉장고에 넣기 ({selectedCount})
+                  {t('shopping.actions.addToFridge')} ({selectedCount})
                 </Text>
               </TouchableOpacity>
             )}
@@ -142,7 +146,7 @@ export function ShoppingTableView({
             >
               <Trash2 size={14} color={colors.white} />
               <Text style={[typography.styles.t7Medium, { color: colors.white }]}>
-                삭제{selectedCount > 0 ? ` (${selectedCount})` : ''}
+                {t('shopping.actions.delete')}{selectedCount > 0 ? ` (${selectedCount})` : ''}
               </Text>
             </TouchableOpacity>
           </View>
@@ -214,13 +218,13 @@ export function ShoppingTableView({
           {/* Header */}
           <View style={styles.headerRow}>
             <View style={[styles.cell, styles.checkboxCell]}>
-              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>완료</Text>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>{t('shopping.tableHeader.done')}</Text>
             </View>
             <View style={[styles.cell, styles.nameCell]}>
-              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>{t('shopping.tableHeader.name')}</Text>
             </View>
             <View style={[styles.cell, styles.memoCell]}>
-              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>메모</Text>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>{t('shopping.tableHeader.memo')}</Text>
             </View>
           </View>
 

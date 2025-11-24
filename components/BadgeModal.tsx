@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useTheme } from '@/lib/theme';
 import { Achievement } from '@/data/models/achievement.model';
 import { Button } from './ui';
+import { useTranslation } from 'react-i18next';
 
 interface BadgeModalProps {
   visible: boolean;
@@ -11,6 +12,7 @@ interface BadgeModalProps {
 }
 
 export default function BadgeModal({ visible, achievement, onClose }: BadgeModalProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing, borderRadius } = useTheme();
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -57,7 +59,7 @@ export default function BadgeModal({ visible, achievement, onClose }: BadgeModal
         >
           {/* 축하 텍스트 */}
           <Text style={[typography.styles.t3Semibold, { color: colors.textSecondary, textAlign: 'center' }]}>
-            축하합니다! 🎉
+            {t('achievement.congratulations')}
           </Text>
 
           {/* 뱃지 이미지 */}
@@ -84,7 +86,7 @@ export default function BadgeModal({ visible, achievement, onClose }: BadgeModal
             }}
             onPress={onClose}
           >
-            확인
+            {t('common.confirm')}
           </Button>
         </Animated.View>
       </TouchableOpacity>

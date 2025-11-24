@@ -5,6 +5,7 @@ import { Ingredient } from '@/mvi/features/ingredients';
 import { IngredientsTableRow } from './IngredientsTableRow';
 import { useTheme } from '@/lib/theme';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface IngredientsTableAccordionProps {
   title: string;
@@ -41,6 +42,7 @@ export function IngredientsTableAccordion({
   onQuickUpdateMemo,
   onViewDetail,
 }: IngredientsTableAccordionProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
@@ -65,27 +67,29 @@ export function IngredientsTableAccordion({
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}> </Text>
             </View>
             <View style={[styles.cell, styles.nameCell]}>
-              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>이름</Text>
+              <Text style={[typography.styles.t8Medium, { color: colors.textSecondary }]}>
+                {t('ingredients.tableHeader.name')}
+              </Text>
             </View>
             <View style={[styles.cell, styles.expiryCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
-                유통기한
+                {t('ingredients.tableHeader.expiry')}
               </Text>
             </View>
             <View style={[styles.cell, styles.quantityCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
-                수량
+                {t('ingredients.tableHeader.quantity')}
               </Text>
             </View>
             <View style={[styles.cell, styles.storageCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
-                보관
+                {t('ingredients.tableHeader.storage')}
               </Text>
             </View>
 
             <View style={[styles.cell, styles.memoCell]}>
               <Text style={[typography.styles.t8Medium, { color: colors.textSecondary, textAlign: 'center' }]}>
-                메모
+                {t('ingredients.tableHeader.memo')}
               </Text>
             </View>
           </View>
@@ -109,7 +113,7 @@ export function IngredientsTableAccordion({
           ))}
         </View>
       ) : (
-        <EmptyStateUI title="재료가 없어요" description="재료를 추가해주세요" />
+        <EmptyStateUI title={t('ingredients.empty.categoryEmpty')} description={t('ingredients.empty.description')} />
       )}
     </Accordion>
   );

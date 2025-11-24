@@ -9,6 +9,7 @@ import { ingredientService } from '@/services/ingredient.service';
 import { Category } from '@/data/enums/category';
 import { StorageLocation } from '@/data/enums/storage_location';
 import { ShoppingItem } from '@/data/models/shopping.model';
+import i18n from '@/locales';
 
 jest.mock('@/services/shopping.service', () => ({
   shoppingService: {
@@ -204,7 +205,7 @@ describe('shoppingMiddleware', () => {
         expect.objectContaining({
           type: 'SHOW_CONFIRM',
           payload: expect.objectContaining({
-            title: '항목 삭제',
+            title: i18n.t('shopping.messages.deleteItemTitle'),
             isDanger: true,
             actionType: 'delete',
           }),
@@ -276,7 +277,7 @@ describe('shoppingMiddleware', () => {
         expect.objectContaining({
           type: 'SHOW_CONFIRM',
           payload: expect.objectContaining({
-            title: '선택 항목 삭제',
+            title: i18n.t('shopping.messages.deleteSelectedTitle'),
             isDanger: true,
             actionType: 'delete',
           }),
@@ -438,7 +439,7 @@ describe('shoppingMiddleware', () => {
         expect.objectContaining({
           type: 'SHOW_CONFIRM',
           payload: expect.objectContaining({
-            title: '냉장고에 넣기',
+            title: i18n.t('shopping.messages.addToFridgeTitle'),
             actionType: 'add_to_storage',
           }),
         }),
@@ -657,7 +658,7 @@ describe('shoppingMiddleware', () => {
         expect.objectContaining({
           type: 'SHOW_CONFIRM',
           payload: expect.objectContaining({
-            title: '구매완료 취소',
+            title: i18n.t('shopping.messages.cancelPurchaseTitle'),
             actionType: 'cancel_purchase',
           }),
         }),
@@ -789,7 +790,7 @@ describe('shoppingMiddleware', () => {
         expect.objectContaining({
           type: 'SHOW_CONFIRM',
           payload: expect.objectContaining({
-            title: '날짜별 항목 삭제',
+            title: i18n.t('shopping.messages.deleteDateItemsTitle'),
             isDanger: true,
             actionType: 'delete',
           }),

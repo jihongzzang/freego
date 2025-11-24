@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import { Achievement } from '@/data/models/achievement.model';
 import { Button, Chip } from './ui';
+import { useTranslation } from 'react-i18next';
 
 interface AchievementCardProps {
   achievement: Achievement;
@@ -10,6 +11,7 @@ interface AchievementCardProps {
 }
 
 export default function AchievementCard({ achievement, onClaimBadge, onViewBadge }: AchievementCardProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const progress = achievement.target > 0 ? (achievement.current / achievement.target) * 100 : 0;
@@ -53,10 +55,10 @@ export default function AchievementCard({ achievement, onClaimBadge, onViewBadge
             {achievement.description}
           </Text>
         </View>
-        {achievement.completed && achievement.claimed && <Chip label="완료" variant="secondary" size="xlarge" />}
+        {achievement.completed && achievement.claimed && <Chip label={t('common.completed')} variant="secondary" size="xlarge" />}
         {achievement.completed && !achievement.claimed && (
           <Button size="small" onPress={() => onClaimBadge?.(achievement)}>
-            <Text style={[typography.styles.t7Semibold, { color: colors.white }]}>뱃지 받기</Text>
+            <Text style={[typography.styles.t7Semibold, { color: colors.white }]}>{t('achievement.claimBadge')}</Text>
           </Button>
         )}
       </View>
@@ -118,7 +120,7 @@ export default function AchievementCard({ achievement, onClaimBadge, onViewBadge
           // ]}
           onPress={() => onViewBadge(achievement)}
         >
-          <Text style={[typography.styles.t5Semibold, { color: colors.white }]}>뱃지 보기</Text>
+          <Text style={[typography.styles.t5Semibold, { color: colors.white }]}>{t('achievement.viewBadge')}</Text>
         </Button>
       )}
 
@@ -133,7 +135,7 @@ export default function AchievementCard({ achievement, onClaimBadge, onViewBadge
             },
           ]}
         >
-          {new Date(achievement.completed_date_time).toLocaleDateString('ko-KR')} 달성
+          {new Date(achievement.completed_date_time).toLocaleDateString()} {t('common.achieved')}
         </Text>
       )}
     </View>

@@ -4,6 +4,7 @@ import BottomSheet from './ui/BottomSheet';
 import { StorageLocation } from '@/data/enums/storage_location';
 import { makeStorageList } from '@/utils/category/makeStorageList';
 import { getStorageLocationIcon } from '@/utils/storageLocation/getStorageLocationIcon';
+import { useTranslation } from 'react-i18next';
 
 interface SelectStorageBottomSheetProps {
   visible: boolean;
@@ -20,6 +21,7 @@ export default function SelectStorageBottomSheet({
   onClose,
   onSelect,
 }: SelectStorageBottomSheetProps) {
+  const { i18n } = useTranslation();
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const handleSelect = (storageLocation: StorageLocation) => {
@@ -27,7 +29,8 @@ export default function SelectStorageBottomSheet({
     onClose();
   };
 
-  const storageLocations = makeStorageList({ lang: 'kr' });
+  const lang = i18n.language === 'ko' ? 'kr' : 'en';
+  const storageLocations = makeStorageList({ lang });
 
   return (
     <BottomSheet visible={visible} onClose={onClose} title={title} maxHeight={260}>

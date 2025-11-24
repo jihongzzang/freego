@@ -13,6 +13,7 @@ import EmptyStateUI from '@/components/ui/EmptyState';
 import { useShoppingLogic } from './hooks/useShoppingLogic';
 import { ShoppingTableView } from './components/ShoppingTableView';
 import EmojiBottomSheet from '@/components/EmojiBottomSheet';
+import { useTranslation } from 'react-i18next';
 
 const TAB_BAR_HEIGHT = 48;
 
@@ -22,6 +23,7 @@ type Route = {
 };
 
 export default function ShoppingListTableScreen() {
+  const { t } = useTranslation();
   const { colors, spacing, typography } = useTheme();
   const insets = useSafeAreaInsets();
   const layout = useWindowDimensions();
@@ -63,8 +65,8 @@ export default function ShoppingListTableScreen() {
 
   const [index, setIndex] = useState(0);
   const [routes] = useState<Route[]>([
-    { key: 'unpurchased', title: '구매 예정' },
-    { key: 'purchased', title: '구매 완료' },
+    { key: 'unpurchased', title: 'unpurchased' },
+    { key: 'purchased', title: 'purchased' },
   ]);
 
   const horizontalScrollRef = useRef<ScrollView>(null);
@@ -146,7 +148,7 @@ export default function ShoppingListTableScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Fixed Header */}
       <View style={styles.headerContainer}>
-        <Header title="장보기" />
+        <Header title={t('shopping.title')} />
         <View style={styles.tabBar}>
           {routes.map((route, i) => {
             const isActive = index === i;
@@ -160,7 +162,7 @@ export default function ShoppingListTableScreen() {
                     },
                   ]}
                 >
-                  {route.title}
+                  {t(`shopping.tabs.${route.key}`)}
                 </Text>
                 {isActive && <View style={[styles.tabIndicator, { backgroundColor: colors.primary }]} />}
               </TouchableOpacity>
@@ -196,14 +198,14 @@ export default function ShoppingListTableScreen() {
               >
                 {state.loading ? (
                   <View style={styles.sceneContainer}>
-                    <EmptyStateUI title="로딩 중이에요..." />
+                    <EmptyStateUI title={t('common.loading')} />
                   </View>
                 ) : isEmpty ? (
                   <View style={styles.sceneContainer}>
                     <EmptyStateUI
                       icon={<ShoppingCart size={64} color={colors.textTertiary} />}
-                      title={isUnpurchasedRoute ? '구매 예정 항목이 없어요.' : '구매 완료 항목이 없어요.'}
-                      description={isUnpurchasedRoute ? '식재료를 소모하면 자동으로 추가돼요' : ''}
+                      title={isUnpurchasedRoute ? t('shopping.empty.unpurchasedTitle') : t('shopping.empty.purchasedTitle')}
+                      description={isUnpurchasedRoute ? t('shopping.empty.unpurchasedDescription') : t('shopping.empty.purchasedDescription')}
                     />
                   </View>
                 ) : (
@@ -237,7 +239,7 @@ export default function ShoppingListTableScreen() {
             ? [
                 {
                   icon: <Share2 size={24} color="#FFFFFF" />,
-                  label: '구매 예정 공유',
+                  label: t('shopping.actions.share'),
                   onPress: handleShare,
                   labelColor: colors.white,
                   backgroundColor: colors.blue500,
@@ -246,7 +248,7 @@ export default function ShoppingListTableScreen() {
             : []),
           {
             icon: <Plus size={24} color="#FFFFFF" />,
-            label: '항목 추가',
+            label: t('shopping.actions.addItem'),
             onPress: addShoppingItem.open,
             labelColor: colors.white,
             backgroundColor: colors.primary,
@@ -267,7 +269,7 @@ export default function ShoppingListTableScreen() {
       <MemoBottomSheet
         visible={editingMemoId !== null}
         onClose={handleMemoClose}
-        title={'메모 수정'}
+        title={t('shopping.bottomSheet.editMemo')}
         memo={editingMemo}
         onMemoChange={handleMemoChange}
         onSubmit={handleMemoSubmit}
@@ -275,21 +277,21 @@ export default function ShoppingListTableScreen() {
       <NameBottomSheet
         visible={editingNameId !== null}
         onClose={handleNameClose}
-        title="이름 수정"
+        title={t('shopping.bottomSheet.editName')}
         name={editingName}
         onNameChange={handleNameChange}
         onConfirm={handleNameSubmit}
       />
       <EmojiBottomSheet
         visible={editingEmojiId !== null}
-        title="이모지 수정"
+        title={t('shopping.bottomSheet.editEmoji')}
         onClose={handleEmojiClose}
         onSelect={handleEmojiSubmit}
       />
       <SelectStorageBottomSheet
         visible={selectingStorageForItem !== null}
-        title="냉장고에 넣기"
-        description="냉장고에 넣기전 보관위치를 설정해 주세요."
+        title={t('shopping.bottomSheet.selectStorage')}
+        description={t('shopping.bottomSheet.selectStorageDescription')}
         onClose={() => setSelectingStorageForItem(null)}
         onSelect={handleStorageSelect}
       />

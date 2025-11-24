@@ -20,6 +20,7 @@ import SelectStorageBottomSheet from '@/components/SelectStorageBottomSheet';
 import MemoBottomSheet from '@/components/MemoBottomSheet';
 import EmojiBottomSheet from '@/components/EmojiBottomSheet';
 import NameBottomSheet from '@/components/NameBottomSheet';
+import { useTranslation } from 'react-i18next';
 
 export const TAB_BAR_HEIGHT = 48;
 
@@ -29,6 +30,8 @@ type Route = {
 };
 
 export default function IngredientsTableScreen() {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language === 'ko' ? 'kr' : 'en';
   const { colors, spacing, typography } = useTheme();
   const insets = useSafeAreaInsets();
   const layout = useWindowDimensions();
@@ -62,10 +65,13 @@ export default function IngredientsTableScreen() {
   } = useIngredientsData(ingredients, loading);
 
   const [index, setIndex] = useState(0);
-  const [routes] = useState<Route[]>([
-    { key: 'category', title: '카테고리별' },
-    { key: 'storage', title: '보관위치별' },
-  ]);
+  const routes: Route[] = useMemo(
+    () => [
+      { key: 'category', title: t('ingredients.tabs.byCategory') },
+      { key: 'storage', title: t('ingredients.tabs.byStorage') },
+    ],
+    [t],
+  );
 
   const horizontalScrollRef = useRef<ScrollView>(null);
 
@@ -104,7 +110,7 @@ export default function IngredientsTableScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Fixed Header */}
       <View style={styles.headerContainer}>
-        <Header title="재료 관리" />
+        <Header title={t('ingredients.title')} />
         <View style={styles.tabBar}>
           {routes.map((route, i) => {
             const isActive = index === i;
@@ -154,11 +160,11 @@ export default function IngredientsTableScreen() {
               >
                 {loading ? (
                   <View style={styles.sceneContainer}>
-                    <EmptyStateUI title="로딩 중이에요..." />
+                    <EmptyStateUI title={t('common.loading')} />
                   </View>
                 ) : isEmpty ? (
                   <View style={styles.sceneContainer}>
-                    <EmptyStateUI title="등록된 재료가 없어요." description="재료를 추가해주세요" />
+                    <EmptyStateUI title={t('ingredients.empty.title')} description={t('ingredients.empty.description')} />
                   </View>
                 ) : (
                   <View style={styles.accordionsContainer}>
@@ -172,7 +178,7 @@ export default function IngredientsTableScreen() {
                           return (
                             <IngredientsTableAccordion
                               key={catId}
-                              title={getCategoryLabel({ category: catId as Category, lang: 'kr' })}
+                              title={getCategoryLabel({ category: catId as Category, lang })}
                               leftIcon={getCategoryIcon(catId as Category, 20)}
                               items={categoryItems}
                               isExpanded={isExpanded}
@@ -203,7 +209,7 @@ export default function IngredientsTableScreen() {
                               key={storageId}
                               title={getStorageLocationLabel({
                                 storageLocation: storageId as StorageLocation,
-                                lang: 'kr',
+                                lang,
                               })}
                               leftIcon={getStorageLocationIcon(storageId as StorageLocation, 20)}
                               items={storageItems}
@@ -236,14 +242,14 @@ export default function IngredientsTableScreen() {
         menuItems={[
           {
             icon: <Edit3 size={24} color="#FFFFFF" />,
-            label: '직접 재료 등록',
+            label: t('ingredients.floatingButton.addManually'),
             onPress: handleNavigateToAdd,
             labelColor: colors.white,
             backgroundColor: colors.green600,
           },
           {
             icon: <Grid3x3 size={24} color="#FFFFFF" />,
-            label: '한꺼번에 재료 등록',
+            label: t('ingredients.floatingButton.addBulk'),
             onPress: bulkAdd.open,
             labelColor: colors.white,
             backgroundColor: colors.orange600,
@@ -263,7 +269,7 @@ export default function IngredientsTableScreen() {
 
       <NameBottomSheet
         visible={nameUpdate.isVisible}
-        title="이름 수정"
+        title={t('ingredients.bottomSheet.editName')}
         name={nameUpdate.name}
         onClose={nameUpdate.close}
         onNameChange={nameUpdate.handleNameChange}
@@ -272,7 +278,7 @@ export default function IngredientsTableScreen() {
 
       <EmojiBottomSheet
         visible={emojiUpdate.isVisible}
-        title="이모지 수정"
+        title={t('ingredients.bottomSheet.editEmoji')}
         onClose={emojiUpdate.close}
         onSelect={emojiUpdate.handleSelect}
       />
@@ -280,7 +286,7 @@ export default function IngredientsTableScreen() {
       <SelectDateBottomSheet
         visible={expiryUpdate.isVisible}
         onClose={expiryUpdate.close}
-        title="유통기한 수정"
+        title={t('ingredients.bottomSheet.editExpiry')}
         selectedDate={expiryUpdate.expiryDate}
         onDateChange={expiryUpdate.handleDateChange}
         onConfirm={expiryUpdate.handleConfirm}
@@ -289,7 +295,7 @@ export default function IngredientsTableScreen() {
       <QuantityBottomSheet
         visible={quantityUpdate.isVisible}
         onClose={quantityUpdate.close}
-        title="수량 수정"
+        title={t('ingredients.bottomSheet.editQuantity')}
         quantity={quantityUpdate.quantity}
         onQuantityChange={quantityUpdate.handleQuantityChange}
         onConfirm={quantityUpdate.handleConfirm}
@@ -297,7 +303,7 @@ export default function IngredientsTableScreen() {
 
       <SelectStorageBottomSheet
         visible={storageUpdate.isVisible}
-        title="보관위치 수정"
+        title={t('ingredients.bottomSheet.editStorage')}
         onClose={storageUpdate.close}
         onSelect={storageUpdate.handleSelect}
       />
@@ -306,7 +312,7 @@ export default function IngredientsTableScreen() {
         visible={memoUpdate.isVisible}
         onClose={memoUpdate.close}
         memo={memoUpdate.memo}
-        title="메모 수정"
+        title={t('ingredients.bottomSheet.editMemo')}
         onMemoChange={memoUpdate.handleMemoChange}
         onSubmit={memoUpdate.handleConfirm}
       />

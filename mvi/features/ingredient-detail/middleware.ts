@@ -10,7 +10,7 @@ import { ingredientService } from '@/services/ingredient.service';
 import { shoppingService } from '@/services/shopping.service';
 import { Ingredient } from '@/data/models/ingredient.model';
 import { createErrorEffect, createSuccessEffect } from '@/mvi/shared';
-import ERROR_MESSAGES from '@/constants/toast/errorMessages';
+import i18n from '@/locales';
 
 /**
  * Ingredient Detail Middleware
@@ -28,7 +28,7 @@ export const ingredientDetailMiddleware: Middleware<
 
         if (!data) {
           return {
-            state: { ...state, loading: false, error: '식재료를 찾을 수 없어요.' },
+            state: { ...state, loading: false, error: i18n.t('ingredientDetail.notFound') },
           };
         }
 
@@ -48,9 +48,9 @@ export const ingredientDetailMiddleware: Middleware<
           state: {
             ...state,
             loading: false,
-            error: error instanceof Error ? error.message : '데이터 로드 실패',
+            error: error instanceof Error ? error.message : i18n.t('ingredientDetail.loadFailed'),
           },
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_LOAD_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredientDetail.loadFailed'))],
         };
       }
     }
@@ -63,8 +63,8 @@ export const ingredientDetailMiddleware: Middleware<
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '식재료 삭제',
-              message: '이 식재료를 삭제할까요?',
+              title: i18n.t('ingredientDetail.deleteTitle'),
+              message: i18n.t('ingredientDetail.deleteConfirm'),
               onConfirm: async () => {
                 try {
                   await ingredientService.deleteIngredient(state.ingredient!.id);
@@ -83,7 +83,7 @@ export const ingredientDetailMiddleware: Middleware<
 
     case 'DELETE_SUCCESS': {
       return {
-        effects: [createSuccessEffect('식재료가 삭제됐어요.'), { type: 'NAVIGATE_BACK' }],
+        effects: [createSuccessEffect(i18n.t('ingredientDetail.deleteSuccess')), { type: 'NAVIGATE_BACK' }],
       };
     }
 
@@ -98,8 +98,8 @@ export const ingredientDetailMiddleware: Middleware<
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '식재료 소모',
-              message: `${ingredient.name}을(를) 소모 처리할까요?\n장보기 목록에 자동으로 추가돼요.`,
+              title: i18n.t('ingredientDetail.consumeTitle'),
+              message: i18n.t('ingredientDetail.consumeConfirm', { name: ingredient.name }),
               onConfirm: async () => {
                 try {
                   await ingredientService.consumeIngredient(ingredient.id);
@@ -126,7 +126,7 @@ export const ingredientDetailMiddleware: Middleware<
     case 'CONSUME_SUCCESS': {
       return {
         effects: [
-          createSuccessEffect(`${intent.payload.name}이(가) 장보기 목록에 추가됐어요.`),
+          createSuccessEffect(i18n.t('ingredientDetail.consumeSuccess', { name: intent.payload.name })),
           { type: 'NAVIGATE_BACK' },
         ],
       };

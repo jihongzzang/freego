@@ -5,6 +5,7 @@ import { EditFormData } from '@/mvi/features/ingredient-edit';
 import { QUICK_SELECT_OPTIONS } from '@/constants/quickSelectOptions';
 import { useMemo } from 'react';
 import { toLocalDate } from '@/utils/time';
+import { useTranslation } from 'react-i18next';
 
 interface DateSectionProps {
   isEdit: boolean;
@@ -25,7 +26,9 @@ export function DateSection({
   onExpiryDatePress,
   onQuickSelect,
 }: DateSectionProps) {
+  const { t, i18n } = useTranslation();
   const { colors, typography, spacing, borderRadius } = useTheme();
+  const lang = i18n.language;
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
@@ -41,7 +44,7 @@ export function DateSection({
       {/* 구매일 */}
       <View style={styles.container}>
         <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
-          <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>구매일</Text>
+          <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{t('ingredientForm.purchaseDate')}</Text>
           {!isEdit && (
             <TouchableOpacity
               style={[styles.sameCreatedButton, { backgroundColor: colors.surface, borderColor: colors.surface }]}
@@ -50,7 +53,7 @@ export function DateSection({
               }}
               activeOpacity={0.7}
             >
-              <Text style={[typography.styles.t7, { color: colors.textTertiary }]}>등록일과 동일</Text>
+              <Text style={[typography.styles.t7, { color: colors.textTertiary }]}>{t('ingredientForm.sameAsRegistration')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -75,14 +78,14 @@ export function DateSection({
               },
             ]}
           >
-            {purchaseDate ? toLocalDate(purchaseDate) : '날짜 선택'}
+            {purchaseDate ? toLocalDate(purchaseDate) : t('ingredientForm.selectDate')}
           </Text>
         </TouchableOpacity>
       </View>
 
       {/* 유통기한 */}
       <View style={styles.container}>
-        <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>유통기한</Text>
+        <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{t('ingredientForm.expiryDate')}</Text>
 
         <View style={styles.quickSelectContainer}>
           {QUICK_SELECT_OPTIONS.map((option) => (
@@ -98,7 +101,7 @@ export function DateSection({
               ]}
               onPress={() => onQuickSelect(option.days)}
             >
-              <Text style={[typography.styles.t7, { color: colors.textTertiary }]}>{option.krLabel}</Text>
+              <Text style={[typography.styles.t7, { color: colors.textTertiary }]}>{lang === 'ko' ? option.krLabel : option.enLabel}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -123,7 +126,7 @@ export function DateSection({
               },
             ]}
           >
-            {expiryDate ? toLocalDate(expiryDate) : '날짜 선택'}
+            {expiryDate ? toLocalDate(expiryDate) : t('ingredientForm.selectDate')}
           </Text>
         </TouchableOpacity>
       </View>

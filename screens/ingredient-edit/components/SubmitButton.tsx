@@ -5,6 +5,7 @@ import { ColorPalette, useTheme } from '@/lib/theme';
 import { useMemo } from 'react';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 
 interface SubmitButtonProps {
   onSubmit: () => void;
@@ -12,6 +13,7 @@ interface SubmitButtonProps {
 }
 
 export function SubmitButton({ onSubmit, disabled }: SubmitButtonProps) {
+  const { t } = useTranslation();
   const { spacing, colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -29,7 +31,7 @@ export function SubmitButton({ onSubmit, disabled }: SubmitButtonProps) {
   return (
     <Animated.View style={[styles.container, { paddingBottom: insets.bottom }, buttonAnimatedStyle]}>
       <Button variant="primary" size="large" onPress={onSubmit} disabled={disabled}>
-        수정하기
+        {t('ingredientEdit.submit')}
       </Button>
     </Animated.View>
   );

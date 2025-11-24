@@ -8,6 +8,7 @@ import * as Notifications from 'expo-notifications';
 import { ingredientRepository } from '@/data/repositories/ingredient.repository';
 import { notificationRepository } from '@/data/repositories/notification.repository';
 import { getCalculateDaysRemaining } from '@/utils/time';
+import i18n from '@/locales';
 
 /**
  * 알림 핸들러 설정
@@ -89,12 +90,12 @@ export async function checkExpiryAndNotify(): Promise<void> {
     }
 
     if (expiringIngredients.length > 0) {
+      const ingredient = expiringIngredients[0];
+      const displayName = ingredient.emoji ? `${ingredient.emoji}${ingredient.name}` : ingredient.name;
       const message =
         expiringIngredients.length === 1
-          ? expiringIngredients[0].emoji
-            ? `${expiringIngredients[0].emoji + expiringIngredients[0].name}의 유통기한이 끝나가요.`
-            : `${expiringIngredients[0].name}의 유통기한이 끝나가요.`
-          : `${expiringIngredients.length}개 품목의 유통기한이 끝나가요.`;
+          ? i18n.t('settings.notification.expiryAlertSingle', { name: displayName })
+          : i18n.t('settings.notification.expiryAlertMultiple', { count: expiringIngredients.length });
 
       // 알림 전송 시간 결정
       const now = new Date();
@@ -119,7 +120,7 @@ export async function checkExpiryAndNotify(): Promise<void> {
       try {
         await Notifications.scheduleNotificationAsync({
           content: {
-            title: '유통기한 알림',
+            title: i18n.t('settings.notification.expiryAlertTitle'),
             body: message,
             sound: true,
             priority: Notifications.AndroidNotificationPriority.HIGH,

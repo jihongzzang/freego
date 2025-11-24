@@ -3,6 +3,7 @@ import { Bell, BellOff } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import Card from '@/components/ui/Card';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface NotificationSettingsProps {
   hasPermission: boolean;
@@ -17,6 +18,7 @@ export function NotificationSettings({
   onRequestPermission,
   onUpdateDays,
 }: NotificationSettingsProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
@@ -26,14 +28,14 @@ export function NotificationSettings({
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Bell size={20} color={colors.textSecondary} />
-          <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>알림 설정</Text>
+          <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>{t('settings.notification.title')}</Text>
         </View>
 
         <Card variant="elevated" padding="large">
           <View style={styles.permissionContent}>
             <BellOff size={40} color={colors.textTertiary} />
             <Text style={[typography.styles.t5Semibold, { color: colors.text, marginTop: spacing.md }]}>
-              알림 권한이 필요해요
+              {t('settings.notification.permissionRequired')}
             </Text>
             <Text
               style={[
@@ -45,7 +47,7 @@ export function NotificationSettings({
                 },
               ]}
             >
-              유통기한 알림을 받으려면{'\n'}알림 권한을 허용해주세요
+              {t('settings.notification.permissionDescription')}
             </Text>
           </View>
           <TouchableOpacity
@@ -54,7 +56,7 @@ export function NotificationSettings({
             activeOpacity={0.7}
           >
             <Bell size={20} color={colors.white} />
-            <Text style={[typography.styles.t5Semibold, { color: colors.white }]}>알림 권한 허용하기</Text>
+            <Text style={[typography.styles.t5Semibold, { color: colors.white }]}>{t('settings.notification.allowPermission')}</Text>
           </TouchableOpacity>
         </Card>
       </View>
@@ -65,13 +67,13 @@ export function NotificationSettings({
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
         <Bell size={20} color={colors.textSecondary} />
-        <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>알림 설정</Text>
+        <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>{t('settings.notification.title')}</Text>
       </View>
 
       <Card variant="elevated" padding="large">
-        <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>유통기한 알림 주기</Text>
+        <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{t('settings.notification.expiryPeriod')}</Text>
         <Text style={[typography.styles.t7, { color: colors.textSecondary, marginTop: spacing.xs }]}>
-          유통기한 며칠 전부터 알림을 받을지 선택하세요
+          {t('settings.notification.expiryDescription')}
         </Text>
 
         <View style={styles.notificationOptions}>
@@ -101,7 +103,7 @@ export function NotificationSettings({
                   },
                 ]}
               >
-                {days}일
+                {t('common.days', { count: days })}
               </Text>
             </TouchableOpacity>
           ))}

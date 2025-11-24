@@ -1,0 +1,451 @@
+{
+  "app": {
+    "name": "Fridge Manager",
+    "footer": "Frigo App"
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "start": "Get Started",
+    "steps": {
+      "smartFridge": {
+        "title": "Smart Fridge Management",
+        "description": "Organize your ingredients systematically\nand never miss expiry dates"
+      },
+      "easyShopping": {
+        "title": "Easy Shopping List",
+        "description": "Easily add used up ingredients\nto your shopping list"
+      },
+      "letsStart": {
+        "title": "Ready to Start?",
+        "description": "Build smart consumption habits\nand make a difference for the planet"
+      }
+    },
+    "lifestyle": {
+      "title": "What's your lifestyle?",
+      "description": "We'll create a customized ingredient list for you",
+      "skipButton": "Skip and add manually"
+    },
+    "package": {
+      "confirmQuestion": "Would you like to add basic ingredients automatically?",
+      "includedIngredients": "Included Ingredients",
+      "confirmAdd": "Yes, add automatically",
+      "confirmSkip": "No, I'll add manually"
+    },
+    "lifestyles": {
+      "single": {
+        "label": "Single Household",
+        "description": "Package for those living alone and doing basic cooking"
+      },
+      "office_worker": {
+        "label": "Busy Worker",
+        "description": "Package for busy professionals who prefer quick meals"
+      },
+      "healthy": {
+        "label": "Healthy Diet",
+        "description": "Package for those who prefer healthy and clean eating"
+      },
+      "family": {
+        "label": "Family",
+        "description": "Package for families who eat together"
+      },
+      "beginner": {
+        "label": "Beginner",
+        "description": "Basic package for those just starting to live independently"
+      }
+    },
+    "starterPackageAdded": "{{count}} ingredients have been added.",
+    "starterPackageError": "Failed to add starter package."
+  },
+  "common": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "empty": "No data available",
+    "days": "{{count}} day",
+    "days_plural": "{{count}} days",
+    "today": "Today",
+    "achieved": "Achieved",
+    "completed": "Completed",
+    "name": "Name",
+    "memo": "Memo",
+    "unknownDate": "Unknown Date",
+    "category": "Category",
+    "quantity": "Quantity",
+    "storageLocation": "Storage Location",
+    "registeredDate": "Registered",
+    "purchasedDate": "Purchased",
+    "expiryDate": "Expiry Date",
+    "consume": "Consume",
+    "dataLoadFailed": "Failed to load data",
+    "datePicker": {
+      "monthYear": "{{month}} {{year}}",
+      "weekDays": {
+        "sun": "Sun",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat"
+      }
+    }
+  },
+  "ingredientDetail": {
+    "notFound": "Ingredient not found.",
+    "loadFailed": "Failed to load ingredient data.",
+    "deleteTitle": "Delete Ingredient",
+    "deleteConfirm": "Delete this ingredient?",
+    "deleteSuccess": "Ingredient has been deleted.",
+    "consumeTitle": "Consume Ingredient",
+    "consumeConfirm": "Consume {{name}}?\nIt will be automatically added to the shopping list.",
+    "consumeSuccess": "{{name}} has been added to the shopping list."
+  },
+  "ingredientEdit": {
+    "notFound": "Ingredient not found.",
+    "loadFailed": "Failed to load data",
+    "updateSuccess": "Ingredient has been updated.",
+    "updateFailed": "Failed to update ingredient.",
+    "missingName": "Please enter a name.",
+    "invalidQuantity": "Please enter a valid quantity.",
+    "quantityMustBePositive": "Quantity must be greater than 0.",
+    "invalidInput": "Invalid input.",
+    "editPurchaseDate": "Edit Purchase Date",
+    "editExpiryDate": "Edit Expiry Date",
+    "editEmoji": "Edit Emoji",
+    "submit": "Update"
+  },
+  "ingredientAdd": {
+    "addSuccess": "Ingredient has been registered.",
+    "addFailed": "Failed to register ingredient.",
+    "selectPurchaseDate": "Select Purchase Date",
+    "selectExpiryDate": "Select Expiry Date",
+    "selectEmoji": "Select Emoji",
+    "submit": "Register"
+  },
+  "ingredientForm": {
+    "name": "Name",
+    "namePlaceholder": "Ingredient name",
+    "emojiAdd": "Emoji +",
+    "category": "Category",
+    "quantity": "Quantity",
+    "quantityPlaceholder": "Enter",
+    "unit": "Unit",
+    "unitPlaceholder": "Select",
+    "purchaseDate": "Purchase Date",
+    "sameAsRegistration": "Same as registration",
+    "selectDate": "Select date",
+    "expiryDate": "Expiry Date",
+    "storageLocation": "Storage Location",
+    "memo": "Memo",
+    "memoPlaceholder": "Enter memo",
+    "quickSelect": {
+      "3days": "3 days",
+      "7days": "7 days",
+      "2weeks": "2 weeks",
+      "1month": "1 month"
+    }
+  },
+  "tabs": {
+    "home": "Home",
+    "ingredients": "Ingredients",
+    "shopping": "Shopping",
+    "achievement": "Challenge",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "More",
+    "notification": {
+      "title": "Notifications",
+      "permissionRequired": "Notification permission required",
+      "permissionDescription": "Please allow notifications\nto receive expiry alerts",
+      "allowPermission": "Allow Notifications",
+      "expiryPeriod": "Expiry Alert Period",
+      "expiryDescription": "Select how many days before expiry to receive alerts",
+      "expiryAlertTitle": "Expiry Alert",
+      "expiryAlertSingle": "{{name}} is expiring soon.",
+      "expiryAlertMultiple": "{{count}} items are expiring soon."
+    },
+    "theme": {
+      "title": "Theme",
+      "darkMode": "Dark Mode",
+      "resetToSystem": "Reset to System Setting"
+    },
+    "data": {
+      "title": "Data Management",
+      "deleteAll": "Delete Fridge Data",
+      "deleteDescription": "All registered ingredients will be deleted"
+    },
+    "appInfo": {
+      "title": "App Info",
+      "version": "Version",
+      "developer": "Developer",
+      "developerName": "Minjun Joo, laonzenamoon",
+      "contact": "Contact",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "rateApp": "Rate App"
+    },
+    "messages": {
+      "notificationDaysChanged": "Notification period changed to {{days}} days.",
+      "deleteDataSuccess": "All data has been deleted.",
+      "deleteDataFailed": "Failed to delete data.",
+      "privacyPolicyError": "Unable to open privacy policy",
+      "termsOfServiceError": "Unable to open terms of service",
+      "rateAppFallback": "Please rate us directly on the App Store",
+      "rateAppError": "Unable to open rating screen",
+      "permissionRequiredTitle": "Notification Permission Required",
+      "permissionRequiredMessage": "Please allow notifications in Settings.",
+      "openSettings": "Open Settings",
+      "permissionRequestFailed": "Unable to request notification permission.",
+      "deleteDataTitle": "Delete Data",
+      "deleteDataConfirm": "All registered fridge ingredients will be deleted.\nThis action cannot be undone.\n\nAre you sure you want to delete?",
+      "emailAppOpenFailed": "Unable to open email app."
+    },
+    "feedback": {
+      "title": "Developer Feedback",
+      "send": "Send Feedback",
+      "description": "Had any inconveniences or\nsuggestions for improvement?\nWe'd love to hear from you.",
+      "emailSubject": "Frigo App Feedback",
+      "emailBody": "Hello,\n\nPlease enter your feedback:\n\n"
+    }
+  },
+  "achievement": {
+    "title": "Challenge",
+    "statistics": {
+      "title": "My Statistics",
+      "totalRegistered": "Total Registered",
+      "totalConsumed": "Total Consumed",
+      "shopping": "Shopping",
+      "currentStreak": "Current Streak",
+      "longestStreak": "Longest Streak"
+    },
+    "categories": {
+      "streak": "🔥 Streak Record",
+      "consume": "✅ Consume Challenge",
+      "register": "📦 Register Challenge",
+      "shopping": "🛒 Shopping Challenge"
+    },
+    "claimBadge": "Claim Badge",
+    "viewBadge": "View Badge",
+    "congratulations": "Congratulations! 🎉",
+    "items": {
+      "streak3Days": {
+        "title": "3-Day Streak Champion",
+        "description": "Consume within expiry for 3 consecutive days"
+      },
+      "streak7Days": {
+        "title": "Weekly Challenge Master",
+        "description": "Consume within expiry for 7 consecutive days"
+      },
+      "streak30Days": {
+        "title": "Perfect Monthly Manager",
+        "description": "Consume within expiry for 30 consecutive days"
+      },
+      "consume10": {
+        "title": "First Steps",
+        "description": "Consume 10 ingredients"
+      },
+      "consume50": {
+        "title": "Thrifty Lifestyle",
+        "description": "Consume 50 ingredients"
+      },
+      "consume100": {
+        "title": "Consumption Master",
+        "description": "Consume 100 ingredients"
+      },
+      "registerFirst": {
+        "title": "First Registration",
+        "description": "Register your first ingredient"
+      },
+      "register10": {
+        "title": "Ingredient Collector",
+        "description": "Register 10 ingredients"
+      },
+      "register50": {
+        "title": "Well-Stocked Fridge",
+        "description": "Register 50 ingredients"
+      },
+      "register100": {
+        "title": "Fridge Master",
+        "description": "Register 100 ingredients"
+      },
+      "shopping5": {
+        "title": "Planned Shopping",
+        "description": "Complete shopping list 5 times"
+      },
+      "shopping20": {
+        "title": "Shopping Expert",
+        "description": "Complete shopping list 20 times"
+      },
+      "shopping50": {
+        "title": "Shopping Master",
+        "description": "Complete shopping list 50 times"
+      }
+    },
+    "messages": {
+      "loadFailed": "Failed to load achievements.",
+      "claimFailed": "Failed to claim badge."
+    }
+  },
+  "ingredients": {
+    "title": "Ingredients",
+    "tabs": {
+      "byCategory": "By Category",
+      "byStorage": "By Storage"
+    },
+    "empty": {
+      "title": "No ingredients registered.",
+      "description": "Please add ingredients",
+      "categoryEmpty": "No ingredients"
+    },
+    "floatingButton": {
+      "addManually": "Add Manually",
+      "addBulk": "Add Multiple"
+    },
+    "bottomSheet": {
+      "editName": "Edit Name",
+      "editEmoji": "Edit Emoji",
+      "editExpiry": "Edit Expiry",
+      "editQuantity": "Edit Quantity",
+      "editStorage": "Edit Storage",
+      "editMemo": "Edit Memo"
+    },
+    "tableHeader": {
+      "name": "Name",
+      "expiry": "Expiry",
+      "quantity": "Qty",
+      "storage": "Loc",
+      "memo": "Memo"
+    },
+    "menu": {
+      "editName": "Edit Name",
+      "consume": "Consume",
+      "addToShopping": "Add to Shopping",
+      "delete": "Delete",
+      "viewDetail": "View Detail"
+    },
+    "messages": {
+      "notFound": "Ingredient not found.",
+      "addedToShoppingList": "Added to shopping list.",
+      "deleted": "Ingredient has been deleted.",
+      "deleteFailed": "Failed to delete ingredient.",
+      "consumed": "Ingredient has been consumed.",
+      "consumeFailed": "Failed to consume ingredient.",
+      "nameUpdated": "Name has been updated.",
+      "nameUpdateFailed": "Failed to update name.",
+      "emojiUpdated": "Emoji has been updated.",
+      "emojiUpdateFailed": "Failed to update emoji.",
+      "quantityUpdated": "Quantity has been updated.",
+      "quantityUpdateFailed": "Failed to update quantity.",
+      "storageUpdated": "Storage location has been updated.",
+      "storageUpdateFailed": "Failed to update storage location.",
+      "expiryUpdated": "Expiry date has been updated.",
+      "expiryUpdateFailed": "Failed to update expiry date.",
+      "memoUpdated": "Memo has been updated.",
+      "memoUpdateFailed": "Failed to update memo.",
+      "bulkAddSuccess": "{{count}} ingredients have been added.",
+      "bulkAddFailed": "Error adding ingredients.",
+      "shoppingAddFailed": "Failed to add shopping item."
+    }
+  },
+  "shopping": {
+    "title": "Shopping",
+    "tabs": {
+      "unpurchased": "To Buy",
+      "purchased": "Purchased"
+    },
+    "empty": {
+      "unpurchasedTitle": "No items to buy.",
+      "unpurchasedDescription": "Items are added automatically when consumed",
+      "purchasedTitle": "No purchased items.",
+      "purchasedDescription": ""
+    },
+    "actions": {
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All",
+      "addToFridge": "Add to Fridge",
+      "delete": "Delete",
+      "share": "Share Shopping List",
+      "addItem": "Add Item"
+    },
+    "tableHeader": {
+      "done": "Done",
+      "name": "Name",
+      "memo": "Memo"
+    },
+    "menu": {
+      "repurchase": "Repurchase",
+      "cancelPurchase": "Cancel Purchase",
+      "addToFridge": "Add to Fridge",
+      "editName": "Edit Name",
+      "editEmoji": "Edit Emoji",
+      "delete": "Delete"
+    },
+    "bottomSheet": {
+      "editMemo": "Edit Memo",
+      "editName": "Edit Name",
+      "editEmoji": "Edit Emoji",
+      "selectStorage": "Add to Fridge",
+      "selectStorageDescription": "Please select storage location before adding."
+    },
+    "messages": {
+      "noSelectedItems": "No items selected.",
+      "deleteSelectedTitle": "Delete Selected Items",
+      "deleteSelectedConfirm": "Delete {{count}} items?",
+      "deleteItemTitle": "Delete Item",
+      "deleteItemConfirm": "Delete \"{{name}}\"?",
+      "addedToFridge": "{{name}} has been added to the fridge.",
+      "addToFridgeTitle": "Add to Fridge",
+      "addToFridgeConfirm": "Add {{count}} items to fridge?",
+      "addedToFridgeCount": "{{count}} items added to fridge.",
+      "emojiUpdated": "Emoji has been updated.",
+      "emojiUpdateFailed": "Failed to update emoji.",
+      "cancelPurchaseTitle": "Cancel Purchase",
+      "cancelPurchaseConfirm": "Cancel purchase of \"{{name}}\"?",
+      "purchaseCanceled": "Purchase has been canceled.",
+      "cancelPurchaseFailed": "Failed to cancel purchase.",
+      "itemNotFound": "Item not found.",
+      "addedToUnpurchased": "'{{name}}' has been added to shopping list.",
+      "repurchaseFailed": "Failed to add for repurchase.",
+      "deleteDateItemsTitle": "Delete Items by Date",
+      "deleteDateItemsConfirm": "Delete {{count}} items from {{dateKey}}?",
+      "noItemsToShare": "No items to share.",
+      "shoppingListTitle": "📝 Shopping List\n\n",
+      "addedToShoppingList": "'{{name}}' has been added to shopping list.",
+      "dataLoadFailed": "Failed to load data",
+      "loadFailed": "Failed to load shopping list.",
+      "missingName": "Please enter a name.",
+      "addFailed": "Failed to add shopping item.",
+      "ingredientNotFound": "Ingredient not found.",
+      "ingredientAddError": "Error adding ingredient.",
+      "memoUpdated": "Memo has been updated.",
+      "memoUpdateFailed": "Failed to update memo.",
+      "nameUpdated": "Name has been updated.",
+      "nameUpdateFailed": "Failed to update name.",
+      "deleteSuccess": "Shopping item has been deleted.",
+      "sharingFailed": "Error while sharing."
+    }
+  },
+  "bottomSheet": {
+    "selectDate": "Select Date",
+    "selectUnit": "Select Unit",
+    "addShoppingItem": "Add Shopping Item",
+    "bulkAdd": "Add Multiple",
+    "ingredientName": "Ingredient Name",
+    "ingredientNamePlaceholder": "e.g. Onion, Carrot",
+    "memoOptional": "Memo (Optional)",
+    "memoPlaceholder": "Enter memo",
+    "memoExamplePlaceholder": "e.g. 1kg, fresh ones",
+    "namePlaceholder": "Enter name",
+    "quantityPlaceholder": "Enter quantity",
+    "addCount": "Add {{count}} items"
+  }
+}

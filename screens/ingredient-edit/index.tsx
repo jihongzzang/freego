@@ -9,8 +9,10 @@ import EmojiBottomSheet from '@/components/EmojiBottomSheet';
 import { useIngredientEditLogic } from './hooks/useIngredientEditLogic';
 import { EditForm } from '@/screens/ingredient-edit/components/EditForm';
 import { SubmitButton } from './components/SubmitButton';
+import { useTranslation } from 'react-i18next';
 
 export default function IngredientEditScreen() {
+  const { t } = useTranslation();
   const { colors, typography, spacing } = useTheme();
 
   const {
@@ -32,7 +34,7 @@ export default function IngredientEditScreen() {
   if (!state.ingredient) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[typography.styles.t6, { color: colors.text }]}>로딩 중이에요...</Text>
+        <Text style={[typography.styles.t6, { color: colors.text }]}>{t('common.loading')}</Text>
       </View>
     );
   }
@@ -68,7 +70,7 @@ export default function IngredientEditScreen() {
       <SelectDateBottomSheet
         visible={purchaseDatePicker.visible}
         onClose={purchaseDatePicker.close}
-        title="구매일 수정"
+        title={t('ingredientEdit.editPurchaseDate')}
         selectedDate={purchaseDatePicker.selectedDate}
         onDateChange={purchaseDatePicker.handleDateChange}
         onConfirm={purchaseDatePicker.handleConfirm}
@@ -77,7 +79,7 @@ export default function IngredientEditScreen() {
       <SelectDateBottomSheet
         visible={expiryDatePicker.visible}
         onClose={expiryDatePicker.close}
-        title="유통기한 수정"
+        title={t('ingredientEdit.editExpiryDate')}
         selectedDate={expiryDatePicker.selectedDate}
         onDateChange={expiryDatePicker.handleDateChange}
         onConfirm={expiryDatePicker.handleConfirm}
@@ -92,7 +94,7 @@ export default function IngredientEditScreen() {
 
       <EmojiBottomSheet
         visible={isEmojiPickerVisible}
-        title="이모지 수정"
+        title={t('ingredientEdit.editEmoji')}
         onClose={() => setIsEmojiPickerVisible(false)}
         onSelect={handleEmojiSelect}
       />

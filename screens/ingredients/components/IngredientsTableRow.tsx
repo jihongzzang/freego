@@ -6,6 +6,7 @@ import { getStorageLocationIcon } from '@/utils/storageLocation';
 import { calculateDday, getDdayColor } from '@/utils/date/calculateDday';
 import { useMemo } from 'react';
 import { MenuView } from '@react-native-menu/menu';
+import { useTranslation } from 'react-i18next';
 
 interface IngredientsTableRowProps {
   item: Ingredient;
@@ -34,6 +35,7 @@ export function IngredientsTableRow({
   onQuickUpdateMemo,
   onViewDetail,
 }: IngredientsTableRowProps) {
+  const { t } = useTranslation();
   const { isDark, colors, typography, spacing } = useTheme();
 
   const dday = calculateDday(item.expired_date_time);
@@ -100,7 +102,7 @@ export function IngredientsTableRow({
         actions={[
           {
             id: 'nameEdit',
-            title: '이름 수정하기',
+            title: t('ingredients.menu.editName'),
             image: Platform.select({
               ios: 'square.and.pencil',
               android: undefined,
@@ -109,7 +111,7 @@ export function IngredientsTableRow({
           },
           {
             id: 'consume',
-            title: '소모하기',
+            title: t('ingredients.menu.consume'),
             image: Platform.select({
               ios: 'checkmark.circle',
               android: undefined,
@@ -118,7 +120,7 @@ export function IngredientsTableRow({
           },
           {
             id: 'add-to-shopping',
-            title: '장보기 항목에 추가하기',
+            title: t('ingredients.menu.addToShopping'),
             image: Platform.select({
               ios: 'cart',
               android: undefined,
@@ -127,7 +129,7 @@ export function IngredientsTableRow({
           },
           {
             id: 'delete',
-            title: '삭제하기',
+            title: t('ingredients.menu.delete'),
             image: Platform.select({
               ios: 'trash',
               android: undefined,
@@ -139,7 +141,7 @@ export function IngredientsTableRow({
           },
           {
             id: 'view-detail',
-            title: '상세가기',
+            title: t('ingredients.menu.viewDetail'),
             image: Platform.select({
               ios: 'chevron.right',
               android: undefined,

@@ -8,6 +8,7 @@ import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { AchievementState, AchievementIntent, AchievementEffect } from './types';
 import { achievementService } from '@/services/achievement.service';
 import { createErrorEffect } from '@/mvi/shared';
+import i18n from '@/locales';
 
 /**
  * Achievement Middleware
@@ -41,9 +42,9 @@ export const achievementMiddleware: Middleware<AchievementState, AchievementInte
           state: {
             ...state,
             loading: false,
-            error: error instanceof Error ? error.message : '업적 로드 실패',
+            error: error instanceof Error ? error.message : i18n.t('achievement.messages.loadFailed'),
           },
-          effects: [createErrorEffect('업적을 불러오지 못했어요.')],
+          effects: [createErrorEffect(i18n.t('achievement.messages.loadFailed'))],
         };
       }
     }
@@ -68,7 +69,7 @@ export const achievementMiddleware: Middleware<AchievementState, AchievementInte
       } catch (error) {
         console.error('Error claiming badge:', error);
         return {
-          effects: [createErrorEffect('뱃지를 받지 못했어요.')],
+          effects: [createErrorEffect(i18n.t('achievement.messages.claimFailed'))],
         };
       }
     }

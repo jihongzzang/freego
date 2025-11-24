@@ -2,6 +2,7 @@ import { View, StyleSheet, TextInput } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import BottomSheet from '@/components/ui/BottomSheet';
 import { Button } from './ui';
+import { useTranslation } from 'react-i18next';
 
 interface MemoBottomSheetProps {
   visible: boolean;
@@ -20,6 +21,7 @@ export default function MemoBottomSheet({
   onMemoChange,
   onSubmit,
 }: MemoBottomSheetProps) {
+  const { t } = useTranslation();
   const { colors, typography, isDark, spacing } = useTheme();
 
   return (
@@ -38,7 +40,7 @@ export default function MemoBottomSheet({
             ]}
             value={memo}
             onChangeText={onMemoChange}
-            placeholder="메모를 입력하세요"
+            placeholder={t('bottomSheet.memoPlaceholder')}
             placeholderTextColor={colors.textTertiary}
             multiline
             numberOfLines={5}
@@ -58,7 +60,7 @@ export default function MemoBottomSheet({
           ]}
         >
           <Button size="large" variant="primary" onPress={onSubmit}>
-            저장
+            {t('common.save')}
           </Button>
         </View>
       </View>

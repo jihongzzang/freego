@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useState, useMemo } from 'react';
 import { useTheme } from '@/lib/theme';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 
 interface DatePickerProps {
   value?: Date;
@@ -11,6 +12,7 @@ interface DatePickerProps {
 }
 
 export default function DatePicker({ value, onDateSelect, minimumDate, maximumDate }: DatePickerProps) {
+  const { t, i18n } = useTranslation();
   const { colors, typography, spacing, borderRadius } = useTheme();
   const [currentMonth, setCurrentMonth] = useState(
     value
@@ -109,7 +111,12 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
         </TouchableOpacity>
 
         <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
-          {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
+          {i18n.language === 'ko'
+            ? t('common.datePicker.monthYear', { year: currentMonth.getFullYear(), month: currentMonth.getMonth() + 1 })
+            : t('common.datePicker.monthYear', {
+                year: currentMonth.getFullYear(),
+                month: currentMonth.toLocaleString('en-US', { month: 'long' }),
+              })}
         </Text>
 
         <TouchableOpacity onPress={goToNextMonth} style={styles.navButton}>
@@ -118,8 +125,8 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
       </View>
 
       <View style={styles.weekHeader}>
-        {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
-          <View key={day} style={styles.weekDay}>
+        {['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].map((dayKey, index) => (
+          <View key={dayKey} style={styles.weekDay}>
             <Text
               style={[
                 typography.styles.t7,
@@ -128,7 +135,7 @@ export default function DatePicker({ value, onDateSelect, minimumDate, maximumDa
                 },
               ]}
             >
-              {day}
+              {t(`common.datePicker.weekDays.${dayKey}`)}
             </Text>
           </View>
         ))}

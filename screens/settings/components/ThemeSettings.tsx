@@ -4,6 +4,7 @@ import { useTheme } from '@/lib/theme';
 import Card from '@/components/ui/Card';
 import Switch from '@/components/ui/Switch';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ThemeSettingsProps {
   isDark: boolean;
@@ -13,6 +14,7 @@ interface ThemeSettingsProps {
 }
 
 export function ThemeSettings({ isDark, themePreference, onToggleTheme, onResetToSystem }: ThemeSettingsProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing, borderRadius } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing, borderRadius }), [spacing, borderRadius]);
@@ -21,13 +23,13 @@ export function ThemeSettings({ isDark, themePreference, onToggleTheme, onResetT
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
         {isDark ? <Moon size={20} color={colors.textSecondary} /> : <Sun size={20} color={colors.textSecondary} />}
-        <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>테마</Text>
+        <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>{t('settings.theme.title')}</Text>
       </View>
 
       <Card variant="elevated" padding="large">
         <View style={styles.settingRow}>
           <View style={styles.settingInfo}>
-            <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>다크 모드</Text>
+            <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{t('settings.theme.darkMode')}</Text>
           </View>
           <Switch value={isDark} onValueChange={onToggleTheme} />
         </View>
@@ -38,7 +40,7 @@ export function ThemeSettings({ isDark, themePreference, onToggleTheme, onResetT
             onPress={onResetToSystem}
             activeOpacity={0.7}
           >
-            <Text style={[typography.styles.t6Medium, { color: colors.textSecondary }]}>시스템 설정으로 되돌리기</Text>
+            <Text style={[typography.styles.t6Medium, { color: colors.textSecondary }]}>{t('settings.theme.resetToSystem')}</Text>
           </TouchableOpacity>
         )}
       </Card>
