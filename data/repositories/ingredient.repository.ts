@@ -123,7 +123,6 @@ export const ingredientRepository = {
           ...updates,
           last_modified_date_time: new Date().toISOString(),
         };
-        console.log(ingredients);
         await this.saveIngredients(ingredients);
         return true;
       }

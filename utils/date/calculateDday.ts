@@ -1,7 +1,9 @@
+import i18n from '@/locales';
+
 /**
  * 유통기한 D-day 계산
  * @param expirationDate 유통기한 (YYYY-MM-DD)
- * @returns D-day 문자열 (예: "D+3", "D-1", "D-day")
+ * @returns D-day 문자열 (예: "D+3", "D-1", "오늘/Today")
  */
 export function calculateDday(expirationDate?: string | null): string {
   if (!expirationDate) return '-';
@@ -15,7 +17,7 @@ export function calculateDday(expirationDate?: string | null): string {
   const diffTime = expDate.getTime() - today.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return '오늘';
+  if (diffDays === 0) return i18n.t('common.today');
   if (diffDays > 0) return `D+${diffDays}`;
   return `D${diffDays}`;
 }
@@ -28,7 +30,9 @@ export function calculateDday(expirationDate?: string | null): string {
 export function getDdayColor(dday: string): 'none' | 'safe' | 'warning' | 'danger' {
   if (dday === '-') return 'none';
 
-  if (dday === '오늘') return 'warning';
+  // 다국어 지원: '오늘' 또는 'Today' 모두 처리
+  const todayLabel = i18n.t('common.today');
+  if (dday === todayLabel) return 'warning';
 
   const match = dday.match(/D([+-]\d+)/);
   if (!match) return 'safe';

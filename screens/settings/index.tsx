@@ -9,9 +9,11 @@ import { ThemeSettings } from './components/ThemeSettings';
 import { DataManagement } from './components/DataManagement';
 import { FeedbackSection } from './components/FeedbackSection';
 import { AppInfo } from './components/AppInfo';
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { colors, typography, spacing } = useTheme();
 
   const {
@@ -34,7 +36,7 @@ export default function SettingsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Header title="더보기" />
+      <Header title={t('settings.title')} />
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
@@ -62,7 +64,7 @@ export default function SettingsScreen() {
           onRateApp={rateApp}
         />
         <View style={styles.footer}>
-          <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>프리고 앱</Text>
+          <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>{t('app.footer')}</Text>
         </View>
       </ScrollView>
     </View>

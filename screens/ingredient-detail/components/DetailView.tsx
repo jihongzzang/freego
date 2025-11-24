@@ -6,13 +6,16 @@ import { getCategoryIcon, getCategoryLabel } from '@/utils/category';
 import { Ingredient } from '@/data/models/ingredient.model';
 import { getStorageLocationLabel } from '@/utils/storageLocation';
 import { toLocalDate } from '@/utils/time';
+import { useTranslation } from 'react-i18next';
 
 interface DetailViewProps {
   ingredient: Ingredient;
 }
 
 export function DetailView({ ingredient }: DetailViewProps) {
+  const { t, i18n } = useTranslation();
   const { colors, typography } = useTheme();
+  const lang = i18n.language === 'ko' ? 'kr' : 'en';
 
   return (
     <View style={styles.container}>
@@ -29,48 +32,48 @@ export function DetailView({ ingredient }: DetailViewProps) {
           }}
         >
           <Text style={[typography.styles.t7Semibold, { color: '#ffffff' }]}>
-            {getStatusLabel({ expiryDate: ingredient.expired_date_time })}
+            {getStatusLabel({ expiryDate: ingredient.expired_date_time, lang })}
           </Text>
         </Badge>
       </View>
 
       <View style={styles.infoGrid}>
         <View style={styles.infoItem}>
-          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>카테고리</Text>
+          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>{t('common.category')}</Text>
 
           <View style={styles.categoryContentRow}>
             {getCategoryIcon(ingredient.category)}
             <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
-              {getCategoryLabel({ category: ingredient.category })}
+              {getCategoryLabel({ category: ingredient.category, lang })}
             </Text>
           </View>
         </View>
         <View style={styles.infoItem}>
-          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>수량</Text>
+          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>{t('common.quantity')}</Text>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{ingredient.quantity || '-'}</Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>보관 위치</Text>
+          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>{t('common.storageLocation')}</Text>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
             {ingredient.storage_location
-              ? getStorageLocationLabel({ storageLocation: ingredient.storage_location })
+              ? getStorageLocationLabel({ storageLocation: ingredient.storage_location, lang })
               : '-'}
           </Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>등록일</Text>
+          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>{t('common.registeredDate')}</Text>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
             {ingredient.created_date_time ? toLocalDate(ingredient.created_date_time) : '-'}
           </Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>구매일</Text>
+          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>{t('common.purchasedDate')}</Text>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
             {ingredient.purchased_date_time ? toLocalDate(ingredient.purchased_date_time) : '-'}
           </Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>유통기한</Text>
+          <Text style={[typography.styles.t7, { color: colors.textSecondary }]}>{t('common.expiryDate')}</Text>
           <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>
             {ingredient.expired_date_time ? toLocalDate(ingredient.expired_date_time) : '-'}
           </Text>
@@ -79,7 +82,7 @@ export function DetailView({ ingredient }: DetailViewProps) {
 
       {ingredient.memo && (
         <View style={[styles.memoSection, { borderTopColor: colors.border }]}>
-          <Text style={[typography.styles.t6Medium, { color: colors.textSecondary }]}>메모</Text>
+          <Text style={[typography.styles.t6Medium, { color: colors.textSecondary }]}>{t('common.memo')}</Text>
           <Text style={[typography.styles.t7, { color: colors.text }]}>{ingredient.memo}</Text>
         </View>
       )}

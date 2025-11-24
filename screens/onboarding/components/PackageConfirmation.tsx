@@ -1,10 +1,11 @@
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ColorPalette, useTheme } from '@/lib/theme';
-import { LIFESTYLE_PACKAGES } from '@/constants/starterPackages';
+import { getLifestylePackages, SupportedLang } from '@/constants/starterPackages';
 import { useMemo } from 'react';
 import { Button, Card, Chip } from '@/components/ui';
 import { ArrowLeft } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 
 interface PackageConfirmationProps {
   selectedLifestyleId: string;
@@ -19,11 +20,13 @@ export function PackageConfirmation({
   onAddPackage,
   onSkipPackage,
 }: PackageConfirmationProps) {
+  const { t, i18n } = useTranslation();
   const { colors, typography, spacing, borderRadius, shadows, isDark } = useTheme();
 
   const insets = useSafeAreaInsets();
 
-  const selectedPackage = LIFESTYLE_PACKAGES.find((pkg) => pkg.id === selectedLifestyleId);
+  const lang = (i18n.language === 'ko' ? 'ko' : 'en') as SupportedLang;
+  const selectedPackage = getLifestylePackages(lang).find((pkg) => pkg.id === selectedLifestyleId);
 
   const styles = useMemo(() => createStyles({ colors, spacing, borderRadius }), [spacing, borderRadius, shadows]);
 
@@ -40,11 +43,15 @@ export function PackageConfirmation({
             <ArrowLeft color={colors.text} />
           </TouchableOpacity>
           <View style={styles.selectedPackageInfo}>
-            <Text style={[typography.styles.t2Bold, styles.confirmTitle]}>{selectedPackage?.krLabel}</Text>
+            <Text style={[typography.styles.t2Bold, styles.confirmTitle]}>
+              {t(`onboarding.lifestyles.${selectedLifestyleId}.label`)}
+            </Text>
           </View>
         </View>
 
-        <Text style={[typography.styles.t4Medium, styles.confirmDescription]}>기본 재료를 자동으로 추가할까요?</Text>
+        <Text style={[typography.styles.t4Medium, styles.confirmDescription]}>
+          {t('onboarding.package.confirmQuestion')}
+        </Text>
 
         <Card
           variant="elevated"
@@ -60,7 +67,7 @@ export function PackageConfirmation({
                 },
               ]}
             >
-              포함된 재료
+              {t('onboarding.package.includedIngredients')}
             </Text>
           </View>
           <View style={styles.ingredientsGrid}>
@@ -85,9 +92,8 @@ export function PackageConfirmation({
             size="large"
             fullWidth
             style={{ ...styles.primaryButton, ...{ ...shadows.lg } }}
-            // textStyle={{ color: colors.grey700 }}
           >
-            네, 자동으로 추가할게요
+            {t('onboarding.package.confirmAdd')}
           </Button>
 
           <Button
@@ -98,7 +104,7 @@ export function PackageConfirmation({
             style={styles.secondaryButton}
             textStyle={{ color: colors.textTertiary }}
           >
-            아니요, 직접 등록할게요
+            {t('onboarding.package.confirmSkip')}
           </Button>
         </View>
       </ScrollView>

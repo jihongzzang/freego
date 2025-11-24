@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import { ViewMode } from '../hooks/useIngredientsLogic';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ViewModeTabsProps {
   viewMode: ViewMode;
@@ -9,6 +10,7 @@ interface ViewModeTabsProps {
 }
 
 export function ViewModeTabs({ viewMode, onChangeMode }: ViewModeTabsProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing, isDark } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
@@ -31,7 +33,7 @@ export function ViewModeTabs({ viewMode, onChangeMode }: ViewModeTabsProps) {
             { color: viewMode === 'category' ? (isDark ? colors.white : colors.grey900) : colors.textTertiary },
           ]}
         >
-          카테고리별
+          {t('ingredients.tabs.byCategory')}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -50,7 +52,7 @@ export function ViewModeTabs({ viewMode, onChangeMode }: ViewModeTabsProps) {
             { color: viewMode === 'storage' ? (isDark ? colors.white : colors.grey900) : colors.textTertiary },
           ]}
         >
-          보관위치별
+          {t('ingredients.tabs.byStorage')}
         </Text>
       </TouchableOpacity>
     </View>

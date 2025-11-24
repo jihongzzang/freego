@@ -9,6 +9,7 @@ import { shoppingService } from '@/services/shopping.service';
 import { Category } from '@/data/enums/category';
 import { StorageLocation } from '@/data/enums/storage_location';
 import { Ingredient } from '@/data/models/ingredient.model';
+import i18n from '@/locales';
 
 jest.mock('@/services/ingredient.service', () => ({
   ingredientService: {
@@ -104,7 +105,7 @@ describe('ingredientDetailMiddleware', () => {
       const result = await ingredientDetailMiddleware(state, intent);
 
       expect(result.state?.loading).toBe(false);
-      expect(result.state?.error).toBe('식재료를 찾을 수 없어요.');
+      expect(result.state?.error).toBe(i18n.t('ingredientDetail.notFound'));
     });
 
     it('로드 실패 시 에러 토스트를 표시한다', async () => {
@@ -139,7 +140,7 @@ describe('ingredientDetailMiddleware', () => {
 
       const result = await ingredientDetailMiddleware(state, intent);
 
-      expect(result.state?.error).toBe('데이터 로드 실패');
+      expect(result.state?.error).toBe(i18n.t('ingredientDetail.loadFailed'));
     });
   });
 
@@ -163,7 +164,7 @@ describe('ingredientDetailMiddleware', () => {
         expect.objectContaining({
           type: 'SHOW_CONFIRM',
           payload: expect.objectContaining({
-            title: '식재료 삭제',
+            title: i18n.t('ingredientDetail.deleteTitle'),
             isDanger: true,
           }),
         }),
@@ -241,7 +242,7 @@ describe('ingredientDetailMiddleware', () => {
         expect.objectContaining({
           type: 'SHOW_CONFIRM',
           payload: expect.objectContaining({
-            title: '식재료 소모',
+            title: i18n.t('ingredientDetail.consumeTitle'),
           }),
         }),
       );

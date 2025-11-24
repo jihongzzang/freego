@@ -8,9 +8,8 @@ import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { ShoppingState, ShoppingIntent, ShoppingEffect } from './types';
 import { shoppingService } from '@/services/shopping.service';
 import { ingredientService } from '@/services/ingredient.service';
-import { createErrorEffect, createInfoEffect, createSuccessEffect, createWarningEffect } from '@/mvi/shared';
-import ERROR_MESSAGES from '@/constants/toast/errorMessages';
-import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
+import { createErrorEffect, createSuccessEffect, createWarningEffect } from '@/mvi/shared';
+import i18n from '@/locales';
 
 /**
  * Shopping Middleware
@@ -22,9 +21,6 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
   switch (intent.type) {
     case 'LOAD_SHOPPING_LIST': {
       try {
-        console.log('🟡 LOAD_SHOPPING_LIST (middleware):', {
-          currentSelectedIds: state.selectedIds.size,
-        });
         const items = await shoppingService.getShoppingList();
         return {
           state: {
@@ -40,9 +36,9 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           state: {
             ...state,
             loading: false,
-            error: error instanceof Error ? error.message : '데이터 로드 실패',
+            error: error instanceof Error ? error.message : i18n.t('shopping.messages.dataLoadFailed'),
           },
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_SHOPPING_LIST_LOAD_FAILED)],
+          effects: [createErrorEffect(i18n.t('shopping.messages.loadFailed'))],
         };
       }
     }
@@ -52,7 +48,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
       if (selectedCount === 0) {
         return {
-          effects: [createWarningEffect('선택된 항목이 없어요.')],
+          effects: [createWarningEffect(i18n.t('shopping.messages.noSelectedItems'))],
         };
       }
 
@@ -61,8 +57,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '선택 항목 삭제',
-              message: `${selectedCount}개의 항목을 삭제할까요?`,
+              title: i18n.t('shopping.messages.deleteSelectedTitle'),
+              message: i18n.t('shopping.messages.deleteSelectedConfirm', { count: selectedCount }),
               onConfirm: async () => {
                 try {
                   for (const id of state.selectedIds) {
@@ -85,7 +81,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
     case 'SUBMIT_ADD_ITEM': {
       if (!intent.payload.name.trim()) {
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_MISSING_INGREDIENT_NAME)],
+          effects: [createErrorEffect(i18n.t('shopping.messages.missingName'))],
         };
       }
 
@@ -105,12 +101,14 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             ...state,
             shoppingList: items,
           },
-          effects: [createSuccessEffect(`'${intent.payload.name.trim()}'을(를) 장보기 목록에 추가했어요.`)],
+          effects: [
+            createSuccessEffect(i18n.t('shopping.messages.addedToShoppingList', { name: intent.payload.name.trim() })),
+          ],
         };
       } catch (error) {
         console.error('Error adding shopping item:', error);
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_SHOPPING_ITEM_ADD_FAILED)],
+          effects: [createErrorEffect(i18n.t('shopping.messages.addFailed'))],
         };
       }
     }
@@ -121,8 +119,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '항목 삭제',
-              message: `"${intent.payload.name}"을(를) 삭제할까요?`,
+              title: i18n.t('shopping.messages.deleteItemTitle'),
+              message: i18n.t('shopping.messages.deleteItemConfirm', { name: intent.payload.name }),
               onConfirm: async () => {
                 try {
                   await shoppingService.deleteShoppingItem(intent.payload.id);
@@ -149,7 +147,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
         if (!item) {
           return {
-            effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_ITEM_NOT_FOUND)],
+            effects: [createErrorEffect(i18n.t('shopping.messages.ingredientNotFound'))],
           };
         }
 
@@ -180,11 +178,11 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             ...state,
             shoppingList: items,
           },
-          effects: [createSuccessEffect(`${intent.payload.name}이(가) 냉장고에 추가되었어요.`)],
+          effects: [createSuccessEffect(i18n.t('shopping.messages.addedToFridge', { name: intent.payload.name }))],
         };
       } catch (error) {
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_CREATE_ERROR)],
+          effects: [createErrorEffect(i18n.t('shopping.messages.ingredientAddError'))],
         };
       }
     }
@@ -194,7 +192,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
       if (selectedCount === 0) {
         return {
-          effects: [createWarningEffect('선택된 항목이 없어요.')],
+          effects: [createWarningEffect(i18n.t('shopping.messages.noSelectedItems'))],
         };
       }
 
@@ -203,8 +201,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '냉장고에 넣기',
-              message: `${selectedCount}개의 항목을 냉장고에 추가할까요?`,
+              title: i18n.t('shopping.messages.addToFridgeTitle'),
+              message: i18n.t('shopping.messages.addToFridgeConfirm', { count: selectedCount }),
               onConfirm: async () => {
                 try {
                   const todayMidnight = new Date();
@@ -262,12 +260,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             ...state,
             shoppingList: items,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_MEMO_UPDATE)],
+          effects: [createSuccessEffect(i18n.t('shopping.messages.memoUpdated'))],
         };
       } catch (error) {
         console.error('Error updating memo:', error);
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_MEMO_UPDATE_FAILED)],
+          effects: [createErrorEffect(i18n.t('shopping.messages.memoUpdateFailed'))],
         };
       }
     }
@@ -284,12 +282,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             ...state,
             shoppingList: items,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_NAME_UPDATE)],
+          effects: [createSuccessEffect(i18n.t('shopping.messages.nameUpdated'))],
         };
       } catch (error) {
         console.error('Error updating memo:', error);
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_NAME_UPDATE_FAILED)],
+          effects: [createErrorEffect(i18n.t('shopping.messages.nameUpdateFailed'))],
         };
       }
     }
@@ -306,12 +304,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             ...state,
             shoppingList: items,
           },
-          effects: [createSuccessEffect('이모지가 변경되었어요.')],
+          effects: [createSuccessEffect(i18n.t('shopping.messages.emojiUpdated'))],
         };
       } catch (error) {
         console.error('Error updating emoji:', error);
         return {
-          effects: [createErrorEffect('이모지 변경에 실패했어요.')],
+          effects: [createErrorEffect(i18n.t('shopping.messages.emojiUpdateFailed'))],
         };
       }
     }
@@ -322,8 +320,8 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '구매완료 취소',
-              message: `"${intent.payload.name}"의 구매완료를 취소할까요?`,
+              title: i18n.t('shopping.messages.cancelPurchaseTitle'),
+              message: i18n.t('shopping.messages.cancelPurchaseConfirm', { name: intent.payload.name }),
               onConfirm: async () => {
                 try {
                   await shoppingService.updateShoppingItem(intent.payload.id, {
@@ -350,7 +348,7 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
 
         if (!item) {
           return {
-            effects: [createErrorEffect('항목을 찾을 수 없어요.')],
+            effects: [createErrorEffect(i18n.t('shopping.messages.itemNotFound'))],
           };
         }
 
@@ -369,12 +367,12 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             ...state,
             shoppingList: items,
           },
-          effects: [createSuccessEffect(`'${item.name}'을(를) 구매 예정에 추가했어요.`)],
+          effects: [createSuccessEffect(i18n.t('shopping.messages.addedToUnpurchased', { name: item.name }))],
         };
       } catch (error) {
         console.error('Error repurchasing item:', error);
         return {
-          effects: [createErrorEffect('재구매 추가에 실패했어요.')],
+          effects: [createErrorEffect(i18n.t('shopping.messages.repurchaseFailed'))],
         };
       }
     }
@@ -387,8 +385,11 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
           {
             type: 'SHOW_CONFIRM',
             payload: {
-              title: '날짜별 항목 삭제',
-              message: `${intent.payload.dateKey}의 ${itemCount}개 항목을 삭제할까요?`,
+              title: i18n.t('shopping.messages.deleteDateItemsTitle'),
+              message: i18n.t('shopping.messages.deleteDateItemsConfirm', {
+                dateKey: intent.payload.dateKey,
+                count: itemCount,
+              }),
               onConfirm: async () => {
                 try {
                   const now = new Date().toISOString();

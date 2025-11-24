@@ -1,8 +1,9 @@
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { Check, MessageSquare, StickyNote } from 'lucide-react-native';
+import { Check, StickyNote } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import { useMemo } from 'react';
 import { MenuView } from '@react-native-menu/menu';
+import { useTranslation } from 'react-i18next';
 
 interface ShoppingTableRowProps {
   id: string;
@@ -36,6 +37,7 @@ export function ShoppingTableRow({
   onRepurchase,
   hideCheckbox = false,
 }: ShoppingTableRowProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
@@ -104,7 +106,7 @@ export function ShoppingTableRow({
             ? [
                 {
                   id: 'repurchase',
-                  title: '재구매',
+                  title: t('shopping.menu.repurchase'),
                   image: Platform.select({
                     ios: 'arrow.clockwise',
                     android: undefined,
@@ -113,7 +115,7 @@ export function ShoppingTableRow({
                 },
                 {
                   id: 'cancel-purchase',
-                  title: '구매완료 취소',
+                  title: t('shopping.menu.cancelPurchase'),
                   image: Platform.select({
                     ios: 'arrow.uturn.backward',
                     android: undefined,
@@ -122,7 +124,7 @@ export function ShoppingTableRow({
                 },
                 {
                   id: 'delete',
-                  title: '삭제하기',
+                  title: t('shopping.menu.delete'),
                   image: Platform.select({
                     ios: 'trash',
                     android: undefined,
@@ -136,7 +138,7 @@ export function ShoppingTableRow({
             : [
                 {
                   id: 'add-to-storage',
-                  title: '냉장고에 넣기',
+                  title: t('shopping.menu.addToFridge'),
                   image: Platform.select({
                     ios: 'refrigerator',
                     android: undefined,
@@ -145,7 +147,7 @@ export function ShoppingTableRow({
                 },
                 {
                   id: 'name',
-                  title: '이름 수정하기',
+                  title: t('shopping.menu.editName'),
                   image: Platform.select({
                     ios: 'square.and.pencil',
                     android: undefined,
@@ -154,7 +156,7 @@ export function ShoppingTableRow({
                 },
                 {
                   id: 'emoji',
-                  title: '이모지 수정하기',
+                  title: t('shopping.menu.editEmoji'),
                   image: Platform.select({
                     ios: 'face.smiling',
                     android: undefined,
@@ -163,7 +165,7 @@ export function ShoppingTableRow({
                 },
                 {
                   id: 'delete',
-                  title: '삭제하기',
+                  title: t('shopping.menu.delete'),
                   image: Platform.select({
                     ios: 'trash',
                     android: undefined,

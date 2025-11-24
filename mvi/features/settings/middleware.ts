@@ -6,14 +6,13 @@ import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { SettingsState, SettingsIntent, SettingsEffect } from './types';
 import { saveNotificationDays, getNotificationDays } from '@/services/notification.service';
 import { createErrorEffect, createSuccessEffect } from '@/mvi/shared';
-import ERROR_MESSAGES from '@/constants/toast/errorMessages';
-import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
 import * as WebBrowser from 'expo-web-browser';
 import * as StoreReview from 'expo-store-review';
-import { LEGAL_URLS } from '@/constants/legal';
+import { getLegalUrls } from '@/constants/legal';
 import { ingredientService } from '@/services/ingredient.service';
 import { shoppingService } from '@/services/shopping.service';
 import { achievementService } from '@/services/achievement.service';
+import i18n from '@/locales';
 
 export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, SettingsEffect> = async (
   state,
@@ -35,7 +34,7 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
       await saveNotificationDays(intent.payload);
 
       return {
-        effects: [createSuccessEffect(`알림 주기가 ${intent.payload}일로 변경됐어요.`)],
+        effects: [createSuccessEffect(i18n.t('settings.messages.notificationDaysChanged', { days: intent.payload }))],
       };
 
     case 'DELETE_ALL_DATA': {
@@ -49,7 +48,7 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
             ...state,
             isClearing: false,
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_DELETE_DATA)],
+          effects: [createSuccessEffect(i18n.t('settings.messages.deleteDataSuccess'))],
         };
       } catch (error) {
         console.error('Error deleting all data:', error);
@@ -58,31 +57,33 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
             ...state,
             isClearing: false,
           },
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_DELETE_DATA_FAILED)],
+          effects: [createErrorEffect(i18n.t('settings.messages.deleteDataFailed'))],
         };
       }
     }
 
     case 'OPEN_PRIVACY_POLICY': {
       try {
-        await WebBrowser.openBrowserAsync(LEGAL_URLS.PRIVACY_POLICY);
+        const legalUrls = getLegalUrls();
+        await WebBrowser.openBrowserAsync(legalUrls.PRIVACY_POLICY);
         return {};
       } catch (error) {
         console.error('Privacy policy browser error:', error);
         return {
-          effects: [createErrorEffect('개인정보처리방침을 열 수 없습니다')],
+          effects: [createErrorEffect(i18n.t('settings.messages.privacyPolicyError'))],
         };
       }
     }
 
     case 'OPEN_TERMS_OF_SERVICE': {
       try {
-        await WebBrowser.openBrowserAsync(LEGAL_URLS.TERMS_OF_SERVICE);
+        const legalUrls = getLegalUrls();
+        await WebBrowser.openBrowserAsync(legalUrls.TERMS_OF_SERVICE);
         return {};
       } catch (error) {
         console.error('Terms of service browser error:', error);
         return {
-          effects: [createErrorEffect('이용약관을 열 수 없습니다')],
+          effects: [createErrorEffect(i18n.t('settings.messages.termsOfServiceError'))],
         };
       }
     }
@@ -94,12 +95,11 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
           await StoreReview.requestReview();
           return {};
         } else {
-          // 스토어 리뷰가 불가능한 경우 (예: 시뮬레이터)
           return {
             effects: [
               {
                 type: 'SHOW_TOAST',
-                payload: { message: '앱 스토어에서 직접 평가해주세요', variant: 'info' },
+                payload: { message: i18n.t('settings.messages.rateAppFallback'), variant: 'info' },
               },
             ],
           };
@@ -107,7 +107,7 @@ export const settingsMiddleware: Middleware<SettingsState, SettingsIntent, Setti
       } catch (error) {
         console.error('Store review error:', error);
         return {
-          effects: [createErrorEffect('평가 화면을 열 수 없습니다')],
+          effects: [createErrorEffect(i18n.t('settings.messages.rateAppError'))],
         };
       }
     }

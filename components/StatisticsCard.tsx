@@ -1,38 +1,40 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import { Statistics } from '@/data/models/achievement.model';
+import { useTranslation } from 'react-i18next';
 
 interface StatisticsCardProps {
   statistics: Statistics;
 }
 
 export default function StatisticsCard({ statistics }: StatisticsCardProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const stats = [
     {
-      label: '총 등록',
+      label: t('achievement.statistics.totalRegistered'),
       value: statistics.total_registered,
       icon: '📦',
     },
     {
-      label: '총 소비',
+      label: t('achievement.statistics.totalConsumed'),
       value: statistics.total_consumed,
       icon: '✅',
     },
     {
-      label: '장보기',
+      label: t('achievement.statistics.shopping'),
       value: statistics.total_shopping_completed,
       icon: '🛒',
     },
     {
-      label: '현재 연속',
-      value: `${statistics.streak_record.current_streak}일`,
+      label: t('achievement.statistics.currentStreak'),
+      value: t('common.days', { count: statistics.streak_record.current_streak }),
       icon: '🔥',
     },
     {
-      label: '최장 연속',
-      value: `${statistics.streak_record.longest_streak}일`,
+      label: t('achievement.statistics.longestStreak'),
+      value: t('common.days', { count: statistics.streak_record.longest_streak }),
       icon: '👑',
     },
   ];
@@ -48,7 +50,7 @@ export default function StatisticsCard({ statistics }: StatisticsCardProps) {
         },
       ]}
     >
-      <Text style={[typography.styles.t3Semibold, { color: colors.text, marginBottom: spacing.md }]}>나의 통계</Text>
+      <Text style={[typography.styles.t3Semibold, { color: colors.text, marginBottom: spacing.md }]}>{t('achievement.statistics.title')}</Text>
 
       <View style={styles.grid}>
         {stats.map((stat, index) => (

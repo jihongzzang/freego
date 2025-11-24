@@ -3,6 +3,7 @@
  */
 
 import { calculateDday, getDdayColor } from '@/utils/date/calculateDday';
+import i18n from '@/locales';
 
 describe('calculateDday', () => {
   beforeEach(() => {
@@ -25,8 +26,8 @@ describe('calculateDday', () => {
   });
 
   describe('유통기한이 오늘인 경우', () => {
-    it('"오늘"을 반환한다', () => {
-      expect(calculateDday('2024-01-15')).toBe('오늘');
+    it('i18n.t("common.today")를 반환한다', () => {
+      expect(calculateDday('2024-01-15')).toBe(i18n.t('common.today'));
     });
   });
 
@@ -63,8 +64,8 @@ describe('getDdayColor', () => {
   });
 
   describe('오늘', () => {
-    it('"오늘"이면 "warning"을 반환한다', () => {
-      expect(getDdayColor('오늘')).toBe('warning');
+    it('i18n.t("common.today")이면 "warning"을 반환한다', () => {
+      expect(getDdayColor(i18n.t('common.today'))).toBe('warning');
     });
   });
 

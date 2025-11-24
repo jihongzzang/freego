@@ -6,6 +6,7 @@ import { getCategoryIcon } from '@/utils/category';
 import { useMemo } from 'react';
 import { Button, Chip } from './ui';
 import { Category } from '@/data/enums/category';
+import { useTranslation } from 'react-i18next';
 
 interface AddShoppingListBottomSheetProps {
   visible: boolean;
@@ -30,16 +31,18 @@ export default function AddShoppingListBottomSheet({
   onMemoChange,
   onSubmit,
 }: AddShoppingListBottomSheetProps) {
+  const { t, i18n } = useTranslation();
   const { colors, typography, isDark, spacing } = useTheme();
-  const categories = useMemo(() => makeCategoryList({ lang: 'kr' }), []);
+  const lang = i18n.language === 'ko' ? 'kr' : 'en';
+  const categories = useMemo(() => makeCategoryList({ lang }), [lang]);
 
   return (
-    <BottomSheet maxHeight={550} visible={visible} onClose={onClose} title="장보기 항목 추가">
+    <BottomSheet maxHeight={550} visible={visible} onClose={onClose} title={t('bottomSheet.addShoppingItem')}>
       <View style={styles.container}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <View style={styles.content}>
             <View style={styles.inputGroup}>
-              <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>재료 이름</Text>
+              <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>{t('bottomSheet.ingredientName')}</Text>
               <TextInput
                 style={[
                   styles.input,
@@ -52,13 +55,13 @@ export default function AddShoppingListBottomSheet({
                 ]}
                 value={name}
                 onChangeText={onNameChange}
-                placeholder="예: 양파, 당근"
+                placeholder={t('bottomSheet.ingredientNamePlaceholder')}
                 placeholderTextColor={colors.textTertiary}
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>카테고리</Text>
+              <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>{t('common.category')}</Text>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -79,7 +82,7 @@ export default function AddShoppingListBottomSheet({
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>메모 (선택)</Text>
+              <Text style={[typography.styles.t5Semibold, { color: colors.textSecondary }]}>{t('bottomSheet.memoOptional')}</Text>
               <TextInput
                 style={[
                   styles.input,
@@ -93,7 +96,7 @@ export default function AddShoppingListBottomSheet({
                 ]}
                 value={memo}
                 onChangeText={onMemoChange}
-                placeholder="예: 1kg, 신선한 것으로"
+                placeholder={t('bottomSheet.memoExamplePlaceholder')}
                 placeholderTextColor={colors.textTertiary}
                 multiline
                 numberOfLines={3}
@@ -111,7 +114,7 @@ export default function AddShoppingListBottomSheet({
           }}
         >
           <Button size="large" variant="primary" onPress={onSubmit} disabled={!name.trim()}>
-            추가
+            {t('common.add')}
           </Button>
         </View>
       </View>

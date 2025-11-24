@@ -5,6 +5,7 @@ import { getStorageLocationIcon } from '@/utils/storageLocation';
 import { makeStorageList } from '@/utils/category/makeStorageList';
 import { StorageLocation } from '@/data/enums/storage_location';
 import { Chip } from '@/components/ui';
+import { useTranslation } from 'react-i18next';
 
 interface StorageSectionProps {
   storageLocation: StorageLocation | null;
@@ -12,13 +13,15 @@ interface StorageSectionProps {
 }
 
 export function StorageSection({ storageLocation, onFieldChange }: StorageSectionProps) {
+  const { t, i18n } = useTranslation();
   const { colors, typography } = useTheme();
+  const lang = i18n.language === 'ko' ? 'kr' : 'en';
 
   return (
     <View style={styles.container}>
-      <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>보관 위치</Text>
+      <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{t('ingredientForm.storageLocation')}</Text>
       <View style={styles.categoryButtons}>
-        {makeStorageList({}).map((loc) => (
+        {makeStorageList({ lang }).map((loc) => (
           <Chip
             key={loc.id}
             label={loc.label}

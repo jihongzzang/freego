@@ -1,6 +1,6 @@
 import { View, StyleSheet } from 'react-native';
-import { Trash2, Minus } from 'lucide-react-native';
 import Button from '@/components/ui/Button';
+import { useTranslation } from 'react-i18next';
 
 interface ActionButtonsProps {
   onConsume: () => void;
@@ -8,16 +8,18 @@ interface ActionButtonsProps {
 }
 
 export function ActionButtons({ onConsume, onDelete }: ActionButtonsProps) {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
       <View style={{ flex: 1 }}>
         <Button variant="primary" size="large" onPress={onConsume}>
-          소모하기
+          {t('common.consume')}
         </Button>
       </View>
       <View style={{ flex: 1 }}>
         <Button variant="danger" size="large" onPress={onDelete}>
-          삭제하기
+          {t('common.delete')}
         </Button>
       </View>
     </View>

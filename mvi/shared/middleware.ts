@@ -8,7 +8,7 @@ import { MiddlewareResult, Effect } from '@/mvi/base';
 import { IngredientListState, CommonEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
 import { enrichIngredients, createErrorEffect } from './helpers';
-import ERROR_MESSAGES from '@/constants/toast/errorMessages';
+import i18n from '@/locales';
 
 /**
  * 재료 로딩 공통 로직
@@ -34,9 +34,9 @@ export async function handleLoadIngredients<
     return {
       state: {
         loading: false,
-        error: error instanceof Error ? error.message : '데이터 로드 실패',
+        error: error instanceof Error ? error.message : i18n.t('common.dataLoadFailed'),
       } as any as TState,
-      effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_LOAD_FAILED)] as any as TEffect[],
+      effects: [createErrorEffect(i18n.t('ingredientDetail.loadFailed'))] as any as TEffect[],
     };
   }
 }

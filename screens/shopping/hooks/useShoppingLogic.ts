@@ -9,11 +9,11 @@ import { createShoppingStore } from '@/mvi/features/shopping';
 import { StorageLocation } from '@/data/enums/storage_location';
 import { Category } from '@/data/enums/category';
 import { getCategoryLabel } from '@/utils/category/getCategoryLabel';
-import ERROR_MESSAGES from '@/constants/toast/errorMessages';
-import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
 import { getRandomEmojiForCategory } from '@/constants/ingredientTemplates';
+import { useTranslation } from 'react-i18next';
 
 export function useShoppingLogic() {
+  const { t } = useTranslation();
   const { confirm } = useDialog();
   const { showToast } = useToast();
   const [state, dispatch, effect] = useMVIStore(createShoppingStore);
@@ -62,16 +62,12 @@ export function useShoppingLogic() {
           title: effect.payload.title,
           message: effect.payload.message,
           onConfirm: async () => {
-            console.log('🟠 SHOW_CONFIRM onConfirm started');
             const result = await effect.payload.onConfirm();
-            console.log('🟠 SHOW_CONFIRM result:', result);
 
             // 선택 상태 먼저 초기화
-            console.log('🟠 Dispatching CLEAR_SELECTION');
             dispatch({ type: 'CLEAR_SELECTION' });
 
             // 데이터 다시 로드
-            console.log('🟠 Dispatching LOAD_SHOPPING_LIST');
             dispatch({ type: 'LOAD_SHOPPING_LIST' });
 
             // 결과에 따라 토스트 표시
@@ -80,26 +76,26 @@ export function useShoppingLogic() {
               switch (effect.payload.actionType) {
                 case 'add_to_storage':
                   showToast({
-                    message: `${result.count}개 항목이 냉장고에 추가됐어요.`,
+                    message: t('shopping.messages.addedToFridgeCount', { count: result.count }),
                     type: 'success',
                   });
                   break;
                 case 'delete':
                   showToast({
-                    message: SUCCESS_MESSAGES.SUCCESS_DELETE_SHOPPING_LIST_ITEM,
+                    message: t('shopping.messages.deleteSuccess'),
                     type: 'success',
                   });
                   break;
                 case 'cancel_purchase':
                   showToast({
-                    message: '구매완료가 취소되었어요.',
+                    message: t('shopping.messages.purchaseCanceled'),
                     type: 'success',
                   });
                   break;
                 default:
                   // actionType이 없는 경우 기본 성공 메시지
                   showToast({
-                    message: SUCCESS_MESSAGES.SUCCESS_DELETE_SHOPPING_LIST_ITEM,
+                    message: t('shopping.messages.deleteSuccess'),
                     type: 'success',
                   });
               }
@@ -108,33 +104,33 @@ export function useShoppingLogic() {
               switch (effect.payload.actionType) {
                 case 'add_to_storage':
                   showToast({
-                    message: ERROR_MESSAGES.ERROR_INGREDIENT_CREATE_ERROR,
+                    message: t('shopping.messages.ingredientAddError'),
                     type: 'error',
                   });
                   break;
                 case 'delete':
                   showToast({
-                    message: ERROR_MESSAGES.ERROR_SHOPPING_ITEM_DELETE_FAILED,
+                    message: t('shopping.messages.addFailed'),
                     type: 'error',
                   });
                   break;
                 case 'cancel_purchase':
                   showToast({
-                    message: '구매완료 취소에 실패했어요.',
+                    message: t('shopping.messages.cancelPurchaseFailed'),
                     type: 'error',
                   });
                   break;
                 default:
                   showToast({
-                    message: ERROR_MESSAGES.ERROR_SHOPPING_ITEM_DELETE_FAILED,
+                    message: t('shopping.messages.addFailed'),
                     type: 'error',
                   });
               }
             }
           },
           onCancel: undefined,
-          confirmText: effect.payload.isDanger ? '삭제' : '확인',
-          cancelText: '취소',
+          confirmText: effect.payload.isDanger ? t('common.delete') : t('common.confirm'),
+          cancelText: t('common.cancel'),
           isDestructive: effect.payload.isDanger,
         });
         break;
@@ -186,7 +182,7 @@ export function useShoppingLogic() {
 
     if (unpurchasedItems.length === 0) {
       showToast({
-        message: '공유할 구매 예정 항목이 없어요.',
+        message: t('shopping.messages.noItemsToShare'),
         type: 'info',
       });
       return;
@@ -202,7 +198,7 @@ export function useShoppingLogic() {
     });
 
     // 공유 텍스트 생성
-    let shareText = '📝 장보기 목록\n\n';
+    let shareText = t('shopping.messages.shoppingListTitle');
 
     Object.keys(groupedItems).forEach((categoryId) => {
       const items = groupedItems[categoryId];
@@ -230,7 +226,7 @@ export function useShoppingLogic() {
           await Clipboard.setStringAsync(shareText);
         } catch (clipboardError) {
           showToast({
-            message: ERROR_MESSAGES.ERROR_SHARING_FAILED,
+            message: t('shopping.messages.sharingFailed'),
             type: 'error',
           });
         }

@@ -9,8 +9,10 @@ import Header, { HEADER_HEIGHT } from '@/components/ui/Header';
 import AchievementCard from '@/components/AchievementCard';
 import StatisticsCard from '@/components/StatisticsCard';
 import BadgeModal from '@/components/BadgeModal';
+import { useTranslation } from 'react-i18next';
 
 export default function AchievementScreen() {
+  const { t } = useTranslation();
   const { colors, spacing, typography } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -79,10 +81,10 @@ export default function AchievementScreen() {
   }, [state.achievements]);
 
   const categoryLabels: Record<'streak' | 'consume' | 'register' | 'shopping', string> = {
-    streak: '🔥 연속 기록',
-    consume: '✅ 소비 챌린지',
-    register: '📦 등록 챌린지',
-    shopping: '🛒 장보기 챌린지',
+    streak: t('achievement.categories.streak'),
+    consume: t('achievement.categories.consume'),
+    register: t('achievement.categories.register'),
+    shopping: t('achievement.categories.shopping'),
   };
 
   const styles = useMemo(
@@ -112,14 +114,14 @@ export default function AchievementScreen() {
   if (!state.statistics) {
     return (
       <View style={styles.container}>
-        <Header title="챌린지" />
+        <Header title={t('achievement.title')} />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Header title="챌린지" />
+      <Header title={t('achievement.title')} />
 
       <View style={styles.content}>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent}>

@@ -18,6 +18,9 @@ import { DialogProvider } from '@/contexts/DialogContext';
 import { ToastProvider } from '@/components/ui';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
+// i18n 초기화
+import '@/locales';
+
 // 스플래시 화면 자동 숨김 방지
 SplashScreen.preventAutoHideAsync();
 

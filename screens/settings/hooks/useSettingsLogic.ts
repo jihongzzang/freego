@@ -2,14 +2,15 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { Platform, Linking, AppState } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/lib/theme';
 import { useDialog } from '@/contexts/DialogContext';
 import { useMVIStore } from '@/mvi/base';
 import { createSettingsStore } from '@/mvi/features/settings';
 import { useToast } from '@/components/ui';
-import ERROR_MESSAGES from '@/constants/toast/errorMessages';
 
 export function useSettingsLogic() {
+  const { t } = useTranslation();
   const { isDark, themePreference, setTheme } = useTheme();
   const { alert, confirm } = useDialog();
   const { showToast } = useToast();
@@ -96,10 +97,10 @@ export function useSettingsLogic() {
         await checkExpiryAndNotify();
       } else {
         confirm({
-          title: '알림 권한 필요',
-          message: '설정에서 알림 권한을 허용해주세요.',
-          confirmText: '설정 열기',
-          cancelText: '취소',
+          title: t('settings.messages.permissionRequiredTitle'),
+          message: t('settings.messages.permissionRequiredMessage'),
+          confirmText: t('settings.messages.openSettings'),
+          cancelText: t('common.cancel'),
           onConfirm: () => {
             if (Platform.OS === 'ios') {
               Linking.openURL('app-settings:');
@@ -112,7 +113,7 @@ export function useSettingsLogic() {
     } catch (error) {
       // console.log('Failed to request notification permission (expected in Expo Go):', error);
       showToast({
-        message: '알림 권한을 요청할 수 없어요.',
+        message: t('settings.messages.permissionRequestFailed'),
         type: 'warning',
       });
     }
@@ -133,8 +134,8 @@ export function useSettingsLogic() {
 
   async function sendFeedback() {
     const email = 'jujihong2@gmail.com';
-    const subject = '프리고 앱 피드백';
-    const body = '안녕하세요,\n\n피드백 내용을 입력해주세요:\n\n';
+    const subject = t('settings.feedback.emailSubject');
+    const body = t('settings.feedback.emailBody');
 
     const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
@@ -143,7 +144,7 @@ export function useSettingsLogic() {
       await Linking.openURL(url);
     } else {
       showToast({
-        message: ERROR_MESSAGES.ERROR_EMAIL_APP_OPEN_FAILED,
+        message: t('settings.messages.emailAppOpenFailed'),
         type: 'error',
       });
     }
@@ -151,10 +152,10 @@ export function useSettingsLogic() {
 
   function handleDeleteAllData() {
     confirm({
-      title: '데이터 삭제',
-      message: '등록된 모든 냉장고 재료가 삭제돼요.\n이 작업은 되돌릴 수 없어요.\n\n정말 삭제하시겠어요?',
-      confirmText: '삭제',
-      cancelText: '취소',
+      title: t('settings.messages.deleteDataTitle'),
+      message: t('settings.messages.deleteDataConfirm'),
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
       isDestructive: true,
       onConfirm: async () => {
         dispatch({ type: 'DELETE_ALL_DATA' });

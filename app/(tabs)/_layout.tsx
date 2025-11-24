@@ -1,9 +1,10 @@
 import { Tabs } from 'expo-router';
-import { Award, ClipboardList, Home, Layers, Package, Refrigerator, Settings, ShoppingCart } from 'lucide-react-native';
+import { Award, ClipboardList, Settings, ShoppingCart } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/lib/theme';
 import { Platform, Text, TouchableOpacity } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 
 function AnimatedTabBarButton({ children, onPress, ...props }: any) {
   const scale = useSharedValue(1);
@@ -46,7 +47,7 @@ function AnimatedTabBarButton({ children, onPress, ...props }: any) {
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
-
+  const { t } = useTranslation();
   const { colors, isDark, typography } = useTheme();
 
   return (
@@ -80,7 +81,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '재료관리',
+          title: 'ingredients',
           sceneStyle: { backgroundColor: colors.background },
           tabBarLabel: ({ focused }) => (
             <Text
@@ -97,14 +98,10 @@ export default function TabLayout() {
                 },
               ]}
             >
-              재료관리
+              {t('tabs.ingredients')}
             </Text>
           ),
           tabBarIcon: ({ focused }) => (
-            // <Refrigerator
-            //   size={24}
-            //   color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
-            // />
             <ClipboardList
               size={24}
               color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
@@ -112,41 +109,10 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* <Tabs.Screen
-        name="ingredients"
-        options={{
-          title: '재료 관리',
-          sceneStyle: { backgroundColor: colors.background },
-          tabBarLabel: ({ focused }) => (
-            <Text
-              style={[
-                typography.styles.t8Medium,
-                {
-                  color: isDark
-                    ? focused
-                      ? colors.grey200
-                      : colors.grey600
-                    : focused
-                      ? colors.grey900
-                      : colors.grey600,
-                },
-              ]}
-            >
-              재료 관리
-            </Text>
-          ),
-          tabBarIcon: ({ focused }) => (
-            <ClipboardList
-              size={24}
-              color={isDark ? (focused ? colors.grey200 : colors.grey700) : focused ? colors.grey800 : colors.grey400}
-            />
-          ),
-        }}
-      /> */}
       <Tabs.Screen
         name="shopping"
         options={{
-          title: '장보기',
+          title: 'shopping',
           sceneStyle: { backgroundColor: colors.background },
           tabBarLabel: ({ focused }) => (
             <Text
@@ -163,7 +129,7 @@ export default function TabLayout() {
                 },
               ]}
             >
-              장보기
+              {t('tabs.shopping')}
             </Text>
           ),
           tabBarIcon: ({ focused }) => (
@@ -177,7 +143,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="achievement"
         options={{
-          title: '챌린지',
+          title: 'achievement',
           sceneStyle: { backgroundColor: colors.background },
           tabBarLabel: ({ focused }) => (
             <Text
@@ -194,7 +160,7 @@ export default function TabLayout() {
                 },
               ]}
             >
-              챌린지
+              {t('tabs.achievement')}
             </Text>
           ),
           tabBarIcon: ({ focused }) => (
@@ -208,7 +174,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: '설정',
+          title: 'settings',
           sceneStyle: { backgroundColor: colors.background },
           tabBarLabel: ({ focused }) => (
             <Text
@@ -225,7 +191,7 @@ export default function TabLayout() {
                 },
               ]}
             >
-              설정
+              {t('tabs.settings')}
             </Text>
           ),
           tabBarIcon: ({ focused }) => (

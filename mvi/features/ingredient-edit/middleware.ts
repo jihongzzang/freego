@@ -8,9 +8,8 @@ import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { IngredientEditState, IngredientEditIntent, IngredientEditEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
 import { Ingredient } from '@/data/models/ingredient.model';
-import ERROR_MESSAGES from '@/constants/toast/errorMessages';
 import { createErrorEffect, createSuccessEffect } from '@/mvi/shared';
-import SUCCESS_MESSAGES from '@/constants/toast/successMessages';
+import i18n from '@/locales';
 
 /**
  * 폼 유효성 검사
@@ -23,7 +22,7 @@ function validateForm(form: IngredientEditState['editForm']): {
 
   // 이름 검증 (필수)
   if (!form.name.trim()) {
-    errors.name = ERROR_MESSAGES.ERROR_MISSING_INGREDIENT_NAME;
+    errors.name = i18n.t('ingredientEdit.missingName');
   }
 
   // 수량 검증 (선택적 - 안 쓰거나 양수만)
@@ -34,11 +33,11 @@ function validateForm(form: IngredientEditState['editForm']): {
     if (trimmedQuantity !== '') {
       // 숫자가 아닌 경우
       if (isNaN(Number(trimmedQuantity))) {
-        errors.quantity = ERROR_MESSAGES.ERROR_INVALID_INGREDIENT_QUANTITY;
+        errors.quantity = i18n.t('ingredientEdit.invalidQuantity');
       }
       // 0 이하인 경우 (0 포함, 음수 포함)
       else if (Number(trimmedQuantity) <= 0) {
-        errors.quantity = ERROR_MESSAGES.ERROR_INGREDIENT_QUANTITY_MUST_BE_GREATER_THAN_ZERO;
+        errors.quantity = i18n.t('ingredientEdit.quantityMustBePositive');
       }
     }
   }
@@ -65,7 +64,7 @@ export const ingredientEditMiddleware: Middleware<
 
         if (!data) {
           return {
-            state: { ...state, loading: false, error: '식재료를 찾을 수 없어요.' },
+            state: { ...state, loading: false, error: i18n.t('ingredientEdit.notFound') },
           };
         }
 
@@ -96,9 +95,9 @@ export const ingredientEditMiddleware: Middleware<
           state: {
             ...state,
             loading: false,
-            error: error instanceof Error ? error.message : '데이터 로드 실패',
+            error: error instanceof Error ? error.message : i18n.t('ingredientEdit.loadFailed'),
           },
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_LOAD_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredientEdit.loadFailed'))],
         };
       }
     }
@@ -120,7 +119,7 @@ export const ingredientEditMiddleware: Middleware<
             {
               type: 'SHOW_TOAST',
               payload: {
-                message: firstError || ERROR_MESSAGES.ERROR_INVALID_INPUT_FIELDS,
+                message: firstError || i18n.t('ingredientEdit.invalidInput'),
                 variant: 'error',
               },
             },
@@ -146,12 +145,12 @@ export const ingredientEditMiddleware: Middleware<
             ...state,
             errors: {},
           },
-          effects: [createSuccessEffect(SUCCESS_MESSAGES.SUCCESS_UPDATE_INGREDIENT), { type: 'NAVIGATE_BACK' }],
+          effects: [createSuccessEffect(i18n.t('ingredientEdit.updateSuccess')), { type: 'NAVIGATE_BACK' }],
         };
       } catch (error) {
         console.error('Error updating ingredient:', JSON.stringify(error, null, 2));
         return {
-          effects: [createErrorEffect(ERROR_MESSAGES.ERROR_INGREDIENT_UPDATE_FAILED)],
+          effects: [createErrorEffect(i18n.t('ingredientEdit.updateFailed'))],
         };
       }
     }

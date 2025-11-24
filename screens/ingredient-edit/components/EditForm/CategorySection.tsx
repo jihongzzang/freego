@@ -6,6 +6,7 @@ import { makeCategoryList } from '@/utils/category/makeCategoryList';
 import { Category } from '@/data/enums/category';
 import { useMemo } from 'react';
 import { Chip } from '@/components/ui';
+import { useTranslation } from 'react-i18next';
 
 interface CategorySectionProps {
   selectedCategory: Category;
@@ -13,15 +14,17 @@ interface CategorySectionProps {
 }
 
 export function CategorySection({ selectedCategory, onCategoryChange }: CategorySectionProps) {
+  const { t, i18n } = useTranslation();
   const { colors, typography, spacing, isDark, borderRadius } = useTheme();
+  const lang = i18n.language === 'ko' ? 'kr' : 'en';
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
   return (
     <View style={styles.container}>
-      <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>카테고리</Text>
+      <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{t('ingredientForm.category')}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {makeCategoryList({}).map((cat) => (
+        {makeCategoryList({ lang }).map((cat) => (
           <Chip
             key={cat.id}
             label={cat.label}

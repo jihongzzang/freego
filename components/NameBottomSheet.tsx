@@ -2,6 +2,7 @@ import { View, StyleSheet, TextInput } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import BottomSheet from '@/components/ui/BottomSheet';
 import { Button } from './ui';
+import { useTranslation } from 'react-i18next';
 
 interface NameBottomSheetProps {
   visible: boolean;
@@ -20,6 +21,7 @@ export default function NameBottomSheet({
   onNameChange,
   onConfirm,
 }: NameBottomSheetProps) {
+  const { t } = useTranslation();
   const { colors, typography, isDark, spacing } = useTheme();
 
   return (
@@ -38,7 +40,7 @@ export default function NameBottomSheet({
             ]}
             value={name}
             onChangeText={onNameChange}
-            placeholder="이름을 입력하세요"
+            placeholder={t('bottomSheet.namePlaceholder')}
             placeholderTextColor={colors.textTertiary}
             autoFocus
           />
@@ -55,7 +57,7 @@ export default function NameBottomSheet({
           ]}
         >
           <Button size="large" variant="primary" onPress={onConfirm} disabled={!name}>
-            저장
+            {t('common.save')}
           </Button>
         </View>
       </View>

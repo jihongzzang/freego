@@ -4,6 +4,7 @@ import { useTheme } from '@/lib/theme';
 import BottomSheet from '@/components/ui/BottomSheet';
 import { Unit } from '@/data/enums/unit';
 import { makeUnitList } from '@/utils/unit/makeUnitList';
+import { useTranslation } from 'react-i18next';
 
 interface SelectUnitBottomSheetProps {
   visible: boolean;
@@ -18,6 +19,7 @@ export default function SelectUnitBottomSheet({
   selectedUnit,
   onUnitSelect,
 }: SelectUnitBottomSheetProps) {
+  const { t, i18n } = useTranslation();
   const { colors, typography, spacing, borderRadius, isDark } = useTheme();
 
   const handleUnitSelect = (unitId: Unit) => {
@@ -25,10 +27,11 @@ export default function SelectUnitBottomSheet({
     onClose();
   };
 
-  const units = makeUnitList({ lang: 'kr' });
+  const lang = i18n.language === 'ko' ? 'kr' : 'en';
+  const units = makeUnitList({ lang });
 
   return (
-    <BottomSheet maxHeight={450} visible={visible} onClose={onClose} title="단위 선택">
+    <BottomSheet maxHeight={450} visible={visible} onClose={onClose} title={t('bottomSheet.selectUnit')}>
       <View style={styles.container}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
           {units.map((unit) => (

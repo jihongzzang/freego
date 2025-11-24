@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { useTheme } from '@/lib/theme';
 import { EditFormData } from '@/mvi/features/ingredient-edit';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface BasicInfoSectionProps {
   formData: EditFormData;
@@ -11,6 +12,7 @@ interface BasicInfoSectionProps {
 }
 
 export function BasicInfoSection({ formData, selectedEmoji, onFieldChange, onEmojiPress }: BasicInfoSectionProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing, borderRadius } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
@@ -18,7 +20,7 @@ export function BasicInfoSection({ formData, selectedEmoji, onFieldChange, onEmo
   return (
     <View style={styles.container}>
       <View style={styles.inputHeader}>
-        <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>이름</Text>
+        <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{t('ingredientForm.name')}</Text>
         <TouchableOpacity
           style={[styles.emojiButton, { backgroundColor: colors.surface, borderColor: colors.surface }]}
           onPress={onEmojiPress}
@@ -29,7 +31,7 @@ export function BasicInfoSection({ formData, selectedEmoji, onFieldChange, onEmo
               <Text style={[typography.styles.t7, { color: colors.textTertiary }]}>+</Text>
             </View>
           ) : (
-            <Text style={[typography.styles.t7, { color: colors.textTertiary }]}>이모지 +</Text>
+            <Text style={[typography.styles.t7, { color: colors.textTertiary }]}>{t('ingredientForm.emojiAdd')}</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -46,7 +48,7 @@ export function BasicInfoSection({ formData, selectedEmoji, onFieldChange, onEmo
         ]}
         value={formData.name}
         onChangeText={(text) => onFieldChange('name', text)}
-        placeholder="식재료 이름"
+        placeholder={t('ingredientForm.namePlaceholder')}
         placeholderTextColor={colors.textTertiary}
       />
     </View>

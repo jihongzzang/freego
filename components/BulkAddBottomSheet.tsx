@@ -7,6 +7,7 @@ import { getCategoryIcon } from '@/utils/category';
 import { makeCategoryList } from '@/utils/category/makeCategoryList';
 import { useMemo, useRef, useEffect } from 'react';
 import { Button, Chip } from './ui';
+import { useTranslation } from 'react-i18next';
 
 interface BulkAddBottomSheetProps {
   visible: boolean;
@@ -27,6 +28,7 @@ export default function BulkAddBottomSheet({
   onTemplateToggle,
   onConfirm,
 }: BulkAddBottomSheetProps) {
+  const { t, i18n } = useTranslation();
   const { colors, typography, borderRadius, spacing, isDark } = useTheme();
 
   const screenWidth = Dimensions.get('window').width;
@@ -37,7 +39,8 @@ export default function BulkAddBottomSheet({
   const categoryScrollRef = useRef<ScrollView>(null);
   const chipRefs = useRef<{ [key: string]: View | null }>({});
 
-  const categories = useMemo(() => makeCategoryList({ includeAllCategory: false, lang: 'kr' }).slice(0, -1), []);
+  const lang = i18n.language === 'ko' ? 'kr' : 'en';
+  const categories = useMemo(() => makeCategoryList({ includeAllCategory: false, lang }).slice(0, -1), [lang]);
 
   const filteredTemplates = useMemo(() => {
     if (selectedCategoryId === Category.ALL || selectedCategoryId === Category.OTHER) {
@@ -68,7 +71,7 @@ export default function BulkAddBottomSheet({
   }
 
   return (
-    <BottomSheet maxHeight={600} visible={visible} onClose={onClose} title="한꺼번에 등록">
+    <BottomSheet maxHeight={600} visible={visible} onClose={onClose} title={t('bottomSheet.bulkAdd')}>
       <View style={styles.container}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -134,7 +137,7 @@ export default function BulkAddBottomSheet({
                     ]}
                     numberOfLines={1}
                   >
-                    {template.krLabel}
+                    {i18n.language === 'ko' ? template.krLabel : template.enLabel}
                   </Text>
                 </TouchableOpacity>
               );
@@ -156,7 +159,7 @@ export default function BulkAddBottomSheet({
               disabled={selectedTemplates.length > 0 ? false : true}
               onPress={onConfirm}
             >
-              {selectedTemplates.length}개 추가하기
+              {t('bottomSheet.addCount', { count: selectedTemplates.length })}
             </Button>
           </View>
         )}

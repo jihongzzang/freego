@@ -8,9 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Middleware, MiddlewareResult } from '@/mvi/base';
 import { OnboardingState, OnboardingIntent, OnboardingEffect } from './types';
 import { ingredientService } from '@/services/ingredient.service';
-import { findLifestylePackageById } from '@/constants/starterPackages';
+import { findLifestylePackageById, SupportedLang } from '@/constants/starterPackages';
 import { createErrorEffect, createSuccessEffect } from '@/mvi/shared';
-import ERROR_MESSAGES from '@/constants/toast/errorMessages';
+import i18n from '@/locales';
 
 const ONBOARDING_KEY = '@onboarding_completed';
 
@@ -32,7 +32,8 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
     case 'ADD_STARTER_PACKAGE':
       // 스타터 패키지 추가
       if (state.selectedLifestyle) {
-        const lifestylePackage = findLifestylePackageById(state.selectedLifestyle);
+        const lang = (i18n.language === 'ko' ? 'ko' : 'en') as SupportedLang;
+        const lifestylePackage = findLifestylePackageById(state.selectedLifestyle, lang);
 
         if (lifestylePackage) {
           try {
@@ -56,7 +57,7 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
             await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
             return {
               effects: [
-                createSuccessEffect(`${ingredientsToAdd.length}개의 식재료가 추가됐어요.`),
+                createSuccessEffect(i18n.t('onboarding.starterPackageAdded', { count: ingredientsToAdd.length })),
                 { type: 'REQUEST_NOTIFICATION_PERMISSION' },
                 { type: 'NAVIGATE_TO_HOME' },
               ],
@@ -66,7 +67,7 @@ export const onboardingMiddleware: Middleware<OnboardingState, OnboardingIntent,
             await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
             return {
               effects: [
-                createErrorEffect(ERROR_MESSAGES.ERROR_STARTER_PACKAGE_ADD_FAILED),
+                createErrorEffect(i18n.t('onboarding.starterPackageError')),
                 { type: 'REQUEST_NOTIFICATION_PERMISSION' },
                 { type: 'NAVIGATE_TO_HOME' },
               ],

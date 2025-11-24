@@ -3,12 +3,14 @@ import { Database } from 'lucide-react-native';
 import { useTheme } from '@/lib/theme';
 import Card from '@/components/ui/Card';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface DataManagementProps {
   onDeleteAllData: () => void;
 }
 
 export function DataManagement({ onDeleteAllData }: DataManagementProps) {
+  const { t } = useTranslation();
   const { colors, typography, spacing } = useTheme();
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
@@ -17,15 +19,15 @@ export function DataManagement({ onDeleteAllData }: DataManagementProps) {
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
         <Database size={20} color={colors.textSecondary} />
-        <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>데이터 관리</Text>
+        <Text style={[typography.styles.t4Semibold, { color: colors.text }]}>{t('settings.data.title')}</Text>
       </View>
 
       <Card variant="elevated" padding="large">
         <TouchableOpacity style={styles.deleteButton} onPress={onDeleteAllData} activeOpacity={0.7}>
           <View style={styles.deleteButtonText}>
-            <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>냉장고 데이터 삭제</Text>
+            <Text style={[typography.styles.t5Semibold, { color: colors.text }]}>{t('settings.data.deleteAll')}</Text>
             <Text style={[typography.styles.t7, { color: colors.textSecondary, marginTop: spacing.xs }]}>
-              등록된 모든 재료가 삭제돼요
+              {t('settings.data.deleteDescription')}
             </Text>
           </View>
         </TouchableOpacity>

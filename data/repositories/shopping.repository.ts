@@ -66,7 +66,6 @@ export const shoppingRepository = {
         purchased_date_time: null,
         created_date_time: new Date().toISOString(),
       };
-      console.log('🤎 장보기 아이템 추가', JSON.stringify(newItem, null, 2));
       shoppingList.push(newItem);
       await this.saveShoppingList(shoppingList);
       return newItem;
@@ -90,7 +89,6 @@ export const shoppingRepository = {
           ...updates,
           last_modified_date_time: new Date().toISOString(),
         };
-        console.log('🤎 장보기 아이템 업데이트', JSON.stringify(shoppingList[index], null, 2));
         await this.saveShoppingList(shoppingList);
         return true;
       }
@@ -114,7 +112,6 @@ export const shoppingRepository = {
           ...shoppingList[index],
           deleted_date_time: new Date().toISOString(),
         };
-        console.log('🤎 장보기 아이템 삭제', JSON.stringify(shoppingList[index], null, 2));
         await this.saveShoppingList(shoppingList);
         return true;
       }

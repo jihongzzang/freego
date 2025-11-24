@@ -4,6 +4,7 @@ import BottomSheet from '@/components/ui/BottomSheet';
 import DatePicker from '@/components/ui/DatePicker';
 import { useMemo } from 'react';
 import { Button } from './ui';
+import { useTranslation } from 'react-i18next';
 
 interface SelectDateBottomSheetProps {
   visible: boolean;
@@ -19,18 +20,20 @@ interface SelectDateBottomSheetProps {
 export default function SelectDateBottomSheet({
   visible,
   onClose,
-  title = '날짜 선택',
+  title,
   maxHeight = 610,
   selectedDate,
   onDateChange,
   onConfirm,
 }: SelectDateBottomSheetProps) {
+  const { t } = useTranslation();
   const { colors, spacing, isDark } = useTheme();
+  const displayTitle = title || t('bottomSheet.selectDate');
 
   const styles = useMemo(() => createStyles({ spacing }), [spacing]);
 
   return (
-    <BottomSheet maxHeight={maxHeight} visible={visible} onClose={onClose} title={title}>
+    <BottomSheet maxHeight={maxHeight} visible={visible} onClose={onClose} title={displayTitle}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <DatePicker value={selectedDate} onDateSelect={onDateChange} />
         <View
@@ -42,7 +45,7 @@ export default function SelectDateBottomSheet({
           ]}
         >
           <Button variant="primary" size="large" onPress={onConfirm}>
-            확인
+            {t('common.confirm')}
           </Button>
         </View>
       </ScrollView>
