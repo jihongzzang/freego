@@ -21,9 +21,6 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
   switch (intent.type) {
     case 'LOAD_SHOPPING_LIST': {
       try {
-        console.log('🟡 LOAD_SHOPPING_LIST (middleware):', {
-          currentSelectedIds: state.selectedIds.size,
-        });
         const items = await shoppingService.getShoppingList();
         return {
           state: {
@@ -104,7 +101,9 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             ...state,
             shoppingList: items,
           },
-          effects: [createSuccessEffect(i18n.t('shopping.messages.addedToShoppingList', { name: intent.payload.name.trim() }))],
+          effects: [
+            createSuccessEffect(i18n.t('shopping.messages.addedToShoppingList', { name: intent.payload.name.trim() })),
+          ],
         };
       } catch (error) {
         console.error('Error adding shopping item:', error);
@@ -387,7 +386,10 @@ export const shoppingMiddleware: Middleware<ShoppingState, ShoppingIntent, Shopp
             type: 'SHOW_CONFIRM',
             payload: {
               title: i18n.t('shopping.messages.deleteDateItemsTitle'),
-              message: i18n.t('shopping.messages.deleteDateItemsConfirm', { dateKey: intent.payload.dateKey, count: itemCount }),
+              message: i18n.t('shopping.messages.deleteDateItemsConfirm', {
+                dateKey: intent.payload.dateKey,
+                count: itemCount,
+              }),
               onConfirm: async () => {
                 try {
                   const now = new Date().toISOString();

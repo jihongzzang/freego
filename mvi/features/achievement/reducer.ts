@@ -10,12 +10,10 @@ import { AchievementState, AchievementIntent } from './types';
 export const achievementReducer: Reducer<AchievementState, AchievementIntent> = (state, intent): AchievementState => {
   switch (intent.type) {
     case 'LOAD_ACHIEVEMENTS': {
-      console.log('🟡 LOAD_ACHIEVEMENTS (reducer)');
       return state;
     }
 
     case 'REFRESH_ACHIEVEMENTS': {
-      console.log('🔵 REFRESH_ACHIEVEMENTS (reducer)');
       return state;
     }
 

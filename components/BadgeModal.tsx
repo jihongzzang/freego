@@ -13,7 +13,7 @@ interface BadgeModalProps {
 
 export default function BadgeModal({ visible, achievement, onClose }: BadgeModalProps) {
   const { t } = useTranslation();
-  const { colors, typography, spacing, borderRadius } = useTheme();
+  const { colors, typography, spacing, borderRadius, isDark } = useTheme();
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -49,7 +49,7 @@ export default function BadgeModal({ visible, achievement, onClose }: BadgeModal
           style={[
             styles.container,
             {
-              backgroundColor: colors.background,
+              backgroundColor: isDark ? '#2C2C35' : colors.white,
               borderRadius: borderRadius.xl,
               padding: spacing.xl,
               opacity: fadeAnim,

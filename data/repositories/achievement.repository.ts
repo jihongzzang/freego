@@ -4,9 +4,9 @@ import { AchievementType } from '@/data/enums/achievement-type';
 import i18n from '@/locales';
 
 /**
- * 뱃지 이미지
+ * 뱃지 이미지 (한국어)
  */
-const BADGE_IMAGES = {
+const BADGE_IMAGES_KO = {
   streak_3d: require('@/assets/images/streak-3d.png'),
   streak_7d: require('@/assets/images/streak-7d.png'),
   streak_30d: require('@/assets/images/streak-30d.png'),
@@ -21,6 +21,62 @@ const BADGE_IMAGES = {
   shopping_20: require('@/assets/images/shopping-planner-20.png'),
   shopping_50: require('@/assets/images/shopping-planner-50.png'),
 };
+
+/**
+ * 뱃지 이미지 (영어)
+ */
+const BADGE_IMAGES_EN = {
+  streak_3d: require('@/assets/images/streak-3d-en.png'),
+  streak_7d: require('@/assets/images/streak-7d-en.png'),
+  streak_30d: require('@/assets/images/streak-30d-en.png'),
+  consume_10: require('@/assets/images/consume-10-en.png'),
+  consume_50: require('@/assets/images/consume-50-en.png'),
+  consume_100: require('@/assets/images/consume-100-en.png'),
+  register_first: require('@/assets/images/frigo-first-ingredient-en.png'),
+  register_10: require('@/assets/images/ingredient-10-registered-en.png'),
+  register_50: require('@/assets/images/ingredient-50-registered-en.png'),
+  register_100: require('@/assets/images/ingredient-100-registered-en.png'),
+  shopping_5: require('@/assets/images/shopping-planner-en.png'),
+  shopping_20: require('@/assets/images/shopping-planner-20-en.png'),
+  shopping_50: require('@/assets/images/shopping-planner-50-en.png'),
+};
+
+/**
+ * 현재 언어에 맞는 뱃지 이미지 반환
+ */
+function getBadgeImages() {
+  const currentLang = i18n.language;
+  const isKorean = currentLang?.startsWith('ko');
+  return isKorean ? BADGE_IMAGES_KO : BADGE_IMAGES_EN;
+}
+
+/**
+ * AchievementType에 따른 뱃지 이미지 키 매핑
+ */
+const ACHIEVEMENT_BADGE_KEY: Record<AchievementType, keyof typeof BADGE_IMAGES_KO> = {
+  [AchievementType.STREAK_3_DAYS]: 'streak_3d',
+  [AchievementType.STREAK_7_DAYS]: 'streak_7d',
+  [AchievementType.STREAK_30_DAYS]: 'streak_30d',
+  [AchievementType.CONSUME_10]: 'consume_10',
+  [AchievementType.CONSUME_50]: 'consume_50',
+  [AchievementType.CONSUME_100]: 'consume_100',
+  [AchievementType.REGISTER_FIRST]: 'register_first',
+  [AchievementType.REGISTER_10]: 'register_10',
+  [AchievementType.REGISTER_50]: 'register_50',
+  [AchievementType.REGISTER_100]: 'register_100',
+  [AchievementType.SHOPPING_USE_5]: 'shopping_5',
+  [AchievementType.SHOPPING_USE_20]: 'shopping_20',
+  [AchievementType.SHOPPING_USE_50]: 'shopping_50',
+};
+
+/**
+ * AchievementType에 따른 현재 언어의 뱃지 이미지 반환
+ */
+function getBadgeImageForType(type: AchievementType) {
+  const images = getBadgeImages();
+  const key = ACHIEVEMENT_BADGE_KEY[type];
+  return images[key];
+}
 
 /**
  * AsyncStorage 키 상수
@@ -64,6 +120,8 @@ export function getAchievementDescription(type: AchievementType): string {
  * 기본 업적 목록 생성 함수
  */
 function createDefaultAchievements(): Achievement[] {
+  const BADGE_IMAGES = getBadgeImages();
+
   return [
     // 연속 기록
     {
@@ -287,12 +345,13 @@ export const achievementRepository = {
         await this.saveAchievements(defaultAchievements);
         return defaultAchievements;
       }
-      // 저장된 데이터에 현재 언어의 title/description 적용
+      // 저장된 데이터에 현재 언어의 title/description/badge_image 적용
       const achievements: Achievement[] = JSON.parse(data);
       return achievements.map((achievement) => ({
         ...achievement,
         title: getAchievementTitle(achievement.type),
         description: getAchievementDescription(achievement.type),
+        badge_image: getBadgeImageForType(achievement.type),
       }));
     } catch (error) {
       console.error('Error reading achievements:', error);

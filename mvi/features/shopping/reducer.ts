@@ -19,13 +19,6 @@ export const shoppingReducer: Reducer<ShoppingState, ShoppingIntent> = (state, i
         newSelectedIds.add(id);
       }
 
-      console.log('🔵 TOGGLE_SELECT:', {
-        id,
-        before: state.selectedIds.size,
-        after: newSelectedIds.size,
-        selectedIds: Array.from(newSelectedIds),
-      });
-
       return {
         ...state,
         selectedIds: newSelectedIds,
@@ -42,14 +35,6 @@ export const shoppingReducer: Reducer<ShoppingState, ShoppingIntent> = (state, i
 
       const newSelectedIds = allUnpurchasedSelected ? new Set<string>() : new Set(unpurchasedIds);
 
-      console.log('🟢 TOGGLE_SELECT_ALL:', {
-        unpurchasedCount: unpurchasedItems.length,
-        allUnpurchasedSelected,
-        before: state.selectedIds.size,
-        after: newSelectedIds.size,
-        selectedIds: Array.from(newSelectedIds),
-      });
-
       return {
         ...state,
         selectedIds: newSelectedIds,
@@ -57,11 +42,6 @@ export const shoppingReducer: Reducer<ShoppingState, ShoppingIntent> = (state, i
     }
 
     case 'CLEAR_SELECTION': {
-      console.log('🔴 CLEAR_SELECTION:', {
-        before: state.selectedIds.size,
-        selectedIds: Array.from(state.selectedIds),
-      });
-
       return {
         ...state,
         selectedIds: new Set<string>(),
@@ -71,13 +51,6 @@ export const shoppingReducer: Reducer<ShoppingState, ShoppingIntent> = (state, i
     case 'SET_SELECTION': {
       const newSelectedIds = new Set(intent.payload.ids);
 
-      console.log('🟣 SET_SELECTION:', {
-        before: state.selectedIds.size,
-        after: newSelectedIds.size,
-        beforeIds: Array.from(state.selectedIds),
-        afterIds: Array.from(newSelectedIds),
-      });
-
       return {
         ...state,
         selectedIds: newSelectedIds,
@@ -85,11 +58,6 @@ export const shoppingReducer: Reducer<ShoppingState, ShoppingIntent> = (state, i
     }
 
     case 'LOAD_SHOPPING_LIST': {
-      console.log('🟡 LOAD_SHOPPING_LIST (reducer):', {
-        before: state.selectedIds.size,
-        selectedIds: Array.from(state.selectedIds),
-      });
-
       // 로드 시 선택 해제
       return {
         ...state,

@@ -76,7 +76,6 @@ export default function ShoppingListTableScreen() {
 
   // 탭이 바뀔 때 선택 해제
   useEffect(() => {
-    console.log('🟣 Tab changed:', { index, route: routes[index].key });
     dispatch({ type: 'CLEAR_SELECTION' });
   }, [index, dispatch, routes]);
 
@@ -95,28 +94,17 @@ export default function ShoppingListTableScreen() {
 
     // 선택된 항목 중 구매 완료된 것이 있으면, 구매 예정 항목만 남기기
     if (hasInvalidSelection && state.selectedIds.size > 0) {
-      console.log('🔸 Removing purchased items from selection (keeping unpurchased)');
       // 구매 예정 항목만 필터링해서 새로운 선택 상태로 업데이트
       const validSelectedIds = Array.from(state.selectedIds).filter((id) => unpurchasedIds.has(id));
 
       // 유효한 선택이 있으면 그것만 유지, 없으면 전체 초기화
       if (validSelectedIds.length > 0) {
-        console.log('🔸 Keeping valid selections:', validSelectedIds);
         dispatch({ type: 'SET_SELECTION', payload: { ids: validSelectedIds } });
       } else {
-        console.log('🔸 No valid selections remaining, clearing all');
         dispatch({ type: 'CLEAR_SELECTION' });
       }
     }
   }, [unpurchasedItems, state.selectedIds, dispatch]);
-
-  // selectedIds 변경 추적
-  useEffect(() => {
-    console.log('⭐ selectedIds changed:', {
-      size: state.selectedIds.size,
-      ids: Array.from(state.selectedIds),
-    });
-  }, [state.selectedIds]);
 
   // Handle horizontal scroll - update selected tab
   const handleHorizontalScroll = useCallback(
@@ -204,8 +192,14 @@ export default function ShoppingListTableScreen() {
                   <View style={styles.sceneContainer}>
                     <EmptyStateUI
                       icon={<ShoppingCart size={64} color={colors.textTertiary} />}
-                      title={isUnpurchasedRoute ? t('shopping.empty.unpurchasedTitle') : t('shopping.empty.purchasedTitle')}
-                      description={isUnpurchasedRoute ? t('shopping.empty.unpurchasedDescription') : t('shopping.empty.purchasedDescription')}
+                      title={
+                        isUnpurchasedRoute ? t('shopping.empty.unpurchasedTitle') : t('shopping.empty.purchasedTitle')
+                      }
+                      description={
+                        isUnpurchasedRoute
+                          ? t('shopping.empty.unpurchasedDescription')
+                          : t('shopping.empty.purchasedDescription')
+                      }
                     />
                   </View>
                 ) : (

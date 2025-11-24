@@ -99,24 +99,17 @@ export function useIngredientsData(ingredients: Ingredient[], loading: boolean =
 
   // 아코디언 상태 관리 - 로딩 중에는 모두 접힌 상태로 시작
   const [collapsedCategories, setCollapsedCategories] = useState<Set<Category>>(() =>
-    loading ? new Set(categoryOrder) : new Set()
+    loading ? new Set(categoryOrder) : new Set(),
   );
   const [collapsedStorages, setCollapsedStorages] = useState<Set<StorageLocationOrUnset>>(() =>
-    loading ? new Set(storageOrder) : new Set()
+    loading ? new Set(storageOrder) : new Set(),
   );
   const hasInitializedRef = useRef(false);
 
   // 재료 데이터가 로드되면 초기 상태 설정 (한 번만)
   useEffect(() => {
-    console.log('🔵 useEffect 실행됨');
-    console.log('hasInitializedRef.current:', hasInitializedRef.current);
-    console.log('loading:', loading);
-    console.log('ingredients.length:', ingredients.length);
-
     // 로딩이 완료되고 아직 초기화되지 않았을 때만 초기화
     if (!hasInitializedRef.current && !loading) {
-      console.log('🟢 초기화 시작');
-
       // 현재 재료를 기반으로 그룹화
       const grouped: Record<string, Ingredient[]> = {};
       ingredients.forEach((item) => {
@@ -134,7 +127,6 @@ export function useIngredientsData(ingredients: Ingredient[], loading: boolean =
       const collapsedCats = new Set<Category>();
       categoryOrder.forEach((cat) => {
         const hasItems = grouped[cat] && grouped[cat].length > 0;
-        console.log(`카테고리 ${cat}: ${grouped[cat]?.length || 0}개 - ${hasItems ? '펼침' : '접힘'}`);
         if (!hasItems) {
           collapsedCats.add(cat);
         }
@@ -143,19 +135,14 @@ export function useIngredientsData(ingredients: Ingredient[], loading: boolean =
       const collapsedStrs = new Set<StorageLocationOrUnset>();
       storageOrder.forEach((storage) => {
         const hasItems = groupedStorage[storage] && groupedStorage[storage].length > 0;
-        console.log(`보관위치 ${storage}: ${groupedStorage[storage]?.length || 0}개 - ${hasItems ? '펼침' : '접힘'}`);
         if (!hasItems) {
           collapsedStrs.add(storage);
         }
       });
 
-      console.log('접힌 카테고리:', Array.from(collapsedCats));
-      console.log('접힌 보관위치:', Array.from(collapsedStrs));
-
       setCollapsedCategories(collapsedCats);
       setCollapsedStorages(collapsedStrs);
       hasInitializedRef.current = true;
-      console.log('🟢 초기화 완료');
     }
   }, [loading, ingredients]);
 

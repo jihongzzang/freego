@@ -21,7 +21,6 @@ export const achievementMiddleware: Middleware<AchievementState, AchievementInte
     case 'LOAD_ACHIEVEMENTS':
     case 'REFRESH_ACHIEVEMENTS': {
       try {
-        console.log('🟡 LOAD_ACHIEVEMENTS (middleware)');
         const [achievements, statistics] = await Promise.all([
           achievementService.getAchievements(),
           achievementService.getStatistics(),
@@ -51,7 +50,6 @@ export const achievementMiddleware: Middleware<AchievementState, AchievementInte
 
     case 'CLAIM_BADGE': {
       try {
-        console.log('🎁 CLAIM_BADGE (middleware):', intent.payload.achievementId);
         const success = await achievementService.claimBadge(intent.payload.achievementId);
 
         if (success) {
