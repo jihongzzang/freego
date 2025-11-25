@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { useTheme } from '@/lib/theme';
 import BottomSheet from './ui/BottomSheet';
 import { StorageLocation } from '@/data/enums/storage_location';
@@ -32,6 +32,14 @@ export default function SelectStorageBottomSheet({
   const lang = i18n.language === 'ko' ? 'kr' : 'en';
   const storageLocations = makeStorageList({ lang });
 
+  const screenWidth = Dimensions.get('window').width;
+  const H_PADDING = spacing.xl * 2;
+  const GAP = 8;
+  const NUM_COLUMNS = 3;
+
+  // 약간의 여유 공간 추가
+  const ITEM_WIDTH = (screenWidth - H_PADDING - GAP * (NUM_COLUMNS - 1) - 24) / NUM_COLUMNS;
+
   return (
     <BottomSheet visible={visible} onClose={onClose} title={title} maxHeight={260}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -47,6 +55,8 @@ export default function SelectStorageBottomSheet({
               style={[
                 styles.locationCard,
                 {
+                  width: ITEM_WIDTH,
+                  height: 144,
                   backgroundColor: 'rgba(78, 89, 104 ,0.16)',
                   borderColor: 'transparent',
                   borderRadius: borderRadius.md,
@@ -84,8 +94,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between', // ✅ 가로 간격 균등
   },
   locationCard: {
-    width: '31%',
-    aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
